@@ -3,96 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH | Registro de Élite</title>
+    <title>K.B TECH | Activación de Nodo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
+        .color-dot.active { border-color: #000; transform: scale(1.2); }
+    </style>
 </head>
-<body class="bg-slate-900 p-6 md:p-20 flex items-center justify-center min-h-screen">
-    <div class="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl">
+<body class="bg-slate-900 p-6 flex items-center justify-center min-h-screen">
+    
+    <div id="registro-container" class="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl">
         <header class="mb-8 text-center">
             <h1 class="text-3xl font-black italic tracking-tighter">K.B <span class="text-indigo-600">TECH</span></h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronización Nodo 2.0</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configuración de Nodo Profesional</p>
         </header>
 
-        <form id="form-registro" class="space-y-4 text-left">
-            <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Nombre del Especialista</label>
-                <input type="text" id="nombre" placeholder="Ej: Dr. Toby" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-medium" required>
+        <form id="form-registro" class="space-y-4">
+            <input type="text" id="nombre" placeholder="Nombre del Médico" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-bold" required>
+            <input type="email" id="email" placeholder="Correo Profesional" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-bold" required>
+            <input type="text" id="especialidad" placeholder="Especialidad (Ej: Ginecología)" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-bold" required>
+            
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <p class="text-[9px] font-black text-slate-400 uppercase mb-3 tracking-widest">Selecciona tu Identidad Visual</p>
+                <div class="flex justify-between" id="color-selector">
+                    <div class="color-dot active" data-id="1" style="background: #0ea5e9;" title="Sky Knight"></div>
+                    <div class="color-dot" data-id="2" style="background: #f43f5e;" title="Rose Quartz"></div>
+                    <div class="color-dot" data-id="3" style="background: #10b981;" title="Emerald Sage"></div>
+                    <div class="color-dot" data-id="4" style="background: #1e3a8a;" title="Deep Ocean"></div>
+                    <div class="color-dot" data-id="5" style="background: #8b5cf6;" title="Lavender Zen"></div>
+                </div>
             </div>
-            <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Email de Acceso</label>
-                <input type="email" id="email" placeholder="doctor@ejemplo.com" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-medium" required>
+
+            <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                <p class="text-[9px] font-black text-indigo-600 uppercase mb-1">Inversión Mensual</p>
+                <p class="text-2xl font-black text-slate-800">$1,599 <span class="text-xs text-slate-400 italic font-normal">MXN/mes</span></p>
             </div>
-            <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Especialidad</label>
-                <input type="text" id="especialidad" placeholder="Ej: Cardiología" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-medium" required>
-            </div>
-            <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Plan de Red</label>
-                <select id="plan" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-bold bg-white text-indigo-600">
-                    <option value="Semilla" data-id="1">Plan Profesional (Indigo)</option>
-                    <option value="Dominio" data-id="2">Plan Dominio (Esmeralda)</option>
-                </select>
-            </div>
-            <button type="submit" id="btn" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl hover:bg-slate-900 transition-all">
-                Activar Nodo Médico
-            </button>
+
+            <button type="button" onclick="irAPagar()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-900 transition-all shadow-xl">Continuar al Pago</button>
         </form>
-        <div id="resultado" class="hidden mt-6 p-4 bg-slate-100 rounded-2xl break-all text-[9px] font-mono text-slate-500 border border-slate-200"></div>
+    </div>
+
+    <div id="modal-pago" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-[3rem] max-w-sm w-full shadow-2xl">
+            <h3 class="text-xl font-black mb-6 italic">Pago <span class="text-indigo-600">Seguro</span></h3>
+            <div class="space-y-4">
+                <input type="text" placeholder="Número de Tarjeta" class="w-full p-4 rounded-xl bg-slate-50 border-none text-sm font-mono">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" placeholder="MM/AA" class="p-4 rounded-xl bg-slate-50 border-none text-sm text-center">
+                    <input type="text" placeholder="CVV" class="p-4 rounded-xl bg-slate-50 border-none text-sm text-center">
+                </div>
+                <button onclick="finalizarCompra()" id="btn-final" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest">Pagar y Activar Nodo</button>
+                <button onclick="cerrarPago()" class="w-full text-[9px] font-bold text-slate-400 uppercase tracking-widest">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // TUS NUEVAS CREDENCIALES (IMAGEN #7 CORREGIDA)
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        let selectedTemplate = 1;
 
-        document.getElementById('form-registro').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn');
-            btn.innerText = "SINCRO EN CURSO..."; 
-            btn.disabled = true;
+        // Lógica del selector de colores
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                selectedTemplate = parseInt(dot.getAttribute('data-id'));
+            });
+        });
 
-            const sel = document.getElementById('plan');
+        function irAPagar() {
+            if(!document.getElementById('nombre').value || !document.getElementById('email').value) return alert("Completa los datos");
+            document.getElementById('modal-pago').classList.remove('hidden');
+        }
+
+        function cerrarPago() {
+            document.getElementById('modal-pago').classList.add('hidden');
+        }
+
+        async function finalizarCompra() {
+            const btn = document.getElementById('btn-final');
+            btn.innerText = "PROCESANDO PAGO..."; btn.disabled = true;
+
             const datos = {
                 nombre_doctor: document.getElementById('nombre').value,
                 email: document.getElementById('email').value,
                 especialidad: document.getElementById('especialidad').value,
-                plan: sel.value,
-                template_id: parseInt(sel.options[sel.selectedIndex].getAttribute('data-id'))
+                plan: 'Dominio',
+                template_id: selectedTemplate
             };
 
-            try {
-                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos`, {
-                    method: 'POST',
-                    headers: { 
-                        'apikey': KEY, 
-                        'Authorization': `Bearer ${KEY}`, 
-                        'Content-Type': 'application/json', 
-                        'Prefer': 'return=representation' 
-                    },
-                    body: JSON.stringify(datos)
-                });
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                body: JSON.stringify(datos)
+            });
 
-                if(res.ok) {
-                    const data = await res.json();
-                    const id = data[0].id;
-                    const base = window.location.href.split('registro.html')[0];
-                    const link = base + 'agendar.html?id=' + id;
-                    
-                    document.getElementById('resultado').classList.remove('hidden');
-                    document.getElementById('resultado').innerHTML = `<strong>LINK PARA PACIENTES:</strong><br>${link}`;
-                    alert("¡NODO MÉDICO ACTIVADO!");
-                } else {
-                    const errorData = await res.json();
-                    console.error("Error de Supabase:", errorData);
-                    alert("Error: Revisa que el email no esté repetido en la base.");
-                }
-            } catch (err) {
-                console.error("Error de conexión:", err);
-                alert("Fallo de conexión. Revisa el SQL de Supabase.");
+            if(res.ok) {
+                const data = await res.json();
+                const id = data[0].id;
+                const base = window.location.href.split('registro.html')[0];
+                alert("¡PAGO EXITOSO! Tu sistema K.B Tech ha sido activado.");
+                window.location.href = base + 'app.html?id=' + id;
+            } else {
+                alert("Error en el registro. Intenta otro correo.");
+                cerrarPago();
+                btn.innerText = "Pagar y Activar Nodo"; btn.disabled = false;
             }
-            btn.innerText = "Activar Nodo Médico"; 
-            btn.disabled = false;
-        });
+        }
     </script>
 </body>
 </html>
