@@ -3,135 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva tu Cita | K.B Tech</title>
+    <title>K.B Tech | Reservación de Élite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.5s; overflow-x: hidden; }
-        
-        /* Contenedores de Vida (Backgrounds dinámicos) */
-        .bg-element { position: fixed; z-index: -1; opacity: 0.15; pointer-events: none; transition: 1s; }
-        
-        /* Camaleón Estándar */
-        :root { --main: #6366f1; --soft: #f5f3ff; }
-        .text-main { color: var(--main); }
-        .bg-main { background-color: var(--main); }
-        .border-main { border-color: var(--main); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; background-color: #f8fafc; }
+        .bg-element { position: fixed; z-index: -1; opacity: 0.1; pointer-events: none; transition: 1.5s; filter: blur(4px); }
+        :root { --main: #6366f1; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.08); }
+        input { transition: 0.3s !important; }
+        input:focus { transform: scale(1.01); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="visual-1" class="bg-element top-[-5%] right-[-5%] text-[20rem] hidden">🌸</div>
-    <div id="visual-2" class="bg-element bottom-[-5%] left-[-5%] text-[15rem] hidden">🌿</div>
-    <div id="visual-3" class="bg-element top-[10%] left-[-10%] text-[20rem] opacity-[0.05] hidden">🧬</div>
+    <div id="visual-1" class="bg-element top-[-10%] right-[-10%] text-[30rem]"></div>
+    <div id="visual-2" class="bg-element bottom-[-10%] left-[-10%] text-[20rem]"></div>
 
-    <div class="max-w-md w-full bg-white/80 backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl border border-white relative">
-        <header class="text-center mb-8">
-            <div id="icon-header" class="text-4xl mb-2">🏥</div>
-            <h1 id="doc-name" class="text-2xl font-black tracking-tighter text-slate-800 uppercase italic">Cargando Especialista...</h1>
-            <p id="doc-esp" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Nodo Médico Sincronizado</p>
+    <div class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative z-10 border-t-8" id="card-border">
+        <header class="text-center mb-10">
+            <div id="icon-header" class="text-7xl mb-4 drop-shadow-xl animate-bounce" style="animation-duration: 3s;">🏥</div>
+            <h1 id="doc-name" class="text-3xl font-black tracking-tighter text-slate-800 uppercase italic">Conectando Nodo...</h1>
+            <p id="doc-esp" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic mt-2"></p>
         </header>
 
-        <form id="form-cita" class="space-y-4">
-            <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-4">Tu Nombre Completo</label>
-                <input type="text" id="nombre" class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 outline-none focus:border-main transition-all text-sm font-bold" required>
+        <form id="form-cita" class="space-y-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest italic">Nombre Completo</label>
+                <input type="text" id="nombre" placeholder="Tu nombre" class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-transparent focus:border-[var(--main)] focus:bg-white text-sm font-bold outline-none" required>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase text-slate-400 ml-4">Fecha</label>
-                    <input type="date" id="fecha" class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 text-xs font-bold" required>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest italic">Fecha</label>
+                    <input type="date" id="fecha" class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-transparent focus:border-[var(--main)] text-xs font-bold outline-none" required>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase text-slate-400 ml-4">Hora</label>
-                    <input type="time" id="hora" class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 text-xs font-bold" required>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest italic">Hora</label>
+                    <input type="time" id="hora" class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-transparent focus:border-[var(--main)] text-xs font-bold outline-none" required>
                 </div>
             </div>
 
-            <button type="submit" id="btn-submit" class="w-full py-5 bg-main text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl hover:scale-[1.02] transition-all">Confirmar Cita</button>
+            <button type="submit" id="btn-submit" class="w-full py-6 bg-[var(--main)] text-white rounded-[2.5rem] font-black uppercase text-xs tracking-widest shadow-2xl transition-all duration-500 hover:scale-105 active:scale-95" style="background-color: var(--main);">Confirmar Cita</button>
         </form>
 
-        <footer class="mt-8 text-center border-t border-slate-100 pt-6">
-            <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest mb-4">K.B TECH SOLUTIONS POWERED BY</p>
-            <button onclick="document.getElementById('modal-privacidad').classList.remove('hidden')" class="text-[9px] font-bold text-main underline uppercase">Aviso de Privacidad</button>
+        <footer class="mt-10 text-center border-t border-slate-100 pt-8">
+            <button onclick="document.getElementById('modal-privacidad').classList.remove('hidden')" class="text-[10px] font-black text-slate-400 underline uppercase tracking-widest hover:text-slate-600 transition">Aviso de Privacidad Especializado</button>
         </footer>
     </div>
 
-    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 z-50">
-        <div class="bg-white p-8 rounded-[2.5rem] max-w-sm w-full">
-            <h2 class="text-lg font-black mb-4 uppercase italic" id="priv-titulo">Protección de Datos</h2>
-            <p class="text-[11px] text-slate-500 leading-relaxed mb-6" id="priv-texto">
-                Tus datos de salud son sagrados. En esta plataforma, la información se encripta de punto a punto para asegurar que solo tu médico tenga acceso a tu historial.
-            </p>
-            <button onclick="document.getElementById('modal-privacidad').classList.add('hidden')" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase">Entendido</button>
+    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-6 z-50">
+        <div class="bg-white p-10 rounded-[3.5rem] max-w-sm w-full shadow-2xl border-b-8 border-[var(--main)]">
+            <h2 class="text-2xl font-black mb-4 uppercase italic tracking-tighter" id="priv-titulo">Protección de Datos</h2>
+            <p class="text-xs text-slate-500 leading-relaxed mb-8 italic" id="priv-texto"></p>
+            <button onclick="document.getElementById('modal-privacidad').classList.add('hidden')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest">Entendido</button>
         </div>
     </div>
 
     <script>
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
+        const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
 
-        const temas = {
-            1: { main: "#0ea5e9", icon: "💎", visuals: ["🔹", "🛡️"], priv: "Confidencialidad técnica y seguridad de grado médico para tu tranquilidad." },
-            2: { main: "#f43f5e", icon: "🌸", visuals: ["🌸", "✨"], priv: "Cuidamos tu información con la delicadeza y privacidad que tu salud merece." },
-            3: { main: "#10b981", icon: "🌿", visuals: ["🌿", "🍃"], priv: "Un entorno seguro y natural para la gestión de tu bienestar integral." },
-            4: { main: "#1e3a8a", icon: "⚖️", visuals: ["🏢", "💎"], priv: "Protocolos de alta seguridad corporativa aplicados a tu historial clínico." },
-            5: { main: "#8b5cf6", icon: "🔮", visuals: ["✨", "🧘‍♀️"], priv: "Privacidad premium en un espacio diseñado para tu comodidad y confianza." }
+        // MAPA MAESTRO DE 6 ESPECIALIDADES Y SUS TEMAS (Sincronizado con Registro)
+        const MAPA_ESTILOS = {
+            "Ginecología": { color: "#f43f5e", icon: "🌸", bg: "🌸", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad clínica." },
+            "Odontología": { color: "#0ea5e9", icon: "💎", bg: "🦷", priv: "Resguardamos tus registros dentales y radiográficos bajo protocolos de alta seguridad digital." },
+            "Pediatría": { color: "#fb923c", icon: "🧸", bg: "🎈", priv: "La privacidad de los más pequeños es sagrada. Seguridad total para datos pediátricos." },
+            "Cardiología": { color: "#e11d48", icon: "❤️", bg: "📈", priv: "Encriptación de grado médico para proteger tus datos vitales y diagnóstico cardíaco." },
+            "Bienestar (Nutri/Psico)": { color: "#059669", icon: "🧘‍♂️", bg: "🍃", priv: "Tus notas de consulta son encriptadas, asegurando que tu proceso de bienestar sea privado." },
+            "General": { color: "#6366f1", icon: "🏥", bg: "🧬", priv: "Seguridad digital de última generación para resguardar tu historial clínico con control total." }
         };
 
         async function init() {
             if(!docId) return;
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` }
             });
             const data = await res.json();
+            
             if(data.length > 0) {
                 const doc = data[0];
-                const t = temas[doc.template_id] || temas[1];
+                // Buscar estilo por especialidad, si no existe usa "General"
+                const estilo = MAPA_ESTILOS[doc.especialidad] || MAPA_ESTILOS["General"];
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad;
-                document.getElementById('icon-header').innerText = t.icon;
-                document.documentElement.style.setProperty('--main', t.main);
-                
-                // Aplicar Visuales de Fondo
-                document.getElementById('visual-1').innerText = t.visuals[0];
-                document.getElementById('visual-1').classList.remove('hidden');
-                document.getElementById('visual-2').innerText = t.visuals[1];
-                document.getElementById('visual-2').classList.remove('hidden');
+                document.getElementById('icon-header').innerText = estilo.icon;
+                document.documentElement.style.setProperty('--main', estilo.color);
+                document.getElementById('card-border').style.borderColor = estilo.color;
 
-                // Personalizar Privacidad
-                document.getElementById('priv-texto').innerText = t.priv;
-                document.getElementById('priv-titulo').style.color = t.main;
+                // Visuales de fondo
+                document.getElementById('visual-1').innerText = estilo.bg;
+                document.getElementById('visual-2').innerText = estilo.icon;
+
+                // Modal Privacidad
+                document.getElementById('priv-texto').innerText = estilo.priv;
+                document.getElementById('priv-titulo').style.color = estilo.color;
             }
         }
 
         document.getElementById('form-cita').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "SINCRONIZANDO..."; btn.disabled = true;
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
 
-            const nuevaCita = {
-                doctor_id: docId,
-                nombre_paciente: document.getElementById('nombre').value,
-                fecha: document.getElementById('fecha').value,
-                hora: document.getElementById('hora').value,
-                pagado: false
-            };
-
-            const res = await fetch(`${URL}/rest/v1/Citas`, {
+            const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
                 method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevaCita)
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    doctor_id: docId,
+                    nombre_paciente: document.getElementById('nombre').value,
+                    fecha: document.getElementById('fecha').value,
+                    hora: document.getElementById('hora').value,
+                    pagado: false
+                })
             });
 
             if(res.ok) {
-                alert("¡Cita confirmada! El consultorio ha sido notificado.");
+                alert("¡CITA REGISTRADA!\nEl consultorio ha sido notificado.");
                 location.reload();
             } else {
-                alert("Error al agendar.");
+                alert("Error de conexión.");
                 btn.innerText = "Confirmar Cita"; btn.disabled = false;
             }
         });
