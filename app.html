@@ -191,12 +191,14 @@
             syncMaster();
         }
 
-        function copiarLinkCitas() {
-            const link = window.location.origin + "/agendar.html?id=" + docId;
-            navigator.clipboard.writeText(link);
-            alert("✅ Link de Reservación copiado.");
-        }
-
+   function copiarLinkCitas() {
+    // Obtenemos la ruta actual sin el nombre del archivo final
+    const path = window.location.pathname.split('/').slice(0, -1).join('/');
+    const link = window.location.origin + path + "/agendar.html?id=" + docId;
+    
+    navigator.clipboard.writeText(link);
+    alert("✅ Link de Reservación copiado.");
+}
         async function cambiarPin() {
             const nuevoPin = prompt("Ingrese nuevo PIN (4 dígitos):");
             if (nuevoPin && nuevoPin.length === 4) {
