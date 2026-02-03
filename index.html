@@ -3,64 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH 2.0 | Registro</title>
+    <title>K.B TECH SOLUTIONS | Sistemas Médicos de Élite</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #ffffff; color: #1e293b; scroll-behavior: smooth; overflow-x: hidden; }
+        .gradient-text { background: linear-gradient(90deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .kb-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f1f5f9; }
+        .kb-card:hover { transform: translateY(-15px); box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.2); border-color: #6366f1; }
+        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .feature-icon { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .hero-mesh { background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0, transparent 50%); }
+    </style>
 </head>
-<body class="bg-slate-900 p-6 md:p-20 flex items-center justify-center min-h-screen">
-    <div class="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl">
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-black italic tracking-tighter">K.B <span class="text-indigo-600">TECH</span></h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronización de Nuevo Nodo</p>
-        </header>
+<body class="hero-mesh text-left">
 
-        <form id="form-registro" class="space-y-4">
-            <input type="text" id="nombre" placeholder="Nombre del Médico" class="w-full p-4 rounded-xl border border-slate-200 text-sm" required>
-            <input type="email" id="email" placeholder="Correo Electrónico" class="w-full p-4 rounded-xl border border-slate-200 text-sm" required>
-            <input type="text" id="especialidad" placeholder="Especialidad" class="w-full p-4 rounded-xl border border-slate-200 text-sm" required>
-            <select id="plan" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-bold bg-white">
-                <option value="Semilla" data-id="1">Plan Profesional (Indigo)</option>
-                <option value="Dominio" data-id="2">Plan Dominio (Esmeralda)</option>
-            </select>
-            <button type="submit" id="btn" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all">Activar Red</button>
-        </form>
-        <div id="resultado" class="hidden mt-6 p-4 bg-slate-100 rounded-xl break-all text-[10px] font-mono text-slate-600"></div>
-    </div>
+    <nav class="fixed top-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+            <h1 id="master-logo" onclick="activarProtocoloSecreto()" class="text-3xl font-black italic tracking-tighter cursor-pointer select-none">
+                K.B <span class="gradient-text">TECH</span>
+            </h1>
+            <div class="hidden md:flex space-x-10 items-center">
+                <a href="#servicios" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Sincronía</a>
+                <a href="#facturacion" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Facturación</a>
+                <a href="#precios" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Planes</a>
+                <button onclick="window.location.href='registro.html'" class="px-8 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition active:scale-95">Activar Ahora</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-48 pb-32 px-8 text-center max-w-5xl mx-auto">
+        <span class="inline-block px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.4em] mb-6">Tijuana Health Tech · 2026</span>
+        <h2 class="text-7xl md:text-8xl font-black tracking-tighter text-slate-900 mb-8 leading-none">
+            Transformamos tu consultorio en una <span class="gradient-text italic">potencia digital.</span>
+        </h2>
+        <p class="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
+            No somos un software, somos el estándar de lujo en gestión médica. Diseñado para los doctores que no se conforman con menos.
+        </p>
+    </section>
+
+    <section id="facturacion" class="max-w-7xl mx-auto px-8 py-24">
+        <div class="bg-slate-900 rounded-[4rem] p-12 md:p-20 flex flex-col md:flex-row items-center gap-16 overflow-hidden relative">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600/20 blur-[120px] rounded-full"></div>
+            <div class="flex-1 relative z-10 text-left">
+                <h3 class="text-white text-4xl font-black mb-6 tracking-tighter">Facturación Inteligente para <span class="text-indigo-400">Asistentes.</span></h3>
+                <p class="text-slate-400 mb-8 text-lg font-medium leading-relaxed">Genera recibos profesionales en segundos. Multi-plataforma: Tu asistente factura desde la tablet mientras tú consultas en tu PC. Seguridad absoluta con códigos de operación únicos.</p>
+                <div class="flex gap-4">
+                    <div class="p-4 bg-slate-800 rounded-2xl border border-slate-700">
+                        <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Status</p>
+                        <p class="text-xs text-white font-bold">Sincronización 1:1</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 w-full bg-slate-800 h-64 rounded-3xl border border-slate-700 shadow-2xl flex items-center justify-center italic text-slate-500 font-bold text-sm">
+                [ Simulación Interfaz de Facturación K.B ]
+            </div>
+        </div>
+    </section>
+
+    <section id="precios" class="max-w-7xl mx-auto px-8 py-32 text-center">
+        <h3 class="text-5xl font-black tracking-tighter mb-20 text-slate-900">Licencias de <span class="gradient-text">Alto Rendimiento.</span></h3>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="kb-card bg-white p-12 rounded-[3.5rem] flex flex-col h-full text-left">
+                <div class="w-12 h-12 feature-icon rounded-2xl mb-8 flex items-center justify-center text-white text-2xl font-bold">1</div>
+                <h4 class="text-2xl font-black mb-1">Plan Individual</h4>
+                <p class="text-4xl font-black mb-8">$999 <span class="text-xs text-slate-300">MXN/mes</span></p>
+                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <li class="flex items-center text-indigo-600"><span class="mr-2">✓</span> Licencia: 1 Médico</li>
+                    <li>✓ Agenda Camaleón (5 Colores)</li>
+                    <li>✓ 1 Acceso Asistente</li>
+                    <li>✓ Soporte Estándar</li>
+                </ul>
+                <button onclick="window.location.href='registro.html'" class="w-full py-5 border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition">Comenzar</button>
+            </div>
+
+            <div class="kb-card bg-white p-12 rounded-[3.5rem] flex flex-col h-full border-2 border-indigo-500 relative text-left scale-105 z-10">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-6 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.3em]">Más Solicitado en Tijuana</div>
+                <div class="w-12 h-12 feature-icon rounded-2xl mb-8 flex items-center justify-center text-white text-2xl font-bold">50</div>
+                <h4 class="text-2xl font-black mb-1">Plan Dominio</h4>
+                <p class="text-4xl font-black mb-8 text-indigo-600">$1,599 <span class="text-xs text-slate-300">MXN/mes</span></p>
+                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-bold text-slate-900 uppercase tracking-widest">
+                    <li class="flex items-center text-indigo-600"><span class="mr-2">✓</span> Licencia: Hasta 50 Médicos</li>
+                    <li class="flex items-center text-indigo-600"><span class="mr-2">✓</span> Multi-Asistente Ilimitado</li>
+                    <li>✓ Módulo de Facturación Pro</li>
+                    <li>✓ Confirmación WhatsApp</li>
+                </ul>
+                <button onclick="window.location.href='registro.html'" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition">Dominar Ahora</button>
+            </div>
+
+            <div class="kb-card bg-slate-900 p-12 rounded-[3.5rem] flex flex-col h-full text-white text-left">
+                <div class="w-12 h-12 bg-white/10 rounded-2xl mb-8 flex items-center justify-center text-white text-2xl font-bold">∞</div>
+                <h4 class="text-2xl font-black mb-1">Plan Élite</h4>
+                <p class="text-4xl font-black mb-8 text-indigo-400">Personalizado</p>
+                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <li class="text-white">✓ Médicos Ilimitados</li>
+                    <li class="text-white">✓ Servidor Dedicado</li>
+                    <li>✓ Diseño de Interfaz Único</li>
+                    <li>✓ Soporte 24/7 Priority</li>
+                </ul>
+                <button onclick="window.location.href='https://wa.me/tu-numero'" class="w-full py-5 bg-white text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-50 transition">Contactar CEO</button>
+            </div>
+        </div>
+
+        <div class="max-w-2xl mx-auto p-6 bg-indigo-50/50 rounded-3xl border border-indigo-100 mt-16 text-left">
+            <h4 class="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-2 text-left">Transición Sin Fricción</h4>
+            <p class="text-[10px] text-slate-500 leading-relaxed font-bold text-left">
+                ¿Usas otras plataformas? Nuestro protocolo de <span class="text-indigo-600">Migración Inteligente</span> transfiere tus pacientes y citas en minutos. Sin pérdida de información.
+            </p>
+        </div>
+    </section>
+
+    <footer class="pt-32 pb-10 px-8 border-t border-slate-100 bg-white">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+            <div class="text-left">
+                <h4 class="text-2xl font-black italic mb-4">K.B <span class="text-indigo-600">TECH</span></h4>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">Sincronía Médica · Tijuana, BC</p>
+            </div>
+            <div class="text-center md:text-right">
+                <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-300">Powered by K.B Tech Solutions &copy; 2026</p>
+                <p class="text-[8px] font-bold text-slate-400 mt-2 hover:text-indigo-600 cursor-pointer transition uppercase tracking-widest">Aviso de Privacidad / Términos</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
-
-        document.getElementById('form-registro').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn');
-            btn.innerText = "SINCRO EN CURSO..."; btn.disabled = true;
-
-            const sel = document.getElementById('plan');
-            const datos = {
-                nombre_doctor: document.getElementById('nombre').value,
-                email: document.getElementById('email').value,
-                especialidad: document.getElementById('especialidad').value,
-                plan: sel.value,
-                template_id: parseInt(sel.options[sel.selectedIndex].getAttribute('data-id'))
-            };
-
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos`, {
-                method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-                body: JSON.stringify(datos)
-            });
-
-            if(res.ok) {
-                const data = await res.json();
-                const id = data[0].id;
-                const base = window.location.href.split('registro.html')[0];
-                const link = base + 'agendar.html?id=' + id;
-                document.getElementById('resultado').classList.remove('hidden');
-                document.getElementById('resultado').innerText = "URL PARA PACIENTES: " + link;
-                alert("¡NODO ACTIVADO EXITOSAMENTE!");
-            } else { alert("Error: Revisa el correo o la conexión a la base."); }
-            btn.innerText = "Activar Red"; btn.disabled = false;
-        });
+        let clics = 0;
+        function activarProtocoloSecreto() {
+            clics++;
+            if (clics === 3) {
+                const pin = prompt("PROTOCOLO DE SEGURIDAD K.B ACTIVADO\nINGRESE CÓDIGO MAESTRO:");
+                if (pin === "2026") { 
+                    window.location.href = 'secreto.html';
+                } else {
+                    alert("ACCESO DENEGADO");
+                    clics = 0;
+                }
+            }
+            setTimeout(() => { clics = 0; }, 2000);
+        }
     </script>
 </body>
 </html>
