@@ -104,33 +104,50 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
-        const CATALOGO = {
-            "Ginecología": [
-                { id: 2, color: "#f43f5e", icon: "🌸", bg: "🌸", desc: "Rose Quartz: Delicadeza y confianza absoluta.", tag: "Floral" },
-                { id: 5, color: "#8b5cf6", icon: "🔮", bg: "✨", desc: "Lavender Silk: Sofisticación y calma boutique.", tag: "Boutique" }
-            ],
-            "Odontología": [
-                { id: 1, color: "#0ea5e9", icon: "💎", bg: "🦷", desc: "Arctic Bright: Limpieza extrema y tecnología.", tag: "Clínico" },
-                { id: 3, color: "#10b981", icon: "🌿", bg: "🍃", desc: "Emerald Fresh: Frescura y salud dental.", tag: "Orgánico" }
-            ],
-            "Pediatría": [
-                { id: 2, color: "#fb923c", icon: "🧸", bg: "🎈", desc: "Sunny Kids: Un entorno alegre y sin miedo.", tag: "Infantil" },
-                { id: 1, color: "#38bdf8", icon: "🚀", bg: "☁️", desc: "Sky Dreams: Confianza y juego.", tag: "Lúdico" }
-            ],
-            "Cardiología": [
-                { id: 4, color: "#e11d48", icon: "❤️", bg: "📈", desc: "Vital Pulse: Alta tecnología cardíaca.", tag: "Precisión" },
-                { id: 4, color: "#1e293b", icon: "⚡", bg: "🧬", desc: "Tech Heart: Seriedad y vanguardia.", tag: "Digital" }
-            ],
-            "Bienestar (Nutri/Psico)": [
-                { id: 3, color: "#059669", icon: "🧘‍♂️", bg: "🍃", desc: "Zen Leaf: Equilibrio y paz mental.", tag: "Holístico" },
-                { id: 5, color: "#a855f7", icon: "🧠", bg: "✨", desc: "Mind Flow: Crecimiento seguro.", tag: "Mental" }
-            ],
-            "General": [
-                { id: 4, color: "#1e3a8a", icon: "⚖️", bg: "🛡️", desc: "Deep Ocean: Autoridad médica.", tag: "Sólido" },
-                { id: 1, color: "#6366f1", icon: "🏥", bg: "🧬", desc: "Tech Navy: Innovación digital.", tag: "Moderno" }
-            ]
-        };
-
+       const CATALOGO = {
+    "Ginecología": [
+        { id: 2, color: "#f43f5e", icon: "🌸", bg: "🌸", desc: "Rose Quartz: Delicadeza y confianza absoluta.", tag: "Floral" },
+        { id: 5, color: "#8b5cf6", icon: "🔮", bg: "✨", desc: "Lavender Silk: Sofisticación y calma boutique.", tag: "Boutique" },
+        { id: 2, color: "#fb7185", icon: "🌷", bg: "🎀", desc: "Pink Velvet: Suavidad y atención prenatal.", tag: "Maternal" },
+        { id: 3, color: "#059669", icon: "🍃", bg: "🌿", desc: "Nature Essence: Salud femenina orgánica.", tag: "Orgánico" },
+        { id: 4, color: "#1e293b", icon: "💎", bg: "🛡️", desc: "Premium Care: Discreción de alta gama.", tag: "Élite" }
+    ],
+    "Odontología": [
+        { id: 1, color: "#0ea5e9", icon: "💎", bg: "🦷", desc: "Arctic Bright: Limpieza extrema y tecnología.", tag: "Clínico" },
+        { id: 3, color: "#10b981", icon: "🌿", bg: "🍃", desc: "Emerald Fresh: Frescura y salud dental.", tag: "Orgánico" },
+        { id: 1, color: "#22d3ee", icon: "❄️", bg: "✨", desc: "Ice Smile: Estética y blanqueamiento.", tag: "Estético" },
+        { id: 4, color: "#1e3a8a", icon: "🛡️", bg: "🦾", desc: "Titanium Pro: Cirugía e implantes.", tag: "Cirugía" },
+        { id: 1, color: "#6366f1", icon: "⚡", bg: "🧬", desc: "Digital Dentist: Innovación 3D.", tag: "Tech" }
+    ],
+    "Pediatría": [
+        { id: 2, color: "#fb923c", icon: "🧸", bg: "🎈", desc: "Sunny Kids: Un entorno alegre y sin miedo.", tag: "Infantil" },
+        { id: 1, color: "#38bdf8", icon: "🚀", bg: "☁️", desc: "Sky Dreams: Confianza y juego.", tag: "Lúdico" },
+        { id: 3, color: "#4ade80", icon: "🦖", bg: "🌳", desc: "Dino Jungle: Aventura en el consultorio.", tag: "Aventura" },
+        { id: 2, color: "#f472b6", icon: "🍭", bg: "✨", desc: "Candy Health: Dulzura y cuidado.", tag: "Tierno" },
+        { id: 5, color: "#818cf8", icon: "🌙", bg: "⭐", desc: "Starry Night: Calma para los más pequeños.", tag: "Paz" }
+    ],
+    "Cardiología": [
+        { id: 4, color: "#e11d48", icon: "❤️", bg: "📈", desc: "Vital Pulse: Alta tecnología cardíaca.", tag: "Precisión" },
+        { id: 4, color: "#1e293b", icon: "⚡", bg: "🧬", desc: "Tech Heart: Seriedad y vanguardia.", tag: "Digital" },
+        { id: 1, color: "#0284c7", icon: "🌊", bg: "❄️", desc: "Flow System: Circulación y salud.", tag: "Vascular" },
+        { id: 4, color: "#9f1239", icon: "🩸", bg: "💉", desc: "Deep Crimson: Especialidad en sangre.", tag: "Hematología" },
+        { id: 1, color: "#4f46e5", icon: "🛰️", bg: "📡", desc: "Cyber Cardio: Monitoreo remoto Pro.", tag: "Remoto" }
+    ],
+    "Bienestar (Nutri/Psico)": [
+        { id: 3, color: "#059669", icon: "🧘‍♂️", bg: "🍃", desc: "Zen Leaf: Equilibrio y paz mental.", tag: "Holístico" },
+        { id: 5, color: "#a855f7", icon: "🧠", bg: "✨", desc: "Mind Flow: Crecimiento seguro.", tag: "Mental" },
+        { id: 3, color: "#fbbf24", icon: "🍎", bg: "☀️", desc: "Vital Food: Nutrición energética.", tag: "Nutrición" },
+        { id: 1, color: "#0ea5e9", icon: "🌊", bg: "💧", desc: "Deep Therapy: Inmersión emocional.", tag: "Terapia" },
+        { id: 3, color: "#10b981", icon: "🥑", bg: "🥗", desc: "Clean Eating: Estilo de vida fit.", tag: "Fitness" }
+    ],
+    "General": [
+        { id: 4, color: "#1e3a8a", icon: "⚖️", bg: "🛡️", desc: "Deep Ocean: Autoridad médica.", tag: "Sólido" },
+        { id: 1, color: "#6366f1", icon: "🏥", bg: "🧬", desc: "Tech Navy: Innovación digital.", tag: "Moderno" },
+        { id: 3, color: "#10b981", icon: "🩺", bg: "🏥", desc: "Clinic Green: Salud primaria.", tag: "Básico" },
+        { id: 2, color: "#be123c", icon: "🚑", bg: "🚨", desc: "Urgency Red: Atención inmediata.", tag: "Urgencias" },
+        { id: 5, color: "#4338ca", icon: "🏢", bg: "🏬", desc: "City Medical: Red hospitalaria.", tag: "Corporativo" }
+    ]
+};
         let currentSelection = { template_id: 2, color: "#f43f5e" };
 
         function cambiarCatalogo() {
