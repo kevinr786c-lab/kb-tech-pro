@@ -8,39 +8,36 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; transition: 0.5s; }
-        
         .preview-phone { width: 260px; height: 500px; border: 12px solid #1e293b; border-radius: 3rem; position: relative; overflow: hidden; background: #f8fafc; transition: 0.5s; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5); }
         .color-dot { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
         .color-dot.active { border-color: white; transform: scale(1.2); box-shadow: 0 0 20px rgba(99,102,241,0.5); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
-        
         #prev-bg-icon { transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
 
     <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        
         <div class="lg:col-span-7 space-y-8">
             <header>
-                <h1 class="text-5xl font-black italic tracking-tighter mb-2">K.B <span class="text-indigo-400 text-main-dynamic">TECH</span></h1>
-                <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold">Plataforma de Gestión Médica de Élite</p>
+                <h1 class="text-5xl font-black italic tracking-tighter mb-2 italic">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
+                <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold">Gestión Médica de Élite</p>
             </header>
 
             <form id="form-registro" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase text-slate-500 ml-4">Nombre del Especialista</label>
-                        <input type="text" id="nombre" placeholder="Ej. Dr. Kevin Rivera" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-indigo-500 transition-all text-sm font-bold text-white">
+                        <input type="text" id="nombre" placeholder="Ej. Dr. Kevin Rivera" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-white transition-all text-sm font-bold text-white">
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase text-slate-500 ml-4">Especialidad</label>
-                        <select id="especialidad" onchange="cambiarCatalogo()" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-indigo-500 text-sm font-bold text-white appearance-none">
+                        <select id="especialidad" onchange="cambiarCatalogo()" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none text-sm font-bold text-white appearance-none">
                             <option value="Ginecología">Ginecología</option>
                             <option value="Odontología">Odontología</option>
                             <option value="Pediatría">Pediatría</option>
                             <option value="Cardiología">Cardiología</option>
-                            <option value="Bienestar (Nutri/Psico)">Bienestar (Nutri/Psico)</option>
+                            <option value="Bienestar">Bienestar</option>
                             <option value="General">Medicina General</option>
                         </select>
                     </div>
@@ -48,7 +45,7 @@
 
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
-                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em]">Personalización Atmosférica</p>
+                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em]">Ambiente Atmosférico</p>
                         <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white">Seleccione un estilo</span>
                     </div>
                     <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
@@ -56,43 +53,21 @@
 
                 <div class="flex items-center gap-6 p-6 bg-indigo-500/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
-                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1">Plan de Suscripción Nodo Pro</p>
+                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Activación de Nodo Pro</p>
                         <p class="text-4xl font-black text-white">$1,599 <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span></p>
                     </div>
-                    <button type="button" onclick="procesarPago()" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-[0_20px_40px_rgba(99,102,241,0.3)] hover:bg-indigo-400 hover:scale-105 transition-all">Activar Nodo</button>
+                    <button type="button" onclick="procesarPago(event)" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all">Activar</button>
                 </div>
             </form>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col items-center justify-center space-y-8">
-            <div class="text-center px-4">
-                <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Simulación de Experiencia</p>
-                <p id="prev-privacidad" class="text-[9px] text-indigo-200 italic leading-tight max-w-[250px] mx-auto"></p>
-            </div>
-            
+        <div class="lg:col-span-5 flex flex-col items-center">
             <div id="preview-box" class="preview-phone">
-                <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-10 pointer-events-none select-none">🌸</div>
-                
-                <div class="p-8 text-slate-800 space-y-8 relative h-full flex flex-col justify-center bg-white/90">
-                    <div class="text-center space-y-2">
-                        <div id="prev-icon" class="text-5xl mb-4">🏥</div>
-                        <div class="h-5 w-40 bg-slate-200 rounded-full mx-auto"></div>
-                        <div class="h-2 w-24 bg-slate-100 rounded-full mx-auto"></div>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div class="h-12 w-full bg-white rounded-2xl border-2 border-slate-50 shadow-sm"></div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="h-12 w-full bg-white rounded-2xl border-2 border-slate-50 shadow-sm"></div>
-                            <div class="h-12 w-full bg-white rounded-2xl border-2 border-slate-50 shadow-sm"></div>
-                        </div>
-                    </div>
-
-                    <div id="prev-button" class="h-14 w-full rounded-[1.5rem] shadow-xl transition-all duration-500"></div>
-                    
-                    <div class="text-center pt-4">
-                        <p class="text-[8px] font-black text-slate-300 uppercase">Powered by K.B Tech Solutions</p>
-                    </div>
+                <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-5 text-slate-900 pointer-events-none select-none">🏥</div>
+                <div class="p-8 text-slate-800 space-y-8 relative h-full flex flex-col justify-center bg-white/90 text-center">
+                    <div id="prev-icon" class="text-5xl mb-4">🏥</div>
+                    <div class="h-5 w-40 bg-slate-200 rounded-full mx-auto"></div>
+                    <div id="prev-button" class="h-14 w-full rounded-[1.5rem] shadow-xl transition-all"></div>
                 </div>
             </div>
         </div>
@@ -103,127 +78,75 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
         const CATALOGO = {
-            "Ginecología": [
-                { id: 2, color: "#f43f5e", icon: "🌸", bg: "🌸", desc: "Rose Quartz", tag: "Floral", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad. Garantizamos un entorno seguro." },
-                { id: 5, color: "#8b5cf6", icon: "🔮", bg: "✨", desc: "Lavender Silk", tag: "Boutique", priv: "Resguardamos tu información con la elegancia y discreción que mereces, asegurando un proceso privado." },
-                { id: 2, color: "#fb7185", icon: "🌷", bg: "🎀", desc: "Pink Velvet", tag: "Maternal", priv: "Tu intimidad es nuestra prioridad. Cuidamos tu proceso de salud con absoluta reserva profesional." },
-                { id: 3, color: "#059669", icon: "🍃", bg: "🌿", desc: "Nature Essence", tag: "Orgánico", priv: "Salud femenina en equilibrio. Tus datos están protegidos bajo estándares de ética y privacidad." },
-                { id: 4, color: "#1e293b", icon: "💎", bg: "🛡️", desc: "Premium Care", tag: "Élite", priv: "Protocolos de alta seguridad para la gestión confidencial de tu historial clínico especializado." }
-            ],
-            "Odontología": [
-                { id: 1, color: "#0ea5e9", icon: "💎", bg: "🦷", desc: "Arctic Bright", tag: "Clínico", priv: "Resguardamos tus registros radiográficos y dentales bajo estrictos protocolos de seguridad digital." },
-                { id: 3, color: "#10b981", icon: "🌿", bg: "🍃", desc: "Emerald Fresh", tag: "Orgánico", priv: "Tu historial dental está protegido en un entorno digital enfocado en tu bienestar y salud bucal." },
-                { id: 1, color: "#22d3ee", icon: "❄️", bg: "✨", desc: "Ice Smile", tag: "Estético", priv: "Protección total para tu diagnóstico estético. Tus datos están seguros con nuestra tecnología." },
-                { id: 4, color: "#1e3a8a", icon: "🛡️", bg: "🦾", desc: "Titanium Pro", tag: "Cirugía", priv: "Seguridad avanzada para datos de procedimientos quirúrgicos e implantes de alta precisión." },
-                { id: 1, color: "#6366f1", icon: "⚡", bg: "🧬", desc: "Digital Dentist", tag: "Tech", priv: "Innovación 3D resguardada. Tus diagnósticos digitales están protegidos por encriptación médica." }
-            ],
-            "Pediatría": [
-                { id: 2, color: "#fb923c", icon: "🧸", bg: "🎈", desc: "Sunny Kids", tag: "Infantil", priv: "La privacidad de los más pequeños es sagrada. Cumplimos con los estándares de protección para menores." },
-                { id: 1, color: "#38bdf8", icon: "🚀", bg: "☁️", desc: "Sky Dreams", tag: "Lúdico", priv: "Información infantil protegida. Solo tutores y médicos autorizados tienen acceso al historial." },
-                { id: 3, color: "#4ade80", icon: "🦖", bg: "🌳", desc: "Dino Jungle", tag: "Aventura", priv: "Seguridad y confianza para el cuidado de los niños. Datos resguardados con absoluta ética." },
-                { id: 2, color: "#f472b6", icon: "🍭", bg: "✨", desc: "Candy Health", tag: "Tierno", priv: "Tratamos los datos pediátricos con la misma ternura y seguridad que a nuestros pacientes." },
-                { id: 5, color: "#818cf8", icon: "🌙", bg: "⭐", desc: "Starry Night", tag: "Paz", priv: "Un entorno sereno y protegido para el resguardo de la salud y privacidad infantil." }
-            ],
-            "Cardiología": [
-                { id: 4, color: "#e11d48", icon: "❤️", bg: "📈", desc: "Vital Pulse", tag: "Precisión", priv: "Utilizamos encriptación de grado médico para proteger tus datos vitales y diagnóstico cardíaco." },
-                { id: 4, color: "#1e293b", icon: "⚡", bg: "🧬", desc: "Tech Heart", tag: "Digital", priv: "Tu salud cardiovascular es monitoreada bajo estándares tecnológicos de alta seguridad." },
-                { id: 1, color: "#0284c7", icon: "🌊", bg: "❄️", desc: "Flow System", tag: "Vascular", priv: "Seguridad avanzada para la gestión de datos circulatorios y sistemas de salud vital." },
-                { id: 4, color: "#9f1239", icon: "🩸", bg: "💉", desc: "Deep Crimson", tag: "Hematología", priv: "Resguardo ético de tus análisis y datos sanguíneos bajo protocolos de máxima reserva." },
-                { id: 1, color: "#4f46e5", icon: "🛰️", bg: "📡", desc: "Cyber Cardio", tag: "Remoto", priv: "Tecnología satelital aplicada a la seguridad de tu monitoreo cardíaco en tiempo real." }
-            ],
-            "Bienestar (Nutri/Psico)": [
-                { id: 3, color: "#059669", icon: "🧘‍♂️", bg: "🍃", desc: "Zen Leaf", tag: "Holístico", priv: "Tus notas de consulta son encriptadas, asegurando que tu proceso de bienestar sea privado y ético." },
-                { id: 5, color: "#a855f7", icon: "🧠", bg: "✨", desc: "Mind Flow", tag: "Mental", priv: "Tu crecimiento personal ocurre en un espacio seguro. Protegemos tu historia emocional con confidencialidad." },
-                { id: 3, color: "#fbbf24", icon: "🍎", bg: "☀️", desc: "Vital Food", tag: "Nutrición", priv: "Planes alimenticios resguardados. Tu transformación física está protegida en nuestra nube privada." },
-                { id: 1, color: "#0ea5e9", icon: "🌊", bg: "💧", desc: "Deep Therapy", tag: "Terapia", priv: "Confidencialidad absoluta para tu sanación. Tus datos emocionales están encriptados." },
-                { id: 3, color: "#10b981", icon: "🥑", bg: "🥗", desc: "Clean Eating", tag: "Fitness", priv: "Privacidad integral para tu estilo de vida saludable. Datos seguros de principio a fin." }
-            ],
-            "General": [
-                { id: 4, color: "#1e3a8a", icon: "⚖️", bg: "🛡️", desc: "Deep Ocean", tag: "Sólido", priv: "Tus datos personales y notas de consulta son encriptados para asegurar un proceso ético." },
-                { id: 1, color: "#6366f1", icon: "🏥", bg: "🧬", desc: "Tech Navy", tag: "Moderno", priv: "Implementamos seguridad digital de última generación para resguardar tu historial clínico con control." },
-                { id: 3, color: "#10b981", icon: "🩺", bg: "🏥", desc: "Clinic Green", tag: "Básico", priv: "Atención primaria con seguridad avanzada. Tu salud y tus datos están en buenas manos." },
-                { id: 2, color: "#be123c", icon: "🚑", bg: "🚨", desc: "Urgency Red", tag: "Urgencias", priv: "Seguridad inmediata para datos críticos en situaciones de emergencia médica." },
-                { id: 5, color: "#4338ca", icon: "🏢", bg: "🏬", desc: "City Medical", tag: "Corporativo", priv: "Protección de datos a escala corporativa para redes de salud conectadas y seguras." }
-            ]
+            "Ginecología": [{ id: 2, color: "#f43f5e", icon: "🌸", tag: "Floral" }, { id: 5, color: "#8b5cf6", icon: "🔮", tag: "Boutique" }],
+            "Odontología": [{ id: 1, color: "#0ea5e9", icon: "💎", tag: "Arctic" }, { id: 3, color: "#10b981", icon: "🌿", tag: "Emerald" }],
+            "Pediatría": [{ id: 2, color: "#fb923c", icon: "🧸", tag: "Infantil" }, { id: 1, color: "#38bdf8", icon: "🚀", tag: "Lúdico" }],
+            "General": [{ id: 4, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" }, { id: 1, color: "#6366f1", icon: "🏥", tag: "Moderno" }]
         };
 
-        let currentSelection = { template_id: 2, color: "#f43f5e", privacidad: "" };
+        let currentSelection = { template_id: 1, color: "#6366f1" };
 
         function cambiarCatalogo() {
             const esp = document.getElementById('especialidad').value;
             const contenedor = document.getElementById('contenedor-colores');
             const temas = CATALOGO[esp] || CATALOGO["General"];
-            
             contenedor.innerHTML = "";
             temas.forEach((t, index) => {
                 const dot = document.createElement('div');
                 dot.className = `color-dot ${index === 0 ? 'active' : ''}`;
                 dot.style.backgroundColor = t.color;
-                dot.onclick = () => actualizarSimulador(t, dot);
+                dot.onclick = () => {
+                    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+                    dot.classList.add('active');
+                    currentSelection = { template_id: t.id, color: t.color };
+                    document.getElementById('prev-button').style.backgroundColor = t.color;
+                    document.getElementById('prev-icon').innerText = t.icon;
+                    document.getElementById('theme-tag').innerText = t.tag;
+                    document.getElementById('text-logo').style.color = t.color;
+                };
                 contenedor.appendChild(dot);
-                if(index === 0) actualizarSimulador(t, dot);
+                if(index === 0) dot.click();
             });
         }
 
-        function actualizarSimulador(t, el) {
-            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-            el.classList.add('active');
-            
-            currentSelection = { template_id: t.id, color: t.color, privacidad: t.priv };
-            
-            // Efectos Visuales
-            document.getElementById('prev-button').style.backgroundColor = t.color;
-            document.getElementById('prev-icon').innerText = t.icon;
-            document.getElementById('prev-bg-icon').innerText = t.bg;
-            document.getElementById('prev-privacidad').innerText = t.priv;
-            document.getElementById('theme-tag').innerText = t.tag;
-            document.getElementById('theme-tag').style.color = t.color;
-            
-            // Brillo dinámico
-            document.getElementById('preview-box').style.boxShadow = `0 40px 100px -20px ${t.color}44`;
-            
-            // Actualizar color de la marca
-            document.querySelectorAll('.text-main-dynamic').forEach(el => el.style.color = t.color);
-        }
-
-        async function procesarPago() {
+        async function procesarPago(event) {
             const nombre = document.getElementById('nombre').value;
-            if(!nombre) return alert("Por favor, ingrese el nombre del médico.");
+            if(!nombre) return alert("Nombre obligatorio");
             
             const btn = event.target;
-            btn.innerText = "PROCESANDO ACTIVACIÓN...";
+            btn.innerText = "ACTIVANDO...";
             btn.disabled = true;
 
-            const datos = {
-                nombre_doctor: nombre,
-                especialidad: document.getElementById('especialidad').value,
-                template_id: currentSelection.template_id,
-                plan: 'Dominio',
-                email: nombre.toLowerCase().split(' ').join('.') + "@kbtech.com",
-                frase_personalizada: currentSelection.privacidad // ENVIAMOS EL AVISO AQUÍ
-            };
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': KEY_DB, 
+                    'Authorization': `Bearer ${KEY_DB}`, 
+                    'Content-Type': 'application/json', 
+                    'Prefer': 'return=representation' 
+                },
+                body: JSON.stringify({
+                    nombre_doctor: nombre,
+                    especialidad: document.getElementById('especialidad').value,
+                    template_id: currentSelection.template_id,
+                    plan: 'Dominio',
+                    email: nombre.toLowerCase().replace(/ /g, ".") + "@kbtech.com"
+                })
+            });
 
-            try {
-                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-                    body: JSON.stringify(datos)
-                });
-
-                if(res.ok) {
-                    const data = await res.json();
-                    alert("¡NODO ACTIVADO EXITOSAMENTE!\nBienvenido a la red K.B Tech Pro.");
-                    window.location.href = `app.html?id=${data[0].id}`;
-                } else {
-                    throw new Error("Error en servidor");
-                }
-            } catch(e) {
-                alert("Hubo un problema. Intente con otro nombre.");
-                btn.innerText = "Activar Nodo";
+            if(res.ok) {
+                const data = await res.json();
+                alert("¡NODO ACTIVADO!");
+                // Te mando a la asistente.html que es tu base segura
+                window.location.href = `asistente.html?id=${data[0].id}`;
+            } else {
+                const error = await res.json();
+                console.error(error);
+                alert("Error de registro.");
+                btn.innerText = "Activar";
                 btn.disabled = false;
             }
         }
-
         cambiarCatalogo();
     </script>
 </body>
