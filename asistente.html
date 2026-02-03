@@ -3,134 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Assistant | Nodo Definitivo</title>
+    <title>K.B Assistant | Gestión Profesional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         :root { --main: #6366f1; --bg: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; }
-        .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1); box-shadow: 0 10px 20px -5px var(--main); }
-        .input-kb { width: 100%; padding: 1rem; border-radius: 1.25rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; }
-        .input-kb:focus { border-color: var(--main); background: white; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #1e293b; }
+        .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); }
+        .nav-icon { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 25px -5px var(--main); }
+        .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; transition: 0.3s; }
+        .input-kb:focus { border-color: var(--main); background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); outline: none; }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
     </style>
 </head>
-<body class="p-4 md:p-10 pb-32 text-slate-800">
+<body class="p-4 md:p-10 pb-40">
 
-    <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[100] flex items-center justify-center">
-        <div class="text-center p-10 glass-panel max-w-sm w-full border-2 border-slate-100">
-            <div class="text-5xl mb-4">🐉</div>
-            <h2 class="text-xl font-black mb-6 uppercase tracking-widest">K.B Assistant</h2>
-            <input type="password" id="pin-acceso" class="w-full p-4 rounded-2xl bg-slate-50 text-center text-2xl tracking-[1em] mb-4 outline-none border-2 border-transparent focus:border-indigo-500" placeholder="****">
-            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase tracking-widest">Entrar al Nodo</button>
+    <div id="pantalla-bloqueo" class="fixed inset-0 bg-slate-900/40 backdrop-blur-2xl z-[100] flex items-center justify-center">
+        <div class="text-center p-12 bg-white rounded-[3.5rem] shadow-2xl max-w-sm w-full border border-white">
+            <div class="text-6xl mb-6">💎</div>
+            <h2 class="text-2xl font-black mb-2 tracking-tighter">K.B TECH</h2>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Protocolo de Seguridad</p>
+            <input type="password" id="pin-acceso" class="w-full p-5 rounded-3xl bg-slate-100 text-center text-3xl tracking-[0.6em] mb-6 outline-none focus:ring-4 ring-indigo-500/10 transition-all" placeholder="****">
+            <button onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-xl">Desbloquear Nodo</button>
         </div>
     </div>
 
-    <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-700">
-        <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
+    <div id="contenido-panel" class="hidden opacity-0 transition-all duration-1000 transform translate-y-4">
+        <header class="max-w-7xl mx-auto flex justify-between items-center mb-12">
             <div>
-                <h1 class="text-3xl font-black tracking-tight text-slate-800">K.B <span class="text-[var(--main)] italic">Assistant</span></h1>
-                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase mt-1 italic">Conectado</p>
+                <h1 class="text-4xl font-black tracking-tighter italic">K.B <span class="text-[var(--main)]">Assistant</span></h1>
+                <div class="flex items-center mt-2">
+                    <span class="status-dot bg-emerald-500 animate-pulse"></span>
+                    <p id="doc-assigned" class="text-[11px] font-bold text-slate-400 uppercase tracking-widest italic">Sincronizando con Servidor...</p>
+                </div>
             </div>
-            <button onclick="switchView('express')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg">+ Nuevo Paciente</button>
+            <button onclick="switchView('express')" class="px-8 py-4 bg-slate-900 text-white rounded-full text-[11px] font-black uppercase shadow-2xl hover:bg-slate-800 transition-all">+ Nueva Entrada</button>
         </header>
 
-        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-4 space-y-6">
-                <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Turno:</h3>
-                    <p class="text-3xl font-extrabold leading-tight mb-2" id="patient-display">Seleccione...</p>
-                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mb-6 italic"></p>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="contactarWhatsApp()" class="py-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-[10px] uppercase border border-emerald-100">WhatsApp</button>
-                        <button onclick="alert('Llamando...')" class="py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase border border-blue-100">Llamar</button>
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="lg:col-span-4 space-y-8">
+                <div class="glass-panel p-10 border-t-8 border-[var(--main)]">
+                    <p class="text-[10px] font-black uppercase text-slate-400 mb-6 tracking-widest">Atención en Curso</p>
+                    <h3 class="text-4xl font-black leading-tight mb-2 tracking-tighter" id="patient-display">Disponible</h3>
+                    <p id="patient-time-display" class="text-xs font-bold text-[var(--main)] uppercase mb-8 italic"></p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="contactarWhatsApp()" class="py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase border border-emerald-100 hover:bg-emerald-100 transition-all">WhatsApp</button>
+                        <button onclick="switchView('billing')" class="py-4 bg-[var(--main)] text-white rounded-2xl font-black text-[10px] uppercase shadow-lg hover:opacity-90 transition-all">💰 Cobrar</button>
                     </div>
-                    <button onclick="switchView('billing')" class="w-full py-3 bg-[var(--main)] text-white rounded-xl font-bold text-[10px] uppercase shadow-md">💰 Ir a Cobro</button>
                 </div>
 
-                <div class="glass-panel p-8">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic italic">Mensaje del Dr:</h3>
-                    <div class="bg-slate-50 p-4 rounded-2xl text-[11px] mb-4 border-l-4 border-[var(--main)]">
-                        <p id="last-doctor-response" class="font-bold italic">Esperando...</p>
+                <div class="glass-panel p-10">
+                    <p class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Línea Directa Dr.</p>
+                    <div class="bg-slate-50 p-6 rounded-[2rem] text-xs mb-6 border-l-4 border-[var(--main)] shadow-inner">
+                        <p id="last-doctor-response" class="text-slate-600 font-bold leading-relaxed italic">Sin instrucciones pendientes.</p>
                     </div>
-                    <textarea id="internal-note-input" class="input-kb h-20 mb-3 text-xs" placeholder="Nota al consultorio..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase">Enviar Nota</button>
+                    <textarea id="internal-note-input" class="input-kb h-24 mb-4 text-sm" placeholder="Escriba aquí para el Doctor..."></textarea>
+                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest">Enviar al Consultorio</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div id="view-agenda" class="glass-panel p-10 min-h-[500px]">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Citas del Día</h3>
-                    <div id="tabla-citas-body" class="space-y-3"></div>
+                <div id="view-agenda" class="glass-panel p-12 min-h-[550px]">
+                    <div class="flex justify-between items-center mb-10">
+                        <h3 class="text-xl font-black tracking-tighter uppercase italic">Agenda Live</h3>
+                        <div class="text-[10px] font-black bg-slate-100 px-6 py-2 rounded-full text-slate-500 uppercase tracking-widest" id="live-date">...</div>
+                    </div>
+                    <div id="tabla-citas-body" class="space-y-4">
+                        </div>
                 </div>
 
-                <div id="view-express" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">⚡ Registro Express</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="exp-nombre" class="input-kb" placeholder="Nombre completo">
-                        <input type="time" id="exp-hora" class="input-kb">
-                        <input type="tel" id="exp-tel" class="input-kb md:col-span-2" placeholder="WhatsApp / Teléfono">
-                        <button onclick="crearCitaExpress()" class="md:col-span-2 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs shadow-md">Añadir a Fila</button>
+                <div id="view-express" class="hidden glass-panel p-12">
+                    <h3 class="text-xl font-black tracking-tighter uppercase italic mb-10">⚡ Registro Paciente sin Cita</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-4">Nombre Completo</label>
+                            <input type="text" id="exp-nombre" class="input-kb mt-2" placeholder="Ej. Juan Pérez">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-4">Hora de Entrada</label>
+                            <input type="time" id="exp-hora" class="input-kb mt-2">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-4">Teléfono/WhatsApp</label>
+                            <input type="tel" id="exp-tel" class="input-kb mt-2" placeholder="664...">
+                        </div>
+                        <button onclick="crearCitaExpress()" class="md:col-span-2 py-5 bg-emerald-500 text-white rounded-3xl font-black uppercase text-xs shadow-xl hover:bg-emerald-400 transition-all">Confirmar Registro y Enviar a Fila</button>
                     </div>
                 </div>
 
-                <div id="view-calendar" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic italic">📅 Consultar Disponibilidad</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <input type="date" id="check-date" onchange="consultarHuecos()" class="input-kb">
-                        </div>
-                        <div class="bg-slate-50 p-6 rounded-3xl">
-                            <p class="text-[9px] font-black uppercase text-[var(--main)] mb-4 italic">Horas Ocupadas:</p>
-                            <div id="slots-occupied" class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="view-reschedule" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic italic">🔄 Mover Cita (Fecha y Hora)</h3>
-                    <div class="space-y-4 max-w-md">
-                        <p class="text-sm font-bold text-slate-500">Paciente: <span id="reschedule-name" class="text-[var(--main)] uppercase">...</span></p>
-                        <div>
-                            <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Nueva Fecha:</label>
-                            <input type="date" id="new-date" class="input-kb">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Nueva Hora:</label>
-                            <input type="time" id="new-time" class="input-kb">
-                        </div>
-                        <button onclick="confirmarReagendar()" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-xs shadow-lg">Confirmar Cambio de Cita</button>
-                    </div>
-                </div>
-
-                <div id="view-billing" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">🧾 Cobro y Facturación SAT</h3>
-                    <div class="space-y-4">
+                <div id="view-reschedule" class="hidden glass-panel p-12">
+                    <h3 class="text-xl font-black tracking-tighter uppercase italic mb-10">🔄 Reprogramar Paciente</h3>
+                    <div class="space-y-6 max-w-md">
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Paciente: <span id="reschedule-name" class="text-slate-800 underline">...</span></p>
                         <div class="grid grid-cols-2 gap-4">
-                            <input type="number" id="reg-monto" class="input-kb text-2xl" placeholder="$ 0.00">
-                            <select id="reg-metodo" class="input-kb font-bold text-xs">
-                                <option>Efectivo</option>
-                                <option>Tarjeta</option>
-                                <option>Transferencia</option>
-                            </select>
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Nueva Fecha</label>
+                                <input type="date" id="new-date" class="input-kb mt-2">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Nueva Hora</label>
+                                <input type="time" id="new-time" class="input-kb mt-2">
+                            </div>
                         </div>
-                        <div class="bg-slate-50 p-6 rounded-[2rem] space-y-3 border border-slate-100">
-                            <p class="text-[9px] font-black text-indigo-500 uppercase italic">Datos Fiscales:</p>
-                            <input type="text" id="f-rfc" class="input-kb bg-white text-xs uppercase" placeholder="RFC">
-                            <input type="text" id="f-razon" class="input-kb bg-white text-xs" placeholder="Razón Social">
-                            <input type="text" id="f-correo" class="input-kb bg-white text-xs" placeholder="Email">
+                        <button onclick="confirmarReagendar()" class="w-full py-5 bg-orange-500 text-white rounded-3xl font-black uppercase text-xs shadow-lg">Guardar Cambios</button>
+                    </div>
+                </div>
+
+                <div id="view-billing" class="hidden glass-panel p-12">
+                    <h3 class="text-xl font-black tracking-tighter uppercase italic mb-10">🧾 Finalizar y Cobrar</h3>
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Total a Pagar</label>
+                                <input type="number" id="reg-monto" class="input-kb text-3xl text-indigo-600" placeholder="0.00">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Método de Pago</label>
+                                <select id="reg-metodo" class="input-kb mt-2">
+                                    <option>Efectivo</option>
+                                    <option>Tarjeta</option>
+                                    <option>Transferencia</option>
+                                </select>
+                            </div>
                         </div>
-                        <button onclick="procesarCobroFull()" class="w-full py-5 bg-[var(--main)] text-white rounded-2xl font-black uppercase text-xs shadow-xl transition hover:scale-105">Finalizar Pago</button>
+                        <div class="p-8 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
+                            <p class="text-[10px] font-black text-[var(--main)] uppercase mb-6 tracking-widest">Información para Factura (Opcional)</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="f-rfc" class="input-kb bg-white" placeholder="RFC">
+                                <input type="text" id="f-razon" class="input-kb bg-white" placeholder="Razón Social">
+                                <input type="email" id="f-correo" class="input-kb bg-white md:col-span-2" placeholder="Email para envío de archivos">
+                            </div>
+                        </div>
+                        <button onclick="procesarCobroFull()" class="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-xs shadow-2xl hover:scale-[1.02] transition-all">Confirmar Pago y Cerrar Cita</button>
+                    </div>
+                </div>
+
+                <div id="view-calendar" class="hidden glass-panel p-12">
+                    <h3 class="text-xl font-black tracking-tighter uppercase italic mb-10">📅 Disponibilidad</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400">Consultar Día:</label>
+                            <input type="date" id="check-date" onchange="consultarHuecos()" class="input-kb mt-3">
+                        </div>
+                        <div class="bg-slate-50 p-8 rounded-[2.5rem]">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-6">Horarios Ocupados:</p>
+                            <div id="slots-occupied" class="flex flex-wrap gap-2 italic text-xs text-slate-400">Seleccione una fecha para ver huecos libres.</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-xl border border-slate-200 p-3 rounded-full flex gap-4 shadow-2xl z-50">
-        <div class="nav-icon active p-4 rounded-full cursor-pointer" id="nav-agenda" onclick="switchView('agenda')">📋</div>
-        <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-calendar" onclick="switchView('calendar')">📅</div>
-        <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-billing" onclick="switchView('billing')">🧾</div>
+    <nav class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-2xl border border-white p-4 rounded-full flex gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.1)] z-50">
+        <div class="nav-icon active p-4 rounded-full cursor-pointer hover:bg-slate-100" id="nav-agenda" onclick="switchView('agenda')">📋</div>
+        <div class="nav-icon p-4 rounded-full cursor-pointer hover:bg-slate-100" id="nav-calendar" onclick="switchView('calendar')">📅</div>
+        <div class="nav-icon p-4 rounded-full cursor-pointer hover:bg-slate-100" id="nav-billing" onclick="switchView('billing')">🧾</div>
     </nav>
 
     <script>
@@ -143,16 +173,17 @@
         const TEMAS = { 1: "#0ea5e9", 2: "#f43f5e", 3: "#10b981", 4: "#1e3a8a", 5: "#8b5cf6" };
 
         async function verificarAcceso() {
+            if(!docId) return alert("Error: ID del Médico no encontrado.");
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             if(document.getElementById('pin-acceso').value === (data[0].pin_acceso || "0000")) {
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
+                setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; document.getElementById('contenido-panel').style.transform = "translateY(0)"; }, 50);
                 document.documentElement.style.setProperty('--main', TEMAS[data[0].template_id] || TEMAS[1]);
-                document.getElementById('doc-assigned').innerText = "DR. " + data[0].nombre_doctor;
+                document.getElementById('doc-assigned').innerText = "DR. " + data[0].nombre_doctor.toUpperCase();
                 cargarCitas();
-                setInterval(cargarCitas, 10000);
+                setInterval(cargarCitas, 15000);
                 setInterval(escucharDoctor, 3000);
             } else { alert("PIN Incorrecto"); }
         }
@@ -161,12 +192,15 @@
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
-                <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-[1.5rem] hover:border-[var(--main)] transition">
-                    <div class="flex gap-4 items-center cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
-                        <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora.slice(0,5)}</span>
-                        <p class="font-bold text-sm uppercase">${c.nombre_paciente}</p>
+                <div class="flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-[var(--main)] hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="flex gap-6 items-center cursor-pointer flex-grow" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
+                        <span class="text-xs font-black text-[var(--main)] bg-slate-50 px-4 py-3 rounded-2xl border border-slate-100">${c.hora.slice(0,5)}</span>
+                        <div>
+                            <p class="font-black text-slate-800 text-sm uppercase tracking-tight">${c.nombre_paciente}</p>
+                            <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">En espera en recepción</p>
+                        </div>
                     </div>
-                    <button onclick="abrirReagendar('${c.id}', '${c.nombre_paciente}')" class="text-[8px] font-black text-orange-400 border border-orange-100 px-3 py-2 rounded-full">Mover</button>
+                    <button onclick="abrirReagendar('${c.id}', '${c.nombre_paciente}')" class="text-[9px] font-black text-orange-500 bg-orange-50 px-4 py-2 rounded-full border border-orange-100 hover:bg-orange-100 transition-all">REAGENDAR</button>
                 </div>
             `).join('');
         }
@@ -174,27 +208,46 @@
         function seleccionar(id, nombre, hora, tel) {
             currentId = id; pTel = tel;
             document.getElementById('patient-display').innerText = nombre;
-            document.getElementById('patient-time-display').innerText = "Cita: " + hora.slice(0,5);
+            document.getElementById('patient-time-display').innerText = "Entrada programada: " + hora.slice(0,5);
             escucharDoctor();
         }
 
         async function crearCitaExpress() {
             const nom = document.getElementById('exp-nombre').value;
             const hor = document.getElementById('exp-hora').value;
-            if(!nom || !hor) return alert("Faltan datos");
+            if(!nom || !hor) return alert("Nombre y Hora son obligatorios.");
             await fetch(`${URL}/rest/v1/Citas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ doctor_id: docId, nombre_paciente: nom + " (EXPRESS)", hora: hor, fecha: new Date().toISOString().split('T')[0], telefono: document.getElementById('exp-tel').value, pagado: false })
+                body: JSON.stringify({ doctor_id: docId, nombre_paciente: nom + " (E)", hora: hor, fecha: new Date().toISOString().split('T')[0], telefono: document.getElementById('exp-tel').value, pagado: false })
             });
-            alert("Paciente en fila.");
+            alert("Paciente registrado con éxito.");
+            switchView('agenda');
+            cargarCitas();
+        }
+
+        async function procesarCobroFull() {
+            const m = document.getElementById('reg-monto').value;
+            if(!m || !currentId) return alert("Por favor ingrese el monto y seleccione un paciente.");
+            const rfc = document.getElementById('f-rfc').value || "PÚBLICO EN GENERAL";
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagado: true, monto: m, telefono: `COBRADO (${document.getElementById('reg-metodo').value}) | RFC: ${rfc}` })
+            });
+            alert("Cobro finalizado. Registro sincronizado.");
+            // LIMPIEZA SIN SALIR DEL SISTEMA
+            currentId = null;
+            document.getElementById('patient-display').innerText = "Disponible";
+            document.getElementById('patient-time-display').innerText = "";
+            document.getElementById('reg-monto').value = "";
             switchView('agenda');
             cargarCitas();
         }
 
         function abrirReagendar(id, nombre) {
-            currentId = id;
-            document.getElementById('reschedule-name').innerText = nombre;
+            currentId = id; 
+            document.getElementById('reschedule-name').innerText = nombre; 
             document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
             switchView('reschedule');
         }
@@ -202,44 +255,23 @@
         async function confirmarReagendar() {
             const f = document.getElementById('new-date').value;
             const h = document.getElementById('new-time').value;
-            if(!f || !h) return alert("Elija fecha y hora");
+            if(!f || !h) return alert("Complete fecha y hora para reagendar.");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
                 method: 'PATCH',
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fecha: f, hora: h, telefono: "REAGENDADO" })
             });
-            alert("Cita movida.");
+            alert("Cita reprogramada.");
             switchView('agenda');
             cargarCitas();
-        }
-
-        async function procesarCobroFull() {
-            const m = document.getElementById('reg-monto').value;
-            if(!m || !currentId) return alert("Ingrese monto");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pagado: true, monto: m, telefono: `PAGO: ${document.getElementById('reg-metodo').value} | RFC: ${document.getElementById('f-rfc').value || 'PÚBLICO'}` })
-            });
-            alert("Pago registrado.");
-            currentId = null;
-            document.getElementById('patient-display').innerText = "Seleccione...";
-            document.getElementById('patient-time-display').innerText = "";
-            switchView('agenda');
-            cargarCitas();
-        }
-
-        function contactarWhatsApp() {
-            if(!pTel) return alert("Seleccione paciente");
-            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
         }
 
         async function escucharDoctor() {
             if(!currentId) return;
             const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            const m = data[0].telefono || "";
-            document.getElementById('last-doctor-response').innerText = m.includes("DOCTOR DICE:") ? m.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
+            const m = data[0]?.telefono || "";
+            document.getElementById('last-doctor-response').innerText = m.includes("DOCTOR DICE:") ? m.replace("DOCTOR DICE:", "") : "Esperando instrucción del consultorio...";
         }
 
         function switchView(v) {
@@ -254,15 +286,22 @@
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             const ocupadas = citas.map(c => c.hora.slice(0,5));
-            document.getElementById('slots-occupied').innerHTML = ocupadas.length > 0 ? ocupadas.map(h => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg">${h}</span>`).join('') : 'Libre';
+            document.getElementById('slots-occupied').innerHTML = ocupadas.length > 0 ? ocupadas.map(h => `<span class="px-4 py-2 bg-red-50 text-red-500 rounded-xl border border-red-100 font-black">${h}</span>`).join('') : '<p class="text-emerald-500 font-black uppercase">Día totalmente libre</p>';
         }
 
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
-            if(!currentId || !n) return alert("Seleccione paciente");
+            if(!currentId || !n) return alert("Seleccione un paciente para enviar nota.");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "ASISTENTE: " + n }) });
-            document.getElementById('internal-note-input').value = ""; alert("Nota enviada");
+            document.getElementById('internal-note-input').value = ""; alert("Mensaje enviado.");
         }
+
+        function contactarWhatsApp() {
+            if(!pTel) return alert("Seleccione un paciente activo.");
+            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
+        }
+
+        document.getElementById('live-date').innerText = new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
     </script>
 </body>
 </html>
