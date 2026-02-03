@@ -3,31 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Tech Pro | Reservar Cita</title>
+    <title>Reserva tu Cita | K.B Tech Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.8s; overflow-x: hidden; background-color: #f8fafc; }
         :root { --main: #6366f1; }
         
-        .bg-element { position: fixed; z-index: -1; opacity: 0.1; pointer-events: none; transition: 1s; filter: blur(2px); }
+        .bg-element { position: fixed; z-index: -1; opacity: 0.1; pointer-events: none; transition: 1.5s; filter: blur(4px); }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.1); }
         
-        /* Estilo para Inputs Modernos (Phone Style) */
         .input-modern { 
-            width: 100%; 
-            padding: 1.25rem; 
-            border-radius: 1.5rem; 
-            background: #f1f5f9; 
-            border: 2px solid transparent; 
-            font-weight: 700; 
-            font-size: 0.9rem; 
-            transition: 0.3s; 
-            outline: none;
+            width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #f1f5f9; 
+            border: 2px solid transparent; font-weight: 700; font-size: 0.9rem; transition: 0.3s; outline: none;
         }
         .input-modern:focus { border-color: var(--main); background: white; box-shadow: 0 10px 25px -10px var(--main); }
-
-        /* Estilización de selectores nativos */
         input[type="date"], input[type="time"] { cursor: pointer; color: #1e293b; }
     </style>
 </head>
@@ -37,25 +27,25 @@
     <div id="visual-2" class="bg-element bottom-[-5%] left-[-5%] text-[20rem]"></div>
 
     <div class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative z-10 border-t-[10px]" id="card-main">
-        <header class="text-center mb-10">
+        <header class="text-center mb-8">
             <div id="icon-header" class="text-7xl mb-4 drop-shadow-xl animate-bounce" style="animation-duration: 4s;">🏥</div>
-            <h1 id="doc-name" class="text-3xl font-black tracking-tighter text-slate-800 uppercase italic">Cargando...</h1>
+            <h1 id="doc-name" class="text-3xl font-black tracking-tighter text-slate-800 uppercase italic">Conectando...</h1>
             <p id="doc-esp" class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] italic mt-2"></p>
         </header>
 
         <form id="form-cita" class="space-y-6">
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Paciente</label>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Tu Nombre</label>
                 <input type="text" id="nombre" placeholder="Nombre completo" class="input-modern" required>
             </div>
 
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Elegir Día</label>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Día de Cita</label>
                 <input type="date" id="fecha" class="input-modern" required>
             </div>
 
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Elegir Hora</label>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Hora de Cita</label>
                 <input type="time" id="hora" class="input-modern" required>
             </div>
 
@@ -67,7 +57,7 @@
         </footer>
     </div>
 
-    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-6 z-50">
+    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6 z-50">
         <div class="bg-white p-10 rounded-[3.5rem] max-w-sm w-full shadow-2xl border-b-[12px]" id="modal-border">
             <h2 class="text-2xl font-black mb-4 uppercase italic tracking-tighter" id="priv-titulo">Privacidad</h2>
             <p class="text-xs text-slate-500 leading-relaxed mb-8 italic" id="priv-texto"></p>
@@ -80,82 +70,87 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
 
-        const CATALOGO = {
+        const CATALOGO_MAESTRO = {
             "Ginecología": [
-                { color: "#f43f5e", icon: "🌸", bg: "🌸", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad absoluta." },
-                { color: "#8b5cf6", icon: "🔮", bg: "✨", priv: "Sofisticación y calma. Resguardamos tu información con la elegancia que mereces." },
-                { color: "#fb7185", icon: "🌷", bg: "🎀", priv: "Suavidad y atención profesional. Cuidamos de ti y de tu bienestar con reserva." },
-                { color: "#059669", icon: "🍃", bg: "🌿", priv: "Salud orgánica. Tu privacidad es un proceso natural y seguro con nosotros." },
-                { color: "#1e293b", icon: "💎", bg: "🛡️", priv: "Discreción de alta gama. Protocolos de élite para el manejo de tu historial clínico." }
+                { id: 1, color: "#f43f5e", icon: "🌸", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad absoluta." },
+                { id: 2, color: "#8b5cf6", icon: "🔮", priv: "Sofisticación y calma boutique. Resguardamos tu información con la elegancia que mereces." },
+                { id: 3, color: "#fb7185", icon: "🌷", priv: "Suavidad y atención prenatal. Cuidamos de ti y de tu bienestar con reserva profesional." },
+                { id: 4, color: "#059669", icon: "🍃", priv: "Salud femenina orgánica. Tu privacidad es un proceso natural y seguro con nosotros." },
+                { id: 5, color: "#1e293b", icon: "💎", priv: "Discreción de alta gama. Protocolos de élite para el manejo confidencial de tu historial clínico." }
             ],
             "Odontología": [
-                { color: "#0ea5e9", icon: "💎", bg: "🦷", priv: "Limpieza y tecnología. Registros dentales protegidos bajo seguridad digital extrema." },
-                { color: "#10b981", icon: "🌿", bg: "🍃", priv: "Frescura y salud. Tu historial dental está resguardado en un entorno ético." },
-                { color: "#22d3ee", icon: "❄️", bg: "✨", priv: "Estética y blanqueamiento. Protegemos tu diagnóstico con tecnología de vanguardia." },
-                { color: "#1e3a8a", icon: "🛡️", bg: "🦾", priv: "Cirugía e implantes. Máxima seguridad para tus procedimientos especializados." },
-                { color: "#6366f1", icon: "⚡", bg: "🧬", priv: "Innovación 3D. Diagnósticos digitales protegidos por encriptación médica." }
+                { id: 1, color: "#0ea5e9", icon: "💎", priv: "Limpieza y tecnología. Registros dentales protegidos bajo seguridad digital extrema." },
+                { id: 2, color: "#10b981", icon: "🌿", priv: "Frescura y salud dental. Tu historial dental está resguardado en un entorno ético y profesional." },
+                { id: 3, color: "#22d3ee", icon: "❄️", priv: "Estética y blanqueamiento. Protegemos tu diagnóstico estético con tecnología de vanguardia." },
+                { id: 4, color: "#1e3a8a", icon: "🛡️", priv: "Cirugía e implantes. Máxima seguridad digital para tus procedimientos especializados." },
+                { id: 5, color: "#6366f1", icon: "⚡", priv: "Innovación 3D. Tus diagnósticos digitales están protegidos por encriptación médica avanzada." }
             ],
             "Pediatría": [
-                { color: "#fb923c", icon: "🧸", bg: "🎈", priv: "Entorno alegre. La privacidad de los niños es sagrada y está totalmente protegida." },
-                { color: "#38bdf8", icon: "🚀", bg: "☁️", priv: "Confianza y juego. Solo tutores autorizados acceden al historial del menor." },
-                { color: "#4ade80", icon: "🦖", bg: "🌳", priv: "Aventura segura. Datos pediátricos resguardados con absoluta ética y reserva." },
-                { color: "#f472b6", icon: "🍭", bg: "✨", priv: "Dulce cuidado. Tratamos la información infantil con ternura y seguridad total." },
-                { color: "#818cf8", icon: "🌙", bg: "⭐", priv: "Estrella de calma. Un entorno sereno para la privacidad de los más pequeños." }
+                { id: 1, color: "#fb923c", icon: "🧸", priv: "Entorno alegre y seguro. La privacidad de los niños es sagrada y está totalmente protegida." },
+                { id: 2, color: "#38bdf8", icon: "🚀", priv: "Confianza y juego. Solo tutores autorizados tienen acceso al historial clínico del menor." },
+                { id: 3, color: "#4ade80", icon: "🦖", priv: "Aventura segura. Datos pediátricos resguardados con absoluta ética y reserva profesional." },
+                { id: 4, color: "#f472b6", icon: "🍭", priv: "Dulce cuidado infantil. Tratamos la información con la ternura y seguridad que tu familia merece." },
+                { id: 5, color: "#818cf8", icon: "🌙", priv: "Estrella de calma. Un entorno sereno para resguardar la salud y privacidad de los más pequeños." }
             ],
             "Cardiología": [
-                { color: "#e11d48", icon: "❤️", bg: "📈", priv: "Precisión cardíaca. Encriptación de grado médico para tus datos vitales." },
-                { color: "#1e293b", icon: "⚡", bg: "🧬", priv: "Seriedad y vanguardia. Monitoreo cardiovascular bajo estándares de alta seguridad." },
-                { color: "#0284c7", icon: "🌊", bg: "❄️", priv: "Flujo y salud. Tus datos circulatorios están protegidos por tecnología Pro." },
-                { color: "#9f1239", icon: "🩸", bg: "💉", priv: "Hematología especializada. Resguardo ético de tus análisis y datos sanguíneos." },
-                { color: "#4f46e5", icon: "🛰️", bg: "📡", priv: "Ciber Cardiología. Seguridad satelital aplicada a tu monitoreo en tiempo real." }
+                { id: 1, color: "#e11d48", icon: "❤️", priv: "Precisión cardíaca. Utilizamos encriptación de grado médico para proteger tus datos vitales." },
+                { id: 2, color: "#1e293b", icon: "⚡", priv: "Seriedad y vanguardia. Monitoreo cardiovascular bajo estándares tecnológicos de alta seguridad." },
+                { id: 3, color: "#0284c7", icon: "🌊", priv: "Flujo y salud vascular. Tus datos circulatorios están protegidos por tecnología de punta." },
+                { id: 4, color: "#9f1239", icon: "🩸", priv: "Hematología especializada. Resguardo ético de tus análisis y datos sanguíneos bajo protocolos." },
+                { id: 5, color: "#4f46e5", icon: "🛰️", priv: "Ciber Cardiología. Seguridad satelital aplicada a tu monitoreo cardíaco en tiempo real." }
             ],
             "Bienestar (Nutri/Psico)": [
-                { color: "#059669", icon: "🧘‍♂️", bg: "🍃", priv: "Equilibrio y paz. Tus notas de consulta son privadas y encriptadas éticamente." },
-                { color: "#a855f7", icon: "🧠", bg: "✨", priv: "Crecimiento seguro. Tu historia emocional es confidencial y está protegida." },
-                { color: "#fbbf24", icon: "🍎", bg: "☀️", priv: "Nutrición energética. Planes alimenticios resguardados en nuestra nube privada." },
-                { color: "#0ea5e9", icon: "🌊", bg: "💧", priv: "Inmersión emocional. Confidencialidad absoluta para tu proceso de sanación." },
-                { color: "#10b981", icon: "🥑", bg: "🥗", priv: "Vida fit. Privacidad integral para tu estilo de vida saludable y seguro." }
+                { id: 1, color: "#059669", icon: "🧘‍♂️", priv: "Equilibrio y paz. Tus notas de consulta son privadas y encriptadas éticamente." },
+                { id: 2, color: "#a855f7", icon: "🧠", priv: "Crecimiento seguro. Tu historia emocional es confidencial y está protegida en nuestra nube." },
+                { id: 3, color: "#fbbf24", icon: "🍎", priv: "Nutrición energética. Planes alimenticios resguardados con absoluta reserva." },
+                { id: 4, color: "#0ea5e9", icon: "🌊", priv: "Inmersión emocional. Confidencialidad absoluta para tu proceso de sanación y bienestar." },
+                { id: 5, color: "#10b981", icon: "🥑", priv: "Vida saludable. Privacidad integral para tu estilo de vida fit y seguro." }
             ],
             "General": [
-                { color: "#1e3a8a", icon: "⚖️", bg: "🛡️", priv: "Autoridad médica. Datos personales y notas encriptadas bajo la ley vigente." },
-                { color: "#6366f1", icon: "🏥", bg: "🧬", priv: "Innovación moderna. Seguridad digital de última generación para tu historial." },
-                { color: "#10b981", icon: "🩺", bg: "🏥", priv: "Salud básica. Atención primaria con seguridad avanzada para tus datos." },
-                { color: "#be123c", icon: "🚑", bg: "🚨", priv: "Urgencias. Seguridad inmediata para datos críticos en situaciones de emergencia." },
-                { color: "#4338ca", icon: "🏢", bg: "🏬", priv: "Hospitalario. Protección de datos a escala corporativa para redes de salud." }
+                { id: 1, color: "#1e3a8a", icon: "⚖️", priv: "Autoridad médica. Datos personales y notas de consulta encriptadas bajo la ley vigente." },
+                { id: 2, color: "#6366f1", icon: "🏥", priv: "Innovación moderna. Seguridad digital de última generación para tu historial clínico con control." },
+                { id: 3, color: "#10b981", icon: "🩺", priv: "Salud básica. Atención primaria con seguridad avanzada para el resguardo de tus datos." },
+                { id: 4, color: "#be123c", icon: "🚑", priv: "Urgencias médicas. Seguridad inmediata para datos críticos en situaciones de emergencia." },
+                { id: 5, color: "#4338ca", icon: "🏢", priv: "Red hospitalaria. Protección de datos a escala corporativa para redes de salud seguras." }
             ]
         };
 
         async function init() {
-            if(!docId) return alert("Falta Nodo.");
+            if(!docId) return alert("Falta Nodo Médico.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
             
             if(data.length > 0) {
                 const doc = data[0];
-                const cat = CATALOGO[doc.especialidad] || CATALOGO["General"];
-                // El truco está aquí: buscar el estilo que usó el doctor basado en el template_id o el color
-                const t = cat[doc.template_id - 1] || cat[0];
+                const especialidad = doc.especialidad;
+                const template_id = doc.template_id;
 
+                const cat = CATALOGO_MAESTRO[especialidad] || CATALOGO_MAESTRO["General"];
+                const tema = cat.find(t => t.id === template_id) || cat[0];
+
+                // Identidad Visual
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad;
-                document.getElementById('icon-header').innerText = t.icon;
-                document.documentElement.style.setProperty('--main', t.color);
+                document.getElementById('doc-esp').innerText = especialidad;
+                document.getElementById('icon-header').innerText = tema.icon;
+                document.documentElement.style.setProperty('--main', tema.color);
                 
-                // Aplicar Look Móvil Pro
-                document.getElementById('btn-submit').style.backgroundColor = t.color;
-                document.getElementById('card-main').style.borderColor = t.color;
-                document.getElementById('modal-border').style.borderColor = t.color;
-                document.getElementById('visual-1').innerText = t.bg;
-                document.getElementById('visual-2').innerText = t.icon;
-                document.getElementById('priv-texto').innerText = "AVISO LEGAL: " + t.priv;
-                document.getElementById('priv-titulo').style.color = t.color;
+                document.getElementById('btn-submit').style.backgroundColor = tema.color;
+                document.getElementById('card-main').style.borderColor = tema.color;
+                document.getElementById('modal-border').style.borderColor = tema.color;
+                document.getElementById('visual-1').innerText = tema.icon;
+                document.getElementById('visual-2').innerText = tema.icon;
+
+                // Privacidad
+                document.getElementById('priv-texto').innerText = "AVISO LEGAL: " + tema.priv;
+                document.getElementById('priv-titulo').style.color = tema.color;
             }
         }
 
         document.getElementById('form-cita').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "Sincronizando..."; btn.disabled = true;
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+
             const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
@@ -167,8 +162,14 @@
                     pagado: false
                 })
             });
-            if(res.ok) { alert("¡Cita Solicitada!"); location.reload(); }
-            else { alert("Error"); btn.disabled = false; }
+
+            if(res.ok) {
+                alert("¡SOLICITUD ENVIADA!\nRecibirás una confirmación del consultorio.");
+                location.reload();
+            } else {
+                alert("Error al agendar.");
+                btn.innerText = "Confirmar Reservación"; btn.disabled = false;
+            }
         });
 
         init();
