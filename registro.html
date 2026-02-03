@@ -104,15 +104,15 @@
                 { id: 1, color: "#e11d48", icon: "❤️", tag: "Precisión", desc: "Vital Pulse" },
                 { id: 2, color: "#1e293b", icon: "⚡", tag: "Digital", desc: "Tech Heart" },
                 { id: 3, color: "#0284c7", icon: "🌊", tag: "Vascular", desc: "Flow System" },
-                { id: 4, color: "#9f1239", icon: "#9f1239", tag: "Hema", desc: "Deep Crimson" },
+                { id: 4, color: "#9f1239", icon: "🩸", tag: "Hematología", desc: "Deep Crimson" },
                 { id: 5, color: "#4f46e5", icon: "🛰️", tag: "Remoto", desc: "Cyber Cardio" }
             ],
             "Bienestar (Nutri/Psico)": [
                 { id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen", desc: "Zen Leaf" },
                 { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental", desc: "Mind Flow" },
-                { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri", desc: "Vital Food" },
+                { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutrición", desc: "Vital Food" },
                 { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia", desc: "Deep Therapy" },
-                { id: 5, color: "#10b981", icon: "🥑", tag: "Fit", desc: "Clean Eating" }
+                { id: 5, color: "#10b981", icon: "🥑", tag: "Fitness", desc: "Clean Eating" }
             ],
             "General": [
                 { id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido", desc: "Deep Ocean" },
@@ -137,7 +137,7 @@
                 dot.onclick = () => {
                     document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
                     dot.classList.add('active');
-                    currentSelection = { template_id: index + 1, color: t.color };
+                    currentSelection = { template_id: t.id, color: t.color };
                     document.getElementById('prev-button').style.backgroundColor = t.color;
                     document.getElementById('prev-icon').innerText = t.icon;
                     document.getElementById('prev-bg-icon').innerText = t.icon;
@@ -181,7 +181,7 @@
                 window.location.href = `app.html?id=${data[0].id}`;
             } else {
                 alert("Error en la activación.");
-                btn.innerText = "Activar";
+                btn.innerText = "Activar Nodo";
                 btn.disabled = false;
             }
         }
