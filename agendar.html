@@ -2,78 +2,140 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Agendar Cita | K.B Tech</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva tu Cita | K.B Tech</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style> :root { --main: #6366f1; } </style>
-</head>
-<body class="bg-slate-50 p-6 flex flex-col items-center min-h-screen font-sans">
-    <div id="loader" class="mt-20 font-black text-slate-400 animate-pulse text-xs tracking-widest uppercase">Buscando Especialista...</div>
-    
-    <div id="app" class="hidden w-full max-w-md bg-white p-8 rounded-[2.5rem] shadow-2xl mt-10">
-        <h1 id="doc-nombre" class="text-2xl font-black italic tracking-tighter"></h1>
-        <p id="doc-esp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 italic"></p>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.5s; overflow-x: hidden; }
         
-        <form id="form-cita" class="space-y-4 text-left">
+        /* Contenedores de Vida (Backgrounds dinámicos) */
+        .bg-element { position: fixed; z-index: -1; opacity: 0.15; pointer-events: none; transition: 1s; }
+        
+        /* Camaleón Estándar */
+        :root { --main: #6366f1; --soft: #f5f3ff; }
+        .text-main { color: var(--main); }
+        .bg-main { background-color: var(--main); }
+        .border-main { border-color: var(--main); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <div id="visual-1" class="bg-element top-[-5%] right-[-5%] text-[20rem] hidden">🌸</div>
+    <div id="visual-2" class="bg-element bottom-[-5%] left-[-5%] text-[15rem] hidden">🌿</div>
+    <div id="visual-3" class="bg-element top-[10%] left-[-10%] text-[20rem] opacity-[0.05] hidden">🧬</div>
+
+    <div class="max-w-md w-full bg-white/80 backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl border border-white relative">
+        <header class="text-center mb-8">
+            <div id="icon-header" class="text-4xl mb-2">🏥</div>
+            <h1 id="doc-name" class="text-2xl font-black tracking-tighter text-slate-800 uppercase italic">Cargando Especialista...</h1>
+            <p id="doc-esp" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Nodo Médico Sincronizado</p>
+        </header>
+
+        <form id="form-cita" class="space-y-4">
             <div class="space-y-1">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest">Paciente</label>
-                <input type="text" id="p-nom" placeholder="Nombre completo" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-medium" required>
+                <label class="text-[9px] font-black uppercase text-slate-400 ml-4">Tu Nombre Completo</label>
+                <input type="text" id="nombre" class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 outline-none focus:border-main transition-all text-sm font-bold" required>
             </div>
-            <div class="grid grid-cols-2 gap-2">
+
+            <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Fecha</label>
-                    <input type="date" id="p-fec" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-medium" required>
+                    <label class="text-[9px] font-black uppercase text-slate-400 ml-4">Fecha</label>
+                    <input type="date" id="fecha" class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 text-xs font-bold" required>
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Hora</label>
-                    <input type="time" id="p-hor" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-medium" required>
+                    <label class="text-[9px] font-black uppercase text-slate-400 ml-4">Hora</label>
+                    <input type="time" id="hora" class="w-full p-4 rounded-2xl bg-white border-2 border-slate-100 text-xs font-bold" required>
                 </div>
             </div>
-            <button style="background: var(--main)" class="w-full py-4 text-white rounded-xl font-black uppercase text-xs shadow-lg mt-4 hover:opacity-90 transition-all tracking-widest">Sincronizar Cita</button>
+
+            <button type="submit" id="btn-submit" class="w-full py-5 bg-main text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl hover:scale-[1.02] transition-all">Confirmar Cita</button>
         </form>
+
+        <footer class="mt-8 text-center border-t border-slate-100 pt-6">
+            <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest mb-4">K.B TECH SOLUTIONS POWERED BY</p>
+            <button onclick="document.getElementById('modal-privacidad').classList.remove('hidden')" class="text-[9px] font-bold text-main underline uppercase">Aviso de Privacidad</button>
+        </footer>
+    </div>
+
+    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 z-50">
+        <div class="bg-white p-8 rounded-[2.5rem] max-w-sm w-full">
+            <h2 class="text-lg font-black mb-4 uppercase italic" id="priv-titulo">Protección de Datos</h2>
+            <p class="text-[11px] text-slate-500 leading-relaxed mb-6" id="priv-texto">
+                Tus datos de salud son sagrados. En esta plataforma, la información se encripta de punto a punto para asegurar que solo tu médico tenga acceso a tu historial.
+            </p>
+            <button onclick="document.getElementById('modal-privacidad').classList.add('hidden')" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase">Entendido</button>
+        </div>
     </div>
 
     <script>
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
-        const id = new URLSearchParams(window.location.search).get('id');
+        const docId = new URLSearchParams(window.location.search).get('id');
+
+        const temas = {
+            1: { main: "#0ea5e9", icon: "💎", visuals: ["🔹", "🛡️"], priv: "Confidencialidad técnica y seguridad de grado médico para tu tranquilidad." },
+            2: { main: "#f43f5e", icon: "🌸", visuals: ["🌸", "✨"], priv: "Cuidamos tu información con la delicadeza y privacidad que tu salud merece." },
+            3: { main: "#10b981", icon: "🌿", visuals: ["🌿", "🍃"], priv: "Un entorno seguro y natural para la gestión de tu bienestar integral." },
+            4: { main: "#1e3a8a", icon: "⚖️", visuals: ["🏢", "💎"], priv: "Protocolos de alta seguridad corporativa aplicados a tu historial clínico." },
+            5: { main: "#8b5cf6", icon: "🔮", visuals: ["✨", "🧘‍♀️"], priv: "Privacidad premium en un espacio diseñado para tu comodidad y confianza." }
+        };
 
         async function init() {
-            if(!id) return;
-            try {
-                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${id}`, {
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
-                });
-                const data = await res.json();
-                if(data && data.length > 0) {
-                    const doc = data[0];
-                    document.getElementById('doc-nombre').innerText = doc.nombre_doctor;
-                    document.getElementById('doc-esp').innerText = doc.especialidad;
-                    const colores = { 1: "#6366f1", 2: "#059669" };
-                    document.documentElement.style.setProperty('--main', colores[doc.template_id] || "#6366f1");
-                    document.getElementById('loader').classList.add('hidden');
-                    document.getElementById('app').classList.remove('hidden');
-                } else {
-                    document.getElementById('loader').innerText = "ESPECIALISTA NO ENCONTRADO";
-                }
-            } catch (e) { console.error(e); }
+            if(!docId) return;
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+            });
+            const data = await res.json();
+            if(data.length > 0) {
+                const doc = data[0];
+                const t = temas[doc.template_id] || temas[1];
+
+                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                document.getElementById('doc-esp').innerText = doc.especialidad;
+                document.getElementById('icon-header').innerText = t.icon;
+                document.documentElement.style.setProperty('--main', t.main);
+                
+                // Aplicar Visuales de Fondo
+                document.getElementById('visual-1').innerText = t.visuals[0];
+                document.getElementById('visual-1').classList.remove('hidden');
+                document.getElementById('visual-2').innerText = t.visuals[1];
+                document.getElementById('visual-2').classList.remove('hidden');
+
+                // Personalizar Privacidad
+                document.getElementById('priv-texto').innerText = t.priv;
+                document.getElementById('priv-titulo').style.color = t.main;
+            }
         }
 
         document.getElementById('form-cita').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const cita = {
-                doctor_id: id,
-                nombre_paciente: document.getElementById('p-nom').value,
-                fecha: document.getElementById('p-fec').value,
-                hora: document.getElementById('p-hor').value
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "SINCRONIZANDO..."; btn.disabled = true;
+
+            const nuevaCita = {
+                doctor_id: docId,
+                nombre_paciente: document.getElementById('nombre').value,
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                pagado: false
             };
+
             const res = await fetch(`${URL}/rest/v1/Citas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(cita)
+                body: JSON.stringify(nuevaCita)
             });
-            if(res.ok) alert("¡CITA AGENDADA EN LA RED K.B!");
-            else alert("Error al agendar.");
+
+            if(res.ok) {
+                alert("¡Cita confirmada! El consultorio ha sido notificado.");
+                location.reload();
+            } else {
+                alert("Error al agendar.");
+                btn.innerText = "Confirmar Cita"; btn.disabled = false;
+            }
         });
+
         init();
     </script>
 </body>
