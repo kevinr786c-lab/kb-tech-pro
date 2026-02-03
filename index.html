@@ -3,40 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH | Infraestructura Médica Élite</title>
+    <title>K.B TECH 2.0 | Registro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-900 text-white selection:bg-indigo-500">
-    <nav class="p-8 flex justify-between items-center max-w-7xl mx-auto">
-        <h1 class="text-2xl font-black italic tracking-tighter">K.B <span class="text-indigo-500">TECH</span></h1>
-        <a href="registro.html" class="bg-white text-slate-900 px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">Empezar Ahora</a>
-    </nav>
+<body class="bg-slate-900 p-6 md:p-20 flex items-center justify-center min-h-screen">
+    <div class="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-black italic tracking-tighter">K.B <span class="text-indigo-600">TECH</span></h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronización de Nuevo Nodo</p>
+        </header>
 
-    <main class="max-w-4xl mx-auto text-center py-20 px-6">
-        <h2 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">Tu consultorio en la <span class="text-indigo-500 italic">nube.</span></h2>
-        <p class="text-slate-400 text-lg mb-12 font-medium">Agendamiento inteligente, perfiles personalizados y control total de tu práctica médica en Tijuana.</p>
-        
-        <div class="grid md:grid-cols-3 gap-6 text-left">
-            <div class="p-8 bg-slate-800/50 rounded-[2rem] border border-slate-700">
-                <div class="text-3xl mb-4">⚡</div>
-                <h3 class="font-black mb-2 uppercase text-xs tracking-widest text-indigo-400">Velocidad</h3>
-                <p class="text-slate-400 text-sm leading-relaxed">Sincronización en tiempo real con la Red K.B.</p>
-            </div>
-            <div class="p-8 bg-slate-800/50 rounded-[2rem] border border-slate-700">
-                <div class="text-3xl mb-4">🎨</div>
-                <h3 class="font-black mb-2 uppercase text-xs tracking-widest text-indigo-400">Personalización</h3>
-                <p class="text-slate-400 text-sm leading-relaxed">Tu portal cambia de color según tu especialidad.</p>
-            </div>
-            <div class="p-8 bg-slate-800/50 rounded-[2rem] border border-slate-700">
-                <div class="text-3xl mb-4">📱</div>
-                <h3 class="font-black mb-2 uppercase text-xs tracking-widest text-indigo-400">App Incluida</h3>
-                <p class="text-slate-400 text-sm leading-relaxed">Controla tus citas desde cualquier dispositivo.</p>
-            </div>
-        </div>
-    </main>
+        <form id="form-registro" class="space-y-4">
+            <input type="text" id="nombre" placeholder="Nombre del Médico" class="w-full p-4 rounded-xl border border-slate-200 text-sm" required>
+            <input type="email" id="email" placeholder="Correo Electrónico" class="w-full p-4 rounded-xl border border-slate-200 text-sm" required>
+            <input type="text" id="especialidad" placeholder="Especialidad" class="w-full p-4 rounded-xl border border-slate-200 text-sm" required>
+            <select id="plan" class="w-full p-4 rounded-xl border border-slate-200 text-sm font-bold bg-white">
+                <option value="Semilla" data-id="1">Plan Profesional (Indigo)</option>
+                <option value="Dominio" data-id="2">Plan Dominio (Esmeralda)</option>
+            </select>
+            <button type="submit" id="btn" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all">Activar Red</button>
+        </form>
+        <div id="resultado" class="hidden mt-6 p-4 bg-slate-100 rounded-xl break-all text-[10px] font-mono text-slate-600"></div>
+    </div>
+
+    <script>
+        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
+        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+
+        document.getElementById('form-registro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn');
+            btn.innerText = "SINCRO EN CURSO..."; btn.disabled = true;
+
+            const sel = document.getElementById('plan');
+            const datos = {
+                nombre_doctor: document.getElementById('nombre').value,
+                email: document.getElementById('email').value,
+                especialidad: document.getElementById('especialidad').value,
+                plan: sel.value,
+                template_id: parseInt(sel.options[sel.selectedIndex].getAttribute('data-id'))
+            };
+
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                body: JSON.stringify(datos)
+            });
+
+            if(res.ok) {
+                const data = await res.json();
+                const id = data[0].id;
+                const base = window.location.href.split('registro.html')[0];
+                const link = base + 'agendar.html?id=' + id;
+                document.getElementById('resultado').classList.remove('hidden');
+                document.getElementById('resultado').innerText = "URL PARA PACIENTES: " + link;
+                alert("¡NODO ACTIVADO EXITOSAMENTE!");
+            } else { alert("Error: Revisa el correo o la conexión a la base."); }
+            btn.innerText = "Activar Red"; btn.disabled = false;
+        });
+    </script>
 </body>
 </html>
