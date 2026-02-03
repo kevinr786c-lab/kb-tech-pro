@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agendar Cita | K.B Tech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style> :root { --main: #6366f1; } </style>
+</head>
+<body class="bg-slate-50 p-6 flex flex-col items-center min-h-screen font-sans">
+    <div id="loader" class="mt-20 font-black text-slate-400 animate-pulse text-xs tracking-widest">Sincronizando Agenda de Élite...</div>
+    
+    <div id="app" class="hidden w-full max-w-md bg-white p-8 rounded-[2.5rem] shadow-2xl mt-10">
+        <h1 id="doc-nombre" class="text-2xl font-black italic tracking-tighter"></h1>
+        <p id="doc-esp" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8"></p>
+        
+        <form id="form-cita" class="space-y-4 text-left">
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Nombre del Paciente</label>
+                <input type="text" id="p-nom" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm" required>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Fecha</label>
+                    <input type="date" id="p-fec" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm" required>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Hora</label>
+                    <input type="time" id="p-hor" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm" required>
+                </div>
+            </div>
+            <button style="background: var(--main)" class="w-full py-4 text-white rounded-xl font-black uppercase text-xs shadow-lg mt-4 hover:opacity-90 transition-all">Confirmar Cita</button>
+        </form>
+    </div>
+
+    <script>
+        const URL = "https://ypxtceahtjxcdaefskxe.supabase.co"; 
+        const KEY = "sb_publishable_C9j37Nup330TMa-jb3QC4A_z7GhzEBM"; 
+        const id = new URLSearchParams(window.location.search).get('id');
+
+        async function init() {
+            if(!id) return;
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${id}`, {
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+            });
+            const data = await res.json();
+            if(data.length > 0) {
+                const doc = data[0];
+                document.getElementById('doc-nombre').innerText = doc.nombre_doctor;
+                document.getElementById('doc-esp').innerText = doc.especialidad;
+                
+                const colores = { 1: "#6366f1", 2: "#059669" };
+                document.documentElement.style.setProperty('--main', colores[doc.template_id] || "#6366f1");
+                
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('form-cita').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const cita = {
+                doctor_id: id,
+                nombre_paciente: document.getElementById('p-nom').value,
+                fecha: document.getElementById('p-fec').value,
+                hora: document.getElementById('p-hor').value
+            };
+            const res = await fetch(`${URL}/rest/v1/Citas`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(cita)
+            });
+            if(res.ok) alert("¡Cita agendada exitosamente en la Red K.B!");
+        });
+        init();
+    </script>
+</body>
+</html>
