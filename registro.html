@@ -3,116 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH | Activación de Nodo</title>
+    <title>Activación K.B Tech Pro | Simulador</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
-        .color-dot.active { border-color: #000; transform: scale(1.2); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; transition: 0.5s; }
+        .preview-phone { width: 220px; height: 400px; border: 8px solid #334155; border-radius: 2.5rem; position: relative; overflow: hidden; background: #f8fafc; transition: 0.5s; }
+        .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
+        .color-dot.active { border-color: white; transform: scale(1.2); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
-<body class="bg-slate-900 p-6 flex items-center justify-center min-h-screen">
-    
-    <div id="registro-container" class="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl">
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-black italic tracking-tighter">K.B <span class="text-indigo-600">TECH</span></h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configuración de Nodo Profesional</p>
-        </header>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
 
-        <form id="form-registro" class="space-y-4">
-            <input type="text" id="nombre" placeholder="Nombre del Médico" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-bold" required>
-            <input type="email" id="email" placeholder="Correo Profesional" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-bold" required>
-            <input type="text" id="especialidad" placeholder="Especialidad (Ej: Ginecología)" class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50 text-sm font-bold" required>
+    <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        
+        <div class="space-y-8">
+            <header>
+                <h1 class="text-4xl font-black italic tracking-tighter">K.B <span class="text-indigo-400">TECH</span></h1>
+                <p class="text-slate-400 text-sm uppercase tracking-widest font-bold">Configuración de Nodo Médico v2.0</p>
+            </header>
+
+            <form id="form-registro" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="nombre" placeholder="Nombre del Médico" class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-indigo-500 transition-all text-sm font-bold">
+                    <select id="especialidad" onchange="cambiarCatalogo()" class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-indigo-500 text-sm font-bold">
+                        <option value="Ginecología">Ginecología</option>
+                        <option value="Odontología">Odontología</option>
+                        <option value="General">Medicina General</option>
+                        <option value="Pediatría">Pediatría</option>
+                    </select>
+                </div>
+
+                <div class="glass-card p-6 rounded-[2.5rem] space-y-4">
+                    <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em]">Elige tu Identidad Visual</p>
+                    <div id="contenedor-colores" class="flex gap-4">
+                        </div>
+                </div>
+
+                <div class="p-6 bg-indigo-500/10 rounded-[2.5rem] border border-indigo-500/20">
+                    <p class="text-[9px] font-black uppercase text-indigo-400 mb-1">Inversión Nodo Pro</p>
+                    <p class="text-3xl font-black text-white">$1,599 <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span></p>
+                </div>
+
+                <button type="button" onclick="procesarPago()" class="w-full py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-2xl hover:bg-indigo-400 transition-all">Activar mi Sistema</button>
+            </form>
+        </div>
+
+        <div class="flex flex-col items-center space-y-6">
+            <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Vista Previa del Paciente</p>
             
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <p class="text-[9px] font-black text-slate-400 uppercase mb-3 tracking-widest">Selecciona tu Identidad Visual</p>
-                <div class="flex justify-between" id="color-selector">
-                    <div class="color-dot active" data-id="1" style="background: #0ea5e9;" title="Sky Knight"></div>
-                    <div class="color-dot" data-id="2" style="background: #f43f5e;" title="Rose Quartz"></div>
-                    <div class="color-dot" data-id="3" style="background: #10b981;" title="Emerald Sage"></div>
-                    <div class="color-dot" data-id="4" style="background: #1e3a8a;" title="Deep Ocean"></div>
-                    <div class="color-dot" data-id="5" style="background: #8b5cf6;" title="Lavender Zen"></div>
+            <div id="preview-box" class="preview-phone shadow-[0_0_100px_rgba(99,102,241,0.2)]">
+                <div id="prev-bg-icon" class="absolute top-10 right-[-20px] text-[10rem] opacity-10 pointer-events-none">🌸</div>
+                
+                <div class="p-6 text-slate-800 space-y-6 relative h-full flex flex-col justify-center">
+                    <div class="text-center">
+                        <div id="prev-icon" class="text-3xl mb-2">🏥</div>
+                        <div class="h-4 w-32 bg-slate-200 rounded-full mx-auto mb-2 animate-pulse"></div>
+                        <div class="h-2 w-20 bg-slate-100 rounded-full mx-auto"></div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="h-10 w-full bg-white rounded-xl shadow-sm border border-slate-100"></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="h-10 w-full bg-white rounded-xl shadow-sm border border-slate-100"></div>
+                            <div class="h-10 w-full bg-white rounded-xl shadow-sm border border-slate-100"></div>
+                        </div>
+                    </div>
+
+                    <div id="prev-button" class="h-12 w-full rounded-2xl shadow-lg transition-all"></div>
                 </div>
             </div>
-
-            <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                <p class="text-[9px] font-black text-indigo-600 uppercase mb-1">Inversión Mensual</p>
-                <p class="text-2xl font-black text-slate-800">$1,599 <span class="text-xs text-slate-400 italic font-normal">MXN/mes</span></p>
-            </div>
-
-            <button type="button" onclick="irAPagar()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-900 transition-all shadow-xl">Continuar al Pago</button>
-        </form>
-    </div>
-
-    <div id="modal-pago" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6">
-        <div class="bg-white p-8 rounded-[3rem] max-w-sm w-full shadow-2xl">
-            <h3 class="text-xl font-black mb-6 italic">Pago <span class="text-indigo-600">Seguro</span></h3>
-            <div class="space-y-4">
-                <input type="text" placeholder="Número de Tarjeta" class="w-full p-4 rounded-xl bg-slate-50 border-none text-sm font-mono">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" placeholder="MM/AA" class="p-4 rounded-xl bg-slate-50 border-none text-sm text-center">
-                    <input type="text" placeholder="CVV" class="p-4 rounded-xl bg-slate-50 border-none text-sm text-center">
-                </div>
-                <button onclick="finalizarCompra()" id="btn-final" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest">Pagar y Activar Nodo</button>
-                <button onclick="cerrarPago()" class="w-full text-[9px] font-bold text-slate-400 uppercase tracking-widest">Cancelar</button>
-            </div>
+            
+            <p id="prev-desc" class="text-[11px] text-slate-400 italic text-center max-w-[200px]">"Cuidamos tu salud con elegancia y tecnología."</p>
         </div>
     </div>
 
     <script>
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
-        let selectedTemplate = 1;
+        const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
+        const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
-        // Lógica del selector de colores
-        document.querySelectorAll('.color-dot').forEach(dot => {
-            dot.addEventListener('click', () => {
-                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-                dot.classList.add('active');
-                selectedTemplate = parseInt(dot.getAttribute('data-id'));
+        const CATALOGO = {
+            "Ginecología": [
+                { id: 2, color: "#f43f5e", icon: "🌸", bg: "🌸", desc: " Rose Quartz: Delicadeza y confianza." },
+                { id: 5, color: "#8b5cf6", icon: "🔮", bg: "✨", desc: " Lavender Silk: Elegancia y calma." }
+            ],
+            "Odontología": [
+                { id: 1, color: "#0ea5e9", icon: "💎", bg: "🦷", desc: " Arctic Bright: Limpieza y tecnología." },
+                { id: 3, color: "#10b981", icon: "🌿", bg: "🍃", desc: " Emerald Fresh: Frescura orgánica." }
+            ],
+            "General": [
+                { id: 4, color: "#1e3a8a", icon: "⚖️", bg: "🛡️", desc: " Deep Ocean: Autoridad y seriedad." },
+                { id: 1, color: "#6366f1", icon: "🏥", bg: "🧬", desc: " Tech Navy: Innovación médica." }
+            ]
+        };
+
+        let currentSelection = { template_id: 2, color: "#f43f5e" };
+
+        function cambiarCatalogo() {
+            const esp = document.getElementById('especialidad').value;
+            const contenedor = document.getElementById('contenedor-colores');
+            const temas = CATALOGO[esp] || CATALOGO["General"];
+            
+            contenedor.innerHTML = "";
+            temas.forEach((t, index) => {
+                const dot = document.createElement('div');
+                dot.className = `color-dot ${index === 0 ? 'active' : ''}`;
+                dot.style.backgroundColor = t.color;
+                dot.onclick = () => actualizarSimulador(t, dot);
+                contenedor.appendChild(dot);
+                if(index === 0) actualizarSimulador(t, dot);
             });
-        });
-
-        function irAPagar() {
-            if(!document.getElementById('nombre').value || !document.getElementById('email').value) return alert("Completa los datos");
-            document.getElementById('modal-pago').classList.remove('hidden');
         }
 
-        function cerrarPago() {
-            document.getElementById('modal-pago').classList.add('hidden');
+        function actualizarSimulador(t, el) {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            
+            currentSelection = { template_id: t.id, color: t.color };
+            
+            // Actualizar Visuales
+            document.getElementById('prev-button').style.backgroundColor = t.color;
+            document.getElementById('prev-icon').innerText = t.icon;
+            document.getElementById('prev-bg-icon').innerText = t.bg;
+            document.getElementById('prev-desc').innerText = t.desc;
+            document.getElementById('preview-box').style.boxShadow = `0 0 80px ${t.color}33`;
         }
 
-        async function finalizarCompra() {
-            const btn = document.getElementById('btn-final');
-            btn.innerText = "PROCESANDO PAGO..."; btn.disabled = true;
-
+        async function procesarPago() {
+            const nombre = document.getElementById('nombre').value;
+            if(!nombre) return alert("Escribe tu nombre de médico");
+            
             const datos = {
-                nombre_doctor: document.getElementById('nombre').value,
-                email: document.getElementById('email').value,
+                nombre_doctor: nombre,
                 especialidad: document.getElementById('especialidad').value,
+                template_id: currentSelection.template_id,
                 plan: 'Dominio',
-                template_id: selectedTemplate
+                email: nombre.toLowerCase().replace(/ /g, ".") + "@kbtech.com"
             };
 
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos`, {
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
                 method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
                 body: JSON.stringify(datos)
             });
 
             if(res.ok) {
                 const data = await res.json();
-                const id = data[0].id;
-                const base = window.location.href.split('registro.html')[0];
-                alert("¡PAGO EXITOSO! Tu sistema K.B Tech ha sido activado.");
-                window.location.href = base + 'app.html?id=' + id;
-            } else {
-                alert("Error en el registro. Intenta otro correo.");
-                cerrarPago();
-                btn.innerText = "Pagar y Activar Nodo"; btn.disabled = false;
+                alert("¡SISTEMA ACTIVADO! Redirigiendo a tu nuevo consultorio digital...");
+                window.location.href = `app.html?id=${data[0].id}`;
             }
         }
+
+        // Iniciar
+        cambiarCatalogo();
     </script>
 </body>
 </html>
