@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Assistant | Nodo de Control Élite</title>
+    <title>K.B Assistant | Nodo Definitivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
@@ -29,72 +29,77 @@
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-700">
         <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
             <div>
-                <h1 class="text-3xl font-black tracking-tight">K.B <span class="text-[var(--main)] italic">Assistant</span></h1>
+                <h1 class="text-3xl font-black tracking-tight text-slate-800">K.B <span class="text-[var(--main)] italic">Assistant</span></h1>
                 <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase mt-1 italic">Conectado</p>
             </div>
-            <button onclick="switchView('express')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg shadow-indigo-200">+ Paciente Nuevo</button>
+            <button onclick="switchView('express')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg">+ Nuevo Paciente</button>
         </header>
 
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">Atención Actual:</h3>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Turno:</h3>
                     <p class="text-3xl font-extrabold leading-tight mb-2" id="patient-display">Seleccione...</p>
                     <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mb-6 italic"></p>
-                    
                     <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="contactarWhatsApp()" class="py-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-[10px] uppercase border border-emerald-100 transition hover:bg-emerald-100">WhatsApp</button>
-                        <button onclick="alert('Llamando al paciente...')" class="py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase border border-blue-100 transition hover:bg-blue-100">Llamar</button>
+                        <button onclick="contactarWhatsApp()" class="py-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-[10px] uppercase border border-emerald-100">WhatsApp</button>
+                        <button onclick="alert('Llamando...')" class="py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase border border-blue-100">Llamar</button>
                     </div>
-                    <button onclick="switchView('billing')" class="w-full py-3 bg-[var(--main)] text-white rounded-xl font-bold text-[10px] uppercase shadow-md transition hover:opacity-90">💰 Ir a Cobro</button>
+                    <button onclick="switchView('billing')" class="w-full py-3 bg-[var(--main)] text-white rounded-xl font-bold text-[10px] uppercase shadow-md">💰 Ir a Cobro</button>
                 </div>
 
                 <div class="glass-panel p-8">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Canal con el Doctor:</h3>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic italic">Mensaje del Dr:</h3>
                     <div class="bg-slate-50 p-4 rounded-2xl text-[11px] mb-4 border-l-4 border-[var(--main)]">
-                        <p id="last-doctor-response" class="font-bold italic">Sin mensajes nuevos...</p>
+                        <p id="last-doctor-response" class="font-bold italic">Esperando...</p>
                     </div>
-                    <textarea id="internal-note-input" class="input-kb h-20 mb-3 text-xs" placeholder="Nota rápida..."></textarea>
+                    <textarea id="internal-note-input" class="input-kb h-20 mb-3 text-xs" placeholder="Nota al consultorio..."></textarea>
                     <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase">Enviar Nota</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
                 <div id="view-agenda" class="glass-panel p-10 min-h-[500px]">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Agenda del Día</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Citas del Día</h3>
                     <div id="tabla-citas-body" class="space-y-3"></div>
                 </div>
 
                 <div id="view-express" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic italic">⚡ Registro de Paciente sin Cita</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">⚡ Registro Express</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" id="exp-nombre" class="input-kb" placeholder="Nombre completo">
                         <input type="time" id="exp-hora" class="input-kb">
-                        <input type="tel" id="exp-tel" class="input-kb md:col-span-2" placeholder="Número de contacto">
-                        <button onclick="crearCitaExpress()" class="md:col-span-2 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs shadow-md">Añadir a Fila y Avisar al Dr.</button>
+                        <input type="tel" id="exp-tel" class="input-kb md:col-span-2" placeholder="WhatsApp / Teléfono">
+                        <button onclick="crearCitaExpress()" class="md:col-span-2 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs shadow-md">Añadir a Fila</button>
                     </div>
                 </div>
 
                 <div id="view-calendar" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">📅 Disponibilidad</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic italic">📅 Consultar Disponibilidad</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label class="text-[9px] font-black uppercase text-slate-400">Seleccionar Fecha:</label>
-                            <input type="date" id="check-date" onchange="consultarHuecos()" class="input-kb mt-2">
+                            <input type="date" id="check-date" onchange="consultarHuecos()" class="input-kb">
                         </div>
-                        <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                        <div class="bg-slate-50 p-6 rounded-3xl">
                             <p class="text-[9px] font-black uppercase text-[var(--main)] mb-4 italic">Horas Ocupadas:</p>
-                            <div id="slots-occupied" class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 italic">Elija una fecha...</div>
+                            <div id="slots-occupied" class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400">...</div>
                         </div>
                     </div>
                 </div>
 
                 <div id="view-reschedule" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">🔄 Reagendar</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic italic">🔄 Mover Cita (Fecha y Hora)</h3>
                     <div class="space-y-4 max-w-md">
-                        <p class="text-sm font-bold text-slate-500">Mover a <span id="reschedule-name" class="text-[var(--main)]">...</span></p>
-                        <input type="time" id="new-time" class="input-kb">
-                        <button onclick="confirmarReagendar()" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-xs">Confirmar Cambio</button>
+                        <p class="text-sm font-bold text-slate-500">Paciente: <span id="reschedule-name" class="text-[var(--main)] uppercase">...</span></p>
+                        <div>
+                            <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Nueva Fecha:</label>
+                            <input type="date" id="new-date" class="input-kb">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Nueva Hora:</label>
+                            <input type="time" id="new-time" class="input-kb">
+                        </div>
+                        <button onclick="confirmarReagendar()" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-xs shadow-lg">Confirmar Cambio de Cita</button>
                     </div>
                 </div>
 
@@ -111,11 +116,11 @@
                         </div>
                         <div class="bg-slate-50 p-6 rounded-[2rem] space-y-3 border border-slate-100">
                             <p class="text-[9px] font-black text-indigo-500 uppercase italic">Datos Fiscales:</p>
-                            <input type="text" id="f-rfc" class="input-kb bg-white text-xs uppercase" placeholder="RFC (12 o 13 carac.)">
+                            <input type="text" id="f-rfc" class="input-kb bg-white text-xs uppercase" placeholder="RFC">
                             <input type="text" id="f-razon" class="input-kb bg-white text-xs" placeholder="Razón Social">
-                            <input type="text" id="f-correo" class="input-kb bg-white text-xs" placeholder="Email de envío">
+                            <input type="text" id="f-correo" class="input-kb bg-white text-xs" placeholder="Email">
                         </div>
-                        <button onclick="procesarCobroFull()" class="w-full py-5 bg-[var(--main)] text-white rounded-2xl font-black uppercase text-xs shadow-xl transition hover:scale-105">Confirmar y Cerrar</button>
+                        <button onclick="procesarCobroFull()" class="w-full py-5 bg-[var(--main)] text-white rounded-2xl font-black uppercase text-xs shadow-xl transition hover:scale-105">Finalizar Pago</button>
                     </div>
                 </div>
             </div>
@@ -145,7 +150,7 @@
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
                 document.documentElement.style.setProperty('--main', TEMAS[data[0].template_id] || TEMAS[1]);
-                document.getElementById('doc-assigned').innerText = "NODO: DR. " + data[0].nombre_doctor;
+                document.getElementById('doc-assigned').innerText = "DR. " + data[0].nombre_doctor;
                 cargarCitas();
                 setInterval(cargarCitas, 10000);
                 setInterval(escucharDoctor, 3000);
@@ -166,21 +171,6 @@
             `).join('');
         }
 
-        async function crearCitaExpress() {
-            const nom = document.getElementById('exp-nombre').value;
-            const hor = document.getElementById('exp-hora').value;
-            const tel = document.getElementById('exp-tel').value;
-            if(!nom || !hor) return alert("Faltan datos");
-            await fetch(`${URL}/rest/v1/Citas`, {
-                method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ doctor_id: docId, nombre_paciente: nom + " (EXPRESS)", hora: hor, fecha: new Date().toISOString().split('T')[0], telefono: tel, pagado: false })
-            });
-            alert("Paciente añadido a fila.");
-            switchView('agenda');
-            cargarCitas();
-        }
-
         function seleccionar(id, nombre, hora, tel) {
             currentId = id; pTel = tel;
             document.getElementById('patient-display').innerText = nombre;
@@ -188,30 +178,68 @@
             escucharDoctor();
         }
 
+        async function crearCitaExpress() {
+            const nom = document.getElementById('exp-nombre').value;
+            const hor = document.getElementById('exp-hora').value;
+            if(!nom || !hor) return alert("Faltan datos");
+            await fetch(`${URL}/rest/v1/Citas`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doctor_id: docId, nombre_paciente: nom + " (EXPRESS)", hora: hor, fecha: new Date().toISOString().split('T')[0], telefono: document.getElementById('exp-tel').value, pagado: false })
+            });
+            alert("Paciente en fila.");
+            switchView('agenda');
+            cargarCitas();
+        }
+
+        function abrirReagendar(id, nombre) {
+            currentId = id;
+            document.getElementById('reschedule-name').innerText = nombre;
+            document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
+            switchView('reschedule');
+        }
+
+        async function confirmarReagendar() {
+            const f = document.getElementById('new-date').value;
+            const h = document.getElementById('new-time').value;
+            if(!f || !h) return alert("Elija fecha y hora");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fecha: f, hora: h, telefono: "REAGENDADO" })
+            });
+            alert("Cita movida.");
+            switchView('agenda');
+            cargarCitas();
+        }
+
+        async function procesarCobroFull() {
+            const m = document.getElementById('reg-monto').value;
+            if(!m || !currentId) return alert("Ingrese monto");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagado: true, monto: m, telefono: `PAGO: ${document.getElementById('reg-metodo').value} | RFC: ${document.getElementById('f-rfc').value || 'PÚBLICO'}` })
+            });
+            alert("Pago registrado.");
+            currentId = null;
+            document.getElementById('patient-display').innerText = "Seleccione...";
+            document.getElementById('patient-time-display').innerText = "";
+            switchView('agenda');
+            cargarCitas();
+        }
+
+        function contactarWhatsApp() {
+            if(!pTel) return alert("Seleccione paciente");
+            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
+        }
+
         async function escucharDoctor() {
             if(!currentId) return;
             const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             const m = data[0].telefono || "";
-            document.getElementById('last-doctor-response').innerText = m.includes("DOCTOR DICE:") ? m.replace("DOCTOR DICE:", "") : "Esperando instrucción...";
-        }
-
-        async function procesarCobroFull() {
-            const m = document.getElementById('reg-monto').value;
-            const rfc = document.getElementById('f-rfc').value || "PÚBLICO GRAL";
-            if(!m || !currentId) return alert("Ingrese monto");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pagado: true, monto: m, telefono: `PAGO: ${document.getElementById('reg-metodo').value} | RFC: ${rfc}` })
-            });
-            alert("Cobro exitoso.");
-            location.reload();
-        }
-
-        function contactarWhatsApp() {
-            if(!pTel) return alert("Selecciona paciente");
-            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
+            document.getElementById('last-doctor-response').innerText = m.includes("DOCTOR DICE:") ? m.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
         }
 
         function switchView(v) {
@@ -226,11 +254,7 @@
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             const ocupadas = citas.map(c => c.hora.slice(0,5));
-            document.getElementById('slots-occupied').innerHTML = ocupadas.length > 0 ? ocupadas.map(h => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg">${h}</span>`).join('') : 'Día libre';
-        }
-
-        function abrirReagendar(id, nombre) {
-            currentId = id; document.getElementById('reschedule-name').innerText = nombre; switchView('reschedule');
+            document.getElementById('slots-occupied').innerHTML = ocupadas.length > 0 ? ocupadas.map(h => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg">${h}</span>`).join('') : 'Libre';
         }
 
         async function enviarNotaInterna() {
