@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.B Assistant PRO | Centro de Mando</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap');
+        :root { --primario: #ddd6fe; --acentos: #f5f3ff; --fondo: #fbfaff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--fondo); color: #1e293b; overflow-x: hidden; }
+        .glass-panel { background: white; border: 1px solid #ede9fe; border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(139, 92, 246, 0.08); }
+        .input-pure { background: #f5f3ff; border: 2px solid transparent; border-radius: 1.2rem; padding: 14px 18px; width: 100%; outline: none; transition: 0.3s; font-size: 0.9rem; }
+        .input-pure:focus { border-color: #c4b5fd; background: white; }
+        .capsule-menu { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid #ddd6fe; padding: 12px 30px; border-radius: 100px; display: flex; gap: 25px; align-items: center; box-shadow: 0 20px 50px rgba(139, 92, 246, 0.15); z-index: 1000; }
+        .nav-icon { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; font-size: 1.2rem; }
+        .nav-icon.active { background: #ede9fe; color: #7c3aed; }
+        .lock-screen { backdrop-filter: blur(25px); background: rgba(255,255,255,0.9); z-index: 9999; }
+    </style>
+</head>
+<body class="p-4 md:p-12 text-left">
+
+    <div id="pantalla-bloqueo" class="fixed inset-0 lock-screen flex items-center justify-center">
+        <div class="text-center p-10 bg-white rounded-[3rem] shadow-2xl border border-violet-100 max-w-sm w-full">
+            <span class="text-5xl mb-4 block">💜</span>
+            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase tracking-widest text-center">Login Asistente</h2>
+            <input type="password" id="pin-acceso" class="w-full p-4 rounded-2xl bg-violet-50 text-center text-2xl tracking-[1em] mb-4 outline-none" placeholder="****">
+            <button onclick="verificarAcceso()" class="w-full py-4 bg-violet-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-violet-700 transition-all">Entrar</button>
+        </div>
+    </div>
+
+    <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-700">
+        <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start mb-10 gap-4">
+            <div>
+                <h1 class="text-4xl font-black text-slate-800 tracking-tight italic">K.B <span class="text-purple-400">Assistant</span></h1>
+                <p id="live-date" class="text-slate-400 font-medium mt-1 uppercase text-[10px] tracking-widest"></p>
+            </div>
+            <div class="flex items-center gap-4">
+                <select id="master-doc-selector" onchange="cargarCitas()" class="p-3 bg-white border border-violet-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none ring-2 ring-violet-50">
+                    <option value="">Cargando Médicos...</option>
+                </select>
+                <span class="px-4 py-2 bg-violet-50 text-violet-500 rounded-full text-[9px] font-black uppercase border border-violet-100">Live Sync</span>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pb-32">
+            
+            <div class="lg:col-span-4 space-y-6">
+                <div class="glass-panel p-8 border-t-8 border-violet-400">
+                    <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 italic">Control de Turno</h3>
+                    <div class="mb-8">
+                        <p class="text-3xl font-extrabold text-slate-700 leading-tight" id="patient-display">Seleccione Paciente</p>
+                        <p id="patient-phone-display" class="text-[10px] font-bold text-slate-400 uppercase mt-1">Sin selección activa</p>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="contactarWhatsApp()" class="flex-1 py-3 bg-emerald-100 text-emerald-600 rounded-xl font-bold text-[10px] uppercase">WhatsApp</button>
+                        <button onclick="llamarPaciente()" class="flex-1 py-3 bg-blue-100 text-blue-600 rounded-xl font-bold text-[10px] uppercase">Llamar</button>
+                    </div>
+
+                    <button onclick="prepararCobro()" class="w-full py-4 bg-violet-50 text-violet-600 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-violet-100 hover:bg-violet-500 hover:text-white transition-all">💰 Liquidar y Cobrar</button>
+                </div>
+
+                <div class="glass-panel p-8 bg-violet-50/30">
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Intercomunicador Live</h3>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-white rounded-2xl border border-violet-100">
+                            <p class="text-[8px] font-black text-violet-300 uppercase mb-1">Nota para el Médico:</p>
+                            <p id="patient-note-display" class="text-xs font-medium text-slate-600 italic">--</p>
+                        </div>
+                        <input type="text" id="internal-note-input" class="input-pure text-[10px]" placeholder="Instrucción urgente...">
+                        <button onclick="enviarNotaInterna()" class="w-full py-2 bg-violet-600 text-white rounded-xl font-bold text-[9px] uppercase">Enviar a Consultorio</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 space-y-8">
+                <div id="view-agenda" class="glass-panel p-10 min-h-[500px]">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800">Agenda Sincronizada</h3>
+                        <input type="date" id="filtro-fecha" onchange="cargarCitas()" class="bg-slate-50 border-none rounded-xl p-2 text-[10px] font-bold">
+                    </div>
+                    <div class="overflow-hidden rounded-3xl border border-slate-50">
+                        <table class="w-full text-left">
+                            <thead class="bg-violet-50 text-[9px] uppercase font-black text-violet-400">
+                                <tr><th class="p-5">Hora</th><th class="p-5">Paciente</th><th class="p-5">Status</th></tr>
+                            </thead>
+                            <tbody id="tabla-citas-body" class="text-sm font-medium text-slate-600"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="view-register" class="hidden glass-panel p-10">
+                    <h3 class="text-[10px] font-black uppercase text-slate-800 mb-8">Confirmar Liquidación de Consulta</h3>
+                    <div class="space-y-4 max-w-sm">
+                        <input type="text" id="reg-nombre" class="input-pure font-black" readonly>
+                        <input type="number" id="reg-monto" class="input-pure" placeholder="Monto a cobrar (MXN)">
+                        <select id="reg-metodo" class="input-pure font-bold">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                        <div class="flex gap-4 pt-4">
+                            <button onclick="procesarCobroFinal()" class="flex-grow py-5 bg-emerald-500 text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest shadow-lg">Finalizar Pago</button>
+                            <button onclick="switchView('agenda')" class="px-8 bg-slate-100 text-slate-400 rounded-2xl font-bold uppercase text-[10px]">Atrás</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-history" class="hidden glass-panel p-10">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8">Historial de Cobros</h3>
+                    <div class="overflow-hidden rounded-3xl border border-slate-50">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-[9px] uppercase font-black text-slate-400">
+                                <tr><th class="p-5">Paciente</th><th class="p-5">Monto</th><th class="p-5">Método</th></tr>
+                            </thead>
+                            <tbody id="tabla-historial-body" class="text-sm text-slate-500 italic"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <nav class="capsule-menu">
+        <div class="nav-icon active" id="nav-agenda" onclick="switchView('agenda')">📋</div>
+        <div class="nav-icon" id="nav-history" onclick="switchView('history')">🕰️</div>
+        <div class="nav-icon" onclick="location.reload()">🔒</div>
+    </nav>
+
+    <script>
+        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
+        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        let pacienteSeleccionado = null;
+
+        function verificarAcceso() {
+            if(document.getElementById('pin-acceso').value === "0000") {
+                document.getElementById('pantalla-bloqueo').classList.add('hidden');
+                document.getElementById('contenido-panel').classList.remove('hidden');
+                setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
+                initMaster();
+            } else { alert("PIN Incorrecto"); }
+        }
+
+        async function initMaster() {
+            await cargarDoctores();
+            await cargarCitas();
+        }
+
+        async function cargarDoctores() {
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos`, {
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+            });
+            const docs = await res.json();
+            const sel = document.getElementById('master-doc-selector');
+            sel.innerHTML = docs.map(d => `<option value="${d.id}">Dr. ${d.nombre_doctor}</option>`).join('');
+        }
+
+        async function cargarCitas() {
+            const docId = document.getElementById('master-doc-selector').value;
+            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, {
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+            });
+            const citas = await res.json();
+            
+            const activos = citas.filter(c => !c.pagado);
+            const historial = citas.filter(c => c.pagado);
+
+            document.getElementById('tabla-citas-body').innerHTML = activos.map(c => `
+                <tr class="border-b border-violet-50 hover:bg-violet-50 transition cursor-pointer" 
+                    onclick="seleccionarPaciente('${c.nombre_paciente}', '${c.telefono}', '${c.id}', '${c.hora}')">
+                    <td class="p-5 font-bold text-violet-500">${c.hora.slice(0,5)}</td>
+                    <td class="p-5 font-bold">${c.nombre_paciente}</td>
+                    <td class="p-5"><span class="px-2 py-1 bg-violet-100 text-violet-600 rounded text-[9px] font-black uppercase">SALA ESPERA</span></td>
+                </tr>
+            `).join('');
+
+            document.getElementById('tabla-historial-body').innerHTML = historial.map(c => `
+                <tr class="border-b border-slate-50 italic">
+                    <td class="p-5">${c.nombre_paciente}</td>
+                    <td class="p-5">$${c.monto}</td>
+                    <td class="p-5 text-emerald-500 font-bold text-[9px]">PAGADO</td>
+                </tr>
+            `).join('');
+        }
+
+        function seleccionarPaciente(nombre, tel, id, hora) {
+            pacienteSeleccionado = { nombre, tel, id, hora };
+            document.getElementById('patient-display').innerText = nombre;
+            document.getElementById('patient-phone-display').innerText = "📍 Status: Activo";
+            document.getElementById('patient-note-display').innerText = tel || "Sin notas enviadas";
+        }
+
+        async function enviarNotaInterna() {
+            const nota = document.getElementById('internal-note-input').value;
+            if(!pacienteSeleccionado || !nota) return alert("Seleccione paciente");
+            
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${pacienteSeleccionado.id}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telefono: "RECEPCIÓN: " + nota })
+            });
+            alert("Nota enviada al consultorio");
+            document.getElementById('internal-note-input').value = "";
+            cargarCitas();
+        }
+
+        async function procesarCobroFinal() {
+            const monto = document.getElementById('reg-monto').value;
+            const metodo = document.getElementById('reg-metodo').value;
+            if(!monto) return alert("Ingrese monto");
+
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${pacienteSeleccionado.id}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagado: true, monto: parseFloat(monto) })
+            });
+
+            // Registrar en tabla de Pagos para el historial financiero
+            await fetch(`${URL}/rest/v1/Pagos`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    cita_id: pacienteSeleccionado.id, 
+                    doctor_id: document.getElementById('master-doc-selector').value,
+                    monto: parseFloat(monto),
+                    metodo_pago: metodo 
+                })
+            });
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            pdf.text(`RECIBO K.B TECH\nPaciente: ${pacienteSeleccionado.nombre}\nMonto: $${monto}\nMétodo: ${metodo}`, 10, 10);
+            pdf.save(`Ticket_${pacienteSeleccionado.nombre}.pdf`);
+            
+            switchView('agenda');
+            cargarCitas();
+        }
+
+        function switchView(view) {
+            document.getElementById('view-agenda').classList.toggle('hidden', view !== 'agenda');
+            document.getElementById('view-history').classList.toggle('hidden', view !== 'history');
+            document.getElementById('view-register').classList.toggle('hidden', view !== 'register');
+            document.querySelectorAll('.nav-icon').forEach(el => el.classList.remove('active'));
+            if(document.getElementById('nav-' + view)) document.getElementById('nav-' + view).classList.add('active');
+        }
+
+        function prepararCobro() {
+            if(!pacienteSeleccionado) return alert("Elige un paciente");
+            document.getElementById('reg-nombre').value = pacienteSeleccionado.nombre;
+            switchView('register');
+        }
+
+        document.getElementById('live-date').innerText = new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+        setInterval(cargarCitas, 10000);
+    </script>
+</body>
+</html>
