@@ -20,8 +20,8 @@
     <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 space-y-8">
             <header>
-                <h1 class="text-5xl font-black italic tracking-tighter mb-2 italic">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
-                <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold">Gestión Médica de Élite</p>
+                <h1 class="text-5xl font-black italic tracking-tighter mb-2 italic uppercase">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
+                <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic">Gestión Médica de Élite</p>
             </header>
 
             <form id="form-registro" class="space-y-6">
@@ -37,7 +37,7 @@
                             <option value="Odontología">Odontología</option>
                             <option value="Pediatría">Pediatría</option>
                             <option value="Cardiología">Cardiología</option>
-                            <option value="Bienestar">Bienestar</option>
+                            <option value="Bienestar (Nutri/Psico)">Bienestar (Nutri/Psico)</option>
                             <option value="General">Medicina General</option>
                         </select>
                     </div>
@@ -46,27 +46,28 @@
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
                         <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Ambiente Atmosférico</p>
-                        <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white">Seleccione</span>
+                        <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white tracking-widest">Seleccione</span>
                     </div>
                     <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
                 </div>
 
-                <div class="flex items-center gap-6 p-6 bg-indigo-500/5 rounded-[2.5rem] border border-white/5">
+                <div class="flex items-center gap-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
                         <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Activación de Nodo Pro</p>
                         <p class="text-4xl font-black text-white">$1,599 <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span></p>
                     </div>
-                    <button type="button" onclick="procesarPago(event)" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all">Activar</button>
+                    <button type="button" onclick="procesarPago(event)" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all">Activar Nodo</button>
                 </div>
             </form>
         </div>
 
         <div class="lg:col-span-5 flex flex-col items-center">
             <div id="preview-box" class="preview-phone">
-                <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-5 text-slate-900 pointer-events-none select-none">🏥</div>
+                <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-5 text-slate-900 pointer-events-none select-none italic">🏥</div>
                 <div class="p-8 text-slate-800 space-y-8 relative h-full flex flex-col justify-center bg-white/90 text-center">
-                    <div id="prev-icon" class="text-5xl mb-4">🏥</div>
-                    <div class="h-5 w-40 bg-slate-200 rounded-full mx-auto"></div>
+                    <div id="prev-icon" class="text-6xl mb-2 drop-shadow-lg">🏥</div>
+                    <div class="h-4 w-32 bg-slate-200 rounded-full mx-auto mb-2"></div>
+                    <p id="prev-desc" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest px-4"></p>
                     <div id="prev-button" class="h-14 w-full rounded-[1.5rem] shadow-xl transition-all"></div>
                 </div>
             </div>
@@ -78,10 +79,48 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
         const CATALOGO = {
-            "Ginecología": [{ id: 2, color: "#f43f5e", icon: "🌸", tag: "Floral" }, { id: 5, color: "#8b5cf6", icon: "🔮", tag: "Boutique" }],
-            "Odontología": [{ id: 1, color: "#0ea5e9", icon: "💎", tag: "Arctic" }, { id: 3, color: "#10b981", icon: "🌿", tag: "Emerald" }],
-            "Pediatría": [{ id: 2, color: "#fb923c", icon: "🧸", tag: "Infantil" }, { id: 1, color: "#38bdf8", icon: "🚀", tag: "Lúdico" }],
-            "General": [{ id: 4, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" }, { id: 1, color: "#6366f1", icon: "🏥", tag: "Moderno" }]
+            "Ginecología": [
+                { id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral", desc: "Rose Quartz" },
+                { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique", desc: "Lavender Silk" },
+                { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal", desc: "Pink Velvet" },
+                { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico", desc: "Nature Essence" },
+                { id: 5, color: "#1e293b", icon: "💎", tag: "Élite", desc: "Premium Care" }
+            ],
+            "Odontología": [
+                { id: 1, color: "#0ea5e9", icon: "💎", tag: "Clínico", desc: "Arctic Bright" },
+                { id: 2, color: "#10b981", icon: "🌿", tag: "Orgánico", desc: "Emerald Fresh" },
+                { id: 3, color: "#22d3ee", icon: "❄️", tag: "Estético", desc: "Ice Smile" },
+                { id: 4, color: "#1e3a8a", icon: "🛡️", tag: "Cirugía", desc: "Titanium Pro" },
+                { id: 5, color: "#6366f1", icon: "⚡", tag: "Tech", desc: "Digital Dentist" }
+            ],
+            "Pediatría": [
+                { id: 1, color: "#fb923c", icon: "🧸", tag: "Infantil", desc: "Sunny Kids" },
+                { id: 2, color: "#38bdf8", icon: "🚀", tag: "Lúdico", desc: "Sky Dreams" },
+                { id: 3, color: "#4ade80", icon: "🦖", tag: "Aventura", desc: "Dino Jungle" },
+                { id: 4, color: "#f472b6", icon: "🍭", tag: "Tierno", desc: "Candy Health" },
+                { id: 5, color: "#818cf8", icon: "🌙", tag: "Paz", desc: "Starry Night" }
+            ],
+            "Cardiología": [
+                { id: 1, color: "#e11d48", icon: "❤️", tag: "Precisión", desc: "Vital Pulse" },
+                { id: 2, color: "#1e293b", icon: "⚡", tag: "Digital", desc: "Tech Heart" },
+                { id: 3, color: "#0284c7", icon: "🌊", tag: "Vascular", desc: "Flow System" },
+                { id: 4, color: "#9f1239", icon: "#9f1239", tag: "Hema", desc: "Deep Crimson" },
+                { id: 5, color: "#4f46e5", icon: "🛰️", tag: "Remoto", desc: "Cyber Cardio" }
+            ],
+            "Bienestar (Nutri/Psico)": [
+                { id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen", desc: "Zen Leaf" },
+                { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental", desc: "Mind Flow" },
+                { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri", desc: "Vital Food" },
+                { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia", desc: "Deep Therapy" },
+                { id: 5, color: "#10b981", icon: "🥑", tag: "Fit", desc: "Clean Eating" }
+            ],
+            "General": [
+                { id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido", desc: "Deep Ocean" },
+                { id: 2, color: "#6366f1", icon: "🏥", tag: "Moderno", desc: "Tech Navy" },
+                { id: 3, color: "#10b981", icon: "🩺", tag: "Básico", desc: "Clinic Green" },
+                { id: 4, color: "#be123c", icon: "🚑", tag: "Urgencia", desc: "Urgency Red" },
+                { id: 5, color: "#4338ca", icon: "🏢", tag: "Corp", desc: "City Medical" }
+            ]
         };
 
         let currentSelection = { template_id: 1, color: "#6366f1" };
@@ -98,12 +137,13 @@
                 dot.onclick = () => {
                     document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
                     dot.classList.add('active');
-                    currentSelection = { template_id: t.id, color: t.color };
+                    currentSelection = { template_id: index + 1, color: t.color };
                     document.getElementById('prev-button').style.backgroundColor = t.color;
                     document.getElementById('prev-icon').innerText = t.icon;
-                    document.getElementById('theme-tag').innerText = t.tag;
-                    document.getElementById('text-logo').style.color = t.color;
                     document.getElementById('prev-bg-icon').innerText = t.icon;
+                    document.getElementById('theme-tag').innerText = t.tag;
+                    document.getElementById('prev-desc').innerText = t.desc;
+                    document.getElementById('text-logo').style.color = t.color;
                 };
                 contenedor.appendChild(dot);
                 if(index === 0) dot.click();
@@ -112,10 +152,10 @@
 
         async function procesarPago(event) {
             const nombre = document.getElementById('nombre').value;
-            if(!nombre) return alert("Nombre obligatorio");
+            if(!nombre) return alert("Nombre del especialista obligatorio");
             
             const btn = event.target;
-            btn.innerText = "ACTIVANDO...";
+            btn.innerText = "ACTIVANDO NODO...";
             btn.disabled = true;
 
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
@@ -137,11 +177,10 @@
 
             if(res.ok) {
                 const data = await res.json();
-                alert("¡NODO ACTIVADO!");
-                // MODIFICACIÓN: Ahora te manda al panel del doctor (app.html)
+                alert("¡NODO MÉDICO ACTIVADO!");
                 window.location.href = `app.html?id=${data[0].id}`;
             } else {
-                alert("Error de registro.");
+                alert("Error en la activación.");
                 btn.innerText = "Activar";
                 btn.disabled = false;
             }
