@@ -36,9 +36,9 @@
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div>
                     <h1 class="text-2xl font-extrabold text-slate-800 tracking-tighter uppercase">K.B <span class="text-main" id="logo-tech">DOCTOR</span></h1>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold italic">Powered by K.B Tech Solutions</p>
+                    <p id="doc-esp-label" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold italic">Cargando Especialidad...</p>
                 </div>
-                <div id="doctor-avatar" class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-xl border-2 border-white shadow-sm border-main">👨‍⚕️</div>
+                <div id="doctor-avatar" class="h-12 w-12 bg-white rounded-full flex items-center justify-center text-2xl border-2 shadow-sm border-main transition-all">👨‍⚕️</div>
             </div>
         </nav>
 
@@ -60,9 +60,10 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-main mb-1 italic">Ingresos de Hoy</p>
-                    <p class="text-4xl font-black tracking-tighter" id="ganancia-mes">$0.00</p>
+                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+                    <div id="prev-bg-card" class="absolute right-[-20px] top-[-20px] text-8xl opacity-10 pointer-events-none">🏥</div>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-main mb-1 italic relative z-10">Ingresos de Hoy</p>
+                    <p class="text-4xl font-black tracking-tighter relative z-10" id="ganancia-mes">$0.00</p>
                 </div>
             </div>
 
@@ -82,7 +83,7 @@
                 <div class="bg-main p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">📋</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">Link Citas</span>
             </button>
-            <button onclick="abrirLinkAsistente()" class="flex flex-col items-center gap-1 group">
+            <button onclick="window.open('asistente.html?id='+docId, '_blank')" class="flex-col items-center gap-1 flex group">
                 <div class="bg-emerald-500 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">👩‍💼</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">Asistente</span>
             </button>
@@ -98,127 +99,115 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
         let currentPatientId = null;
-        let pinCorrecto = "1234"; // Default
+        let pinCorrecto = "0000";
 
-        const estilos = {
-            1: { main: "#0ea5e9", bg: "#f0f9ff", icon: "👨‍⚕️" },
-            2: { main: "#f43f5e", bg: "#fff1f2", icon: "👩‍⚕️" },
-            3: { main: "#10b981", bg: "#ecfdf5", icon: "🩺" },
-            4: { main: "#1e3a8a", bg: "#eff6ff", icon: "🏥" },
-            5: { main: "#8b5cf6", bg: "#f5f3ff", icon: "🧘‍♀️" }
+        // CATALOGO MAESTRO 6x5 (IGUAL AL DE REGISTRO Y AGENDAR)
+        const CATALOGO_MAESTRO = {
+            "Ginecología": [{id:1,color:"#f43f5e",icon:"🌸"},{id:2,color:"#8b5cf6",icon:"🔮"},{id:3,color:"#fb7185",icon:"🌷"},{id:4,color:"#059669",icon:"🍃"},{id:5,color:"#1e293b",icon:"💎"}],
+            "Odontología": [{id:1,color:"#0ea5e9",icon:"💎"},{id:2,color:"#10b981",icon:"🌿"},{id:3,color:"#22d3ee",icon:"❄️"},{id:4,color:"#1e3a8a",icon:"🛡️"},{id:5,color:"#6366f1",icon:"⚡"}],
+            "Pediatría": [{id:1,color:"#fb923c",icon:"🧸"},{id:2,color:"#38bdf8",icon:"🚀"},{id:3,color:"#4ade80",icon:"🦖"},{id:4,color:"#f472b6",icon:"🍭"},{id:5,color:"#818cf8",icon:"🌙"}],
+            "Cardiología": [{id:1,color:"#e11d48",icon:"❤️"},{id:2,color:"#1e293b",icon:"⚡"},{id:3,color:"#0284c7",icon:"🌊"},{id:4,color:"#9f1239",icon:"🩸"},{id:5,color:"#4f46e5",icon:"🛰️"}],
+            "Bienestar (Nutri/Psico)": [{id:1,color:"#059669",icon:"🧘‍♂️"},{id:2,color:"#a855f7",icon:"🧠"},{id:3,color:"#fbbf24",icon:"🍎"},{id:4,color:"#0ea5e9",icon:"🌊"},{id:5,color:"#10b981",icon:"🥑"}],
+            "General": [{id:1,color:"#1e3a8a",icon:"⚖️"},{id:2,color:"#6366f1",icon:"🏥"},{id:3,color:"#10b981",icon:"🩺"},{id:4,color:"#be123c",icon:"🚑"},{id:5,color:"#4338ca",icon:"🏢"}]
         };
 
-        async function init() {
-            if(!docId) return;
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
-            });
+        async function verificarAcceso() {
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            if(data.length > 0) {
-                const doc = data[0];
-                document.getElementById('lock-doctor-name').innerText = "Dr. " + doc.nombre_doctor;
-                // Si tienes una columna de PIN en Supabase, cárgala aquí:
-                if(doc.pin_acceso) pinCorrecto = doc.pin_acceso;
-
-                const estilo = estilos[doc.template_id] || estilos[1];
-                document.documentElement.style.setProperty('--main-color', estilo.main);
-                document.documentElement.style.setProperty('--bg-soft', estilo.bg);
-                document.getElementById('lock-icon').innerText = estilo.icon;
-                document.getElementById('doctor-avatar').innerText = estilo.icon;
-                document.getElementById('btn-unlock').style.backgroundColor = estilo.main;
-            }
-        }
-
-        function verificarAcceso() {
-            const pin = document.getElementById('pin-acceso').value;
-            if(pin === pinCorrecto) {
+            const doc = data[0];
+            pinCorrecto = doc.pin_acceso || "0000";
+            if(document.getElementById('pin-acceso').value === pinCorrecto) {
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
-                syncMaster();
+                init(doc);
             } else { alert("PIN Incorrecto"); }
+        }
+
+        function init(doc) {
+            // Sincronización Visual Dinámica
+            const cat = CATALOGO_MAESTRO[doc.especialidad] || CATALOGO_MAESTRO["General"];
+            const tema = cat.find(t => t.id === doc.template_id) || cat[0];
+
+            document.documentElement.style.setProperty('--main-color', tema.color);
+            document.documentElement.style.setProperty('--bg-soft', tema.color + "15"); // 15% opacidad
+            
+            document.getElementById('lock-icon').innerText = tema.icon;
+            document.getElementById('doctor-avatar').innerText = tema.icon;
+            document.getElementById('prev-bg-card').innerText = tema.icon;
+            document.getElementById('lock-doctor-name').innerText = "Dr. " + doc.nombre_doctor;
+            document.getElementById('doc-esp-label').innerText = doc.especialidad + " | Nodo Activo";
+            document.getElementById('btn-unlock').style.backgroundColor = tema.color;
+            document.getElementById('logo-tech').style.color = tema.color;
+
+            syncMaster();
+            setInterval(syncMaster, 10000);
         }
 
         async function syncMaster() {
             try {
-                const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, {
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
-                });
+                const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
                 const citas = await res.json();
-                document.getElementById('total-hoy').innerText = citas.filter(c => !c.pagado).length;
+                document.getElementById('total-hoy').innerText = citas.length;
                 const contenedor = document.getElementById('contenedor-citas');
                 
                 contenedor.innerHTML = citas.map(cita => `
                     <div class="card-pro bg-white p-6 rounded-[2.5rem] flex items-center justify-between gap-4 shadow-sm" 
-                         onclick="enfocarPaciente('${cita.id}', '${cita.nombre_paciente}', '${cita.telefono || 'Sin notas del asistente'}')">
+                         onclick="enfocarPaciente('${cita.id}', '${cita.nombre_paciente}', '${cita.telefono || 'Sin notas'}')">
                         <div class="flex items-center gap-6 text-left">
                             <div class="text-xl font-black text-main w-16">${cita.hora.slice(0,5)}</div>
                             <div>
                                 <h3 class="font-bold text-slate-800 text-sm uppercase">${cita.nombre_paciente}</h3>
-                                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest italic">${cita.pagado ? '✅ Finalizada' : '🕒 En espera'}</p>
+                                <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">En espera</p>
                             </div>
                         </div>
-                        <span class="px-3 py-1 rounded-xl uppercase text-[9px] font-black ${cita.pagado ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}">
-                            ${cita.pagado ? 'COBRADO' : 'PENDIENTE'}
-                        </span>
+                        <span class="px-4 py-2 rounded-xl uppercase text-[9px] font-black bg-slate-100 text-slate-400">PENDIENTE</span>
                     </div>
                 `).join('');
 
-                const totalHoy = citas.reduce((acc, c) => acc + (c.pagado ? parseFloat(c.monto || 0) : 0), 0);
-                document.getElementById('ganancia-mes').innerText = `$${totalHoy.toLocaleString()}.00`;
+                const resIngresos = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.true`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+                const pagados = await resIngresos.json();
+                const total = pagados.reduce((acc, c) => acc + parseFloat(c.monto || 0), 0);
+                document.getElementById('ganancia-mes').innerText = `$${total.toLocaleString()}`;
             } catch (e) { console.error(e); }
         }
 
         function enfocarPaciente(id, nombre, nota) {
             currentPatientId = id;
             document.getElementById('dra-patient-name').innerText = nombre;
-            document.getElementById('dra-view-note').innerText = nota;
+            document.getElementById('dra-view-note').innerText = nota.includes("ASISTENTE:") ? nota.replace("ASISTENTE:", "") : nota;
         }
 
         async function enviarRespuestaDra() {
             const respuesta = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !respuesta) return alert("Seleccione un paciente");
+            if(!currentPatientId || !respuesta) return alert("Seleccione un paciente de la lista.");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
                 method: 'PATCH',
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ telefono: "DOCTOR DICE: " + respuesta }) 
             });
-            alert("Mensaje enviado");
+            alert("Respuesta enviada a recepción.");
             document.getElementById('dra-response-input').value = "";
             syncMaster();
         }
 
-        // --- FUNCIONES DE HERRAMIENTAS ---
         function copiarLinkCitas() {
-            // Este link es el que el doctor le da a sus pacientes
-            const link = window.location.origin + "/app.html?id=" + docId;
+            const link = window.location.origin + "/agendar.html?id=" + docId;
             navigator.clipboard.writeText(link);
-            alert("✅ Link de Citas copiado para sus pacientes.");
-        }
-
-        function abrirLinkAsistente() {
-            window.open(`asistente.html?id=${docId}`, '_blank');
+            alert("✅ Link de Reservación copiado.");
         }
 
         async function cambiarPin() {
-            const nuevoPin = prompt("Ingrese su nuevo PIN de 4 dígitos:");
-            if (nuevoPin && nuevoPin.length === 4 && !isNaN(nuevoPin)) {
-                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+            const nuevoPin = prompt("Ingrese nuevo PIN (4 dígitos):");
+            if (nuevoPin && nuevoPin.length === 4) {
+                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
                     method: 'PATCH',
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pin_acceso: nuevoPin }) 
                 });
-                if(res.ok) {
-                    pinCorrecto = nuevoPin;
-                    alert("✅ PIN actualizado con éxito.");
-                }
-            } else {
-                alert("PIN inválido. Debe ser de 4 números.");
+                alert("✅ PIN de seguridad actualizado.");
             }
         }
-
-        init();
-        setInterval(syncMaster, 10000);
     </script>
 </body>
 </html>
