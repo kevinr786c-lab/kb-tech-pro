@@ -2,56 +2,61 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Médico | K.B Tech</title>
+    <title>Panel Médico Élite | K.B Tech</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 p-6 md:p-12 font-sans">
     <div class="max-w-4xl mx-auto">
         <header class="flex justify-between items-center mb-10">
             <div>
-                <h1 id="welcome" class="text-3xl font-black tracking-tighter italic text-slate-900">Cargando Panel...</h1>
+                <h1 id="welcome" class="text-3xl font-black tracking-tighter italic text-slate-900">Sincronizando...</h1>
                 <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-1">Gestión de Citas Entrantes</p>
             </div>
-            <button onclick="location.reload()" class="p-3 bg-white rounded-xl shadow-sm border border-slate-200 hover:bg-slate-100">🔄</button>
+            <button onclick="location.reload()" class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200 hover:bg-slate-100 transition-all">🔄 Refrescar</button>
         </header>
 
         <div id="citas-container" class="grid gap-4">
-            <p id="no-citas" class="text-center py-20 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Esperando sincronización...</p>
+            <p id="no-citas" class="text-center py-20 text-slate-400 font-bold uppercase text-[10px] tracking-[0.5em] animate-pulse">Esperando nuevas citas en la red...</p>
         </div>
     </div>
 
     <script>
-        const URL = "https://ypxtceahtjxcdaefskxe.supabase.co"; 
-        const KEY = "sb_publishable_C9j37Nup330TMa-jb3QC4A_z7GhzEBM"; 
+        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
+        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
 
         async function cargarPanel() {
-            if(!docId) return;
+            if(!docId) {
+                document.body.innerHTML = "<div class='p-20 text-center font-black text-slate-300 tracking-widest uppercase'>Error: Nodo No Identificado</div>";
+                return;
+            }
 
-            // 1. Obtener datos del médico
+            // 1. Obtener perfil del doctor
             const resDoc = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
             });
             const dataDoc = await resDoc.json();
             if(dataDoc.length > 0) document.getElementById('welcome').innerText = "Dr. " + dataDoc[0].nombre_doctor;
 
-            // 2. Obtener sus citas
+            // 2. Obtener citas
             const resCitas = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=fecha.asc,hora.asc`, {
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
             });
             const citas = await resCitas.json();
             
             const container = document.getElementById('citas-container');
-            if(citas.length > 0) {
+            if(citas && citas.length > 0) {
                 document.getElementById('no-citas').classList.add('hidden');
                 container.innerHTML = citas.map(c => `
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center">
-                        <div>
-                            <h3 class="font-black text-slate-800">${c.nombre_paciente}</h3>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${c.telefono || 'Sin teléfono'}</p>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center hover:shadow-md transition-all">
+                        <div class="text-left">
+                            <h3 class="font-black text-slate-800 text-lg">${c.nombre_paciente}</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">${c.telefono || 'Sin WhatsApp'}</p>
                         </div>
                         <div class="text-right">
-                            <span class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full text-[10px] font-black uppercase">${c.fecha} | ${c.hora}</span>
+                            <span class="bg-indigo-50 text-indigo-600 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-tighter border border-indigo-100">
+                                📅 ${c.fecha} | ⏰ ${c.hora}
+                            </span>
                         </div>
                     </div>
                 `).join('');
