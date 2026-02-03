@@ -20,8 +20,8 @@
     <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 space-y-8">
             <header>
-                <h1 class="text-5xl font-black italic tracking-tighter mb-2 italic">K.B <span class="text-indigo-400 text-main-dynamic">TECH</span></h1>
-                <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic uppercase">Plataforma de Gestión Médica de Élite</p>
+                <h1 class="text-5xl font-black italic tracking-tighter mb-2 italic">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
+                <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold">Gestión Médica de Élite</p>
             </header>
 
             <form id="form-registro" class="space-y-6">
@@ -32,12 +32,12 @@
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase text-slate-500 ml-4 italic">Especialidad</label>
-                        <select id="especialidad" onchange="cambiarCatalogo()" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-white text-sm font-bold text-white appearance-none">
+                        <select id="especialidad" onchange="cambiarCatalogo()" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none text-sm font-bold text-white appearance-none">
                             <option value="Ginecología">Ginecología</option>
                             <option value="Odontología">Odontología</option>
                             <option value="Pediatría">Pediatría</option>
                             <option value="Cardiología">Cardiología</option>
-                            <option value="Bienestar (Nutri/Psico)">Bienestar (Nutri/Psico)</option>
+                            <option value="Bienestar">Bienestar</option>
                             <option value="General">Medicina General</option>
                         </select>
                     </div>
@@ -45,7 +45,7 @@
 
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
-                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Atmósfera Visual</p>
+                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Ambiente Atmosférico</p>
                         <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white">Seleccione</span>
                     </div>
                     <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
@@ -53,24 +53,20 @@
 
                 <div class="flex items-center gap-6 p-6 bg-indigo-500/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
-                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Activación Nodo Pro</p>
+                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Activación de Nodo Pro</p>
                         <p class="text-4xl font-black text-white">$1,599 <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span></p>
                     </div>
-                    <button type="button" onclick="procesarPago(event)" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:scale-105 transition-all">Activar Nodo</button>
+                    <button type="button" onclick="procesarPago(event)" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all">Activar</button>
                 </div>
             </form>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col items-center justify-center space-y-8">
-            <div class="text-center px-4">
-                <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 italic">Prevista de Nodo</p>
-                <p id="prev-privacidad" class="text-[9px] text-indigo-200 italic leading-tight max-w-[250px] mx-auto"></p>
-            </div>
+        <div class="lg:col-span-5 flex flex-col items-center">
             <div id="preview-box" class="preview-phone">
                 <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-5 text-slate-900 pointer-events-none select-none">🏥</div>
                 <div class="p-8 text-slate-800 space-y-8 relative h-full flex flex-col justify-center bg-white/90 text-center">
-                    <div id="prev-icon" class="text-6xl mb-2">🏥</div>
-                    <div class="h-4 w-32 bg-slate-200 rounded-full mx-auto mb-2"></div>
+                    <div id="prev-icon" class="text-5xl mb-4">🏥</div>
+                    <div class="h-5 w-40 bg-slate-200 rounded-full mx-auto"></div>
                     <div id="prev-button" class="h-14 w-full rounded-[1.5rem] shadow-xl transition-all"></div>
                 </div>
             </div>
@@ -82,24 +78,13 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
         const CATALOGO = {
-            "Ginecología": [
-                { id: 2, color: "#f43f5e", icon: "🌸", bg: "🌸", desc: "Rose Quartz", tag: "Floral", priv: "Privacidad: Sus datos de salud femenina son tratados con máxima reserva legal." },
-                { id: 5, color: "#8b5cf6", icon: "🔮", bg: "✨", desc: "Lavender Silk", tag: "Boutique", priv: "Privacidad: Resguardamos su información con elegancia y total discreción." }
-            ],
-            "Odontología": [
-                { id: 1, color: "#0ea5e9", icon: "💎", bg: "🦷", tag: "Arctic", priv: "Privacidad: Registros dentales protegidos bajo protocolos de seguridad digital avanzada." },
-                { id: 3, color: "#10b981", icon: "🌿", bg: "🍃", tag: "Emerald", priv: "Privacidad: Historial bucal resguardado en entorno digital de bienestar." }
-            ],
-            "Pediatría": [
-                { id: 2, color: "#fb923c", icon: "🧸", bg: "🎈", tag: "Sunny", priv: "Privacidad: La información de los menores es sagrada. Máxima protección pediátrica." }
-            ],
-            "General": [
-                { id: 4, color: "#1e3a8a", icon: "⚖️", bg: "🛡️", tag: "Sólido", priv: "Privacidad: Sus datos y notas de consulta son encriptados bajo la ley vigente." },
-                { id: 1, color: "#6366f1", icon: "🏥", bg: "🧬", tag: "Moderno", priv: "Privacidad: Seguridad digital de vanguardia para su historial clínico." }
-            ]
+            "Ginecología": [{ id: 2, color: "#f43f5e", icon: "🌸", tag: "Floral" }, { id: 5, color: "#8b5cf6", icon: "🔮", tag: "Boutique" }],
+            "Odontología": [{ id: 1, color: "#0ea5e9", icon: "💎", tag: "Arctic" }, { id: 3, color: "#10b981", icon: "🌿", tag: "Emerald" }],
+            "Pediatría": [{ id: 2, color: "#fb923c", icon: "🧸", tag: "Infantil" }, { id: 1, color: "#38bdf8", icon: "🚀", tag: "Lúdico" }],
+            "General": [{ id: 4, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" }, { id: 1, color: "#6366f1", icon: "🏥", tag: "Moderno" }]
         };
 
-        let currentSelection = { template_id: 1, color: "#6366f1", privacidad: "" };
+        let currentSelection = { template_id: 1, color: "#6366f1" };
 
         function cambiarCatalogo() {
             const esp = document.getElementById('especialidad').value;
@@ -113,13 +98,12 @@
                 dot.onclick = () => {
                     document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
                     dot.classList.add('active');
-                    currentSelection = { template_id: t.id, color: t.color, privacidad: t.priv };
+                    currentSelection = { template_id: t.id, color: t.color };
                     document.getElementById('prev-button').style.backgroundColor = t.color;
                     document.getElementById('prev-icon').innerText = t.icon;
-                    document.getElementById('prev-bg-icon').innerText = t.bg;
-                    document.getElementById('prev-privacidad').innerText = t.priv;
                     document.getElementById('theme-tag').innerText = t.tag;
-                    document.getElementById('theme-tag').style.color = t.color;
+                    document.getElementById('text-logo').style.color = t.color;
+                    document.getElementById('prev-bg-icon').innerText = t.icon;
                 };
                 contenedor.appendChild(dot);
                 if(index === 0) dot.click();
@@ -134,31 +118,31 @@
             btn.innerText = "ACTIVANDO...";
             btn.disabled = true;
 
-            try {
-                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-                    body: JSON.stringify({
-                        nombre_doctor: nombre,
-                        especialidad: document.getElementById('especialidad').value,
-                        template_id: currentSelection.template_id,
-                        plan: 'Dominio',
-                        email: nombre.toLowerCase().replace(/ /g, ".") + "@kbtech.com",
-                        frase_personalizada: currentSelection.privacidad
-                    })
-                });
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': KEY_DB, 
+                    'Authorization': `Bearer ${KEY_DB}`, 
+                    'Content-Type': 'application/json', 
+                    'Prefer': 'return=representation' 
+                },
+                body: JSON.stringify({
+                    nombre_doctor: nombre,
+                    especialidad: document.getElementById('especialidad').value,
+                    template_id: currentSelection.template_id,
+                    plan: 'Dominio',
+                    email: nombre.toLowerCase().replace(/ /g, ".") + "@kbtech.com"
+                })
+            });
 
-                if(res.ok) {
-                    const data = await res.json();
-                    alert("¡NODO ACTIVADO!");
-                    // SALTO DIRECTO A APP.HTML CON LA ID
-                    window.location.href = `app.html?id=${data[0].id}`;
-                } else {
-                    throw new Error("Error 400");
-                }
-            } catch(e) {
-                alert("Error: Revisa que el nombre no esté repetido.");
-                btn.innerText = "Activar Nodo";
+            if(res.ok) {
+                const data = await res.json();
+                alert("¡NODO ACTIVADO!");
+                // MODIFICACIÓN: Ahora te manda al panel del doctor (app.html)
+                window.location.href = `app.html?id=${data[0].id}`;
+            } else {
+                alert("Error de registro.");
+                btn.innerText = "Activar";
                 btn.disabled = false;
             }
         }
