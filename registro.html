@@ -12,6 +12,7 @@
         .color-dot { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
         .color-dot.active { border-color: white; transform: scale(1.2); box-shadow: 0 0 20px rgba(99,102,241,0.5); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .modal-pago { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); }
     </style>
 </head>
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
@@ -55,7 +56,7 @@
                         <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Suscripción Dominio</p>
                         <p class="text-4xl font-black text-white">$1,599 <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span></p>
                     </div>
-                    <button type="button" onclick="procesarPago(event)" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all">Activar Nodo</button>
+                    <button type="submit" id="btn-activar" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all">Activar Nodo</button>
                 </div>
             </form>
         </div>
@@ -73,9 +74,43 @@
         </div>
     </div>
 
+    <div id="modal-pago" class="hidden fixed inset-0 modal-pago z-50 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-[3rem] p-8 text-slate-800 shadow-2xl border-t-[12px] border-indigo-500">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">🏦</div>
+                <h2 class="text-2xl font-black uppercase italic tracking-tighter">Portal de Pago</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">K.B Tech Solutions x BBVA</p>
+            </div>
+            
+            <div class="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
+                <div>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase">Banco</p>
+                    <p class="font-bold">BBVA México</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase">Beneficiario</p>
+                    <p class="font-bold">Kevin Brayan Reyes Cruz</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase">Clave Interbancaria (CLABE)</p>
+                    <p class="font-black text-lg tracking-wider">0120 2801 5649 7592 11</p>
+                </div>
+                <div class="pt-2 border-t border-slate-200">
+                    <p class="text-[9px] font-black text-slate-400 uppercase">Concepto de Pago</p>
+                    <p class="font-bold italic" id="pago-concepto">MÉDICO-NODO</p>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium">Realiza tu transferencia y presiona el botón de abajo para configurar tu consultorio. Tu nodo se activará al validar el depósito.</p>
+            
+            <button onclick="irAConfiguracion()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all">He realizado el pago</button>
+        </div>
+    </div>
+
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        let ultimoIdGenerado = null;
 
         const CATALOGO = {
             "Ginecología": [
@@ -146,17 +181,16 @@
                 };
                 contenedor.appendChild(dot);
             });
-            // Activar primer color por defecto al cambiar especialidad
             contenedor.firstChild.click();
         }
 
-        async function procesarPago(event) {
+        document.getElementById('form-registro').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const nombre = document.getElementById('nombre').value;
             const esp = document.getElementById('especialidad').value;
-            if(!nombre) return alert("Ingrese el nombre del especialista.");
             
-            const btn = event.target;
-            btn.innerText = "ACTIVANDO..."; btn.disabled = true;
+            const btn = document.getElementById('btn-activar');
+            btn.innerText = "ACTIVANDO NODO..."; btn.disabled = true;
 
             try {
                 const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
@@ -178,18 +212,27 @@
 
                 if(res.ok) {
                     const data = await res.json();
-                    alert("¡NODO MÉDICO ACTIVADO CON ÉXITO!");
-                    window.location.href = `app.html?id=${data[0].id}`;
+                    ultimoIdGenerado = data[0].id;
+                    document.getElementById('pago-concepto').innerText = "KB-" + nombre.toUpperCase().substring(0, 5) + "-" + ultimoIdGenerado.substring(0,4);
+                    // MOSTRAR MODAL DE PAGO
+                    document.getElementById('modal-pago').classList.remove('hidden');
                 } else {
                     const err = await res.json();
                     alert("Error: " + err.message);
                     btn.innerText = "Activar Nodo"; btn.disabled = false;
                 }
             } catch (e) {
-                alert("Error crítico de conexión.");
-                btn.disabled = false;
+                alert("Error de conexión con K.B Tech.");
+                btn.innerText = "Activar Nodo"; btn.disabled = false;
+            }
+        });
+
+        function irAConfiguracion() {
+            if(ultimoIdGenerado) {
+                window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
             }
         }
+
         cambiarCatalogo();
     </script>
 </body>
