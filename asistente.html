@@ -14,6 +14,13 @@
         .bg-dr-msg { background: var(--bg); border-left: 4px solid var(--main); }
         .input-kb { width: 100%; padding: 1rem; border-radius: 1.25rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; }
         .input-kb:focus { border-color: var(--main); background: white; }
+        
+        /* Estilos Calendario Grid */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; }
+        .day-box:hover { background: var(--bg); border-color: var(--main); }
+        .day-box.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 15px -3px var(--main); }
+        .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; }
     </style>
 </head>
 <body class="p-4 md:p-10 pb-32 text-slate-800">
@@ -80,8 +87,19 @@
                 </div>
 
                 <div id="view-calendar" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">📅 Disponibilidad</h3>
-                    <input type="date" id="check-date" onchange="consultarHuecos()" class="input-kb mb-6">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">📅 Calendario Maestro</h3>
+                        <p id="month-name" class="text-xs font-black text-[var(--main)] uppercase italic"></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-2 mb-2">
+                        <div class="day-name">Dom</div><div class="day-name">Lun</div><div class="day-name">Mar</div>
+                        <div class="day-name">Mie</div><div class="day-name">Jue</div><div class="day-name">Vie</div>
+                        <div class="day-name">Sab</div>
+                    </div>
+                    <div id="calendar-body" class="calendar-grid mb-8"></div>
+
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Ocupación del día seleccionado:</h3>
                     <div id="slots-occupied" class="flex flex-wrap gap-2"></div>
                 </div>
 
@@ -113,6 +131,7 @@
         <div class="nav-icon active p-4 rounded-full cursor-pointer" id="nav-agenda" onclick="switchView('agenda')">📋</div>
         <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-calendar" onclick="switchView('calendar')">📅</div>
         <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-billing" onclick="switchView('billing')">🧾</div>
+        <div class="nav-icon p-4 rounded-full cursor-pointer bg-slate-100" onclick="cambiarPin()">🔑</div>
     </nav>
 
     <script>
@@ -131,15 +150,50 @@
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
                 document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
                 
-                // Carga inicial
+                initCalendar();
                 cargarCitas(); 
                 setInterval(cargarCitas, 10000); 
                 setInterval(escucharDoctor, 3000);
             } else { alert("PIN Incorrecto"); }
         }
 
+        // --- LÓGICA DE CALENDARIO GRID ---
+        function initCalendar() {
+            const now = new Date();
+            const month = now.getMonth();
+            const year = now.getFullYear();
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('month-name').innerText = monthNames[month] + " " + year;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calBody = document.getElementById('calendar-body');
+            calBody.innerHTML = "";
+
+            // Espacios vacíos
+            for(let i=0; i<firstDay; i++) { calBody.innerHTML += `<div></div>`; }
+
+            // Días del mes
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isToday = d === now.getDate() ? 'border-2 border-[var(--main)]' : '';
+                calBody.innerHTML += `<div class="day-box ${isToday}" id="day-${d}" onclick="consultarHuecos('${dateStr}', ${d})">${d}</div>`;
+            }
+        }
+
+        async function consultarHuecos(fecha, diaNum) {
+            document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
+            document.getElementById('day-'+diaNum).classList.add('selected');
+
+            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const data = await res.json();
+            document.getElementById('slots-occupied').innerHTML = data.length > 0 
+                ? data.map(c => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg text-[10px] font-bold">${c.hora_cita.slice(0,5)}</span>`).join('') 
+                : `<p class="text-[10px] text-emerald-500 font-bold">Día totalmente libre</p>`;
+        }
+
+        // --- FUNCIONES DE AGENDA Y COBRO ---
         async function cargarCitas() {
-            // CORREGIDO: Ahora busca en Citas_Agendadas (igual que el doctor)
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
@@ -162,7 +216,6 @@
 
         async function escucharDoctor() {
             if(!currentId) return;
-            // CORREGIDO: Busca instrucciones en la columna 'status'
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             const statusMsg = data[0].status || "";
@@ -172,22 +225,20 @@
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
             if(!currentId || !n) return alert("Seleccione paciente");
-            // CORREGIDO: Envía nota actualizando la columna 'status'
             await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { 
                 method: 'PATCH', 
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
                 body: JSON.stringify({ status: "ASISTENTE: " + n }) 
             });
             document.getElementById('internal-note-input').value = ""; 
-            alert("Nota enviada al panel del Dr.");
+            alert("Nota enviada.");
         }
 
         async function procesarCobroFull() {
             const m = document.getElementById('reg-monto').value;
             if(!m || !currentId) return alert("Ingrese monto");
             await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, {
-                method: 'PATCH', 
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ pagado: true, monto_cobrado: m, status: `COBRADO | RFC: ${document.getElementById('f-rfc').value || 'PÚBLICO'}` })
             });
             alert("Cobro exitoso."); currentId = null; switchView('agenda'); cargarCitas();
@@ -220,11 +271,16 @@
 
         function contactarWhatsApp() { if(!pTel) return alert("Seleccione paciente"); window.open(`https://wa.me/52${pTel.replace(/\D/g,'')}`, '_blank'); }
 
-        async function consultarHuecos() {
-            const f = document.getElementById('check-date').value;
-            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const data = await res.json();
-            document.getElementById('slots-occupied').innerHTML = data.map(c => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg">${c.hora_cita.slice(0,5)}</span>`).join('') || "Libre";
+        async function cambiarPin() {
+            const nuevoPin = prompt("Ingrese nuevo PIN de 4 dígitos para este consultorio:");
+            if (nuevoPin && nuevoPin.length === 4) {
+                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin_acceso: nuevoPin }) 
+                });
+                if(res.ok) alert("✅ PIN de seguridad actualizado.");
+            } else { alert("PIN inválido. Deben ser 4 números."); }
         }
 
         function switchView(v) {
