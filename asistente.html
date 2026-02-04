@@ -54,12 +54,12 @@
                     <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Intercomunicador Directo</h3>
                     <div id="chat-history" class="mb-4 space-y-2">
                         <div class="bg-dr-msg p-4 rounded-2xl text-[11px] shadow-sm">
-                            <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Respuesta del Dr:</span>
-                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando instrucción...</p>
+                            <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Instrucción del Dr:</span>
+                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando...</p>
                         </div>
                     </div>
-                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-20 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Nota al Dr..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase shadow-sm">Enviar Nota</button>
+                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-20 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Nota rápida al doctor..."></textarea>
+                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase shadow-sm">Enviar a Consultorio</button>
                 </div>
             </div>
 
@@ -74,7 +74,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" id="exp-nombre" class="input-kb" placeholder="Nombre completo">
                         <input type="time" id="exp-hora" class="input-kb">
-                        <input type="tel" id="exp-tel" class="input-kb md:col-span-2" placeholder="WhatsApp / Teléfono">
+                        <input type="tel" id="exp-tel" class="input-kb md:col-span-2" placeholder="WhatsApp (10 dígitos)">
                         <button onclick="crearCitaExpress()" class="md:col-span-2 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs">Añadir a Fila</button>
                     </div>
                 </div>
@@ -139,24 +139,25 @@
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
                 
-                // Sincronización Visual
                 const cat = CATALOGO_MAESTRO[doc.especialidad] || CATALOGO_MAESTRO["General"];
                 const tema = cat.find(t => t.id === doc.template_id) || cat[0];
                 document.documentElement.style.setProperty('--main', tema.color);
                 document.getElementById('lock-icon').innerText = tema.icon;
                 document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
                 
-                cargarCitas(); setInterval(cargarCitas, 10000); setInterval(escucharDoctor, 3000);
+                cargarCitas(); 
+                setInterval(cargarCitas, 10000); 
+                setInterval(escucharDoctor, 3000);
             } else { alert("PIN Incorrecto"); }
         }
 
         async function cargarCitas() {
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
                 <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-[1.5rem] hover:border-[var(--main)] transition">
-                    <div class="flex gap-4 items-center cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
-                        <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora.slice(0,5)}</span>
+                    <div class="flex gap-4 items-center cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora_cita}', '${c.telefono}')">
+                        <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora_cita.slice(0,5)}</span>
                         <p class="font-bold text-sm uppercase">${c.nombre_paciente}</p>
                     </div>
                     <button onclick="abrirReagendar('${c.id}', '${c.nombre_paciente}')" class="text-[8px] font-black text-orange-400 px-3 py-2">Mover</button>
@@ -173,34 +174,43 @@
 
         async function escucharDoctor() {
             if(!currentId) return;
-            const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            const m = data[0].telefono || "";
-            document.getElementById('last-doctor-response').innerText = m.includes("DOCTOR DICE:") ? m.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
+            const status = data[0].status || "";
+            document.getElementById('last-doctor-response').innerText = status.includes("DOCTOR DICE:") ? status.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
         }
 
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
             if(!currentId || !n) return alert("Seleccione paciente");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "ASISTENTE: " + n }) });
-            document.getElementById('internal-note-input').value = ""; alert("Enviado");
+            await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { 
+                method: 'PATCH', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ status: "ASISTENTE: " + n }) 
+            });
+            document.getElementById('internal-note-input').value = ""; 
+            alert("Nota enviada al panel del Dr.");
         }
 
         async function procesarCobroFull() {
             const m = document.getElementById('reg-monto').value;
             if(!m || !currentId) return alert("Ingrese monto");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
-                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pagado: true, monto: m, telefono: `COBRADO | RFC: ${document.getElementById('f-rfc').value || 'PÚBLICO'}` })
+            await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, {
+                method: 'PATCH', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagado: true, monto_cobrado: m, status: `COBRADO | RFC: ${document.getElementById('f-rfc').value || 'PÚBLICO'}` })
             });
             alert("Cobro exitoso."); currentId = null; switchView('agenda'); cargarCitas();
         }
 
         async function crearCitaExpress() {
-            const nom = document.getElementById('exp-nombre').value; const hor = document.getElementById('exp-hora').value;
+            const nom = document.getElementById('exp-nombre').value; 
+            const hor = document.getElementById('exp-hora').value;
             if(!nom || !hor) return alert("Faltan datos");
-            await fetch(`${URL}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ doctor_id: docId, nombre_paciente: nom + " (E)", hora: hor, fecha: new Date().toISOString().split('T')[0], telefono: document.getElementById('exp-tel').value, pagado: false })
+            await fetch(`${URL}/rest/v1/Citas_Agendadas`, { 
+                method: 'POST', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doctor_id: docId, nombre_paciente: nom + " (E)", hora_cita: hor, fecha_cita: new Date().toISOString().split('T')[0], telefono: document.getElementById('exp-tel').value, pagado: false })
             });
             alert("Paciente en fila."); switchView('agenda'); cargarCitas();
         }
@@ -210,17 +220,21 @@
         async function confirmarReagendar() {
             const f = document.getElementById('new-date').value; const h = document.getElementById('new-time').value;
             if(!f || !h) return alert("Falta fecha/hora");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ fecha: f, hora: h }) });
+            await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { 
+                method: 'PATCH', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ fecha_cita: f, hora_cita: h }) 
+            });
             alert("Cita movida."); switchView('agenda'); cargarCitas();
         }
 
-        function contactarWhatsApp() { if(!pTel) return alert("Seleccione paciente"); window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank'); }
+        function contactarWhatsApp() { if(!pTel) return alert("Seleccione paciente"); window.open(`https://wa.me/52${pTel.replace(/\D/g,'')}`, '_blank'); }
 
         async function consultarHuecos() {
             const f = document.getElementById('check-date').value;
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            document.getElementById('slots-occupied').innerHTML = data.map(c => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg">${c.hora.slice(0,5)}</span>`).join('') || "Libre";
+            document.getElementById('slots-occupied').innerHTML = data.map(c => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg">${c.hora_cita.slice(0,5)}</span>`).join('') || "Libre";
         }
 
         function switchView(v) {
