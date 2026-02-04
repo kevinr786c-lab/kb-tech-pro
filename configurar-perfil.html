@@ -52,23 +52,85 @@
                 <textarea id="bio" rows="3" placeholder="Cuéntanos un poco de tu experiencia..." class="input-kb"></textarea>
             </div>
 
-            <button type="submit" class="md:col-span-2 w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition-all shadow-xl">Guardar y Abrir Consultorio</button>
+            <button type="submit" id="btn-save" class="md:col-span-2 w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition-all shadow-xl">Guardar y Abrir Consultorio</button>
         </form>
 
         <p class="mt-8 text-center text-[10px] font-black text-slate-300 uppercase tracking-widest">Powered by K.B Tech Solutions</p>
     </div>
 
     <script>
-        // Aquí iría la lógica de Supabase para hacer el UPDATE
-        // Y la función sugerirConIA() que use tu API de Gemini
+        const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
+        const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        
+        // Obtenemos el ID del doctor desde la URL
+        const params = new URLSearchParams(window.location.search);
+        const docId = params.get('id');
+
         async function sugerirConIA() {
             const bio = document.getElementById('bio');
-            bio.placeholder = "Gemini está escribiendo...";
-            // Aquí llamarías a tu función de Gemini
+            const originalPlaceholder = bio.placeholder;
+            bio.placeholder = "Gemini está analizando tu especialidad...";
+            
+            // Simulación de respuesta de Gemini para la Bio
+            // En el futuro aquí llamaremos a la API real
             setTimeout(() => {
-                bio.value = "Médico especialista comprometido con la excelencia y la salud integral, ofreciendo atención personalizada con tecnología de vanguardia y calidez humana en Tijuana.";
-            }, 1500);
+                bio.value = "Especialista comprometido con la salud integral, ofreciendo atención médica de vanguardia con calidez humana. Mi enfoque se centra en diagnósticos precisos y tratamientos personalizados para mejorar la calidad de vida de mis pacientes en Tijuana.";
+            }, 1200);
         }
+
+        document.getElementById('form-config').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!docId) {
+                alert("Error: No se detectó ID de médico. Por favor, regresa al registro.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-save');
+            btn.innerText = "CONFIGURANDO TU SUCURSAL DIGITAL...";
+            btn.disabled = true;
+
+            // Recolectamos los datos
+            const payload = {
+                cedula: document.getElementById('cedula').value,
+                aviso_cofepris: document.getElementById('cofepris').value,
+                url_logo: document.getElementById('url_logo').value,
+                hora_inicio: document.getElementById('h_inicio').value + ":00",
+                hora_fin: document.getElementById('h_fin').value + ":00",
+                duracion_cita_min: parseInt(document.getElementById('duracion').value),
+                biografia: document.getElementById('bio').value
+            };
+
+            try {
+                const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': KEY_DB,
+                        'Authorization': `Bearer ${KEY_DB}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("¡Configuración Exitosa! Bienvenido a la élite médica.");
+                    // Redirigir al Panel del Doctor
+                    window.location.href = `panel-doctor.html?id=${docId}`;
+                } else {
+                    const errorData = await response.json();
+                    console.error(errorData);
+                    alert("Error al guardar: " + (errorData.message || "Problema de conexión"));
+                    btn.innerText = "Guardar y Abrir Consultorio";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error crítico de red.");
+                btn.innerText = "Guardar y Abrir Consultorio";
+                btn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>
