@@ -62,17 +62,13 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         
-        // Obtenemos el ID del doctor desde la URL
         const params = new URLSearchParams(window.location.search);
         const docId = params.get('id');
 
         async function sugerirConIA() {
             const bio = document.getElementById('bio');
-            const originalPlaceholder = bio.placeholder;
             bio.placeholder = "Gemini está analizando tu especialidad...";
             
-            // Simulación de respuesta de Gemini para la Bio
-            // En el futuro aquí llamaremos a la API real
             setTimeout(() => {
                 bio.value = "Especialista comprometido con la salud integral, ofreciendo atención médica de vanguardia con calidez humana. Mi enfoque se centra en diagnósticos precisos y tratamientos personalizados para mejorar la calidad de vida de mis pacientes en Tijuana.";
             }, 1200);
@@ -87,10 +83,9 @@
             }
 
             const btn = document.getElementById('btn-save');
-            btn.innerText = "CONFIGURANDO TU SUCURSAL DIGITAL...";
+            btn.innerText = "ACTIVANDO TU NODO DIGITAL...";
             btn.disabled = true;
 
-            // Recolectamos los datos
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value,
@@ -114,18 +109,16 @@
                 });
 
                 if (response.ok) {
-                    alert("¡Configuración Exitosa! Bienvenido a la élite médica.");
-                    // Redirigir al Panel del Doctor
-                    window.location.href = `panel-doctor.html?id=${docId}`;
+                    alert("¡Configuración Exitosa! Bienvenido a la élite de K.B Tech.");
+                    // REDIRECCIÓN CORREGIDA PARA EVITAR EL 404
+                    window.location.href = `app.html?id=${docId}`;
                 } else {
                     const errorData = await response.json();
-                    console.error(errorData);
                     alert("Error al guardar: " + (errorData.message || "Problema de conexión"));
                     btn.innerText = "Guardar y Abrir Consultorio";
                     btn.disabled = false;
                 }
             } catch (err) {
-                console.error(err);
                 alert("Error crítico de red.");
                 btn.innerText = "Guardar y Abrir Consultorio";
                 btn.disabled = false;
