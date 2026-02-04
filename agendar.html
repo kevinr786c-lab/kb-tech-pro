@@ -18,7 +18,18 @@
             border: 2px solid transparent; font-weight: 700; font-size: 0.9rem; transition: 0.3s; outline: none;
         }
         .input-modern:focus { border-color: var(--main); background: white; box-shadow: 0 10px 25px -10px var(--main); }
-        input[type="date"], input[type="time"] { cursor: pointer; color: #1e293b; }
+        
+        /* Sistema de Horarios Verde/Rojo */
+        .grid-horas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .btn-hora { 
+            padding: 12px; border-radius: 1.2rem; font-weight: 800; font-size: 0.75rem; 
+            transition: 0.3s; text-align: center; border: 2px solid transparent; cursor: pointer;
+        }
+        .hora-disponible { background: #f1f5f9; color: #475569; }
+        .hora-disponible:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -5px var(--main); border-color: var(--main); }
+        
+        .hora-ocupada { background: #fee2e2; color: #991b1b; opacity: 0.5; cursor: not-allowed; border-color: #f87171; text-decoration: line-through; }
+        .hora-seleccionada { background: var(--main) !important; color: white !important; transform: scale(1.05); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -40,13 +51,16 @@
             </div>
 
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Día de Cita</label>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Selecciona el Día</label>
                 <input type="date" id="fecha" class="input-modern" required>
             </div>
 
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Hora de Cita</label>
-                <input type="time" id="hora" class="input-modern" required>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Horarios Disponibles</label>
+                <div id="contenedor-horas" class="grid-horas">
+                    <p class="col-span-3 text-[8px] text-center text-slate-400 py-4 uppercase font-bold tracking-widest">Elige una fecha para ver disponibilidad</p>
+                </div>
+                <input type="hidden" id="hora-seleccionada" required>
             </div>
 
             <button type="submit" id="btn-submit" class="w-full py-6 bg-slate-900 text-white rounded-[2.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-2xl transition-all duration-500 hover:scale-105 active:scale-95">Confirmar Reservación</button>
@@ -70,66 +84,68 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
 
+        let doctorConfig = null;
+
         const CATALOGO_MAESTRO = {
             "Ginecología": [
                 { id: 1, color: "#f43f5e", icon: "🌸", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad absoluta." },
-                { id: 2, color: "#8b5cf6", icon: "🔮", priv: "Sofisticación y calma boutique. Resguardamos tu información con la elegancia que mereces." },
-                { id: 3, color: "#fb7185", icon: "🌷", priv: "Suavidad y atención prenatal. Cuidamos de ti y de tu bienestar con reserva profesional." },
-                { id: 4, color: "#059669", icon: "🍃", priv: "Salud femenina orgánica. Tu privacidad es un proceso natural y seguro con nosotros." },
-                { id: 5, color: "#1e293b", icon: "💎", priv: "Discreción de alta gama. Protocolos de élite para el manejo confidencial de tu historial clínico." }
+                { id: 2, color: "#8b5cf6", icon: "🔮", priv: "Sofisticación y calma boutique. Resguardamos tu información con elegancia." },
+                { id: 3, color: "#fb7185", icon: "🌷", priv: "Suavidad y atención prenatal. Cuidamos de ti con reserva profesional." },
+                { id: 4, color: "#059669", icon: "🍃", priv: "Salud femenina orgánica. Tu privacidad es un proceso seguro." },
+                { id: 5, color: "#1e293b", icon: "💎", priv: "Discreción de alta gama. Protocolos de élite para tu historial clínico." }
             ],
             "Odontología": [
-                { id: 1, color: "#0ea5e9", icon: "💎", priv: "Limpieza y tecnología. Registros dentales protegidos bajo seguridad digital extrema." },
-                { id: 2, color: "#10b981", icon: "🌿", priv: "Frescura y salud dental. Tu historial dental está resguardado en un entorno ético y profesional." },
-                { id: 3, color: "#22d3ee", icon: "❄️", priv: "Estética y blanqueamiento. Protegemos tu diagnóstico estético con tecnología de vanguardia." },
-                { id: 4, color: "#1e3a8a", icon: "🛡️", priv: "Cirugía e implantes. Máxima seguridad digital para tus procedimientos especializados." },
-                { id: 5, color: "#6366f1", icon: "⚡", priv: "Innovación 3D. Tus diagnósticos digitales están protegidos por encriptación médica avanzada." }
+                { id: 1, color: "#0ea5e9", icon: "💎", priv: "Limpieza y tecnología. Registros dentales protegidos bajo seguridad digital." },
+                { id: 2, color: "#10b981", icon: "🌿", priv: "Frescura y salud dental. Tu historial está en un entorno ético." },
+                { id: 3, color: "#22d3ee", icon: "❄️", priv: "Estética y blanqueamiento. Protegemos tu diagnóstico estético." },
+                { id: 4, color: "#1e3a8a", icon: "🛡️", priv: "Cirugía e implantes. Máxima seguridad digital para tus procedimientos." },
+                { id: 5, color: "#6366f1", icon: "⚡", priv: "Innovación 3D. Tus diagnósticos protegidos por encriptación avanzada." }
             ],
             "Pediatría": [
-                { id: 1, color: "#fb923c", icon: "🧸", priv: "Entorno alegre y seguro. La privacidad de los niños es sagrada y está totalmente protegida." },
-                { id: 2, color: "#38bdf8", icon: "🚀", priv: "Confianza y juego. Solo tutores autorizados tienen acceso al historial clínico del menor." },
-                { id: 3, color: "#4ade80", icon: "🦖", priv: "Aventura segura. Datos pediátricos resguardados con absoluta ética y reserva profesional." },
-                { id: 4, color: "#f472b6", icon: "🍭", priv: "Dulce cuidado infantil. Tratamos la información con la ternura y seguridad que tu familia merece." },
-                { id: 5, color: "#818cf8", icon: "🌙", priv: "Estrella de calma. Un entorno sereno para resguardar la salud y privacidad de los más pequeños." }
+                { id: 1, color: "#fb923c", icon: "🧸", priv: "Entorno alegre y seguro. La privacidad de los niños es sagrada." },
+                { id: 2, color: "#38bdf8", icon: "🚀", priv: "Confianza y juego. Solo tutores autorizados acceden al historial." },
+                { id: 3, color: "#4ade80", icon: "🦖", priv: "Aventura segura. Datos pediátricos resguardados con absoluta ética." },
+                { id: 4, color: "#f472b6", icon: "🍭", priv: "Dulce cuidado infantil. Tratamos la info con ternura y seguridad." },
+                { id: 5, color: "#818cf8", icon: "🌙", priv: "Estrella de calma. Un entorno sereno para la privacidad de los pequeños." }
             ],
             "Cardiología": [
-                { id: 1, color: "#e11d48", icon: "❤️", priv: "Precisión cardíaca. Utilizamos encriptación de grado médico para proteger tus datos vitales." },
-                { id: 2, color: "#1e293b", icon: "⚡", priv: "Seriedad y vanguardia. Monitoreo cardiovascular bajo estándares tecnológicos de alta seguridad." },
-                { id: 3, color: "#0284c7", icon: "🌊", priv: "Flujo y salud vascular. Tus datos circulatorios están protegidos por tecnología de punta." },
-                { id: 4, color: "#9f1239", icon: "🩸", priv: "Hematología especializada. Resguardo ético de tus análisis y datos sanguíneos bajo protocolos." },
-                { id: 5, color: "#4f46e5", icon: "🛰️", priv: "Ciber Cardiología. Seguridad satelital aplicada a tu monitoreo cardíaco en tiempo real." }
+                { id: 1, color: "#e11d48", icon: "❤️", priv: "Precisión cardíaca. Encriptación de grado médico para tus datos vitales." },
+                { id: 2, color: "#1e293b", icon: "⚡", priv: "Seriedad y vanguardia. Monitoreo cardiovascular de alta seguridad." },
+                { id: 3, color: "#0284c7", icon: "🌊", priv: "Flujo y salud vascular. Datos circulatorios protegidos por tecnología de punta." },
+                { id: 4, color: "#9f1239", icon: "🩸", priv: "Hematología especializada. Resguardo ético de tus análisis sanguíneos." },
+                { id: 5, color: "#4f46e5", icon: "🛰️", priv: "Ciber Cardiología. Seguridad satelital aplicada a tu monitoreo cardíaco." }
             ],
             "Bienestar (Nutri/Psico)": [
-                { id: 1, color: "#059669", icon: "🧘‍♂️", priv: "Equilibrio y paz. Tus notas de consulta son privadas y encriptadas éticamente." },
-                { id: 2, color: "#a855f7", icon: "🧠", priv: "Crecimiento seguro. Tu historia emocional es confidencial y está protegida en nuestra nube." },
-                { id: 3, color: "#fbbf24", icon: "🍎", priv: "Nutrición energética. Planes alimenticios resguardados con absoluta reserva." },
-                { id: 4, color: "#0ea5e9", icon: "🌊", priv: "Inmersión emocional. Confidencialidad absoluta para tu proceso de sanación y bienestar." },
-                { id: 5, color: "#10b981", icon: "🥑", priv: "Vida saludable. Privacidad integral para tu estilo de vida fit y seguro." }
+                { id: 1, color: "#059669", icon: "🧘‍♂️", priv: "Equilibrio y paz. Tus notas de consulta son privadas y encriptadas." },
+                { id: 2, color: "#a855f7", icon: "🧠", priv: "Crecimiento seguro. Tu historia emocional es confidencial." },
+                { id: 3, color: "#fbbf24", icon: "🍎", priv: "Nutrición energética. Planes alimenticios resguardados con reserva." },
+                { id: 4, color: "#0ea5e9", icon: "🌊", priv: "Inmersión emocional. Confidencialidad absoluta para tu bienestar." },
+                { id: 5, color: "#10b981", icon: "🥑", priv: "Vida saludable. Privacidad integral para tu estilo de vida fit." }
             ],
             "General": [
-                { id: 1, color: "#1e3a8a", icon: "⚖️", priv: "Autoridad médica. Datos personales y notas de consulta encriptadas bajo la ley vigente." },
-                { id: 2, color: "#6366f1", icon: "🏥", priv: "Innovación moderna. Seguridad digital de última generación para tu historial clínico con control." },
-                { id: 3, color: "#10b981", icon: "🩺", priv: "Salud básica. Atención primaria con seguridad avanzada para el resguardo de tus datos." },
-                { id: 4, color: "#be123c", icon: "🚑", priv: "Urgencias médicas. Seguridad inmediata para datos críticos en situaciones de emergencia." },
-                { id: 5, color: "#4338ca", icon: "🏢", priv: "Red hospitalaria. Protección de datos a escala corporativa para redes de salud seguras." }
+                { id: 1, color: "#1e3a8a", icon: "⚖️", priv: "Autoridad médica. Datos personales encriptados bajo la ley vigente." },
+                { id: 2, color: "#6366f1", icon: "🏥", priv: "Innovación moderna. Seguridad digital para tu historial clínico." },
+                { id: 3, color: "#10b981", icon: "🩺", priv: "Salud básica. Atención primaria con seguridad avanzada." },
+                { id: 4, color: "#be123c", icon: "🚑", priv: "Urgencias médicas. Seguridad inmediata para datos críticos." },
+                { id: 5, color: "#4338ca", icon: "🏢", priv: "Red hospitalaria. Protección de datos a escala corporativa." }
             ]
         };
 
         async function init() {
-            if(!docId) return alert("Falta Nodo Médico.");
+            if(!docId) return alert("Error: Nodo Médico no identificado.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
             
             if(data.length > 0) {
-                const doc = data[0];
-                const especialidad = doc.especialidad;
-                const template_id = doc.template_id;
+                doctorConfig = data[0];
+                const especialidad = doctorConfig.especialidad;
+                const template_id = doctorConfig.template_id;
 
                 const cat = CATALOGO_MAESTRO[especialidad] || CATALOGO_MAESTRO["General"];
                 const tema = cat.find(t => t.id === template_id) || cat[0];
 
-                // Identidad Visual
-                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                // Aplicar Identidad Visual
+                document.getElementById('doc-name').innerText = "Dr. " + doctorConfig.nombre_doctor;
                 document.getElementById('doc-esp').innerText = especialidad;
                 document.getElementById('icon-header').innerText = tema.icon;
                 document.documentElement.style.setProperty('--main', tema.color);
@@ -140,34 +156,79 @@
                 document.getElementById('visual-1').innerText = tema.icon;
                 document.getElementById('visual-2').innerText = tema.icon;
 
-                // Privacidad
+                // Aplicar Privacidad Dinámica
                 document.getElementById('priv-texto').innerText = "AVISO LEGAL: " + tema.priv;
                 document.getElementById('priv-titulo').style.color = tema.color;
             }
         }
 
+        // GENERADOR DE HORARIOS INTELIGENTES (VERDE / ROJO)
+        document.getElementById('fecha').addEventListener('change', async (e) => {
+            const fecha = e.target.value;
+            const contenedor = document.getElementById('contenedor-horas');
+            contenedor.innerHTML = '<p class="col-span-3 text-center text-[8px] animate-pulse">ESCANEANDO DISPONIBILIDAD...</p>';
+
+            // Consultar citas ocupadas en Supabase
+            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, {
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` }
+            });
+            const citas = await res.json();
+            const horasOcupadas = citas.map(c => c.hora_cita.substring(0, 5));
+
+            contenedor.innerHTML = '';
+            
+            // Configuración del doctor (Viene de la base de datos)
+            let inicio = doctorConfig.hora_inicio || "09:00:00";
+            let fin = doctorConfig.hora_fin || "17:00:00";
+            let duracion = doctorConfig.duracion_cita_min || 30;
+
+            let hActual = new Date(`2026-01-01T${inicio}`);
+            let hFinal = new Date(`2026-01-01T${fin}`);
+
+            while(hActual < hFinal) {
+                const textoHora = hActual.toTimeString().substring(0, 5);
+                const btn = document.createElement('div');
+                const ocupada = horasOcupadas.includes(textoHora);
+
+                btn.innerText = textoHora;
+                btn.className = `btn-hora ${ocupada ? 'hora-ocupada' : 'hora-disponible'}`;
+                
+                if(!ocupada) {
+                    btn.onclick = () => {
+                        document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('hora-seleccionada'));
+                        btn.classList.add('hora-seleccionada');
+                        document.getElementById('hora-seleccionada').value = textoHora + ":00";
+                    };
+                }
+                contenedor.appendChild(btn);
+                hActual.setMinutes(hActual.getMinutes() + duracion);
+            }
+        });
+
         document.getElementById('form-cita').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit');
-            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            const hora = document.getElementById('hora-seleccionada').value;
+            if(!hora) return alert("⚠️ Por favor selecciona una hora disponible.");
 
-            const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "PROCESANDO RESERVA..."; btn.disabled = true;
+
+            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value,
-                    fecha: document.getElementById('fecha').value,
-                    hora: document.getElementById('hora').value,
-                    pagado: false
+                    fecha_cita: document.getElementById('fecha').value,
+                    hora_cita: hora
                 })
             });
 
             if(res.ok) {
-                alert("¡SOLICITUD ENVIADA!\nRecibirás una confirmación del consultorio.");
+                alert("✅ ¡CITA CONFIRMADA!\nTu espacio ha sido reservado en el sistema.");
                 location.reload();
             } else {
-                alert("Error al agendar.");
+                alert("❌ Error de conexión. Inténtalo de nuevo.");
                 btn.innerText = "Confirmar Reservación"; btn.disabled = false;
             }
         });
