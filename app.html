@@ -161,7 +161,6 @@
             document.getElementById('btn-unlock').style.backgroundColor = tema.color;
             document.getElementById('logo-tech').style.color = tema.color;
 
-            // Nivel por referidos
             const rec = doc.recomendados_count || 0;
             const progress = (rec / 5) * 100;
             document.getElementById('level-progress').style.width = Math.min(progress, 100) + "%";
@@ -224,19 +223,19 @@
             } catch(e) { alert("Error al enviar nota."); }
         }
 
+        // FUNCIÓN ACTUALIZADA PARA APUNTAR A AGENDAR.HTML (MATANDO EL 404)
         function copiarLinkCitas() {
             const path = window.location.pathname.split('/').slice(0, -1).join('/');
-            const link = window.location.origin + path + "/perfil.html?id=" + docId;
+            const link = window.location.origin + path + "/agendar.html?id=" + docId;
             navigator.clipboard.writeText(link);
-            alert("✅ Link de Reservación copiado.");
+            alert("✅ ¡Tu Link de Reservación ha sido copiado!\nCompártelo con tus pacientes para que agenden en agendar.html");
         }
 
-        // NUEVA FUNCIÓN PARA EL LINK DE LA ASISTENTE
         function copiarLinkAsistente() {
             const path = window.location.pathname.split('/').slice(0, -1).join('/');
             const link = window.location.origin + path + "/asistente.html?id=" + docId;
             navigator.clipboard.writeText(link);
-            alert("✅ ¡Link de Recepción Copiado!\nMándaselo a tu asistente para que gestione la Agenda Live.");
+            alert("✅ ¡Link de Recepción Copiado!\nMándaselo a tu asistente.");
         }
 
         async function cambiarPin() {
