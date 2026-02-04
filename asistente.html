@@ -27,18 +27,18 @@
         .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; }
 
         /* Barra Retráctil Camaleón */
-        #main-nav { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; }
-        .nav-hidden { transform: translate(-50%, 160%); opacity: 0; }
+        #main-nav { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; left: 50%; transform: translateX(-50%); }
+        .nav-hidden { transform: translate(-50%, 160%) !important; opacity: 0; }
     </style>
 </head>
-<body class="p-4 md:p-10 pb-40 text-slate-800">
+<body class="p-4 md:p-10 pb-44 text-slate-800">
 
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[100] flex items-center justify-center">
         <div class="text-center p-10 glass-panel max-w-sm w-full border-2 border-slate-100 shadow-2xl">
             <div id="lock-icon" class="text-5xl mb-4">🔐</div>
             <h2 class="text-xl font-black mb-6 uppercase tracking-widest">Acceso Asistente</h2>
             <input type="password" id="pin-acceso" class="w-full p-4 rounded-2xl bg-slate-50 text-center text-2xl tracking-[1em] mb-4 outline-none border-2 border-transparent focus:border-indigo-500" placeholder="****">
-            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase shadow-lg hover:bg-black transition">Entrar al Nodo</button>
+            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase shadow-lg">Entrar</button>
         </div>
     </div>
 
@@ -46,22 +46,22 @@
         <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
             <div>
                 <h1 class="text-3xl font-black text-slate-800 tracking-tight italic">K.B <span id="brand-text" class="text-[var(--main)]">Assistant</span></h1>
-                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Conectado al Dr...</p>
+                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Sincronizando...</p>
             </div>
-            <button onclick="switchView('express')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg shadow-indigo-100">+ Nuevo Paciente</button>
+            <button onclick="switchView('agenda')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg shadow-indigo-100">Actualizar</button>
         </header>
 
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Consulta Ahora:</h3>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Consulta:</h3>
                     <div class="mb-8">
-                        <p class="text-3xl font-extrabold text-slate-700 leading-tight" id="patient-display">Seleccione Cita</p>
+                        <p class="text-3xl font-extrabold text-slate-700 leading-tight" id="patient-display">Seleccione...</p>
                         <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic"></p>
                     </div>
                     <div class="flex gap-4">
                         <button onclick="contactarWhatsApp()" class="flex-1 py-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-[10px] uppercase">WhatsApp</button>
-                        <button onclick="switchView('billing')" class="flex-1 py-3 bg-[var(--main)] text-white rounded-xl font-bold text-[10px] uppercase shadow-md">💰 Cobrar</button>
+                        <button onclick="switchView('agenda')" class="flex-1 py-3 bg-[var(--main)] text-white rounded-xl font-bold text-[10px] uppercase shadow-md">💰 Cobrar</button>
                     </div>
                 </div>
 
@@ -70,11 +70,11 @@
                     <div id="chat-history" class="mb-4">
                         <div class="bg-dr-msg p-4 rounded-2xl text-[11px] shadow-sm">
                             <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Dr. dice:</span>
-                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando instrucción...</p>
+                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando...</p>
                         </div>
                     </div>
-                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-20 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Nota rápida..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase shadow-sm">Enviar al Doc</button>
+                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-20 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Nota al Dr..."></textarea>
+                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase shadow-sm">Enviar Nota</button>
                 </div>
             </div>
 
@@ -99,10 +99,9 @@
         </main>
     </div>
 
-    <nav id="main-nav" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-2xl border border-slate-200 p-4 rounded-full flex gap-5 shadow-2xl z-50">
+    <nav id="main-nav" class="fixed bottom-10 bg-white/90 backdrop-blur-2xl border border-slate-200 p-4 rounded-full flex gap-5 shadow-2xl z-50">
         <div class="nav-icon active p-4 rounded-full cursor-pointer" id="nav-agenda" onclick="switchView('agenda')">📋</div>
         <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-calendar" onclick="switchView('calendar')">📅</div>
-        <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-billing" onclick="switchView('billing')">🧾</div>
         <div class="w-px h-8 bg-slate-200 self-center mx-1"></div>
         <div class="p-4 rounded-full cursor-pointer bg-slate-50 hover:bg-slate-100 transition" onclick="cambiarPin()">🔑</div>
     </nav>
@@ -118,7 +117,7 @@
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('main-nav');
             const currentScroll = window.pageYOffset;
-            if (currentScroll > lastScroll && currentScroll > 80) {
+            if (currentScroll > lastScroll && currentScroll > 60) {
                 nav.classList.add('nav-hidden');
             } else {
                 nav.classList.remove('nav-hidden');
@@ -135,7 +134,6 @@
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
                 
-                // Color adaptativo
                 const colors = { "Ginecología": "#f43f5e", "Odontología": "#0ea5e9", "Pediatría": "#fb923c", "Cardiología": "#e11d48", "Bienestar (Nutri/Psico)": "#059669", "General": "#1e3a8a" };
                 document.documentElement.style.setProperty('--main', colors[doc.especialidad] || "#6366f1");
                 document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
@@ -148,18 +146,17 @@
         }
 
         async function cargarCitas() {
-            // Sincronización Maestra con Citas_Agendadas
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
                 <div class="flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-[var(--main)] transition-all shadow-sm">
                     <div class="flex gap-5 items-center cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora_cita}', '${c.telefono}')">
-                        <span class="text-xs font-black text-[var(--main)] bg-slate-50 px-4 py-2 rounded-xl shadow-inner">${c.hora_cita.slice(0,5)}</span>
-                        <p class="font-bold text-sm uppercase tracking-tight text-slate-700">${c.nombre_paciente}</p>
+                        <span class="text-xs font-black text-[var(--main)] bg-slate-50 px-4 py-2 rounded-xl">${c.hora_cita.slice(0,5)}</span>
+                        <p class="font-bold text-sm uppercase text-slate-700">${c.nombre_paciente}</p>
                     </div>
                     <span class="text-[9px] font-black text-slate-300">ACTIVO</span>
                 </div>
-            `).join('') || '<p class="text-center text-slate-300 py-20 italic">No hay citas para hoy.</p>';
+            `).join('') || '<p class="text-center text-slate-300 py-20 italic">Sin citas pendientes.</p>';
         }
 
         function initCalendar() {
@@ -193,29 +190,31 @@
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             const status = data[0].status || "";
-            document.getElementById('last-doctor-response').innerText = status.includes("DOCTOR DICE:") ? status.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
+            document.getElementById('last-doctor-response').innerText = status.includes("DOCTOR DICE:") ? status.replace("DOCTOR DICE:", "") : "Esperando instrucción...";
         }
 
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
             if(!currentId || !n) return alert("Seleccione un paciente");
             await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: "ASISTENTE: " + n }) });
-            document.getElementById('internal-note-input').value = ""; alert("Enviado al consultorio.");
+            document.getElementById('internal-note-input').value = ""; alert("Enviado.");
         }
 
         async function cambiarPin() {
             const nuevoPin = prompt("Nuevo PIN (4 números):");
             if (nuevoPin && nuevoPin.length === 4) {
                 await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pin_acceso: nuevoPin }) });
-                alert("✅ Seguridad actualizada.");
+                alert("✅ Actualizado.");
             }
         }
 
         function switchView(v) {
             ['view-agenda', 'view-calendar'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
-            document.getElementById('view-' + v).classList.remove('hidden');
+            const target = document.getElementById('view-' + v);
+            if(target) target.classList.remove('hidden');
             document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
-            document.getElementById('nav-' + v).classList.add('active');
+            document.getElementById('nav-' + v)?.classList.add('active');
+            if(v === 'calendar') initCalendar();
         }
     </script>
 </body>
