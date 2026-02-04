@@ -3,130 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Assistant | Control de Nodo Pro</title>
+    <title>K.B Assistant | Nodo Camaleón Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         :root { --main: #6366f1; --bg: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; }
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .nav-icon { transition: 0.3s; }
-        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1); box-shadow: 0 10px 20px -5px var(--main); }
+        
+        /* Efecto Camaleón en Iconos */
+        .nav-icon { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 25px -5px var(--main); }
+        
         .bg-dr-msg { background: var(--bg); border-left: 4px solid var(--main); }
         .input-kb { width: 100%; padding: 1rem; border-radius: 1.25rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; }
         .input-kb:focus { border-color: var(--main); background: white; }
         
-        /* Estilos Calendario Grid */
+        /* Calendario Grid */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
         .day-box:hover { background: var(--bg); border-color: var(--main); }
         .day-box.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 15px -3px var(--main); }
         .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; }
 
-        /* Barra de Navegación Retráctil Inteligente */
-        #nav-inteligente { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; }
-        .nav-oculta { transform: translate(-50%, 150%); opacity: 0; }
+        /* Barra Retráctil Camaleón */
+        #main-nav { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; }
+        .nav-hidden { transform: translate(-50%, 160%); opacity: 0; }
     </style>
 </head>
 <body class="p-4 md:p-10 pb-40 text-slate-800">
 
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[100] flex items-center justify-center">
-        <div class="text-center p-10 glass-panel max-w-sm w-full border-2 border-slate-100">
+        <div class="text-center p-10 glass-panel max-w-sm w-full border-2 border-slate-100 shadow-2xl">
             <div id="lock-icon" class="text-5xl mb-4">🔐</div>
-            <h2 class="text-xl font-black mb-6 uppercase tracking-widest text-slate-800">Acceso Recepción</h2>
+            <h2 class="text-xl font-black mb-6 uppercase tracking-widest">Acceso Asistente</h2>
             <input type="password" id="pin-acceso" class="w-full p-4 rounded-2xl bg-slate-50 text-center text-2xl tracking-[1em] mb-4 outline-none border-2 border-transparent focus:border-indigo-500" placeholder="****">
-            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase tracking-widest shadow-lg">Entrar</button>
+            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase shadow-lg hover:bg-black transition">Entrar al Nodo</button>
         </div>
     </div>
 
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-700">
         <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
             <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight italic">K.B <span id="brand-text" class="text-[var(--main)] italic">Assistant</span></h1>
-                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sincronizando...</p>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight italic">K.B <span id="brand-text" class="text-[var(--main)]">Assistant</span></h1>
+                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Conectado al Dr...</p>
             </div>
-            <button onclick="switchView('express')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg shadow-indigo-200">+ Nuevo Paciente</button>
+            <button onclick="switchView('express')" class="px-6 py-3 bg-[var(--main)] text-white rounded-full text-[10px] font-black uppercase shadow-lg shadow-indigo-100">+ Nuevo Paciente</button>
         </header>
 
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Atención:</h3>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Consulta Ahora:</h3>
                     <div class="mb-8">
-                        <p class="text-3xl font-extrabold text-slate-700 leading-tight" id="patient-display">Seleccione...</p>
+                        <p class="text-3xl font-extrabold text-slate-700 leading-tight" id="patient-display">Seleccione Cita</p>
                         <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic"></p>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="contactarWhatsApp()" class="flex-1 py-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-[10px] uppercase border border-emerald-100">WhatsApp</button>
+                        <button onclick="contactarWhatsApp()" class="flex-1 py-3 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-[10px] uppercase">WhatsApp</button>
                         <button onclick="switchView('billing')" class="flex-1 py-3 bg-[var(--main)] text-white rounded-xl font-bold text-[10px] uppercase shadow-md">💰 Cobrar</button>
                     </div>
                 </div>
 
                 <div class="glass-panel p-8">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Intercomunicador Directo</h3>
-                    <div id="chat-history" class="mb-4 space-y-2">
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Intercomunicador</h3>
+                    <div id="chat-history" class="mb-4">
                         <div class="bg-dr-msg p-4 rounded-2xl text-[11px] shadow-sm">
-                            <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Instrucción del Dr:</span>
-                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando...</p>
+                            <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Dr. dice:</span>
+                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando instrucción...</p>
                         </div>
                     </div>
-                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-20 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Nota rápida al doctor..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase shadow-sm">Enviar a Consultorio</button>
+                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-20 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Nota rápida..."></textarea>
+                    <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-[9px] uppercase shadow-sm">Enviar al Doc</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div id="view-agenda" class="glass-panel p-10 min-h-[450px]">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Agenda Live</h3>
-                    <div id="tabla-citas-body" class="space-y-3"></div>
+                <div id="view-agenda" class="glass-panel p-10 min-h-[500px]">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic text-center">Agenda Live</h3>
+                    <div id="tabla-citas-body" class="space-y-4"></div>
                 </div>
 
                 <div id="view-calendar" class="hidden glass-panel p-10">
                     <div class="flex justify-between items-center mb-8">
-                        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">📅 Calendario Maestro</h3>
+                        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">📅 Calendario</h3>
                         <p id="month-name" class="text-xs font-black text-[var(--main)] uppercase italic"></p>
                     </div>
-                    
                     <div class="grid grid-cols-7 gap-2 mb-2">
-                        <div class="day-name">Dom</div><div class="day-name">Lun</div><div class="day-name">Mar</div>
-                        <div class="day-name">Mie</div><div class="day-name">Jue</div><div class="day-name">Vie</div>
-                        <div class="day-name">Sab</div>
+                        <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
                     </div>
                     <div id="calendar-body" class="calendar-grid mb-8"></div>
-
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic">Ocupación del día:</h3>
                     <div id="slots-occupied" class="flex flex-wrap gap-2"></div>
-                </div>
-
-                <div id="view-billing" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">🧾 Cobro y Datos SAT</h3>
-                    <div class="space-y-4 max-w-md">
-                        <input type="number" id="reg-monto" class="input-kb text-2xl text-center" placeholder="$ 0.00">
-                        <select id="reg-metodo" class="input-kb font-bold text-xs"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option></select>
-                        <input type="text" id="f-rfc" class="input-kb text-xs uppercase" placeholder="RFC (Opcional)">
-                        <input type="text" id="f-razon" class="input-kb text-xs" placeholder="Razón Social">
-                        <button onclick="procesarCobroFull()" class="w-full py-5 bg-[var(--main)] text-white rounded-2xl font-black uppercase text-xs shadow-xl">Finalizar Pago</button>
-                    </div>
-                </div>
-
-                <div id="view-express" class="hidden glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">⚡ Registro Express</h3>
-                    <div class="grid grid-cols-1 gap-4">
-                        <input type="text" id="exp-nombre" class="input-kb" placeholder="Nombre del paciente">
-                        <input type="time" id="exp-hora" class="input-kb">
-                        <input type="tel" id="exp-tel" class="input-kb" placeholder="WhatsApp">
-                        <button onclick="crearCitaExpress()" class="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs">Agregar a la fila</button>
-                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <nav id="nav-inteligente" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-xl border border-slate-200 p-3 rounded-full flex gap-4 shadow-2xl z-50">
+    <nav id="main-nav" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-2xl border border-slate-200 p-4 rounded-full flex gap-5 shadow-2xl z-50">
         <div class="nav-icon active p-4 rounded-full cursor-pointer" id="nav-agenda" onclick="switchView('agenda')">📋</div>
         <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-calendar" onclick="switchView('calendar')">📅</div>
         <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-billing" onclick="switchView('billing')">🧾</div>
-        <div class="w-px h-8 bg-slate-100 self-center"></div>
+        <div class="w-px h-8 bg-slate-200 self-center mx-1"></div>
         <div class="p-4 rounded-full cursor-pointer bg-slate-50 hover:bg-slate-100 transition" onclick="cambiarPin()">🔑</div>
     </nav>
 
@@ -136,21 +113,20 @@
         const docId = new URLSearchParams(window.location.search).get('id');
         let currentId = null; let pTel = "";
 
-        // --- LÓGICA DE NAVEGACIÓN RETRÁCTIL ---
+        // --- EFECTO CAMALEÓN (Barra Retráctil) ---
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
-            const nav = document.getElementById('nav-inteligente');
+            const nav = document.getElementById('main-nav');
             const currentScroll = window.pageYOffset;
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                nav.classList.add('nav-oculta');
+            if (currentScroll > lastScroll && currentScroll > 80) {
+                nav.classList.add('nav-hidden');
             } else {
-                nav.classList.remove('nav-oculta');
+                nav.classList.remove('nav-hidden');
             }
             lastScroll = currentScroll;
         });
 
         async function verificarAcceso() {
-            if(!docId) return alert("Falta ID de Nodo.");
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             const doc = data[0];
@@ -158,6 +134,10 @@
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
+                
+                // Color adaptativo
+                const colors = { "Ginecología": "#f43f5e", "Odontología": "#0ea5e9", "Pediatría": "#fb923c", "Cardiología": "#e11d48", "Bienestar (Nutri/Psico)": "#059669", "General": "#1e3a8a" };
+                document.documentElement.style.setProperty('--main', colors[doc.especialidad] || "#6366f1");
                 document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
                 
                 initCalendar();
@@ -167,16 +147,29 @@
             } else { alert("PIN Incorrecto"); }
         }
 
+        async function cargarCitas() {
+            // Sincronización Maestra con Citas_Agendadas
+            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const citas = await res.json();
+            document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
+                <div class="flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-[var(--main)] transition-all shadow-sm">
+                    <div class="flex gap-5 items-center cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora_cita}', '${c.telefono}')">
+                        <span class="text-xs font-black text-[var(--main)] bg-slate-50 px-4 py-2 rounded-xl shadow-inner">${c.hora_cita.slice(0,5)}</span>
+                        <p class="font-bold text-sm uppercase tracking-tight text-slate-700">${c.nombre_paciente}</p>
+                    </div>
+                    <span class="text-[9px] font-black text-slate-300">ACTIVO</span>
+                </div>
+            `).join('') || '<p class="text-center text-slate-300 py-20 italic">No hay citas para hoy.</p>';
+        }
+
         function initCalendar() {
             const now = new Date();
-            const month = now.getMonth();
-            const year = now.getFullYear();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const calBody = document.getElementById('calendar-body');
+            const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const cal = document.getElementById('calendar-body');
             document.getElementById('month-name').innerText = now.toLocaleString('es-mx', { month: 'long', year: 'numeric' });
-            calBody.innerHTML = "";
-            for(let d=1; d<=daysInMonth; d++) {
-                calBody.innerHTML += `<div class="day-box" id="day-${d}" onclick="consultarHuecos(${d})">${d}</div>`;
+            cal.innerHTML = "";
+            for(let d=1; d<=days; d++) {
+                cal.innerHTML += `<div class="day-box" id="day-${d}" onclick="consultarHuecos(${d})">${d}</div>`;
             }
         }
 
@@ -186,21 +179,7 @@
             const fecha = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            document.getElementById('slots-occupied').innerHTML = data.map(c => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg text-[10px] font-bold">${c.hora_cita.slice(0,5)}</span>`).join('') || "Día Libre";
-        }
-
-        async function cargarCitas() {
-            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const citas = await res.json();
-            document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
-                <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-[1.5rem] hover:border-[var(--main)] transition shadow-sm">
-                    <div class="flex gap-4 items-center cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora_cita}', '${c.telefono}')">
-                        <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora_cita.slice(0,5)}</span>
-                        <p class="font-bold text-sm uppercase">${c.nombre_paciente}</p>
-                    </div>
-                    <button onclick="alert('Funcionalidad de reagendar')" class="text-[8px] font-black text-orange-400">Mover</button>
-                </div>
-            `).join('');
+            document.getElementById('slots-occupied').innerHTML = data.map(c => `<span class="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-black border border-red-100">${c.hora_cita.slice(0,5)}</span>`).join('') || "Totalmente Libre";
         }
 
         function seleccionar(id, nombre, hora, tel) {
@@ -219,35 +198,21 @@
 
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
-            if(!currentId || !n) return alert("Seleccione paciente");
-            await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { 
-                method: 'PATCH', 
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ status: "ASISTENTE: " + n }) 
-            });
-            document.getElementById('internal-note-input').value = ""; alert("Enviado");
-        }
-
-        async function procesarCobroFull() {
-            const m = document.getElementById('reg-monto').value;
-            if(!m || !currentId) return alert("Ingrese monto");
-            await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, {
-                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pagado: true, monto_cobrado: m, status: `COBRADO` })
-            });
-            alert("Cobro exitoso."); currentId = null; switchView('agenda'); cargarCitas();
+            if(!currentId || !n) return alert("Seleccione un paciente");
+            await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: "ASISTENTE: " + n }) });
+            document.getElementById('internal-note-input').value = ""; alert("Enviado al consultorio.");
         }
 
         async function cambiarPin() {
-            const nuevoPin = prompt("Nuevo PIN de 4 dígitos:");
+            const nuevoPin = prompt("Nuevo PIN (4 números):");
             if (nuevoPin && nuevoPin.length === 4) {
                 await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pin_acceso: nuevoPin }) });
-                alert("✅ PIN actualizado.");
+                alert("✅ Seguridad actualizada.");
             }
         }
 
         function switchView(v) {
-            ['view-agenda', 'view-calendar', 'view-billing', 'view-express'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            ['view-agenda', 'view-calendar'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
             document.getElementById('view-' + v).classList.remove('hidden');
             document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
             document.getElementById('nav-' + v).classList.add('active');
