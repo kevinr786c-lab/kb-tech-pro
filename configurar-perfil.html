@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configura tu Sucursal Digital | K.B Tech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        .glass-card { background: white; border-radius: 2.5rem; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
+        .input-kb { width: 100%; padding: 1rem; border-radius: 1rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 600; outline: none; transition: 0.3s; }
+        .input-kb:focus { border-color: #6366f1; background: white; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-2xl w-full glass-card p-10 border-t-[12px] border-indigo-600">
+        <header class="mb-10 text-center">
+            <span class="text-xs font-black uppercase tracking-[0.3em] text-indigo-500">Paso Final</span>
+            <h1 class="text-4xl font-black tracking-tighter text-slate-800 italic uppercase">Configura tu Poder</h1>
+            <p class="text-slate-400 font-medium mt-2">Personaliza tu consultorio digital en segundos.</p>
+        </header>
+
+        <form id="form-config" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <h3 class="font-black text-xs uppercase text-slate-400 tracking-widest">🛡️ Identidad Legal</h3>
+                <input type="text" id="cedula" placeholder="Cédula Profesional" class="input-kb" required>
+                <input type="text" id="cofepris" placeholder="Registro COFEPRIS (Opcional)" class="input-kb">
+                <input type="text" id="url_logo" placeholder="Link de tu Logo (URL)" class="input-kb">
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-black text-xs uppercase text-slate-400 tracking-widest">📅 Horarios de Atención</h3>
+                <div class="flex gap-2">
+                    <input type="time" id="h_inicio" value="09:00" class="input-kb">
+                    <input type="time" id="h_fin" value="17:00" class="input-kb">
+                </div>
+                <select id="duracion" class="input-kb">
+                    <option value="20">20 min por cita</option>
+                    <option value="30" selected>30 min por cita</option>
+                    <option value="45">45 min por cita</option>
+                    <option value="60">1 hora por cita</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-2 space-y-2">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-black text-xs uppercase text-slate-400 tracking-widest">📝 Biografía Profesional</h3>
+                    <button type="button" onclick="sugerirConIA()" class="text-[10px] font-black text-indigo-600 uppercase bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition">✨ Sugerir con Gemini</button>
+                </div>
+                <textarea id="bio" rows="3" placeholder="Cuéntanos un poco de tu experiencia..." class="input-kb"></textarea>
+            </div>
+
+            <button type="submit" class="md:col-span-2 w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition-all shadow-xl">Guardar y Abrir Consultorio</button>
+        </form>
+
+        <p class="mt-8 text-center text-[10px] font-black text-slate-300 uppercase tracking-widest">Powered by K.B Tech Solutions</p>
+    </div>
+
+    <script>
+        // Aquí iría la lógica de Supabase para hacer el UPDATE
+        // Y la función sugerirConIA() que use tu API de Gemini
+        async function sugerirConIA() {
+            const bio = document.getElementById('bio');
+            bio.placeholder = "Gemini está escribiendo...";
+            // Aquí llamarías a tu función de Gemini
+            setTimeout(() => {
+                bio.value = "Médico especialista comprometido con la excelencia y la salud integral, ofreciendo atención personalizada con tecnología de vanguardia y calidez humana en Tijuana.";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
