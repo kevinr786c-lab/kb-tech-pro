@@ -227,11 +227,12 @@
             }
         });
 
-        function irAConfiguracion() {
-            if(ultimoIdGenerado) {
-                window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
-            }
-        }
+       function irAConfiguracion() {
+    if(ultimoIdGenerado) {
+        // Corregimos para que vaya al archivo que SÍ tienes en GitHub
+        window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
+    }
+}
 
         cambiarCatalogo();
     </script>
