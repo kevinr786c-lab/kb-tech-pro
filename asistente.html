@@ -121,15 +121,6 @@
         const docId = new URLSearchParams(window.location.search).get('id');
         let currentId = null; let pTel = "";
 
-        const CATALOGO_MAESTRO = {
-            "Ginecología": [{id:1,color:"#f43f5e",icon:"🌸"},{id:2,color:"#8b5cf6",icon:"🔮"},{id:3,color:"#fb7185",icon:"🌷"},{id:4,color:"#059669",icon:"🍃"},{id:5,color:"#1e293b",icon:"💎"}],
-            "Odontología": [{id:1,color:"#0ea5e9",icon:"💎"},{id:2,color:"#10b981",icon:"🌿"},{id:3,color:"#22d3ee",icon:"❄️"},{id:4,color:"#1e3a8a",icon:"🛡️"},{id:5,color:"#6366f1",icon:"⚡"}],
-            "Pediatría": [{id:1,color:"#fb923c",icon:"🧸"},{id:2,color:"#38bdf8",icon:"🚀"},{id:3,color:"#4ade80",icon:"🦖"},{id:4,color:"#f472b6",icon:"🍭"},{id:5,color:"#818cf8",icon:"🌙"}],
-            "Cardiología": [{id:1,color:"#e11d48",icon:"❤️"},{id:2,color:"#1e293b",icon:"⚡"},{id:3,color:"#0284c7",icon:"🌊"},{id:4,color:"#9f1239",icon:"🩸"},{id:5,color:"#4f46e5",icon:"🛰️"}],
-            "Bienestar (Nutri/Psico)": [{id:1,color:"#059669",icon:"🧘‍♂️"},{id:2,color:"#a855f7",icon:"🧠"},{id:3,color:"#fbbf24",icon:"🍎"},{id:4,color:"#0ea5e9",icon:"🌊"},{id:5,color:"#10b981",icon:"🥑"}],
-            "General": [{id:1,color:"#1e3a8a",icon:"⚖️"},{id:2,color:"#6366f1",icon:"🏥"},{id:3,color:"#10b981",icon:"🩺"},{id:4,color:"#be123c",icon:"🚑"},{id:5,color:"#4338ca",icon:"🏢"}]
-        };
-
         async function verificarAcceso() {
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
@@ -138,13 +129,9 @@
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
-                
-                const cat = CATALOGO_MAESTRO[doc.especialidad] || CATALOGO_MAESTRO["General"];
-                const tema = cat.find(t => t.id === doc.template_id) || cat[0];
-                document.documentElement.style.setProperty('--main', tema.color);
-                document.getElementById('lock-icon').innerText = tema.icon;
                 document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
                 
+                // Carga inicial
                 cargarCitas(); 
                 setInterval(cargarCitas, 10000); 
                 setInterval(escucharDoctor, 3000);
@@ -152,6 +139,7 @@
         }
 
         async function cargarCitas() {
+            // CORREGIDO: Ahora busca en Citas_Agendadas (igual que el doctor)
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
@@ -174,15 +162,17 @@
 
         async function escucharDoctor() {
             if(!currentId) return;
+            // CORREGIDO: Busca instrucciones en la columna 'status'
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            const status = data[0].status || "";
-            document.getElementById('last-doctor-response').innerText = status.includes("DOCTOR DICE:") ? status.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
+            const statusMsg = data[0].status || "";
+            document.getElementById('last-doctor-response').innerText = statusMsg.includes("DOCTOR DICE:") ? statusMsg.replace("DOCTOR DICE:", "") : "Esperando instrucciones...";
         }
 
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
             if(!currentId || !n) return alert("Seleccione paciente");
+            // CORREGIDO: Envía nota actualizando la columna 'status'
             await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { 
                 method: 'PATCH', 
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
