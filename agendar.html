@@ -3,58 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Tech | Reservación de Élite</title>
+    <title>Reserva tu Cita | K.B Tech Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; background-color: #f8fafc; }
-        .bg-element { position: fixed; z-index: -1; opacity: 0.1; pointer-events: none; transition: 1.5s; filter: blur(4px); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.8s; overflow-x: hidden; background-color: #f8fafc; }
         :root { --main: #6366f1; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.08); }
-        input { transition: 0.3s !important; }
-        input:focus { transform: scale(1.01); }
+        
+        .bg-element { position: fixed; z-index: -1; opacity: 0.1; pointer-events: none; transition: 1.5s; filter: blur(4px); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.1); }
+        
+        .input-modern { 
+            width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #f1f5f9; 
+            border: 2px solid transparent; font-weight: 700; font-size: 0.9rem; transition: 0.3s; outline: none;
+        }
+        .input-modern:focus { border-color: var(--main); background: white; box-shadow: 0 10px 25px -10px var(--main); }
+        
+        /* CALENDARIO GRID */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
+        .day-box:hover { border-color: var(--main); background: #f8fafc; }
+        .day-box.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 15px -5px var(--main); }
+        .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; }
+
+        /* Sistema de Horarios */
+        .grid-horas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .btn-hora { 
+            padding: 12px; border-radius: 1.2rem; font-weight: 800; font-size: 0.75rem; 
+            transition: 0.3s; text-align: center; border: 2px solid transparent; cursor: pointer;
+        }
+        .hora-disponible { background: #f1f5f9; color: #475569; }
+        .hora-disponible:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -5px var(--main); border-color: var(--main); }
+        .hora-ocupada { background: #fee2e2; color: #991b1b; opacity: 0.5; cursor: not-allowed; border-color: #f87171; text-decoration: line-through; }
+        .hora-seleccionada { background: var(--main) !important; color: white !important; transform: scale(1.05); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="visual-1" class="bg-element top-[-10%] right-[-10%] text-[30rem]"></div>
-    <div id="visual-2" class="bg-element bottom-[-10%] left-[-10%] text-[20rem]"></div>
+    <div id="visual-1" class="bg-element top-[-5%] right-[-5%] text-[25rem]"></div>
+    <div id="visual-2" class="bg-element bottom-[-5%] left-[-5%] text-[20rem]"></div>
 
-    <div class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative z-10 border-t-8" id="card-border">
-        <header class="text-center mb-10">
-            <div id="icon-header" class="text-7xl mb-4 drop-shadow-xl animate-bounce" style="animation-duration: 3s;">🏥</div>
-            <h1 id="doc-name" class="text-3xl font-black tracking-tighter text-slate-800 uppercase italic">Conectando Nodo...</h1>
-            <p id="doc-esp" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic mt-2"></p>
+    <div class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative z-10 border-t-[10px]" id="card-main">
+        <header class="text-center mb-8">
+            <div id="icon-header" class="text-7xl mb-4 drop-shadow-xl animate-bounce" style="animation-duration: 4s;">🏥</div>
+            <h1 id="doc-name" class="text-3xl font-black tracking-tighter text-slate-800 uppercase italic">Conectando...</h1>
+            <p id="doc-esp" class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] italic mt-2"></p>
         </header>
 
         <form id="form-cita" class="space-y-6">
-            <div class="space-y-2">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest italic">Nombre Completo</label>
-                <input type="text" id="nombre" placeholder="Tu nombre" class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-transparent focus:border-[var(--main)] focus:bg-white text-sm font-bold outline-none" required>
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Tu Nombre</label>
+                <input type="text" id="nombre" placeholder="Nombre completo" class="input-modern" required>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest italic">Fecha</label>
-                    <input type="date" id="fecha" class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-transparent focus:border-[var(--main)] text-xs font-bold outline-none" required>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-widest italic">Hora</label>
-                    <input type="time" id="hora" class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-transparent focus:border-[var(--main)] text-xs font-bold outline-none" required>
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">WhatsApp (Internacional)</label>
+                <div class="flex gap-2">
+                    <select id="lada" class="w-24 input-modern !px-2 text-xs">
+                        <option value="52">🇲🇽 +52</option>
+                        <option value="1">🇺🇸 +1</option>
+                        <option value="1">🇨🇦 +1</option>
+                        <option value="502">🇬🇹 +502</option>
+                        <option value="34">🇪🇸 +34</option>
+                    </select>
+                    <input type="tel" id="telefono" placeholder="Número" class="flex-1 input-modern" required>
                 </div>
             </div>
 
-            <button type="submit" id="btn-submit" class="w-full py-6 bg-[var(--main)] text-white rounded-[2.5rem] font-black uppercase text-xs tracking-widest shadow-2xl transition-all duration-500 hover:scale-105 active:scale-95" style="background-color: var(--main);">Confirmar Cita</button>
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Selecciona el Día</label>
+                <div id="month-name" class="text-[10px] font-black text-[var(--main)] uppercase italic text-center mb-2">Febrero 2026</div>
+                <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                    <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
+                </div>
+                <div id="calendar-body" class="calendar-grid"></div>
+                <input type="hidden" id="fecha-seleccionada" required>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Horarios Disponibles</label>
+                <div id="contenedor-horas" class="grid-horas">
+                    <p class="col-span-3 text-[8px] text-center text-slate-400 py-4 uppercase font-bold tracking-widest">Elige un día en el calendario</p>
+                </div>
+                <input type="hidden" id="hora-seleccionada" required>
+            </div>
+
+            <button type="submit" id="btn-submit" class="w-full py-6 bg-slate-900 text-white rounded-[2.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-2xl transition-all duration-500 hover:scale-105 active:scale-95">Confirmar Reservación</button>
         </form>
 
         <footer class="mt-10 text-center border-t border-slate-100 pt-8">
-            <button onclick="document.getElementById('modal-privacidad').classList.remove('hidden')" class="text-[10px] font-black text-slate-400 underline uppercase tracking-widest hover:text-slate-600 transition">Aviso de Privacidad Especializado</button>
+            <button onclick="document.getElementById('modal-privacidad').classList.remove('hidden')" class="text-[10px] font-black text-slate-300 underline uppercase tracking-tighter hover:text-slate-500 transition">Aviso de Privacidad Legal</button>
         </footer>
     </div>
 
-    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-6 z-50">
-        <div class="bg-white p-10 rounded-[3.5rem] max-w-sm w-full shadow-2xl border-b-8 border-[var(--main)]">
-            <h2 class="text-2xl font-black mb-4 uppercase italic tracking-tighter" id="priv-titulo">Protección de Datos</h2>
+    <div id="modal-privacidad" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6 z-50">
+        <div class="bg-white p-10 rounded-[3.5rem] max-w-sm w-full shadow-2xl border-b-[12px]" id="modal-border">
+            <h2 class="text-2xl font-black mb-4 uppercase italic tracking-tighter" id="priv-titulo">Privacidad</h2>
             <p class="text-xs text-slate-500 leading-relaxed mb-8 italic" id="priv-texto"></p>
             <button onclick="document.getElementById('modal-privacidad').classList.add('hidden')" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest">Entendido</button>
         </div>
@@ -64,68 +108,129 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
+        let doctorConfig = null;
 
-        // MAPA MAESTRO DE 6 ESPECIALIDADES Y SUS TEMAS (Sincronizado con Registro)
-        const MAPA_ESTILOS = {
-            "Ginecología": { color: "#f43f5e", icon: "🌸", bg: "🌸", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad clínica." },
-            "Odontología": { color: "#0ea5e9", icon: "💎", bg: "🦷", priv: "Resguardamos tus registros dentales y radiográficos bajo protocolos de alta seguridad digital." },
-            "Pediatría": { color: "#fb923c", icon: "🧸", bg: "🎈", priv: "La privacidad de los más pequeños es sagrada. Seguridad total para datos pediátricos." },
-            "Cardiología": { color: "#e11d48", icon: "❤️", bg: "📈", priv: "Encriptación de grado médico para proteger tus datos vitales y diagnóstico cardíaco." },
-            "Bienestar (Nutri/Psico)": { color: "#059669", icon: "🧘‍♂️", bg: "🍃", priv: "Tus notas de consulta son encriptadas, asegurando que tu proceso de bienestar sea privado." },
-            "General": { color: "#6366f1", icon: "🏥", bg: "🧬", priv: "Seguridad digital de última generación para resguardar tu historial clínico con control total." }
+        const CATALOGO_MAESTRO = {
+            "Ginecología": [{id:1,color:"#f43f5e",icon:"🌸",priv:"Tus datos son tratados con máxima confidencialidad."}],
+            "Odontología": [{id:1,color:"#0ea5e9",icon:"💎",priv:"Registros dentales protegidos bajo seguridad digital."}],
+            "Pediatría": [{id:1,color:"#fb923c",icon:"🧸",priv:"La privacidad de los niños es sagrada."}],
+            "Cardiología": [{id:1,color:"#e11d48",icon:"❤️",priv:"Encriptación de grado médico para tus datos vitales."}],
+            "Bienestar (Nutri/Psico)": [{id:1,color:"#059669",icon:"🧘‍♂️",priv:"Tus notas de consulta son privadas y encriptadas."}],
+            "General": [{id:1,color:"#1e3a8a",icon:"⚖️",priv:"Datos personales encriptados bajo la ley vigente."}]
         };
 
         async function init() {
-            if(!docId) return;
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+            if(!docId) return alert("Error de enlace.");
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
+            const data = await res.json();
+            if(data.length > 0) {
+                doctorConfig = data[0];
+                const cat = CATALOGO_MAESTRO[doctorConfig.especialidad] || CATALOGO_MAESTRO["General"];
+                const tema = cat.find(t => t.id === doctorConfig.template_id) || cat[0];
+
+                document.getElementById('doc-name').innerText = "Dr. " + doctorConfig.nombre_doctor;
+                document.getElementById('doc-esp').innerText = doctorConfig.especialidad;
+                document.getElementById('icon-header').innerText = tema.icon;
+                document.documentElement.style.setProperty('--main', tema.color);
+                document.getElementById('btn-submit').style.backgroundColor = tema.color;
+                document.getElementById('card-main').style.borderColor = tema.color;
+                document.getElementById('modal-border').style.borderColor = tema.color;
+                document.getElementById('priv-texto').innerText = "AVISO LEGAL: " + tema.priv;
+                
+                renderCalendar();
+            }
+        }
+
+        function renderCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calBody = document.getElementById('calendar-body');
+            calBody.innerHTML = '';
+
+            for(let i=0; i<firstDay; i++) { calBody.innerHTML += `<div></div>`; }
+
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const div = document.createElement('div');
+                div.className = `day-box ${d === now.getDate() ? 'border-2 border-[var(--main)]' : ''}`;
+                div.innerText = d;
+                div.onclick = () => seleccionarDia(dateStr, div);
+                calBody.appendChild(div);
+            }
+        }
+
+        async function seleccionarDia(fecha, elemento) {
+            document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
+            elemento.classList.add('selected');
+            document.getElementById('fecha-seleccionada').value = fecha;
+
+            const contenedor = document.getElementById('contenedor-horas');
+            contenedor.innerHTML = '<p class="col-span-3 text-center text-[8px] animate-pulse">ESCANEANDO DISPONIBILIDAD...</p>';
+
+            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, {
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` }
             });
-            const data = await res.json();
-            
-            if(data.length > 0) {
-                const doc = data[0];
-                // Buscar estilo por especialidad, si no existe usa "General"
-                const estilo = MAPA_ESTILOS[doc.especialidad] || MAPA_ESTILOS["General"];
+            const citas = await res.json();
+            const ocupadas = citas.map(c => c.hora_cita.substring(0, 5));
 
-                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad;
-                document.getElementById('icon-header').innerText = estilo.icon;
-                document.documentElement.style.setProperty('--main', estilo.color);
-                document.getElementById('card-border').style.borderColor = estilo.color;
+            contenedor.innerHTML = '';
+            let inicio = doctorConfig.hora_inicio || "09:00:00";
+            let fin = doctorConfig.hora_fin || "17:00:00";
+            let duracion = doctorConfig.duracion_cita_min || 30;
 
-                // Visuales de fondo
-                document.getElementById('visual-1').innerText = estilo.bg;
-                document.getElementById('visual-2').innerText = estilo.icon;
+            let hActual = new Date(`2026-01-01T${inicio}`);
+            let hFinal = new Date(`2026-01-01T${fin}`);
 
-                // Modal Privacidad
-                document.getElementById('priv-texto').innerText = estilo.priv;
-                document.getElementById('priv-titulo').style.color = estilo.color;
+            while(hActual < hFinal) {
+                const textoHora = hActual.toTimeString().substring(0, 5);
+                const isOcupada = ocupadas.includes(textoHora);
+                const btn = document.createElement('div');
+                btn.innerText = textoHora;
+                btn.className = `btn-hora ${isOcupada ? 'hora-ocupada' : 'hora-disponible'}`;
+                if(!isOcupada) {
+                    btn.onclick = () => {
+                        document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('hora-seleccionada'));
+                        btn.classList.add('hora-seleccionada');
+                        document.getElementById('hora-seleccionada').value = textoHora + ":00";
+                    };
+                }
+                contenedor.appendChild(btn);
+                hActual.setMinutes(hActual.getMinutes() + duracion);
             }
         }
 
         document.getElementById('form-cita').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit');
-            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            const hora = document.getElementById('hora-seleccionada').value;
+            const fecha = document.getElementById('fecha-seleccionada').value;
+            if(!hora || !fecha) return alert("⚠️ Selecciona día y hora.");
 
-            const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "RESERVANDO..."; btn.disabled = true;
+
+            const fullTel = "+" + document.getElementById('lada').value + document.getElementById('telefono').value;
+
+            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value,
-                    fecha: document.getElementById('fecha').value,
-                    hora: document.getElementById('hora').value,
-                    pagado: false
+                    fecha_cita: fecha,
+                    hora_cita: hora,
+                    telefono: fullTel
                 })
             });
 
             if(res.ok) {
-                alert("¡CITA REGISTRADA!\nEl consultorio ha sido notificado.");
+                alert("✅ ¡CITA CONFIRMADA!\nTu espacio ha sido reservado.");
                 location.reload();
             } else {
-                alert("Error de conexión.");
-                btn.innerText = "Confirmar Cita"; btn.disabled = false;
+                alert("❌ Error al reservar.");
+                btn.innerText = "Confirmar Reservación"; btn.disabled = false;
             }
         });
 
