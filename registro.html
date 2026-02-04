@@ -227,12 +227,12 @@
             }
         });
 
-       function irAConfiguracion() {
-    if(ultimoIdGenerado) {
-        // Corregimos para que vaya al archivo que SÍ tienes en GitHub
-        window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
-    }
-}
+        // ESTA ES LA FUNCIÓN QUE CORREGIMOS PARA ELIMINAR EL 404
+        function irAConfiguracion() {
+            if(ultimoIdGenerado) {
+                window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
+            }
+        }
 
         cambiarCatalogo();
     </script>
