@@ -19,7 +19,14 @@
         }
         .input-modern:focus { border-color: var(--main); background: white; box-shadow: 0 10px 25px -10px var(--main); }
         
-        /* Sistema de Horarios Verde/Rojo */
+        /* CALENDARIO GRID */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
+        .day-box:hover { border-color: var(--main); background: #f8fafc; }
+        .day-box.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 15px -5px var(--main); }
+        .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; }
+
+        /* Sistema de Horarios */
         .grid-horas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .btn-hora { 
             padding: 12px; border-radius: 1.2rem; font-weight: 800; font-size: 0.75rem; 
@@ -27,7 +34,6 @@
         }
         .hora-disponible { background: #f1f5f9; color: #475569; }
         .hora-disponible:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -5px var(--main); border-color: var(--main); }
-        
         .hora-ocupada { background: #fee2e2; color: #991b1b; opacity: 0.5; cursor: not-allowed; border-color: #f87171; text-decoration: line-through; }
         .hora-seleccionada { background: var(--main) !important; color: white !important; transform: scale(1.05); }
     </style>
@@ -51,14 +57,33 @@
             </div>
 
             <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">WhatsApp (Internacional)</label>
+                <div class="flex gap-2">
+                    <select id="lada" class="w-24 input-modern !px-2 text-xs">
+                        <option value="52">🇲🇽 +52</option>
+                        <option value="1">🇺🇸 +1</option>
+                        <option value="1">🇨🇦 +1</option>
+                        <option value="502">🇬🇹 +502</option>
+                        <option value="34">🇪🇸 +34</option>
+                    </select>
+                    <input type="tel" id="telefono" placeholder="Número" class="flex-1 input-modern" required>
+                </div>
+            </div>
+
+            <div class="space-y-1">
                 <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Selecciona el Día</label>
-                <input type="date" id="fecha" class="input-modern" required>
+                <div id="month-name" class="text-[10px] font-black text-[var(--main)] uppercase italic text-center mb-2">Febrero 2026</div>
+                <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                    <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
+                </div>
+                <div id="calendar-body" class="calendar-grid"></div>
+                <input type="hidden" id="fecha-seleccionada" required>
             </div>
 
             <div class="space-y-1">
                 <label class="text-[10px] font-black uppercase text-slate-400 ml-4 italic">Horarios Disponibles</label>
                 <div id="contenedor-horas" class="grid-horas">
-                    <p class="col-span-3 text-[8px] text-center text-slate-400 py-4 uppercase font-bold tracking-widest">Elige una fecha para ver disponibilidad</p>
+                    <p class="col-span-3 text-[8px] text-center text-slate-400 py-4 uppercase font-bold tracking-widest">Elige un día en el calendario</p>
                 </div>
                 <input type="hidden" id="hora-seleccionada" required>
             </div>
@@ -83,101 +108,75 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id');
-
         let doctorConfig = null;
 
         const CATALOGO_MAESTRO = {
-            "Ginecología": [
-                { id: 1, color: "#f43f5e", icon: "🌸", priv: "Tus datos de salud femenina son tratados con la máxima delicadeza y confidencialidad absoluta." },
-                { id: 2, color: "#8b5cf6", icon: "🔮", priv: "Sofisticación y calma boutique. Resguardamos tu información con elegancia." },
-                { id: 3, color: "#fb7185", icon: "🌷", priv: "Suavidad y atención prenatal. Cuidamos de ti con reserva profesional." },
-                { id: 4, color: "#059669", icon: "🍃", priv: "Salud femenina orgánica. Tu privacidad es un proceso seguro." },
-                { id: 5, color: "#1e293b", icon: "💎", priv: "Discreción de alta gama. Protocolos de élite para tu historial clínico." }
-            ],
-            "Odontología": [
-                { id: 1, color: "#0ea5e9", icon: "💎", priv: "Limpieza y tecnología. Registros dentales protegidos bajo seguridad digital." },
-                { id: 2, color: "#10b981", icon: "🌿", priv: "Frescura y salud dental. Tu historial está en un entorno ético." },
-                { id: 3, color: "#22d3ee", icon: "❄️", priv: "Estética y blanqueamiento. Protegemos tu diagnóstico estético." },
-                { id: 4, color: "#1e3a8a", icon: "🛡️", priv: "Cirugía e implantes. Máxima seguridad digital para tus procedimientos." },
-                { id: 5, color: "#6366f1", icon: "⚡", priv: "Innovación 3D. Tus diagnósticos protegidos por encriptación avanzada." }
-            ],
-            "Pediatría": [
-                { id: 1, color: "#fb923c", icon: "🧸", priv: "Entorno alegre y seguro. La privacidad de los niños es sagrada." },
-                { id: 2, color: "#38bdf8", icon: "🚀", priv: "Confianza y juego. Solo tutores autorizados acceden al historial." },
-                { id: 3, color: "#4ade80", icon: "🦖", priv: "Aventura segura. Datos pediátricos resguardados con absoluta ética." },
-                { id: 4, color: "#f472b6", icon: "🍭", priv: "Dulce cuidado infantil. Tratamos la info con ternura y seguridad." },
-                { id: 5, color: "#818cf8", icon: "🌙", priv: "Estrella de calma. Un entorno sereno para la privacidad de los pequeños." }
-            ],
-            "Cardiología": [
-                { id: 1, color: "#e11d48", icon: "❤️", priv: "Precisión cardíaca. Encriptación de grado médico para tus datos vitales." },
-                { id: 2, color: "#1e293b", icon: "⚡", priv: "Seriedad y vanguardia. Monitoreo cardiovascular de alta seguridad." },
-                { id: 3, color: "#0284c7", icon: "🌊", priv: "Flujo y salud vascular. Datos circulatorios protegidos por tecnología de punta." },
-                { id: 4, color: "#9f1239", icon: "🩸", priv: "Hematología especializada. Resguardo ético de tus análisis sanguíneos." },
-                { id: 5, color: "#4f46e5", icon: "🛰️", priv: "Ciber Cardiología. Seguridad satelital aplicada a tu monitoreo cardíaco." }
-            ],
-            "Bienestar (Nutri/Psico)": [
-                { id: 1, color: "#059669", icon: "🧘‍♂️", priv: "Equilibrio y paz. Tus notas de consulta son privadas y encriptadas." },
-                { id: 2, color: "#a855f7", icon: "🧠", priv: "Crecimiento seguro. Tu historia emocional es confidencial." },
-                { id: 3, color: "#fbbf24", icon: "🍎", priv: "Nutrición energética. Planes alimenticios resguardados con reserva." },
-                { id: 4, color: "#0ea5e9", icon: "🌊", priv: "Inmersión emocional. Confidencialidad absoluta para tu bienestar." },
-                { id: 5, color: "#10b981", icon: "🥑", priv: "Vida saludable. Privacidad integral para tu estilo de vida fit." }
-            ],
-            "General": [
-                { id: 1, color: "#1e3a8a", icon: "⚖️", priv: "Autoridad médica. Datos personales encriptados bajo la ley vigente." },
-                { id: 2, color: "#6366f1", icon: "🏥", priv: "Innovación moderna. Seguridad digital para tu historial clínico." },
-                { id: 3, color: "#10b981", icon: "🩺", priv: "Salud básica. Atención primaria con seguridad avanzada." },
-                { id: 4, color: "#be123c", icon: "🚑", priv: "Urgencias médicas. Seguridad inmediata para datos críticos." },
-                { id: 5, color: "#4338ca", icon: "🏢", priv: "Red hospitalaria. Protección de datos a escala corporativa." }
-            ]
+            "Ginecología": [{id:1,color:"#f43f5e",icon:"🌸",priv:"Tus datos son tratados con máxima confidencialidad."}],
+            "Odontología": [{id:1,color:"#0ea5e9",icon:"💎",priv:"Registros dentales protegidos bajo seguridad digital."}],
+            "Pediatría": [{id:1,color:"#fb923c",icon:"🧸",priv:"La privacidad de los niños es sagrada."}],
+            "Cardiología": [{id:1,color:"#e11d48",icon:"❤️",priv:"Encriptación de grado médico para tus datos vitales."}],
+            "Bienestar (Nutri/Psico)": [{id:1,color:"#059669",icon:"🧘‍♂️",priv:"Tus notas de consulta son privadas y encriptadas."}],
+            "General": [{id:1,color:"#1e3a8a",icon:"⚖️",priv:"Datos personales encriptados bajo la ley vigente."}]
         };
 
         async function init() {
-            if(!docId) return alert("Error: Nodo Médico no identificado.");
+            if(!docId) return alert("Error de enlace.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
-            
             if(data.length > 0) {
                 doctorConfig = data[0];
-                const especialidad = doctorConfig.especialidad;
-                const template_id = doctorConfig.template_id;
+                const cat = CATALOGO_MAESTRO[doctorConfig.especialidad] || CATALOGO_MAESTRO["General"];
+                const tema = cat.find(t => t.id === doctorConfig.template_id) || cat[0];
 
-                const cat = CATALOGO_MAESTRO[especialidad] || CATALOGO_MAESTRO["General"];
-                const tema = cat.find(t => t.id === template_id) || cat[0];
-
-                // Aplicar Identidad Visual
                 document.getElementById('doc-name').innerText = "Dr. " + doctorConfig.nombre_doctor;
-                document.getElementById('doc-esp').innerText = especialidad;
+                document.getElementById('doc-esp').innerText = doctorConfig.especialidad;
                 document.getElementById('icon-header').innerText = tema.icon;
                 document.documentElement.style.setProperty('--main', tema.color);
-                
                 document.getElementById('btn-submit').style.backgroundColor = tema.color;
                 document.getElementById('card-main').style.borderColor = tema.color;
                 document.getElementById('modal-border').style.borderColor = tema.color;
-                document.getElementById('visual-1').innerText = tema.icon;
-                document.getElementById('visual-2').innerText = tema.icon;
-
-                // Aplicar Privacidad Dinámica
                 document.getElementById('priv-texto').innerText = "AVISO LEGAL: " + tema.priv;
-                document.getElementById('priv-titulo').style.color = tema.color;
+                
+                renderCalendar();
             }
         }
 
-        // GENERADOR DE HORARIOS INTELIGENTES (VERDE / ROJO)
-        document.getElementById('fecha').addEventListener('change', async (e) => {
-            const fecha = e.target.value;
+        function renderCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calBody = document.getElementById('calendar-body');
+            calBody.innerHTML = '';
+
+            for(let i=0; i<firstDay; i++) { calBody.innerHTML += `<div></div>`; }
+
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const div = document.createElement('div');
+                div.className = `day-box ${d === now.getDate() ? 'border-2 border-[var(--main)]' : ''}`;
+                div.innerText = d;
+                div.onclick = () => seleccionarDia(dateStr, div);
+                calBody.appendChild(div);
+            }
+        }
+
+        async function seleccionarDia(fecha, elemento) {
+            document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
+            elemento.classList.add('selected');
+            document.getElementById('fecha-seleccionada').value = fecha;
+
             const contenedor = document.getElementById('contenedor-horas');
             contenedor.innerHTML = '<p class="col-span-3 text-center text-[8px] animate-pulse">ESCANEANDO DISPONIBILIDAD...</p>';
 
-            // Consultar citas ocupadas en Supabase
             const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, {
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` }
             });
             const citas = await res.json();
-            const horasOcupadas = citas.map(c => c.hora_cita.substring(0, 5));
+            const ocupadas = citas.map(c => c.hora_cita.substring(0, 5));
 
             contenedor.innerHTML = '';
-            
-            // Configuración del doctor (Viene de la base de datos)
             let inicio = doctorConfig.hora_inicio || "09:00:00";
             let fin = doctorConfig.hora_fin || "17:00:00";
             let duracion = doctorConfig.duracion_cita_min || 30;
@@ -187,13 +186,11 @@
 
             while(hActual < hFinal) {
                 const textoHora = hActual.toTimeString().substring(0, 5);
+                const isOcupada = ocupadas.includes(textoHora);
                 const btn = document.createElement('div');
-                const ocupada = horasOcupadas.includes(textoHora);
-
                 btn.innerText = textoHora;
-                btn.className = `btn-hora ${ocupada ? 'hora-ocupada' : 'hora-disponible'}`;
-                
-                if(!ocupada) {
+                btn.className = `btn-hora ${isOcupada ? 'hora-ocupada' : 'hora-disponible'}`;
+                if(!isOcupada) {
                     btn.onclick = () => {
                         document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('hora-seleccionada'));
                         btn.classList.add('hora-seleccionada');
@@ -203,15 +200,18 @@
                 contenedor.appendChild(btn);
                 hActual.setMinutes(hActual.getMinutes() + duracion);
             }
-        });
+        }
 
         document.getElementById('form-cita').addEventListener('submit', async (e) => {
             e.preventDefault();
             const hora = document.getElementById('hora-seleccionada').value;
-            if(!hora) return alert("⚠️ Por favor selecciona una hora disponible.");
+            const fecha = document.getElementById('fecha-seleccionada').value;
+            if(!hora || !fecha) return alert("⚠️ Selecciona día y hora.");
 
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "PROCESANDO RESERVA..."; btn.disabled = true;
+            btn.innerText = "RESERVANDO..."; btn.disabled = true;
+
+            const fullTel = "+" + document.getElementById('lada').value + document.getElementById('telefono').value;
 
             const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
                 method: 'POST',
@@ -219,16 +219,17 @@
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value,
-                    fecha_cita: document.getElementById('fecha').value,
-                    hora_cita: hora
+                    fecha_cita: fecha,
+                    hora_cita: hora,
+                    telefono: fullTel
                 })
             });
 
             if(res.ok) {
-                alert("✅ ¡CITA CONFIRMADA!\nTu espacio ha sido reservado en el sistema.");
+                alert("✅ ¡CITA CONFIRMADA!\nTu espacio ha sido reservado.");
                 location.reload();
             } else {
-                alert("❌ Error de conexión. Inténtalo de nuevo.");
+                alert("❌ Error al reservar.");
                 btn.innerText = "Confirmar Reservación"; btn.disabled = false;
             }
         });
