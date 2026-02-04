@@ -92,6 +92,10 @@
                 <div class="bg-main p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">🔗</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">Mi Link</span>
             </button>
+            <button onclick="copiarLinkAsistente()" class="flex flex-col items-center gap-1 group">
+                <div class="bg-rose-500 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">👩‍💼</div>
+                <span class="text-[8px] font-black uppercase text-slate-500">Asistente</span>
+            </button>
             <button onclick="window.location.href='configurar-perfil.html?id='+docId" class="flex flex-col items-center gap-1 group">
                 <div class="bg-indigo-400 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">⚙️</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">Perfil</span>
@@ -225,6 +229,14 @@
             const link = window.location.origin + path + "/perfil.html?id=" + docId;
             navigator.clipboard.writeText(link);
             alert("✅ Link de Reservación copiado.");
+        }
+
+        // NUEVA FUNCIÓN PARA EL LINK DE LA ASISTENTE
+        function copiarLinkAsistente() {
+            const path = window.location.pathname.split('/').slice(0, -1).join('/');
+            const link = window.location.origin + path + "/asistente.html?id=" + docId;
+            navigator.clipboard.writeText(link);
+            alert("✅ ¡Link de Recepción Copiado!\nMándaselo a tu asistente para que gestione la Agenda Live.");
         }
 
         async function cambiarPin() {
