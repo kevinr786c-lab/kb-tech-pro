@@ -14,7 +14,7 @@
         .btn-lujo { background: var(--main); color: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px -10px var(--main); }
         .btn-lujo:hover { transform: scale(1.02) translateY(-5px); filter: brightness(1.1); }
         
-        .gallery-img { aspect-ratio: 16/9; background: #e2e8f0; border-radius: 2rem; overflow: hidden; border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .gallery-img { aspect-ratio: 16/9; background: #e2e8f0; border-radius: 2rem; overflow: hidden; border: 1px solid #f1f5f9; background-size: cover; background-position: center; }
 
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.1); } }
@@ -44,13 +44,9 @@
                 <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic">Infraestructura Médica</h3>
                 <h2 class="text-3xl font-black italic tracking-tighter uppercase mt-2">Tecnología y Confort</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="gallery-img">
-                    <p class="text-[10px] font-black text-slate-400 uppercase italic px-10">Espacio diseñado para su bienestar integral</p>
-                </div>
-                <div class="gallery-img">
-                    <p class="text-[10px] font-black text-slate-400 uppercase italic px-10">Equipamiento de última generación</p>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="galeria-contenedor">
+                <div id="img-1" class="gallery-img"></div>
+                <div id="img-2" class="gallery-img"></div>
             </div>
         </section>
 
@@ -58,14 +54,18 @@
             <div>
                 <span class="text-4xl">📍</span>
                 <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación del Consultorio</h3>
-                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Encuéntrenos en la zona de mayor prestigio médico en Tijuana. Accesibilidad y seguridad para todos nuestros pacientes.</p>
+                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Infraestructura médica de alta precisión ubicada estratégicamente para su comodidad.</p>
                 <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                     <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
-                    <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider">Zona Río, Tijuana, B.C.</p>
+                    <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">---</p>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Google Maps</a>
+                    <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Waze</a>
                 </div>
             </div>
-            <div class="h-64 bg-slate-200 rounded-[3rem] border-2 border-dashed border-slate-300 flex items-center justify-center">
-                <p class="text-[10px] font-black text-slate-400 uppercase italic">Mapa en Proceso de Activación</p>
+            <div id="mapa-wrapper" class="h-80 bg-slate-200 rounded-[3rem] overflow-hidden border-2 border-dashed border-slate-300">
+                <iframe id="google-map-iframe" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>
 
@@ -104,7 +104,23 @@
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + " | Certificado";
-                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica y el cuidado personalizado de su salud.";
+                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica.";
+                document.getElementById('doc-direccion').innerText = doc.direccion_consultorio || "Tijuana, Baja California";
+
+                // SINCRONIZACIÓN DE MAPA REAL ✦
+                if(doc.latitud && doc.longitud) {
+                    const lat = doc.latitud;
+                    const lon = doc.longitud;
+                    document.getElementById('google-map-iframe').src = `https://www.google.com/maps/embed/v1/place?key=REEMPLAZAR_CON_TU_API_KEY&q=${lat},${lon}&zoom=16`;
+                    document.getElementById('link-maps').href = `https://www.google.com/maps?q=${lat},${lon}`;
+                    document.getElementById('link-waze').href = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
+                } else {
+                    document.getElementById('mapa-wrapper').innerHTML = "<div class='flex items-center justify-center h-full text-[9px] font-black text-slate-400 uppercase italic'>Mapa no vinculado</div>";
+                }
+
+                // GALERÍA DINÁMICA
+                if(doc.url_foto_consultorio) document.getElementById('img-1').style.backgroundImage = `url('${doc.url_foto_consultorio}')`;
+                if(doc.url_foto_equipo) document.getElementById('img-2').style.backgroundImage = `url('${doc.url_foto_equipo}')`;
             }
         }
         init();
