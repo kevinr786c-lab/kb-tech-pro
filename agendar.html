@@ -38,14 +38,14 @@
         
         <header class="text-center mb-10">
             <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none">Cargando...</h1>
-            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Gemini Engine ✦ Sincronizando Nodo...</p>
+            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none italic">Sincronizando...</h1>
+            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Gemini Engine ✦ K.B Tech</p>
             <p id="doc-bio" class="text-[10px] text-slate-500 font-medium mt-6 px-4 leading-relaxed italic opacity-0 transition-opacity duration-1000"></p>
         </header>
 
         <form id="form-cita" class="space-y-6">
             <div class="space-y-4">
-                <input type="text" id="nombre" placeholder="Nombre y Apellido" class="input-premium" required>
+                <input type="text" id="nombre" placeholder="Nombre del Paciente" class="input-premium" required>
                 <div class="flex gap-3">
                     <select id="lada" class="w-24 input-premium text-xs">
                         <option value="52">🇲🇽 +52</option>
@@ -58,7 +58,7 @@
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-2">
                     <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest italic">Seleccione Día</p>
-                    <span id="current-month" class="text-[9px] font-black text-main uppercase"></span>
+                    <span id="current-month" class="text-[9px] font-black text-main uppercase italic"></span>
                 </div>
                 <div id="date-slider" class="date-slider"></div>
                 <input type="hidden" id="fecha-sel" required>
@@ -67,44 +67,42 @@
             <div class="space-y-3">
                 <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">Horarios Disponibles</p>
                 <div id="time-grid" class="grid grid-cols-3 gap-3">
-                    <p class="col-span-3 text-center text-[8px] font-bold text-slate-300 uppercase py-4">Selecciona un día primero</p>
+                    <p class="col-span-3 text-center text-[8px] font-bold text-slate-300 uppercase py-4 italic">Selecciona un día primero</p>
                 </div>
                 <input type="hidden" id="hora-sel" required>
             </div>
 
             <div class="flex items-center gap-3 px-2 pt-2">
                 <input type="checkbox" id="check-privacidad" class="w-5 h-5 accent-slate-900" required>
-                <label class="text-[8px] text-slate-400 font-bold uppercase leading-tight">
+                <label class="text-[8px] text-slate-400 font-bold uppercase leading-tight italic">
                     Acepto el <button type="button" onclick="abrirPrivacidad()" class="text-slate-900 underline">Aviso de Privacidad</button> y seguridad SSL.
                 </label>
             </div>
 
-            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación</button>
+            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px] italic tracking-[0.2em]">Confirmar Reservación</button>
         </form>
 
         <footer class="mt-8 text-center border-t border-slate-100 pt-6">
             <span class="gemini-star text-xs">✦</span>
-            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Gemini Engine ✦ K.B Solutions · Tijuana</p>
+            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2 italic">Gemini Engine ✦ K.B Solutions · Tijuana</p>
         </footer>
     </div>
 
     <div id="modal-privacidad" class="modal-blur">
         <div class="bg-white p-10 rounded-[3rem] max-w-sm w-full shadow-2xl">
-            <h2 class="font-black uppercase italic text-xl mb-4 tracking-tighter">Protección K.B</h2>
-            <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed text-left">
+            <h2 class="font-black uppercase italic text-xl mb-4 tracking-tighter italic">Protección K.B</h2>
+            <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed text-left italic">
                 <p>1. Datos bajo encriptación biométrica de Gemini Engine ✦.</p>
                 <p>2. El canal de comunicación será exclusivo vía WhatsApp Business.</p>
                 <p>3. Reservación garantizada bajo protocolo de seguridad de datos.</p>
             </div>
-            <button type="button" onclick="cerrarPrivacidad()" class="w-full mt-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase">Aceptar Términos</button>
+            <button type="button" onclick="cerrarPrivacidad()" class="w-full mt-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase italic tracking-widest">Aceptar Términos</button>
         </div>
     </div>
 
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
-        
-        // EXTRAER ID (Flexible para Números o UUIDs)
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         
         let planNivel = 0;
@@ -120,58 +118,45 @@
 
         async function init() {
             if(!docId) return alert("Error: Nodo de Doctor no identificado.");
-            
             try {
-                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
-                    headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} 
-                });
+                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
                 const data = await res.json();
-                
                 if(data && data.length > 0) {
                     const doc = data[0];
                     planNivel = (doc.plan === 'Dominio' || doc.plan === 'Corporativo') ? 1 : 0;
                     configHoras.inicio = doc.hora_inicio || "09:00";
                     configHoras.fin = doc.hora_fin || "17:00";
 
-                    // Aplicar Color
                     const palette = CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"];
                     const color = palette[(doc.template_id || 1) % 5];
                     document.documentElement.style.setProperty('--main', color);
 
                     document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                    document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Nodo Verificado" : "");
-                    
+                    document.getElementById('doc-esp').innerText = doc.especialidad + " | Verificado";
                     if(doc.biografia) {
                         const bioEl = document.getElementById('doc-bio');
-                        bioEl.innerText = doc.biografia;
-                        bioEl.style.opacity = "1";
+                        bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
                     }
                     renderDateSlider();
                 }
-            } catch (e) { console.error("Error inicializando:", e); }
+            } catch (e) { console.error("Error init:", e); }
         }
 
         function renderDateSlider() {
-            const slider = document.getElementById('date-slider');
-            slider.innerHTML = "";
+            const slider = document.getElementById('date-slider'); slider.innerHTML = "";
             const now = new Date();
             document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
-            
             const limiteDias = planNivel > 0 ? 14 : 7;
-
             for(let i=0; i < limiteDias; i++) {
                 const d = new Date(); d.setDate(now.getDate() + i);
                 const dayName = d.toLocaleString('es-mx', {weekday:'short'}).replace('.','');
-                const dayNum = d.getDate();
                 const fullDate = d.toISOString().split('T')[0];
-                
                 const card = document.createElement('div');
                 card.className = "date-card";
-                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40">${dayName}</span><span class="text-xl font-black">${dayNum}</span>`;
+                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40 italic">${dayName}</span><span class="text-xl font-black">${d.getDate()}</span>`;
                 card.onclick = () => {
                     document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    document.getElementById('fecha-sel').value = fullDate;
+                    card.classList.add('selected'); document.getElementById('fecha-sel').value = fullDate;
                     getHoras(fullDate);
                 };
                 slider.appendChild(card);
@@ -180,63 +165,45 @@
 
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
-            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse text-indigo-500'>Sincronizando Nodo...</p>";
-            
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse text-indigo-500 italic'>Sincronizando Nodo...</p>";
             try {
-                // Consulta a la tabla de citas agendadas
-                const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { 
-                    headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} 
-                });
-                
+                const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
                 const data = await res.json();
-                
-                // VALIDACIÓN DE ARRAY PARA EVITAR ERROR .MAP
                 const ocupadas = Array.isArray(data) ? data.map(c => c.hora_cita.slice(0,5)) : [];
-
                 grid.innerHTML = "";
-                const horasDisponibles = [];
                 let start = parseInt(configHoras.inicio.split(':')[0]);
                 let end = parseInt(configHoras.fin.split(':')[0]);
-
                 for(let h = start; h < end; h++) {
-                    const hourStr = h < 10 ? `0${h}:00` : `${h}:00`;
-                    horasDisponibles.push(hourStr);
+                    const hStr = h < 10 ? `0${h}:00` : `${h}:00`;
+                    const isOcu = ocupadas.includes(hStr);
+                    const pill = document.createElement('div');
+                    pill.className = `time-pill ${isOcu ? 'disabled' : ''} italic`;
+                    pill.innerText = hStr;
+                    if(!isOcu) pill.onclick = () => {
+                        document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                        pill.classList.add('selected'); document.getElementById('hora-sel').value = hStr + ":00";
+                    };
+                    grid.appendChild(pill);
                     if(planNivel > 0) {
-                        const halfStr = h < 10 ? `0${h}:30` : `${h}:30`;
-                        horasDisponibles.push(halfStr);
+                        const h30 = h < 10 ? `0${h}:30` : `${h}:30`;
+                        const isOcu30 = ocupadas.includes(h30);
+                        const pill30 = document.createElement('div');
+                        pill30.className = `time-pill ${isOcu30 ? 'disabled' : ''} italic`;
+                        pill30.innerText = h30;
+                        if(!isOcu30) pill30.onclick = () => {
+                            document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                            pill30.classList.add('selected'); document.getElementById('hora-sel').value = h30 + ":00";
+                        };
+                        grid.appendChild(pill30);
                     }
                 }
-
-                horasDisponibles.forEach(t => {
-                    const isOcu = ocupadas.includes(t);
-                    const pill = document.createElement('div');
-                    pill.className = `time-pill ${isOcu ? 'disabled' : ''}`;
-                    pill.innerText = t;
-                    if(!isOcu) {
-                        pill.onclick = () => {
-                            document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                            pill.classList.add('selected');
-                            document.getElementById('hora-sel').value = t + ":00";
-                        };
-                    }
-                    grid.appendChild(pill);
-                });
-            } catch (e) {
-                console.error("Error cargando horas:", e);
-                grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black text-rose-500 uppercase'>Fallo de Sincronización</p>";
-            }
+            } catch (e) { grid.innerHTML = "Fallo de conexión."; }
         }
 
         document.getElementById('form-cita').onsubmit = async (e) => {
             e.preventDefault();
-            const h = document.getElementById('hora-sel').value;
-            const f = document.getElementById('fecha-sel').value;
-            if(!h || !f) return alert("Por favor, selecciona un día y un horario.");
-
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "ENLAZANDO CON GEMINI ✦";
-            btn.disabled = true;
-
+            btn.innerText = "ENLAZANDO CON GEMINI ✦"; btn.disabled = true;
             try {
                 const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
                     method: 'POST',
@@ -244,30 +211,15 @@
                     body: JSON.stringify({
                         doctor_id: docId,
                         nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                        fecha_cita: f, 
-                        hora_cita: h,
+                        fecha_cita: document.getElementById('fecha-sel').value, 
+                        hora_cita: document.getElementById('hora-sel').value,
                         created_at: new Date().toISOString()
                     })
                 });
-
-                if(res.ok) {
-                    alert("✅ RESERVACIÓN CONFIRMADA.\nEl consultorio ha sido notificado vía Gemini Engine ✦.");
-                    location.reload();
-                } else {
-                    alert("Error en el Nodo. Intente de nuevo.");
-                    btn.innerText = "Confirmar Reservación";
-                    btn.disabled = false;
-                }
-            } catch (e) { 
-                alert("Error de Conexión."); 
-                btn.disabled = false; 
-                btn.innerText = "Confirmar Reservación";
-            }
+                if(res.ok) { alert("✅ RESERVACIÓN CONFIRMADA VÍA GEMINI ENGINE ✦"); location.reload(); }
+                else { alert("Error de Nodo. Reintente."); btn.disabled = false; btn.innerText = "Confirmar Reservación"; }
+            } catch (e) { alert("Error de Conexión."); btn.disabled = false; }
         };
-
-        function abrirPrivacidad() { document.getElementById('modal-privacidad').style.display = 'flex'; }
-        function cerrarPrivacidad() { document.getElementById('modal-privacidad').style.display = 'none'; }
-        
         init();
     </script>
 </body>
