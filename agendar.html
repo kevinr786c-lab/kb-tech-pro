@@ -115,9 +115,10 @@
             document.getElementById('d-'+d).classList.add('selected');
             document.getElementById('fecha-sel').value = fecha;
 
-            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
+            // --- CORREGIDO PARA APUNTAR A LA TABLA "Citas" ---
+            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
             const citas = await res.json();
-            const ocupadas = citas.map(c => c.hora_cita.slice(0,5));
+            const ocupadas = citas.map(c => c.hora.slice(0,5));
 
             const cont = document.getElementById('contenedor-horas');
             cont.innerHTML = "";
@@ -148,34 +149,40 @@
             
             if(!h || !f) return alert("Selecciona el horario deseado.");
             
-            btn.innerText = "BLOQUEANDO NODO...";
+            btn.innerText = "SINCRONIZANDO...";
             btn.disabled = true;
 
+            // --- BLINDAJE AJUSTADO A TU TABLA "Citas" ---
             const payload = {
                 doctor_id: docId,
                 nombre_paciente: document.getElementById('nombre').value.trim().toUpperCase(),
-                fecha_cita: f,
-                hora_cita: h,
+                fecha: f, // Columna real: fecha
+                hora: h,  // Columna real: hora
                 telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value.replace(/\D/g,''),
                 pagado: false,
-                status: "NUEVA CITA",
                 monto: 0
             };
 
             try {
-                const res = await fetch(`${URL}/rest/v1/Citas_Agendadas`, {
+                // --- APUNTANDO A LA TABLA CORRECTA "Citas" ---
+                const res = await fetch(`${URL}/rest/v1/Citas`, {
                     method: 'POST',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    headers: { 
+                        'apikey': KEY, 
+                        'Authorization': `Bearer ${KEY}`, 
+                        'Content-Type': 'application/json', 
+                        'Prefer': 'return=minimal' 
+                    },
                     body: JSON.stringify(payload)
                 });
 
                 if(res.ok) { 
-                    alert("✅ Cita Confirmada Exitosamente"); 
+                    alert("✅ Cita agendada con éxito."); 
                     location.reload(); 
                 } else { 
                     const errorTecnico = await res.json();
-                    await reportarError("Error 400 en Reserva", {payload, errorTecnico});
-                    alert("❌ Error: Los datos no son compatibles. El Centinela ya está analizando la causa.");
+                    await reportarError("Fallo en POST Citas", {payload, errorTecnico});
+                    alert("❌ Error de compatibilidad. Reporte enviado al Centinela.");
                     btn.innerText = "Confirmar Reservación";
                     btn.disabled = false;
                 }
