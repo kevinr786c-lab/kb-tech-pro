@@ -14,6 +14,9 @@
         .input-kb:focus { border-color: var(--main-color); background: rgba(255,255,255,0.1); }
         .btn-ia { background: var(--main-color); opacity: 0.9; }
         .btn-ia:hover { opacity: 1; transform: scale(1.05); }
+
+        .gemini-star { color: var(--main-color); animation: pulse-star 3s infinite; display: inline-block; }
+        @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
@@ -23,7 +26,7 @@
             <div id="doc-preview-icon" class="text-6xl mb-4">🩺</div>
             <span class="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Nodo de Configuración Final</span>
             <h1 id="welcome-doc" class="text-4xl font-black tracking-tighter italic uppercase mt-2">Personaliza tu Poder</h1>
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Ajusta los parámetros de tu Red K.B</p>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Gemini Engine ✦ Sincronizando Parámetros</p>
         </header>
 
         <form id="form-config" class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -59,10 +62,10 @@
 
             <div class="md:col-span-2 space-y-4">
                 <div class="flex justify-between items-center px-2">
-                    <h3 class="font-black text-[10px] uppercase text-slate-500 tracking-[0.3em]">📝 Biografía con IA</h3>
-                    <button type="button" onclick="sugerirConIA()" class="btn-ia text-[9px] font-black text-white px-4 py-2 rounded-full transition shadow-lg">✨ GENERAR CON GEMINI</button>
+                    <h3 class="font-black text-[10px] uppercase text-slate-500 tracking-[0.3em]">📝 Biografía Profesional</h3>
+                    <button type="button" onclick="sugerirConIA()" class="btn-ia text-[9px] font-black text-white px-4 py-2 rounded-full transition shadow-lg">✨ GENERAR CON GEMINI ✦</button>
                 </div>
-                <textarea id="bio" rows="4" placeholder="Describe tu visión médica..." class="input-kb resize-none"></textarea>
+                <textarea id="bio" rows="4" placeholder="Gemini Engine ✦: Describe tu visión médica..." class="input-kb resize-none"></textarea>
             </div>
 
             <div class="md:col-span-2 pt-6">
@@ -84,7 +87,7 @@
         };
 
         async function init() {
-            if (!docId) return alert("Error de Nodo.");
+            if (!docId) return alert("Error de Nodo Gemini.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
             currentDocData = data[0];
@@ -98,7 +101,7 @@
 
         async function sugerirConIA() {
             const bio = document.getElementById('bio');
-            bio.value = "Generando...";
+            bio.value = "Gemini Engine ✦: Generando...";
             const prompts = {
                 "Pediatría": "Especialista dedicado al crecimiento saludable y bienestar integral de los más pequeños, combinando calidez humana con medicina de precisión.",
                 "Ginecología": "Atención integral y empoderamiento de la salud femenina en todas sus etapas, con protocolos de vanguardia y máxima confidencialidad.",
@@ -112,7 +115,7 @@
         document.getElementById('form-config').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-save');
-            btn.innerText = "CONFIGURANDO RED...";
+            btn.innerText = "GEMINI ✦: CONFIGURANDO RED...";
             btn.disabled = true;
 
             const payload = {
@@ -132,7 +135,7 @@
             });
 
             if (response.ok) {
-                alert("🚀 Nodo Sincronizado. Entrando al Centro de Control.");
+                alert("🚀 Gemini Engine ✦: Nodo Sincronizado. Entrando al Centro de Control.");
                 window.location.href = `app.html?id=${docId}`;
             }
         });
