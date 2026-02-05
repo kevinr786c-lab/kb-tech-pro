@@ -37,15 +37,15 @@
         <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 mb-8">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tighter uppercase">K.B <span class="text-main" id="logo-tech">DOCTOR</span></h1>
+                    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tighter uppercase leading-none">K.B <span class="text-main italic" id="logo-tech">DOCTOR</span></h1>
                     <p id="doc-esp-label" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold italic">Cargando...</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="hidden md:block text-right">
-                        <p id="level-name" class="text-[8px] font-black text-main uppercase italic">Nodo Aspirante</p>
+                        <p id="level-name" class="text-[8px] font-black text-main uppercase italic">Analizando Nodo...</p>
                         <div class="progress-bar w-32 mt-1"><div id="level-progress" class="progress-fill bg-main" style="width: 10%"></div></div>
                     </div>
-                    <div id="doctor-avatar" class="h-12 w-12 bg-white rounded-full flex items-center justify-center text-2xl border-2 shadow-sm border-main transition-all">👨‍⚕️</div>
+                    <div id="doctor-avatar" class="h-12 w-12 bg-white rounded-full flex items-center justify-center text-2xl border-2 shadow-sm border-main">👨‍⚕️</div>
                 </div>
             </div>
         </nav>
@@ -53,18 +53,18 @@
         <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-8">
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
-                    <h2 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2 italic">Intercomunicador <span class="animate-ping h-2 w-2 rounded-full bg-main"></span></h2>
+                    <h2 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2 italic text-main">INTERCOM <span class="animate-ping h-2 w-2 rounded-full bg-main"></span></h2>
                     <div class="mb-4 p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-center">
                         <p class="text-[9px] font-black text-slate-400 uppercase">Paciente Actual:</p>
                         <p id="dra-patient-name" class="text-sm font-bold text-slate-700 italic">Seleccione de la lista</p>
                     </div>
                     <div class="space-y-4">
                         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <p class="text-[8px] font-black text-main uppercase mb-1 italic">Estado / Nota:</p>
-                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight italic">Esperando actualización...</p>
+                            <p class="text-[8px] font-black text-main uppercase mb-1 italic">Nota de Recepción:</p>
+                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight">Esperando actualización...</p>
                         </div>
-                        <textarea id="dra-response-input" class="input-dra h-24" placeholder="Escribe instrucción para recepción..."></textarea>
-                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 shadow-md transition-all">Enviar a Recepción</button>
+                        <textarea id="dra-response-input" class="input-dra h-24" placeholder="Instrucción para recepción..."></textarea>
+                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 shadow-md">Enviar Instrucción</button>
                     </div>
                 </div>
 
@@ -78,10 +78,9 @@
             <div class="lg:col-span-8">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-black text-slate-800 italic uppercase tracking-tight">Agenda Live</h2>
-                    <div class="bg-white px-4 py-2 rounded-2xl shadow-sm text-xs font-bold text-slate-500 border border-slate-100">Citas Hoy: <span id="total-hoy" class="text-main">0</span></div>
+                    <div class="bg-white px-4 py-2 rounded-2xl shadow-sm text-xs font-bold text-slate-500 border border-slate-100">Hoy: <span id="total-hoy" class="text-main">0</span></div>
                 </div>
-                <div id="contenedor-citas" class="space-y-4">
-                    </div>
+                <div id="contenedor-citas" class="space-y-4"></div>
             </div>
         </main>
     </div>
@@ -89,23 +88,23 @@
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-lg z-50">
         <div class="glass-tool p-4 rounded-[2.5rem] shadow-2xl flex justify-around items-center border border-white">
             <button onclick="copiarLinkCitas()" class="flex flex-col items-center gap-1 group">
-                <div class="bg-main p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">🔗</div>
-                <span class="text-[8px] font-black uppercase text-slate-500">Mi Link</span>
+                <div class="bg-main p-3 rounded-full text-white shadow-lg group-active:scale-95 transition">🔗</div>
+                <span class="text-[8px] font-black uppercase text-slate-500">Link Citas</span>
             </button>
             <button onclick="copiarLinkAsistente()" class="flex flex-col items-center gap-1 group">
-                <div class="bg-rose-500 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">👩‍💼</div>
+                <div class="bg-rose-500 p-3 rounded-full text-white shadow-lg group-active:scale-95 transition">👩‍💼</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">Asistente</span>
             </button>
             <button onclick="window.location.href='configurar-perfil.html?id='+docId" class="flex flex-col items-center gap-1 group">
-                <div class="bg-indigo-400 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">⚙️</div>
+                <div class="bg-indigo-400 p-3 rounded-full text-white shadow-lg group-active:scale-95 transition">⚙️</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">Perfil</span>
             </button>
-            <button onclick="alert('Tu ID de Referido: ' + docId.substring(0,8).toUpperCase())" class="flex flex-col items-center gap-1 group">
-                <div class="bg-amber-400 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">🏆</div>
-                <span class="text-[8px] font-black uppercase text-slate-500">Nivel</span>
+            <button onclick="alert('Nodo ID: ' + docId.substring(0,8).toUpperCase())" class="flex flex-col items-center gap-1 group">
+                <div class="bg-amber-400 p-3 rounded-full text-white shadow-lg group-active:scale-95 transition">🏆</div>
+                <span class="text-[8px] font-black uppercase text-slate-500">Rango</span>
             </button>
             <button onclick="cambiarPin()" class="flex flex-col items-center gap-1 group">
-                <div class="bg-slate-800 p-3 rounded-full text-white shadow-lg group-active:scale-90 transition">🔑</div>
+                <div class="bg-slate-800 p-3 rounded-full text-white shadow-lg group-active:scale-95 transition">🔑</div>
                 <span class="text-[8px] font-black uppercase text-slate-500">PIN</span>
             </button>
         </div>
@@ -114,9 +113,23 @@
     <script>
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
-        const docId = new URLSearchParams(window.location.search).get('id');
+        const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentPatientId = null;
-        let pinCorrecto = "0000";
+
+        // --- SISTEMA CENTINELA (MONITOREO) ---
+        async function reportarError(msg, datos = {}) {
+            await fetch(`${URL}/rest/v1/Logs_Sistema`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pagina_origen: "app.html (Doctor)",
+                    codigo_error: "Doctor_Feed",
+                    mensaje_error: msg,
+                    datos_enviados: datos,
+                    dispositivo_info: navigator.userAgent
+                })
+            });
+        }
 
         const CATALOGO_MAESTRO = {
             "Ginecología": [{id:1,color:"#f43f5e",icon:"🌸"},{id:2,color:"#8b5cf6",icon:"🔮"},{id:3,color:"#fb7185",icon:"🌷"},{id:4,color:"#059669",icon:"🍃"},{id:5,color:"#1e293b",icon:"💎"}],
@@ -135,15 +148,18 @@
                 if(data.length === 0) return alert("Nodo Médico no encontrado.");
                 
                 const doc = data[0];
-                pinCorrecto = doc.pin_acceso || "0000";
+                const pinIngresado = document.getElementById('pin-acceso').value;
                 
-                if(document.getElementById('pin-acceso').value === pinCorrecto) {
+                if(pinIngresado === (doc.pin_acceso || "0000")) {
                     document.getElementById('pantalla-bloqueo').classList.add('hidden');
                     document.getElementById('contenido-panel').classList.remove('hidden');
                     setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
                     init(doc);
-                } else { alert("PIN Incorrecto."); }
-            } catch (e) { alert("Error de conexión con la red K.B."); }
+                } else { 
+                    alert("PIN Incorrecto.");
+                    reportarError("Intento de acceso fallido", {id: docId});
+                }
+            } catch (e) { reportarError("Fallo en verificación de acceso", {error: e.message}); }
         }
 
         function init(doc) {
@@ -181,7 +197,7 @@
                 
                 const contenedor = document.getElementById('contenedor-citas');
                 if(citas.length === 0) {
-                    contenedor.innerHTML = `<p class="text-center text-slate-400 py-10 italic">No hay citas registradas hoy.</p>`;
+                    contenedor.innerHTML = `<p class="text-center text-slate-400 py-10 italic">No hay citas para hoy.</p>`;
                 } else {
                     contenedor.innerHTML = citas.map(cita => `
                         <div class="card-pro bg-white p-6 rounded-[2.5rem] flex items-center justify-between gap-4 shadow-sm" 
@@ -190,15 +206,17 @@
                                 <div class="text-xl font-black text-main w-16">${cita.hora_cita.slice(0,5)}</div>
                                 <div>
                                     <h3 class="font-bold text-slate-800 text-sm uppercase">${cita.nombre_paciente}</h3>
-                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">${cita.status || 'En Espera'}</p>
+                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">${cita.status || 'Confirmado'}</p>
                                 </div>
                             </div>
-                            <span class="px-4 py-2 rounded-xl uppercase text-[9px] font-black bg-emerald-50 text-emerald-500">LISTO</span>
+                            <span class="px-4 py-2 rounded-xl uppercase text-[9px] font-black ${cita.pagado ? 'bg-blue-50 text-blue-500' : 'bg-emerald-50 text-emerald-500'}">${cita.pagado ? 'PAGADO' : 'ACTIVO'}</span>
                         </div>
                     `).join('');
                 }
-                document.getElementById('ganancia-mes').innerText = `$${(citas.length * 999).toLocaleString()}.00`;
-            } catch (e) { console.error("Sync Error:", e); }
+                // Ganancia proyectada (Ejemplo: $999 por consulta)
+                const pagadas = citas.filter(c => c.pagado).length;
+                document.getElementById('ganancia-mes').innerText = `$${(pagadas * 999).toLocaleString()}.00`;
+            } catch (e) { reportarError("Error en sincronización de citas", {id: docId}); }
         }
 
         function enfocarpaciente(id, nombre, nota) {
@@ -212,42 +230,43 @@
             if(!currentPatientId || !respuesta) return alert("Seleccione un paciente.");
             
             try {
-                await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentPatientId}`, {
+                const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentPatientId}`, {
                     method: 'PATCH',
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: "DOCTOR DICE: " + respuesta }) 
+                    body: JSON.stringify({ status: "DOCTOR DICE: " + respuesta.toUpperCase() }) 
                 });
-                alert("Nota enviada a recepción.");
-                document.getElementById('dra-response-input').value = "";
-                syncMaster();
-            } catch(e) { alert("Error al enviar nota."); }
+                if(res.ok) {
+                    alert("Instrucción enviada.");
+                    document.getElementById('dra-response-input').value = "";
+                    syncMaster();
+                }
+            } catch(e) { reportarError("Error al enviar instrucción del doctor", {patientId: currentPatientId}); }
         }
 
-        // FUNCIÓN ACTUALIZADA PARA APUNTAR A AGENDAR.HTML (MATANDO EL 404)
         function copiarLinkCitas() {
-            const path = window.location.pathname.split('/').slice(0, -1).join('/');
-            const link = window.location.origin + path + "/agendar.html?id=" + docId;
+            const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
             navigator.clipboard.writeText(link);
-            alert("✅ ¡Tu Link de Reservación ha sido copiado!\nCompártelo con tus pacientes para que agenden en agendar.html");
+            alert("✅ Link de Reservación Copiado.");
         }
 
         function copiarLinkAsistente() {
-            const path = window.location.pathname.split('/').slice(0, -1).join('/');
-            const link = window.location.origin + path + "/asistente.html?id=" + docId;
+            const link = window.location.origin + window.location.pathname.replace('app.html', 'asistente.html') + "?id=" + docId;
             navigator.clipboard.writeText(link);
-            alert("✅ ¡Link de Recepción Copiado!\nMándaselo a tu asistente.");
+            alert("✅ Link de Recepción Copiado.");
         }
 
         async function cambiarPin() {
             const nuevoPin = prompt("Nuevo PIN (4 dígitos):");
             if (nuevoPin && nuevoPin.length === 4) {
-                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pin_acceso: nuevoPin }) 
-                });
-                alert("✅ PIN actualizado.");
-            } else { alert("PIN inválido."); }
+                try {
+                    await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                        method: 'PATCH',
+                        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pin_acceso: nuevoPin }) 
+                    });
+                    alert("✅ Seguridad actualizada.");
+                } catch(e) { reportarError("Error al cambiar PIN", {id: docId}); }
+            } else { alert("Formato de PIN inválido."); }
         }
     </script>
 </body>
