@@ -184,6 +184,7 @@
             const grid = document.getElementById('time-grid');
             grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Gemini ✦ Consultando...</p>";
             
+            // CORRECCIÓN TÉCNICA: Sincronización con tabla Citas_Agendadas y campo fecha_cita
             const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
             const ocupadas = (await res.json()).map(c => c.hora_cita.slice(0,5));
 
@@ -226,6 +227,7 @@
             btn.innerText = "ENLAZANDO CON GEMINI ✦";
             btn.disabled = true;
 
+            // CORRECCIÓN TÉCNICA: Sincronización con esquema SQL definitivo
             const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
@@ -241,6 +243,10 @@
             if(res.ok) {
                 alert("✅ GEMINI ENGINE ✦: RESERVACIÓN CONFIRMADA.");
                 location.reload();
+            } else {
+                alert("Error de Sincronización. Intente de nuevo.");
+                btn.innerText = "Confirmar Reservación";
+                btn.disabled = false;
             }
         };
 
