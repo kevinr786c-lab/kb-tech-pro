@@ -419,12 +419,33 @@ async function enviarNotaAlDr() {
             abrirModal();
         }
 
-        function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/5216641234567?text=Hola ${currentPatient.nombre_paciente}`); }
-        async function enviarNotaAlDr() { /* ... lógica de envío notas ... */ }
+    function contactarWhatsApp() { 
+            if(currentPatient) window.open(`https://wa.me/5216641234567?text=Hola ${currentPatient.nombre_paciente}`); 
+        }
+
         function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
         function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        verificarAcceso();
+
+        async function verificarAcceso() {
+            const pin = document.getElementById('pin-acceso').value;
+            if(!docId) return eliteAviso("ID DE MÉDICO NO ENCONTRADO");
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB } });
+            const data = await res.json();
+            globalDocData = data[0];
+            if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
+                const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
+                const color = palette[(globalDocData.template_id || 1) % 5];
+                document.documentElement.style.setProperty('--main', color);
+                document.getElementById('brand-text').style.color = color;
+                document.getElementById('pantalla-bloqueo').style.display = 'none';
+                document.getElementById('contenido-panel').classList.remove('hidden');
+                setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
+                document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${globalDocData.nombre_doctor}`;
+                cargarCitas(); 
+                setInterval(cargarCitas, 30000); 
+            } else { eliteAviso("PIN INCORRECTO"); }
+        }
     </script>
 </body>
 </html>
