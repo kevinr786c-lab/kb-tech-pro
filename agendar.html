@@ -56,7 +56,7 @@
             <div id="contenedor-horas" class="grid-horas"></div>
             <input type="hidden" id="hora-sel" required>
 
-            <button type="submit" id="btn-submit" class="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition">Confirmar Cita</button>
+            <button type="submit" id="btn-submit" class="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition">Confirmar Reservación</button>
         </form>
     </div>
 
@@ -65,15 +65,15 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
 
-        // --- SISTEMA CENTINELA (VIGILANTE) ---
+        // --- SISTEMA CENTINELA (ANÁLISIS DE FALLOS) ---
         async function reportarError(errorMsg, datos = {}) {
             try {
                 await fetch(`${URL}/rest/v1/Logs_Sistema`, {
                     method: 'POST',
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        pagina_origen: "agendar.html (Paciente)",
-                        codigo_error: "400_RESERVA",
+                        pagina_origen: "agendar.html",
+                        codigo_error: "400_CRITICO",
                         mensaje_error: errorMsg,
                         datos_enviados: datos,
                         dispositivo_info: navigator.userAgent
@@ -148,15 +148,15 @@
             
             if(!h || !f) return alert("Selecciona el horario deseado.");
             
-            btn.innerText = "SINCRONIZANDO...";
+            btn.innerText = "BLOQUEANDO NODO...";
             btn.disabled = true;
 
             const payload = {
                 doctor_id: docId,
-                nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
+                nombre_paciente: document.getElementById('nombre').value.trim().toUpperCase(),
                 fecha_cita: f,
                 hora_cita: h,
-                telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value,
+                telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value.replace(/\D/g,''),
                 pagado: false,
                 status: "NUEVA CITA",
                 monto: 0
@@ -170,17 +170,17 @@
                 });
 
                 if(res.ok) { 
-                    alert("✅ Cita agendada con éxito."); 
+                    alert("✅ Cita Confirmada Exitosamente"); 
                     location.reload(); 
                 } else { 
-                    const technicalError = await res.json();
-                    reportarError("Fallo en POST Citas_Agendadas", {payload, technicalError});
-                    alert("❌ Error de red. Reporte enviado al Centro de Mando.");
-                    btn.innerText = "Confirmar Cita";
+                    const errorTecnico = await res.json();
+                    await reportarError("Error 400 en Reserva", {payload, errorTecnico});
+                    alert("❌ Error: Los datos no son compatibles. El Centinela ya está analizando la causa.");
+                    btn.innerText = "Confirmar Reservación";
                     btn.disabled = false;
                 }
             } catch(e) {
-                reportarError("Excepción en Submit", {error: e.message});
+                await reportarError("Error Crítico de Red", {error: e.message});
                 btn.disabled = false;
             }
         });
