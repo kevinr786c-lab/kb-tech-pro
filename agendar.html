@@ -3,64 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva tu Cita | K.B Tech Pro</title>
+    <title>RESERVACIÓN ÉLITE | K.B TECH PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.8s; background-color: #f8fafc; }
-        :root { --main: #6366f1; } /* Color dinámico */
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.1); }
-        .input-modern { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; transition: 0.3s; outline: none; }
-        .input-modern:focus { border-color: var(--main); background: white; }
-        
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 0.8rem; font-size: 0.7rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
-        .day-box.selected { background: var(--main) !important; color: white !important; box-shadow: 0 10px 15px -5px var(--main); }
-        .day-name { text-align: center; font-size: 0.55rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;500;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; color: #0f172a; overflow-x: hidden; }
+        :root { --main: #6366f1; } 
 
-        .grid-horas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .btn-hora { padding: 10px; border-radius: 1rem; font-weight: 800; font-size: 0.7rem; transition: 0.3s; text-align: center; cursor: pointer; }
-        .hora-disponible { background: #f1f5f9; color: #475569; }
-        .hora-seleccionada { background: var(--main) !important; color: white !important; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
+        .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        .border-main-heavy { border-top: 10px solid var(--main); }
-        .text-main { color: var(--main); }
+        /* Date Slider de Prestigio */
+        .date-slider { display: flex; overflow-x: auto; gap: 12px; padding: 10px 5px; scrollbar-width: none; }
+        .date-slider::-webkit-scrollbar { display: none; }
+        .date-card { min-width: 65px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.5rem; border: 1px solid #f1f5f9; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .date-card.selected { background: var(--main); border-color: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 30px -10px var(--main); }
+        
+        /* Cápsulas de Hora */
+        .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
+        .time-pill.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 20px -5px var(--main); }
+        .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; }
+
+        .btn-lujo { width: 100%; py: 1.25rem; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
+        .btn-lujo:hover { transform: translateY(-3px); }
+        .modal-blur { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 pb-32 text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-md w-full glass-card p-8 rounded-[3rem] relative z-10 border-main-heavy" id="main-container">
-        <header class="text-center mb-6">
-            <div id="icon-header" class="text-6xl mb-4">🏥</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-800 uppercase italic leading-tight">Cargando Nodo...</h1>
-            <p id="doc-esp" class="text-[8px] font-black text-slate-400 uppercase tracking-[0.4em] italic mt-1"></p>
+    <div class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        
+        <header class="text-center mb-10">
+            <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
+            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">---</h1>
+            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Cargando Nodo Médico...</p>
         </header>
 
-        <form id="form-cita" class="space-y-4">
-            <input type="text" id="nombre" placeholder="Nombre Completo" class="input-modern" required>
-            
-            <div class="flex gap-2">
-                <select id="lada" class="w-24 input-modern text-xs !px-2">
-                    <option value="52">🇲🇽 +52</option>
-                    <option value="1">🇺🇸 +1</option>
-                </select>
-                <input type="tel" id="telefono" placeholder="WhatsApp" class="flex-1 input-modern" required>
-            </div>
-
-            <div class="bg-slate-50 p-4 rounded-[2rem]">
-                <div id="month-name" class="text-[10px] font-black text-main uppercase text-center mb-3"></div>
-                <div class="grid grid-cols-7 gap-1 mb-2">
-                    <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
+        <form id="form-cita" class="space-y-6">
+            <div class="space-y-4">
+                <input type="text" id="nombre" placeholder="Nombre y Apellido" class="input-premium" required>
+                <div class="flex gap-3">
+                    <select id="lada" class="w-24 input-premium text-xs">
+                        <option value="52">🇲🇽 +52</option>
+                        <option value="1">🇺🇸 +1</option>
+                    </select>
+                    <input type="tel" id="telefono" placeholder="WhatsApp" class="flex-1 input-premium" required>
                 </div>
-                <div id="calendar-body" class="calendar-grid"></div>
             </div>
-            <input type="hidden" id="fecha-sel" required>
 
-            <div id="contenedor-horas" class="grid-horas"></div>
-            <input type="hidden" id="hora-sel" required>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-2">
+                    <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest italic">Seleccione Día</p>
+                    <span id="current-month" class="text-[9px] font-black text-main uppercase"></span>
+                </div>
+                <div id="date-slider" class="date-slider">
+                    </div>
+                <input type="hidden" id="fecha-sel" required>
+            </div>
 
-            <button type="submit" id="btn-submit" class="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition">Confirmar Reservación</button>
+            <div class="space-y-3">
+                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">Horario de Preferencia</p>
+                <div id="time-grid" class="grid grid-cols-3 gap-3">
+                    </div>
+                <input type="hidden" id="hora-sel" required>
+            </div>
+
+            <div class="flex items-center gap-3 px-2 pt-2">
+                <input type="checkbox" id="check-privacidad" class="w-5 h-5 accent-slate-900" required>
+                <label class="text-[8px] text-slate-400 font-bold uppercase leading-tight">
+                    Acepto el <button type="button" onclick="abrirPrivacidad()" class="text-slate-900 underline">Aviso de Privacidad</button> y seguridad SSL.
+                </label>
+            </div>
+
+            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Mi Espacio</button>
         </form>
+    </div>
+
+    <div id="modal-privacidad" class="modal-blur">
+        <div class="bg-white p-10 rounded-[3rem] max-w-sm w-full shadow-2xl">
+            <h2 class="font-black uppercase italic text-xl mb-4 tracking-tighter">Protección K.B</h2>
+            <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed">
+                <p>1. Datos bajo encriptación biométrica de grado médico.</p>
+                <p>2. El canal de comunicación será exclusivo vía WhatsApp Business.</p>
+                <p>3. Reservación garantizada bajo protocolo de depósito del 20%.</p>
+            </div>
+            <button type="button" onclick="cerrarPrivacidad()" class="w-full mt-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase">Aceptar Términos</button>
+        </div>
     </div>
 
     <script>
@@ -68,144 +98,107 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
 
-        const COLORES_ESPECIALIDAD = {
-            "Ginecología": "#f43f5e",
-            "Odontología": "#0ea5e9",
-            "Pediatría": "#fb923c",
-            "Cardiología": "#e11d48",
-            "Bienestar (Nutri/Psico)": "#059669",
-            "General": "#6366f1"
+        const CATALOGO = {
+            "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
+            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
+            "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
+            "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
+            "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
         };
 
-        async function reportarError(errorMsg, datos = {}) {
-            try {
-                await fetch(`${URL}/rest/v1/Logs_Sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        pagina_origen: "agendar.html",
-                        codigo_error: "400_ULTRA",
-                        mensaje_error: errorMsg,
-                        datos_enviados: datos,
-                        dispositivo_info: navigator.userAgent
-                    })
-                });
-            } catch(e) { console.error("Centinela Offline"); }
-        }
-
         async function init() {
-            if(!docId) return alert("Error: Nodo no identificado.");
-            try {
-                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
-                const data = await res.json();
-                if(data.length > 0) {
-                    const config = data[0];
-                    
-                    // Sincronización de Color Maestro
-                    const colorTema = COLORES_ESPECIALIDAD[config.especialidad] || "#6366f1";
-                    document.documentElement.style.setProperty('--main', colorTema);
-                    
-                    document.getElementById('doc-name').innerText = "Dr. " + config.nombre_doctor;
-                    document.getElementById('doc-esp').innerText = config.especialidad;
-                    renderCalendar();
-                }
-            } catch (e) { reportarError("Fallo carga inicial perfil", {docId}); }
-        }
-
-        function renderCalendar() {
-            const now = new Date();
-            const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            const start = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-            const cal = document.getElementById('calendar-body');
-            document.getElementById('month-name').innerText = now.toLocaleString('es-mx', {month:'long', year:'numeric'});
-            cal.innerHTML = "";
-            for(let i=0; i<start; i++) cal.innerHTML += "<div></div>";
-            for(let d=1; d<=days; d++) {
-                const date = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                cal.innerHTML += `<div class="day-box" id="d-${d}" onclick="getHoras('${date}', ${d})">${d}</div>`;
+            if(!docId) return;
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
+            const data = await res.json();
+            if(data[0]) {
+                const doc = data[0];
+                const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
+                const color = palette[(doc.template_id || 1) % 5];
+                document.documentElement.style.setProperty('--main', color);
+                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                document.getElementById('doc-esp').innerText = doc.especialidad;
+                renderDateSlider();
             }
         }
 
-        async function getHoras(fecha, d) {
-            document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
-            document.getElementById('d-'+d).classList.add('selected');
-            document.getElementById('fecha-sel').value = fecha;
+        function renderDateSlider() {
+            const slider = document.getElementById('date-slider');
+            const now = new Date();
+            document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
+            
+            for(let i=0; i<14; i++) {
+                const d = new Date(); d.setDate(now.getDate() + i);
+                const dayName = d.toLocaleString('es-mx', {weekday:'short'}).replace('.','');
+                const dayNum = d.getDate();
+                const fullDate = d.toISOString().split('T')[0];
+                
+                const card = document.createElement('div');
+                card.className = "date-card";
+                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40">${dayName}</span><span class="text-xl font-black">${dayNum}</span>`;
+                card.onclick = () => {
+                    document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('fecha-sel').value = fullDate;
+                    getHoras(fullDate);
+                };
+                slider.appendChild(card);
+            }
+        }
 
-            // Consulta a tabla unificada "Citas"
+        async function getHoras(fecha) {
+            const grid = document.getElementById('time-grid');
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Buscando Espacios...</p>";
+            
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
-            const citas = await res.json();
-            const ocupadas = citas.map(c => c.hora.slice(0,5));
+            const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
 
-            const cont = document.getElementById('contenedor-horas');
-            cont.innerHTML = "";
-            let h = new Date("2026-01-01T09:00:00");
-            let f = new Date("2026-01-01T17:00:00");
-
-            while(h < f) {
-                const t = h.toTimeString().slice(0,5);
+            grid.innerHTML = "";
+            const horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "16:00", "16:30", "17:00", "17:30"];
+            
+            horas.forEach(t => {
                 const isOcu = ocupadas.includes(t);
-                const btn = document.createElement('div');
-                btn.className = `btn-hora ${isOcu ? 'opacity-20 cursor-not-allowed bg-red-100' : 'hora-disponible'}`;
-                btn.innerText = t;
-                if(!isOcu) btn.onclick = () => {
-                    document.querySelectorAll('.btn-hora').forEach(bh => bh.classList.remove('hora-seleccionada'));
-                    btn.classList.add('hora-seleccionada');
+                const pill = document.createElement('div');
+                pill.className = `time-pill ${isOcu ? 'disabled' : ''}`;
+                pill.innerText = t;
+                if(!isOcu) pill.onclick = () => {
+                    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                    pill.classList.add('selected');
                     document.getElementById('hora-sel').value = t + ":00";
                 };
-                cont.appendChild(btn);
-                h.setMinutes(h.getMinutes() + 30);
-            }
+                grid.appendChild(pill);
+            });
         }
 
-        document.getElementById('form-cita').addEventListener('submit', async (e) => {
+        document.getElementById('form-cita').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit');
             const h = document.getElementById('hora-sel').value;
             const f = document.getElementById('fecha-sel').value;
-            
-            if(!h || !f) return alert("Selecciona el horario deseado.");
-            
-            btn.innerText = "PROCESANDO ENLACE...";
+            if(!h || !f) return alert("Seleccione Fecha y Hora.");
+
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "Sincronizando con Nodo...";
             btn.disabled = true;
 
-            const payload = {
-                doctor_id: docId,
-                nombre_paciente: document.getElementById('nombre').value.trim().toUpperCase(),
-                fecha: f,
-                hora: h,
-                telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value.replace(/\D/g,''),
-                pagado: false,
-                monto: 0
-            };
+            const res = await fetch(`${URL}/rest/v1/Citas`, {
+                method: 'POST',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    doctor_id: docId,
+                    nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
+                    fecha: f, hora: h,
+                    telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value.replace(/\D/g,''),
+                    pagado: false, monto: 0
+                })
+            });
 
-            try {
-                const res = await fetch(`${URL}/rest/v1/Citas`, {
-                    method: 'POST',
-                    headers: { 
-                        'apikey': KEY, 
-                        'Authorization': `Bearer ${KEY}`, 
-                        'Content-Type': 'application/json', 
-                        'Prefer': 'return=minimal' 
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if(res.ok) { 
-                    alert("✅ Cita agendada con éxito."); 
-                    location.reload(); 
-                } else { 
-                    const errorTecnico = await res.json();
-                    await reportarError("Fallo en POST Citas Ultra", {payload, errorTecnico});
-                    alert("❌ Error de compatibilidad. El Centinela ya está analizando el reporte.");
-                    btn.innerText = "Confirmar Reservación";
-                    btn.disabled = false;
-                }
-            } catch(e) {
-                await reportarError("Error Crítico de Red", {error: e.message});
-                btn.disabled = false;
+            if(res.ok) {
+                alert("✅ RESERVACIÓN SOLICITADA CON ÉXITO.");
+                location.reload();
             }
-        });
+        };
 
+        function abrirPrivacidad() { document.getElementById('modal-privacidad').style.display = 'flex'; }
+        function cerrarPrivacidad() { document.getElementById('modal-privacidad').style.display = 'none'; }
         init();
     </script>
 </body>
