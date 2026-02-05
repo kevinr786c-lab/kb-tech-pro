@@ -21,16 +21,12 @@
         
         .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 20px -5px var(--main); }
-        .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; }
+        .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; background: #f8fafc; }
 
         .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
-        .btn-lujo:hover { transform: translateY(-3px); }
+        .btn-lujo:hover { transform: translateY(-3px); filter: brightness(1.2); }
         .modal-blur { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        
-        .plan-basico .date-slider { display: block; }
-        .plan-basico .date-card { width: 100%; height: auto; padding: 15px; margin-bottom: 5px; flex-direction: row; justify-content: space-between; padding-inline: 25px; }
 
-        /* Mi Estrella de Inteligencia ✦ */
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
@@ -42,9 +38,8 @@
         
         <header class="text-center mb-10">
             <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none">---</h1>
+            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none">Cargando...</h1>
             <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Gemini Engine ✦ Sincronizando Nodo...</p>
-            
             <p id="doc-bio" class="text-[10px] text-slate-500 font-medium mt-6 px-4 leading-relaxed italic opacity-0 transition-opacity duration-1000"></p>
         </header>
 
@@ -71,7 +66,9 @@
 
             <div class="space-y-3">
                 <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">Horarios Disponibles</p>
-                <div id="time-grid" class="grid grid-cols-3 gap-3"></div>
+                <div id="time-grid" class="grid grid-cols-3 gap-3">
+                    <p class="col-span-3 text-center text-[8px] font-bold text-slate-300 uppercase py-4">Selecciona un día primero</p>
+                </div>
                 <input type="hidden" id="hora-sel" required>
             </div>
 
@@ -85,7 +82,7 @@
             <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación</button>
         </form>
 
-        <footer class="mt-8 text-center">
+        <footer class="mt-8 text-center border-t border-slate-100 pt-6">
             <span class="gemini-star text-xs">✦</span>
             <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Gemini Engine ✦ K.B Solutions · Tijuana</p>
         </footer>
@@ -106,12 +103,14 @@
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
-        const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+        
+        // CORRECCIÓN MAESTRA: Forzar ID numérico
+        const docId = parseInt(new URLSearchParams(window.location.search).get('id'));
         
         let planNivel = 0;
         let configHoras = { inicio: "09:00", fin: "17:00" };
 
-        const CATALOGO = {
+        const CATALOGO_TEMAS = {
             "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
             "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
             "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
@@ -120,42 +119,41 @@
         };
 
         async function init() {
-            if(!docId) return;
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
-            const data = await res.json();
+            if(isNaN(docId)) return alert("Error: Nodo de Doctor no identificado.");
             
-            if(data[0]) {
-                const doc = data[0];
-                planNivel = doc.plan === 'Dominio' ? 1 : 0;
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
+                    headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} 
+                });
+                const data = await res.json();
                 
-                configHoras.inicio = doc.hora_inicio || "09:00";
-                configHoras.fin = doc.hora_fin || "17:00";
+                if(data[0]) {
+                    const doc = data[0];
+                    planNivel = (doc.plan === 'Dominio' || doc.plan === 'Corporativo') ? 1 : 0;
+                    configHoras.inicio = doc.hora_inicio || "09:00";
+                    configHoras.fin = doc.hora_fin || "17:00";
 
-                if(planNivel === 0) {
-                    document.documentElement.style.setProperty('--main', '#64748b');
-                    document.getElementById('main-node-container').classList.add('plan-basico');
-                } else {
-                    const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
-                    const colorIdx = (doc.template_id || 1) % 5;
-                    const color = palette[colorIdx];
+                    // Aplicar Color
+                    const palette = CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"];
+                    const color = palette[(doc.template_id || 1) % 5];
                     document.documentElement.style.setProperty('--main', color);
-                }
 
-                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Nodo Verificado" : "");
-                
-                if(doc.biografia) {
-                    const bioEl = document.getElementById('doc-bio');
-                    bioEl.innerText = doc.biografia;
-                    bioEl.style.opacity = "1";
+                    document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                    document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Nodo Verificado" : "");
+                    
+                    if(doc.biografia) {
+                        const bioEl = document.getElementById('doc-bio');
+                        bioEl.innerText = doc.biografia;
+                        bioEl.style.opacity = "1";
+                    }
+                    renderDateSlider();
                 }
-
-                renderDateSlider();
-            }
+            } catch (e) { console.error("Error inicializando:", e); }
         }
 
         function renderDateSlider() {
             const slider = document.getElementById('date-slider');
+            slider.innerHTML = "";
             const now = new Date();
             document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
             
@@ -182,72 +180,81 @@
 
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
-            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Gemini ✦ Consultando...</p>";
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse text-indigo-500'>Sincronizando Nodo...</p>";
             
-            // CORRECCIÓN TÉCNICA: Sincronización con tabla Citas_Agendadas y campo fecha_cita
-            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
-            const ocupadas = (await res.json()).map(c => c.hora_cita.slice(0,5));
+            try {
+                // Consulta a la tabla de citas
+                const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { 
+                    headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} 
+                });
+                const data = await res.json();
+                const ocupadas = data.map(c => c.hora_cita.slice(0,5));
 
-            grid.innerHTML = "";
-            
-            const horasDisponibles = [];
-            let start = parseInt(configHoras.inicio.split(':')[0]);
-            let end = parseInt(configHoras.fin.split(':')[0]);
+                grid.innerHTML = "";
+                const horasDisponibles = [];
+                let start = parseInt(configHoras.inicio.split(':')[0]);
+                let end = parseInt(configHoras.fin.split(':')[0]);
 
-            for(let h = start; h < end; h++) {
-                const hourStr = h < 10 ? `0${h}:00` : `${h}:00`;
-                horasDisponibles.push(hourStr);
-                if(planNivel > 0) {
-                    const halfStr = h < 10 ? `0${h}:30` : `${h}:30`;
-                    horasDisponibles.push(halfStr);
+                for(let h = start; h < end; h++) {
+                    const hourStr = h < 10 ? `0${h}:00` : `${h}:00`;
+                    horasDisponibles.push(hourStr);
+                    if(planNivel > 0) {
+                        const halfStr = h < 10 ? `0${h}:30` : `${h}:30`;
+                        horasDisponibles.push(halfStr);
+                    }
                 }
-            }
 
-            horasDisponibles.forEach(t => {
-                const isOcu = ocupadas.includes(t);
-                const pill = document.createElement('div');
-                pill.className = `time-pill ${isOcu ? 'disabled' : ''}`;
-                pill.innerText = t;
-                if(!isOcu) pill.onclick = () => {
-                    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                    pill.classList.add('selected');
-                    document.getElementById('hora-sel').value = t + ":00";
-                };
-                grid.appendChild(pill);
-            });
+                horasDisponibles.forEach(t => {
+                    const isOcu = ocupadas.includes(t);
+                    const pill = document.createElement('div');
+                    pill.className = `time-pill ${isOcu ? 'disabled' : ''}`;
+                    pill.innerText = t;
+                    if(!isOcu) {
+                        pill.onclick = () => {
+                            document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                            pill.classList.add('selected');
+                            document.getElementById('hora-sel').value = t + ":00";
+                        };
+                    }
+                    grid.appendChild(pill);
+                });
+            } catch (e) {
+                grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black text-rose-500 uppercase'>Fallo de Sincronización</p>";
+            }
         }
 
         document.getElementById('form-cita').onsubmit = async (e) => {
             e.preventDefault();
             const h = document.getElementById('hora-sel').value;
             const f = document.getElementById('fecha-sel').value;
-            if(!h || !f) return alert("Seleccione Fecha y Hora.");
+            if(!h || !f) return alert("Por favor, selecciona un día y un horario.");
 
             const btn = document.getElementById('btn-submit');
             btn.innerText = "ENLAZANDO CON GEMINI ✦";
             btn.disabled = true;
 
-            // CORRECCIÓN TÉCNICA: Sincronización con esquema SQL definitivo
-            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
-                method: 'POST',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    doctor_id: docId,
-                    nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                    fecha_cita: f, 
-                    hora_cita: h,
-                    created_at: new Date().toISOString()
-                })
-            });
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        doctor_id: docId,
+                        nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
+                        fecha_cita: f, 
+                        hora_cita: h,
+                        created_at: new Date().toISOString()
+                    })
+                });
 
-            if(res.ok) {
-                alert("✅ GEMINI ENGINE ✦: RESERVACIÓN CONFIRMADA.");
-                location.reload();
-            } else {
-                alert("Error de Sincronización. Intente de nuevo.");
-                btn.innerText = "Confirmar Reservación";
-                btn.disabled = false;
-            }
+                if(res.ok) {
+                    alert("✅ RESERVACIÓN CONFIRMADA.\nEl consultorio ha sido notificado vía Gemini Engine ✦.");
+                    location.reload();
+                } else {
+                    alert("Error en el Nodo. Intente de nuevo.");
+                    btn.innerText = "Confirmar Reservación";
+                    btn.disabled = false;
+                }
+            } catch (e) { alert("Error de Conexión."); btn.disabled = false; }
         };
 
         function abrirPrivacidad() { document.getElementById('modal-privacidad').style.display = 'flex'; }
