@@ -40,7 +40,7 @@
         <p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p>
     </div>
 
-    <div id="main-node-container" class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative overflow-hidden">
+    <div id="main-node-container" class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative overflow-hidden text-left">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
         
         <header class="text-center mb-10">
@@ -60,6 +60,7 @@
                     </select>
                     <input type="tel" id="telefono" placeholder="WHATSAPP" class="flex-1 input-premium" required>
                 </div>
+                <textarea id="motivo-consulta" placeholder="MOTIVO DE CONSULTA O SÍNTOMAS..." class="input-premium text-xs h-20 resize-none uppercase" required></textarea>
             </div>
 
             <div class="space-y-3">
@@ -129,33 +130,19 @@
             setTimeout(() => toast.classList.remove('active'), 4000);
         }
 
-        async function sentinela(mensaje, codigo = "info") {
-            try {
-                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "agendar.html", codigo_error: codigo.toLowerCase(), mensaje_error: mensaje.toLowerCase() })
-                });
-            } catch (e) { }
-        }
-
         async function init() {
             if(!docId) return eliteAviso("NODO NO IDENTIFICADO");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
             const doc = (await res.json())[0];
-            
             if(doc) {
                 planNivel = doc.plan === 'Dominio' || doc.plan === 'Corporativo' ? 1 : 0;
                 configHoras.inicio = doc.hora_inicio || "09:00";
                 configHoras.fin = doc.hora_fin || "17:00";
-
                 const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
                 const color = palette[(doc.template_id || 1) % 5];
                 document.documentElement.style.setProperty('--main', color);
-
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Verificado" : "");
-                
                 if(doc.biografia) {
                     const bioEl = document.getElementById('doc-bio');
                     bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
@@ -169,18 +156,11 @@
             const now = new Date();
             document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
             const limite = planNivel > 0 ? 14 : 7;
-
             for(let i=0; i < limite; i++) {
                 const d = new Date(); d.setDate(now.getDate() + i);
                 const dayName = d.toLocaleString('es-mx', {weekday:'short'});
                 const dayNum = d.getDate();
-                
-                // --- FIX DE FECHA LOCAL ---
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                const localISO = `${year}-${month}-${day}`;
-                
+                const localISO = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                 const card = document.createElement('div');
                 card.className = "date-card";
                 card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40">${dayName}</span><span class="text-xl font-black">${dayNum}</span>`;
@@ -197,18 +177,14 @@
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
             grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Sincronizando...</p>";
-            
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY_DB} });
             const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
-
             grid.innerHTML = "";
             let start = parseInt(configHoras.inicio.split(':')[0]);
             let end = parseInt(configHoras.fin.split(':')[0]);
-
             for(let h = start; h < end; h++) {
                 const slots = [h < 10 ? `0${h}:00` : `${h}:00`];
                 if(planNivel > 0) slots.push(h < 10 ? `0${h}:30` : `${h}:30`);
-
                 slots.forEach(t => {
                     const isOcu = ocupadas.includes(t);
                     const pill = document.createElement('div');
@@ -228,7 +204,19 @@
             e.preventDefault();
             const h = document.getElementById('hora-sel').value;
             const f = document.getElementById('fecha-sel').value;
+            const motivo = document.getElementById('motivo-consulta').value.toUpperCase();
             if(!h || !f) return eliteAviso("POR FAVOR SELECCIONE FECHA Y HORA");
+
+            // --- MOTOR DE TRIAGE IA (SEMÁFORO) ---
+            let clasificacionIA = "";
+            const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "RESPIRAR", "ACCIDENTE", "URGENTE", "FRACTURA"];
+            const prioridadKills = ["FIEBRE", "VOMITO", "FUERTE", "DIARREA", "MAREO", "DESMAYO"];
+
+            if (urgenciaKills.some(palabra => motivo.includes(palabra))) {
+                clasificacionIA = " | URGENTE 🔴";
+            } else if (prioridadKills.some(palabra => motivo.includes(palabra))) {
+                clasificacionIA = " | PRIORIDAD 🟡";
+            }
 
             const btn = document.getElementById('btn-submit');
             btn.innerText = "ENLAZANDO CON NODO..."; btn.disabled = true;
@@ -239,13 +227,13 @@
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                    telefono: (document.getElementById('lada').value + document.getElementById('telefono').value),
+                    // Inyectamos la clasificación en el campo de teléfono (que usa el Doctor para ver notas)
+                    telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + clasificacionIA,
                     fecha: f, hora: h, pagado: false, monto: 0
                 })
             });
 
             if(res.ok) {
-                sentinela("Cita agendada exitosamente", "exito");
                 eliteAviso("RESERVACIÓN CONFIRMADA CON ÉXITO");
                 setTimeout(() => location.reload(), 3000);
             } else {
