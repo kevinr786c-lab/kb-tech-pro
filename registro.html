@@ -15,7 +15,6 @@
         .modal-pago { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); }
         .badge-plan { background: #6366f1; color: white; padding: 4px 12px; border-radius: 99px; font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
         
-        /* Mi Estrella de Vida ✦ */
         .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
@@ -27,7 +26,7 @@
             <header class="flex justify-between items-start">
                 <div>
                     <h1 class="text-5xl font-black italic tracking-tighter mb-2 uppercase">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Sincronizando tu Nodo Maestro</p>
+                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Forjando Infraestructura Médica</p>
                 </div>
                 <div id="plan-display-badge" class="badge-plan">Sincronizando...</div>
             </header>
@@ -53,7 +52,7 @@
 
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
-                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Ambientes de Prestigio (Modo Camaleón)</p>
+                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Catálogo Camaleón</p>
                         <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white tracking-widest">Seleccione</span>
                     </div>
                     <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
@@ -61,8 +60,8 @@
 
                 <div class="flex items-center gap-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
-                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Inversión del Nodo</p>
-                        <p class="text-4xl font-black text-white" id="precio-display">$1,599 <span class="text-xs text-slate-500 italic font-normal tracking-normal uppercase">MXN/mes</span></p>
+                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Costo de Activación</p>
+                        <p class="text-4xl font-black text-white" id="precio-display">$0 <span class="text-xs text-slate-500 italic font-normal tracking-normal uppercase">MXN/mes</span></p>
                     </div>
                     <button type="submit" id="btn-activar" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all active:scale-95">Activar Nodo</button>
                 </div>
@@ -86,28 +85,24 @@
         <div class="max-w-md w-full bg-white rounded-[3rem] p-8 text-slate-800 shadow-2xl border-t-[12px] border-indigo-500">
             <div class="text-center mb-6">
                 <div class="text-4xl mb-2">🏦</div>
-                <h2 class="text-2xl font-black uppercase italic tracking-tighter">Pasarela de Activación</h2>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">K.B Tech Solutions x BBVA</p>
+                <h2 class="text-2xl font-black uppercase italic tracking-tighter">Pasarela BBVA</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic tracking-[0.3em]">Kevin Brayan Reyes Cruz</p>
             </div>
             
             <div class="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
                 <div>
-                    <p class="text-[9px] font-black text-indigo-500 uppercase italic">Beneficiario Único</p>
-                    <p class="font-bold">Kevin Brayan Reyes Cruz</p>
-                </div>
-                <div>
-                    <p class="text-[9px] font-black text-indigo-500 uppercase italic">Clabe de Infraestructura</p>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase italic">Clabe Interbancaria</p>
                     <p class="font-black text-lg tracking-wider">0120 2801 5649 7592 11</p>
                 </div>
                 <div class="pt-2 border-t border-slate-200">
-                    <p class="text-[9px] font-black text-slate-400 uppercase italic">Referencia de Nodo</p>
-                    <p class="font-bold italic text-indigo-600" id="pago-concepto">SINCRONIZANDO...</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase italic">Concepto de Transferencia</p>
+                    <p class="font-bold italic text-indigo-600" id="pago-concepto">CARGANDO...</p>
                 </div>
             </div>
 
-            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, nuestro motor Gemini ✦ validará la transferencia y activará tu Nodo Maestro automáticamente.</p>
+            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, J.A.R.V.I.S. validará la transacción y activará tu Nodo Maestro automáticamente.</p>
             
-            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">He realizado la transferencia</button>
+            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">Confirmar Transferencia</button>
         </div>
     </div>
 
@@ -118,13 +113,13 @@
 
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         const infoPlanes = [
-            { nombre: "Independiente", precio: "$999" },
-            { nombre: "Premium", precio: "$1,599" },
+            { nombre: "Aspirante", precio: "$999" },
+            { nombre: "Dominio", precio: "$1,599" },
             { nombre: "Corporativo", precio: "Consultoría" }
         ];
 
         document.getElementById('plan-display-badge').innerText = `PLAN: ${infoPlanes[planElegido].nombre}`;
-        document.getElementById('precio-display').innerHTML = `${infoPlanes[planElegido].precio} <span class="text-xs text-slate-500 italic font-normal tracking-normal uppercase">MXN/mes</span>`;
+        document.getElementById('precio-display').innerHTML = `${infoPlanes[planElegido].precio} <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span>`;
 
         const CATALOGO = {
             "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral", desc: "Rose Quartz" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique", desc: "Lavender Silk" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal", desc: "Pink Velvet" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico", desc: "Nature Essence" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite", desc: "Premium Care" }],
@@ -165,40 +160,61 @@
 
         document.getElementById('form-registro').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nombre = document.getElementById('nombre').value;
+            const nombre = document.getElementById('nombre').value.trim();
             const esp = document.getElementById('especialidad').value;
             const btn = document.getElementById('btn-activar');
             
-            btn.innerText = "SINCRO EN CURSO..."; 
+            btn.innerText = "FORJANDO NODO..."; 
             btn.disabled = true;
 
+            // Sincronización con esquema SQL (según archivo compartido)
+            const planFinal = infoPlanes[planElegido].nombre;
+            const emailTecnico = `${nombre.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`;
+
             try {
+                const payload = {
+                    nombre_doctor: nombre,
+                    email: emailTecnico,
+                    especialidad: esp,
+                    plan: planFinal, // Usamos 'plan' tipo texto
+                    template_id: String(currentSelection.template_id),
+                    creado_en: new Date().toISOString()
+                };
+
                 const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
                     method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-                    body: JSON.stringify({
-                        nombre_doctor: nombre.toUpperCase(),
-                        especialidad: esp,
-                        template_id: currentSelection.template_id,
-                        plan_nivel: planElegido,
-                        pin_acceso: "0000"
-                    })
+                    headers: { 
+                        'apikey': KEY_DB, 
+                        'Authorization': `Bearer ${KEY_DB}`, 
+                        'Content-Type': 'application/json', 
+                        'Prefer': 'return=representation' 
+                    },
+                    body: JSON.stringify(payload)
                 });
 
-                if(res.ok) {
-                    const data = await res.json();
+                const data = await res.json();
+
+                if (res.ok && data.length > 0) {
                     ultimoIdGenerado = data[0].id;
-                    document.getElementById('pago-concepto').innerText = "KB-TJ-" + nombre.toUpperCase().substring(0, 5) + "-" + ultimoIdGenerado.substring(0,4);
+                    const shortName = nombre.split(' ')[0].toUpperCase();
+                    document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
+                } else {
+                    console.error("Fallo de arquitectura:", data);
+                    alert("Error 400: El Sentinela detectó un fallo de esquema. Verifique los datos.");
+                    btn.disabled = false;
+                    btn.innerText = "Reintentar Activación";
                 }
-            } catch (e) { alert("Error de enlace. Reintente."); btn.disabled = false; btn.innerText = "Activar Nodo"; }
+            } catch (e) { 
+                alert("Fallo de enlace con el servidor central."); 
+                btn.disabled = false; 
+            }
         });
 
         function irANodo() {
             if(ultimoIdGenerado) {
-                // Pequeña pausa para efecto de "validación de transferencia"
                 const btn = event.target;
-                btn.innerText = "VALIDANDO PAGO...";
+                btn.innerText = "SINCRO EN CURSO...";
                 setTimeout(() => {
                     window.location.href = `app.html?id=${ultimoIdGenerado}`;
                 }, 1500);
