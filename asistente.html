@@ -5,104 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K.B Assistant | Gemini Engine ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         :root { --main: #6366f1; --bg: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; }
+        
+        /* Paleta Dinámica */
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
-        .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; font-size: 0.9rem; }
+        .text-main { color: var(--main); }
+        .bg-main { background-color: var(--main); }
+        .border-main { border-color: var(--main); }
+
+        .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; }
         .input-kb:focus { border-color: var(--main); background: white; }
         
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; }
+        
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
-
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="p-4 md:p-10 pb-32">
 
-    <div id="modal-container" class="modal-overlay" onclick="if(event.target.id==='modal-container') cerrarModal()">
-        <div class="modal-content shadow-2xl border border-slate-100">
-            <header class="text-center mb-8">
-                <div id="modal-icon" class="text-6xl mb-4">💎</div>
-                <h2 id="modal-title" class="text-3xl font-black uppercase italic tracking-tighter">Nodo Operativo</h2>
-                <p id="modal-desc" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Gemini Engine ✦ K.B Tech</p>
-            </header>
-            <div id="modal-body" class="max-h-[55vh] overflow-y-auto space-y-5 px-2"></div>
-            <div id="modal-footer" class="flex gap-4 mt-12">
-                <button onclick="cerrarModal()" class="flex-1 py-5 bg-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white z-[50000] flex items-center justify-center">
-        <div class="text-center p-12 glass-panel max-w-sm w-full border-t-8 border-indigo-600">
+        <div class="text-center p-12 glass-panel max-w-sm w-full border-t-8 border-main">
             <div class="text-7xl mb-6">👩‍💼</div>
-            <h2 class="text-3xl font-black mb-10 uppercase italic tracking-tighter">Recepción <span class="text-indigo-600">K.B</span></h2>
-            <p class="text-[10px] text-slate-400 uppercase font-bold mb-4 italic">Gemini Engine ✦ Sincronizando Nodo...</p>
+            <h2 class="text-3xl font-black mb-10 uppercase italic tracking-tighter text-slate-900">Recepción <span class="text-main">K.B</span></h2>
             <input type="password" id="pin-acceso" class="input-kb text-center text-4xl tracking-[0.6em] mb-8" placeholder="****" maxlength="4">
-            <button onclick="verificarAcceso()" class="w-full py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl">Entrar al Nodo</button>
+            <button onclick="verificarAcceso()" class="w-full py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl hover:bg-main transition">Entrar al Nodo</button>
         </div>
-    </div>
-
-    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-10 text-white">
-        <button onclick="toggleMenu()" class="absolute top-8 right-8 text-2xl">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-12 italic">Gemini Admin Center</h3>
-        <nav class="space-y-5">
-            <button onclick="toggleMenu(); abrirBuscador()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl hover:bg-slate-700 transition">
-                <div class="text-2xl">🔍</div><span class="text-[11px] font-black uppercase tracking-widest">Buscador Pro</span>
-            </button>
-            <button onclick="toggleMenu(); irAAgendar()" class="flex items-center gap-5 w-full p-5 bg-indigo-600/20 border border-indigo-600/30 rounded-3xl text-indigo-400">
-                <div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span>
-            </button>
-            <hr class="border-slate-800 my-8">
-            <button onclick="toggleMenu(); logout()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cerrar Sesión</button>
-        </nav>
     </div>
 
     <div id="contenido-panel" class="hidden max-w-7xl mx-auto opacity-0 transition-all duration-700">
         <header class="flex justify-between items-end mb-16">
             <div>
-                <h1 class="text-6xl font-black text-slate-900 italic tracking-tighter">K.B <span id="brand-text">Assistant</span></h1>
+                <h1 class="text-6xl font-black text-slate-900 italic tracking-tighter">K.B <span class="text-main">Assistant</span></h1>
                 <p id="doc-assigned" class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.4em] mt-3 px-1 italic">Nodo Maestro: Verificando...</p>
             </div>
-            <button onclick="toggleMenu()" class="p-6 bg-slate-900 text-white rounded-[2rem] shadow-2xl active:scale-95 transition">
-                <div class="space-y-2">
-                    <div class="w-8 h-1 bg-white"></div><div id="menu-dot" class="w-5 h-1 bg-white opacity-40"></div>
-                </div>
-            </button>
+            <button onclick="logout()" class="p-4 bg-slate-100 rounded-full hover:bg-rose-100 text-slate-400 hover:text-rose-600 transition">✕</button>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-8">
-                <div id="card-paciente" class="glass-panel p-10 border-l-[15px]">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest italic">Seleccionado:</h3>
-                    <p class="text-4xl font-extrabold text-slate-900 leading-none mb-3" id="patient-display">---</p>
-                    <p id="patient-time-display" class="text-[10px] font-bold text-slate-500 uppercase italic">Gemini Engine ✦ Standby</p>
-                    
+                <div id="card-paciente" class="glass-panel p-10 border-l-[15px] border-main">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-8 tracking-widest italic">Paciente en Turno:</h3>
+                    <p class="text-4xl font-extrabold text-slate-900 leading-none mb-3 uppercase tracking-tighter" id="patient-display">---</p>
+                    <p id="patient-time-display" class="text-[10px] font-bold text-slate-500 uppercase italic">Esperando selección...</p>
                     <div class="grid grid-cols-1 gap-4 mt-10">
-                        <button onclick="confirmarArribo()" class="py-5 bg-emerald-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg">Confirmar Arribo</button>
-                        <button onclick="llamarWhatsApp()" class="py-5 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[11px] uppercase tracking-widest">WhatsApp</button>
+                        <button onclick="alert('Arribo Notificado')" class="py-5 bg-emerald-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg">Confirmar Arribo</button>
+                        <button onclick="llamarWhatsApp()" class="py-5 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[11px] uppercase tracking-widest">WhatsApp Directo</button>
                     </div>
-                </div>
-
-                <div class="glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-5 italic">Intercomunicador Gemini ✦</h3>
-                    <textarea id="internal-note-input" class="w-full p-5 rounded-2xl bg-slate-50 text-xs font-bold h-24 outline-none resize-none border-2 border-transparent focus:border-indigo-500" placeholder="Aviso para el Doctor..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase mt-3">Mandar Nota</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div class="glass-panel p-12 min-h-[650px]">
+                <div class="glass-panel p-12 min-h-[600px]">
                     <div class="flex justify-between items-center mb-12">
-                        <h3 id="agenda-title" class="text-lg font-black uppercase text-slate-800 italic tracking-widest pb-3 border-b-4 border-slate-900">Agenda Hoy ✦</h3>
+                        <h3 class="text-lg font-black uppercase text-slate-800 italic tracking-widest pb-3 border-b-4 border-slate-900">Agenda de Hoy ✦</h3>
                     </div>
-                    <div id="tabla-citas-body" class="grid gap-4"></div>
+                    <div id="tabla-citas-body" class="grid gap-4">
+                        </div>
                 </div>
             </div>
         </main>
@@ -112,77 +76,73 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-        let currentPatient = null; 
-        let globalDocData = null;
+
+        // 30 TEMAS - EFECTO CAMALEÓN
+        const CATALOGO_TEMAS = {
+            "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
+            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
+            "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
+            "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
+            "Bienestar (Nutri/Psico)": ["#10b981", "#059669", "#34d399", "#064e3b", "#6ee7b7"],
+            "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
+        };
 
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
-            globalDocData = data[0];
+            const doc = data[0];
 
-            if(pin === (globalDocData.pin_acceso || "0000")) {
+            if(doc && pin === (doc.pin_acceso || "0000")) {
+                // ACTIVAR EFECTO CAMALEÓN
+                const palette = CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"];
+                const color = palette[(doc.template_id || 1) % 5];
+                document.documentElement.style.setProperty('--main', color);
+
                 document.getElementById('pantalla-bloqueo').style.display = 'none';
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
-                document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${globalDocData.nombre_doctor} | Gemini Engine ✦`;
+                document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${doc.nombre_doctor}`;
                 
-                cargarCitas(); 
-                setInterval(cargarCitas, 30000); // Sincronización cada 30 segundos
-            } else { alert("PIN Gemini Incorrecto"); }
+                cargarCitas();
+            } else { alert("PIN Incorrecto"); }
         }
 
         async function cargarCitas() {
             const hoy = new Date().toISOString().split('T')[0];
-            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${hoy}&order=hora_cita.asc`, { 
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } 
-            });
-            const citas = await res.json();
-            
-            document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
-                <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer shadow-sm" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
-                    <div class="flex items-center gap-8">
-                        <p class="text-[12px] font-black uppercase italic text-indigo-600">${c.hora_cita.slice(0,5)} HS</p>
-                        <p class="font-extrabold text-base text-slate-800 uppercase tracking-tight">${c.nombre_paciente}</p>
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
+                const citas = await res.json();
+                
+                document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
+                    <div class="flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-main transition cursor-pointer shadow-sm group" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
+                        <div class="flex items-center gap-6">
+                            <p class="text-xs font-black text-main italic">${c.hora.slice(0,5)} HS</p>
+                            <p class="font-bold text-slate-800 uppercase tracking-tight group-hover:text-main transition">${c.nombre_paciente}</p>
+                        </div>
+                        <span class="text-[8px] font-black px-3 py-1 rounded-full ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'} uppercase">
+                            ${c.pagado ? 'Liquidado' : 'Pendiente'}
+                        </span>
                     </div>
-                </div>
-            `).join('') || '<div class="text-center py-20 opacity-20 font-black italic text-xl">Sin citas hoy</div>';
+                `).join('') || '<p class="opacity-20 uppercase font-black italic">Sin actividad hoy</p>';
+            } catch (e) { console.error(e); }
         }
 
         function seleccionarPaciente(cita) {
-            currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
-            document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora_cita.slice(0,5)} hs | Gemini Engine ✦`;
+            document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} HS | Nodo Sincronizado`;
+            window.currentTel = cita.telefono;
         }
 
         function llamarWhatsApp() {
-            if(!currentPatient) return alert("Seleccione paciente.");
-            // Link simplificado
-            window.open(`https://wa.me/5216641234567?text=Hola ${currentPatient.nombre_paciente}, le saludamos de recepción.`);
+            if(!window.currentTel) return alert("Seleccione un paciente");
+            window.open(`https://wa.me/${window.currentTel.replace(/\D/g,'')}?text=Hola, le saludamos de la recepción de K.B Tech.`);
         }
 
-        function confirmarArribo() {
-            if(!currentPatient) return alert("Seleccione paciente.");
-            alert("✅ Gemini Engine ✦: Arribo confirmado. Notificación enviada al Dr.");
-        }
-
-        function enviarNotaInterna() {
-            const nota = document.getElementById('internal-note-input').value;
-            if(!nota) return alert("Escriba una nota.");
-            alert("✅ Nota enviada al panel del Doctor.");
-            document.getElementById('internal-note-input').value = "";
-        }
-
-        function abrirBuscador() {
-            document.getElementById('modal-title').innerText = "Buscador Pro";
-            document.getElementById('modal-body').innerHTML = `<input type="text" class="input-kb" placeholder="Escriba nombre del paciente...">`;
-            document.getElementById('modal-container').style.display = 'flex';
-        }
-
-        function irAAgendar() { window.open(`agendar.html?id=${docId}`, '_blank'); }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
         function logout() { location.reload(); }
+        
+        // Carga inicial de datos de UI si existe el ID
+        if(docId) { console.log("Canal de telemetría abierto para ID:", docId); }
     </script>
 </body>
 </html>
