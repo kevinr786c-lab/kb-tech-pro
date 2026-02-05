@@ -14,16 +14,20 @@
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
         .modal-pago { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); }
         .badge-plan { background: #6366f1; color: white; padding: 4px 12px; border-radius: 99px; font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        
+        /* Mi Estrella de Vida ✦ */
+        .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; display: inline-block; }
+        @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
 </head>
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
 
     <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-7 space-y-8">
+        <div class="lg:col-span-7 space-y-8 text-left">
             <header class="flex justify-between items-start">
                 <div>
                     <h1 class="text-5xl font-black italic tracking-tighter mb-2 uppercase">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic">Activación de Nodo de Élite</p>
+                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Sincronizando tu Nodo Maestro</p>
                 </div>
                 <div id="plan-display-badge" class="badge-plan">Sincronizando...</div>
             </header>
@@ -49,7 +53,7 @@
 
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
-                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Catálogo de Ambientes (Camaleón)</p>
+                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Ambientes de Prestigio (Modo Camaleón)</p>
                         <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white tracking-widest">Seleccione</span>
                     </div>
                     <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
@@ -58,7 +62,7 @@
                 <div class="flex items-center gap-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
                         <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Inversión del Nodo</p>
-                        <p class="text-4xl font-black text-white" id="precio-display">$1,599 <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span></p>
+                        <p class="text-4xl font-black text-white" id="precio-display">$1,599 <span class="text-xs text-slate-500 italic font-normal tracking-normal uppercase">MXN/mes</span></p>
                     </div>
                     <button type="submit" id="btn-activar" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all active:scale-95">Activar Nodo</button>
                 </div>
@@ -82,28 +86,28 @@
         <div class="max-w-md w-full bg-white rounded-[3rem] p-8 text-slate-800 shadow-2xl border-t-[12px] border-indigo-500">
             <div class="text-center mb-6">
                 <div class="text-4xl mb-2">🏦</div>
-                <h2 class="text-2xl font-black uppercase italic tracking-tighter">Portal de Pago</h2>
+                <h2 class="text-2xl font-black uppercase italic tracking-tighter">Pasarela de Activación</h2>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">K.B Tech Solutions x BBVA</p>
             </div>
             
             <div class="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
                 <div>
-                    <p class="text-[9px] font-black text-indigo-500 uppercase">Beneficiario</p>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase italic">Beneficiario Único</p>
                     <p class="font-bold">Kevin Brayan Reyes Cruz</p>
                 </div>
                 <div>
-                    <p class="text-[9px] font-black text-indigo-500 uppercase">Clabe Interbancaria</p>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase italic">Clabe de Infraestructura</p>
                     <p class="font-black text-lg tracking-wider">0120 2801 5649 7592 11</p>
                 </div>
                 <div class="pt-2 border-t border-slate-200">
-                    <p class="text-[9px] font-black text-slate-400 uppercase">Concepto de Nodo</p>
-                    <p class="font-bold italic text-indigo-600" id="pago-concepto">CARGANDO...</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase italic">Referencia de Nodo</p>
+                    <p class="font-bold italic text-indigo-600" id="pago-concepto">SINCRONIZANDO...</p>
                 </div>
             </div>
 
-            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, el Sentinela activará tu acceso al Nodo Maestro y el modo Camaleón.</p>
+            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, nuestro motor Gemini ✦ validará la transferencia y activará tu Nodo Maestro automáticamente.</p>
             
-            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all">He realizado la transferencia</button>
+            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">He realizado la transferencia</button>
         </div>
     </div>
 
@@ -112,7 +116,6 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
-        // --- 🛰️ DETECCIÓN DE PLAN ELEGIDO ---
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         const infoPlanes = [
             { nombre: "Independiente", precio: "$999" },
@@ -121,7 +124,7 @@
         ];
 
         document.getElementById('plan-display-badge').innerText = `PLAN: ${infoPlanes[planElegido].nombre}`;
-        document.getElementById('precio-display').innerHTML = `${infoPlanes[planElegido].precio} <span class="text-xs text-slate-500 italic font-normal">MXN/mes</span>`;
+        document.getElementById('precio-display').innerHTML = `${infoPlanes[planElegido].precio} <span class="text-xs text-slate-500 italic font-normal tracking-normal uppercase">MXN/mes</span>`;
 
         const CATALOGO = {
             "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral", desc: "Rose Quartz" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique", desc: "Lavender Silk" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal", desc: "Pink Velvet" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico", desc: "Nature Essence" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite", desc: "Premium Care" }],
@@ -166,7 +169,7 @@
             const esp = document.getElementById('especialidad').value;
             const btn = document.getElementById('btn-activar');
             
-            btn.innerText = "FORJANDO NODO..."; 
+            btn.innerText = "SINCRO EN CURSO..."; 
             btn.disabled = true;
 
             try {
@@ -185,14 +188,21 @@
                 if(res.ok) {
                     const data = await res.json();
                     ultimoIdGenerado = data[0].id;
-                    document.getElementById('pago-concepto').innerText = "KB-" + nombre.toUpperCase().substring(0, 5) + "-" + ultimoIdGenerado.substring(0,4);
+                    document.getElementById('pago-concepto').innerText = "KB-TJ-" + nombre.toUpperCase().substring(0, 5) + "-" + ultimoIdGenerado.substring(0,4);
                     document.getElementById('modal-pago').classList.remove('hidden');
                 }
-            } catch (e) { alert("Error en conexión."); btn.disabled = false; }
+            } catch (e) { alert("Error de enlace. Reintente."); btn.disabled = false; btn.innerText = "Activar Nodo"; }
         });
 
         function irANodo() {
-            if(ultimoIdGenerado) window.location.href = `app.html?id=${ultimoIdGenerado}`;
+            if(ultimoIdGenerado) {
+                // Pequeña pausa para efecto de "validación de transferencia"
+                const btn = event.target;
+                btn.innerText = "VALIDANDO PAGO...";
+                setTimeout(() => {
+                    window.location.href = `app.html?id=${ultimoIdGenerado}`;
+                }, 1500);
+            }
         }
 
         cambiarCatalogo();
