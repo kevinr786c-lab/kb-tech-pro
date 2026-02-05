@@ -13,7 +13,6 @@
         .input-modern { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; transition: 0.3s; outline: none; }
         .input-modern:focus { border-color: var(--main); background: white; }
         
-        /* CALENDARIO GRID */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 0.8rem; font-size: 0.7rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
         .day-box.selected { background: var(--main) !important; color: white !important; box-shadow: 0 10px 15px -5px var(--main); }
@@ -23,9 +22,6 @@
         .btn-hora { padding: 10px; border-radius: 1rem; font-weight: 800; font-size: 0.7rem; transition: 0.3s; text-align: center; cursor: pointer; }
         .hora-disponible { background: #f1f5f9; color: #475569; }
         .hora-seleccionada { background: var(--main) !important; color: white !important; }
-
-        #nav-camaleon { transition: transform 0.4s ease-in-out, opacity 0.3s; }
-        .nav-oculta { transform: translate(-50%, 150%); opacity: 0; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 pb-32 text-slate-800">
@@ -38,7 +34,7 @@
         </header>
 
         <form id="form-cita" class="space-y-4">
-            <input type="text" id="nombre" placeholder="Nombre del Paciente" class="input-modern" required>
+            <input type="text" id="nombre" placeholder="Nombre Completo" class="input-modern" required>
             
             <div class="flex gap-2">
                 <select id="lada" class="w-24 input-modern text-xs !px-2">
@@ -60,41 +56,34 @@
             <div id="contenedor-horas" class="grid-horas"></div>
             <input type="hidden" id="hora-sel" required>
 
-            <button type="submit" id="btn-submit" class="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition">Confirmar Reserva</button>
+            <button type="submit" id="btn-submit" class="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition">Confirmar Cita</button>
         </form>
     </div>
-
-    <nav id="nav-camaleon" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-xl border border-slate-200 p-3 rounded-full flex gap-6 shadow-2xl z-50">
-        <div class="cursor-pointer" onclick="location.reload()">🔄</div>
-        <div class="cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">⬆️</div>
-    </nav>
 
     <script>
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
-        // Limpiamos el ID para evitar espacios raros
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
 
-        // --- SISTEMA CENTINELA (REPORTERO) ---
+        // --- SISTEMA CENTINELA (VIGILANTE) ---
         async function reportarError(errorMsg, datos = {}) {
-            await fetch(`${URL}/rest/v1/Logs_Sistema`, {
-                method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pagina_origen: "agendar.html",
-                    codigo_error: "400/Fetch",
-                    mensaje_error: errorMsg,
-                    datos_enviados: datos,
-                    dispositivo_info: navigator.userAgent
-                })
-            });
+            try {
+                await fetch(`${URL}/rest/v1/Logs_Sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pagina_origen: "agendar.html (Paciente)",
+                        codigo_error: "400_RESERVA",
+                        mensaje_error: errorMsg,
+                        datos_enviados: datos,
+                        dispositivo_info: navigator.userAgent
+                    })
+                });
+            } catch(e) { console.error("Centinela Offline"); }
         }
 
         async function init() {
-            if(!docId) {
-                alert("Error: Nodo Médico no especificado.");
-                return;
-            }
+            if(!docId) return alert("Error: Nodo no identificado.");
             try {
                 const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
                 const data = await res.json();
@@ -104,7 +93,7 @@
                     document.getElementById('doc-esp').innerText = config.especialidad;
                     renderCalendar();
                 }
-            } catch (e) { reportarError("Fallo al cargar perfil médico", {docId}); }
+            } catch (e) { reportarError("Fallo carga inicial perfil", {docId}); }
         }
 
         function renderCalendar() {
@@ -157,9 +146,9 @@
             const h = document.getElementById('hora-sel').value;
             const f = document.getElementById('fecha-sel').value;
             
-            if(!h || !f) return alert("Por favor selecciona día y hora.");
+            if(!h || !f) return alert("Selecciona el horario deseado.");
             
-            btn.innerText = "PROCESANDO...";
+            btn.innerText = "SINCRONIZANDO...";
             btn.disabled = true;
 
             const payload = {
@@ -169,28 +158,29 @@
                 hora_cita: h,
                 telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value,
                 pagado: false,
-                status: "NUEVA CITA"
+                status: "NUEVA CITA",
+                monto: 0
             };
 
-            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas`, {
-                method: 'POST',
-                headers: {
-                    'apikey': KEY, 
-                    'Authorization': `Bearer ${KEY}`, 
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const res = await fetch(`${URL}/rest/v1/Citas_Agendadas`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    body: JSON.stringify(payload)
+                });
 
-            if(res.ok) { 
-                alert("✅ Cita Confirmada Exitosamente"); 
-                location.reload(); 
-            } else { 
-                const errorLog = await res.json();
-                reportarError("Error 400 en reserva", {payload, errorLog});
-                alert("❌ Error al reservar. El Centinela IA ya está analizando el fallo.");
-                btn.innerText = "Reservar Cita";
+                if(res.ok) { 
+                    alert("✅ Cita agendada con éxito."); 
+                    location.reload(); 
+                } else { 
+                    const technicalError = await res.json();
+                    reportarError("Fallo en POST Citas_Agendadas", {payload, technicalError});
+                    alert("❌ Error de red. Reporte enviado al Centro de Mando.");
+                    btn.innerText = "Confirmar Cita";
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                reportarError("Excepción en Submit", {error: e.message});
                 btn.disabled = false;
             }
         });
