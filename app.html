@@ -49,6 +49,10 @@
         <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-main mb-10 italic">Centro de Control</h3>
         <nav class="space-y-4">
+            <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl hover:bg-main transition group">
+                <div class="text-xl group-hover:scale-110 transition">🌐</div><span class="text-[10px] font-black uppercase">Ver Mi Sucursal Digital</span>
+            </button>
+            
             <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
                 <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
             </button>
@@ -273,6 +277,13 @@
             alert("✅ Enviado a Recepción.");
             document.getElementById('dra-response-input').value = "";
             syncMaster();
+        }
+
+        // --- FUNCIÓN AGREGADA: VER SUCURSAL DIGITAL ---
+        function verMiSitio() {
+            if(!docId) return alert("Nodo no identificado.");
+            // Abre la página que verían sus pacientes
+            window.open(`reservar.html?id=${docId}`, '_blank');
         }
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
