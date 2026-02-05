@@ -50,6 +50,7 @@
             <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl hover:bg-main transition group">
                 <div class="text-xl group-hover:scale-110 transition">🌐</div><span class="text-[10px] font-black uppercase">Ver Mi Sucursal Digital</span>
             </button>
+            
             <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
                 <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
             </button>
@@ -61,6 +62,7 @@
             <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
                 <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
             </button>
+            
             <button id="btn-ceo-directo" onclick="contactarCEO()" class="hidden flex items-center gap-4 w-full p-4 btn-ceo-gold rounded-2xl text-black">
                 <div class="text-xl">👑</div><span class="text-[10px] font-black uppercase italic">Línea con el Comandante</span>
             </button>
@@ -183,17 +185,20 @@
                     </div>
                     <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic bg-emerald-50 text-emerald-500">Programada</span>
                 </div>
-            `).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Sin actividad en el Nodo</p>';
+            `).join('') || '<p class="text-center py-20 opacity-20 font-black italic uppercase">Nodo Vacío</p>';
         }
 
-        // REDIRECCIONES TÁCTICAS (SOLUCIÓN 404)
+        // REDIRECCIONES TÁCTICAS CALIBRADAS
         function verMiSitio() {
             if(!docId) return alert("Gemini Engine ✦: Nodo no identificado.");
-            window.open(`agendar.html?id=${docId}`, '_blank');
+            // Apunta a la página informativa purificada
+            window.open(`web.html?id=${docId}`, '_blank');
         }
 
         function copiarLinkCitas() { 
+            if(!docId) return alert("Gemini Engine ✦: Nodo no identificado.");
             const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            // El link para pacientes siempre va al agendador directo
             const link = window.location.origin + path + "agendar.html?id=" + docId;
             navigator.clipboard.writeText(link); 
             alert("✅ Link Gemini ✦: Sucursal Copiada."); 
@@ -202,6 +207,7 @@
         function copiarLinkAsistente() { 
             if(!docId) return alert("Gemini Engine ✦: Nodo no identificado.");
             const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            // Link para el portal de recepción
             const link = window.location.origin + path + "asistente.html?id=" + docId;
             navigator.clipboard.writeText(link); 
             alert("✅ Link Gemini ✦: Acceso a Recepción Copiado."); 
