@@ -11,26 +11,29 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; }
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         
-        /* Efecto Camaleón en Iconos */
         .nav-icon { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); filter: grayscale(1); opacity: 0.5; }
         .nav-icon.active { background: var(--main); color: white; transform: scale(1.1) translateY(-10px); box-shadow: 0 15px 25px -5px var(--main); filter: grayscale(0); opacity: 1; }
         
         .bg-dr-msg { background: var(--bg); border-left: 4px solid var(--main); }
         
-        /* Calendario Grid Mejorado */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
         .day-box.selected { background: var(--main) !important; color: white !important; border-color: var(--main); box-shadow: 0 10px 15px -3px var(--main); }
         .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; }
 
-        /* Barra Retráctil Corregida */
-        #main-nav { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; left: 50%; transform: translateX(-50%); z-index: 100; }
-        .nav-hidden { transform: translate(-50%, 180%) !important; opacity: 0; }
+        /* BARRA RETRÁCTIL ULTRA */
+        #main-nav { 
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 1000; 
+        }
+        .nav-hidden { transform: translate(-50%, 200%) !important; opacity: 0; }
     </style>
 </head>
 <body class="p-4 md:p-8 pb-48 text-slate-800">
 
-    <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[200] flex items-center justify-center">
+    <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[2000] flex items-center justify-center">
         <div class="text-center p-8 glass-panel max-w-sm w-full border-2 border-slate-100 shadow-2xl">
             <div id="lock-icon" class="text-5xl mb-4">👩‍💼</div>
             <h2 class="text-xl font-black mb-6 uppercase tracking-widest">Recepción K.B</h2>
@@ -46,20 +49,16 @@
                 <h1 class="text-3xl font-black text-slate-800 tracking-tighter italic leading-none">K.B <span id="brand-text" class="text-[var(--main)]">Assistant</span></h1>
                 <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic"></p>
             </div>
-            <div class="flex gap-2">
-                <button onclick="location.reload()" class="p-3 bg-white rounded-full shadow-sm border border-slate-100">🔄</button>
-            </div>
+            <button onclick="location.reload()" class="p-3 bg-white rounded-full shadow-sm border border-slate-100">🔄</button>
         </header>
 
         <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
                     <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic tracking-widest">Paciente en Turno:</h3>
-                    <div class="mb-8">
-                        <p class="text-3xl font-extrabold text-slate-800 leading-tight" id="patient-display">---</p>
-                        <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Selecciona de la lista</p>
-                    </div>
-                    <div class="flex gap-4">
+                    <p class="text-3xl font-extrabold text-slate-800 leading-tight" id="patient-display">---</p>
+                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Selecciona de la lista</p>
+                    <div class="flex gap-4 mt-8">
                         <button onclick="contactarWhatsApp()" class="flex-1 py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase active:scale-95 transition">WhatsApp</button>
                         <button onclick="cobrarPaciente()" class="flex-1 py-4 bg-[var(--main)] text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-indigo-100 active:scale-95 transition">Cobrar</button>
                     </div>
@@ -67,11 +66,9 @@
 
                 <div class="glass-panel p-8">
                     <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic tracking-widest">Canal con el Doctor</h3>
-                    <div id="chat-history" class="mb-4">
-                        <div class="bg-dr-msg p-4 rounded-2xl text-[11px] shadow-sm">
-                            <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Instrucción del Dr:</span>
-                            <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando...</p>
-                        </div>
+                    <div class="bg-dr-msg p-4 rounded-2xl text-[11px] shadow-sm mb-4">
+                        <span class="text-[var(--main)] uppercase text-[8px] font-black italic">Instrucción del Dr:</span>
+                        <p id="last-doctor-response" class="text-slate-700 mt-1 font-bold italic">Esperando...</p>
                     </div>
                     <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-[11px] font-bold mb-3 h-24 outline-none focus:ring-2 ring-[var(--main)]" placeholder="Escribe al doctor aquí..."></textarea>
                     <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-md active:scale-95 transition">Enviar Aviso</button>
@@ -80,12 +77,8 @@
 
             <div class="lg:col-span-8">
                 <div id="view-agenda" class="glass-panel p-8 md:p-10 min-h-[500px]">
-                    <div class="flex justify-between items-center mb-8">
-                        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">Próximas Citas</h3>
-                        <div class="bg-slate-50 px-4 py-2 rounded-full text-[9px] font-black text-slate-400">LIVE SYNC</div>
-                    </div>
-                    <div id="tabla-citas-body" class="space-y-4">
-                        </div>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Próximas Citas</h3>
+                    <div id="tabla-citas-body" class="space-y-4"></div>
                 </div>
 
                 <div id="view-calendar" class="hidden glass-panel p-8 md:p-10">
@@ -93,11 +86,11 @@
                         <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">📅 Disponibilidad</h3>
                         <p id="month-name" class="text-xs font-black text-[var(--main)] uppercase italic"></p>
                     </div>
-                    <div class="grid grid-cols-7 gap-2 mb-4">
+                    <div class="grid grid-cols-7 gap-2 mb-4 text-center">
                         <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
                     </div>
                     <div id="calendar-body" class="calendar-grid mb-10"></div>
-                    <div id="slots-occupied" class="flex flex-wrap gap-2 p-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                    <div id="slots-occupied" class="flex flex-wrap gap-2 p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                         <p class="text-[9px] font-black text-slate-400 uppercase italic">Selecciona un día para ver huecos...</p>
                     </div>
                 </div>
@@ -118,33 +111,21 @@
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentId = null; let pTel = "";
 
-        // --- SISTEMA CENTINELA ---
-        async function reportarError(msg, datos = {}) {
-            await fetch(`${URL}/rest/v1/Logs_Sistema`, {
-                method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pagina_origen: "asistente.html",
-                    codigo_error: "ASISTENTE_SYNC",
-                    mensaje_error: msg,
-                    datos_enviados: datos,
-                    dispositivo_info: navigator.userAgent
-                })
-            });
-        }
-
-        // Barra Retráctil Inteligente
+        // Lógica de Barra Retráctil
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('main-nav');
             const currentScroll = window.pageYOffset;
-            if (currentScroll > lastScroll && currentScroll > 80) nav.classList.add('nav-hidden');
-            else nav.classList.remove('nav-hidden');
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                nav.classList.add('nav-hidden');
+            } else {
+                nav.classList.remove('nav-hidden');
+            }
             lastScroll = currentScroll;
         });
 
         async function verificarAcceso() {
-            if(!docId) return alert("Error: Nodo no válido.");
+            if(!docId) return alert("Error de Nodo.");
             try {
                 const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
                 const data = await res.json();
@@ -162,33 +143,60 @@
                     
                     initCalendar();
                     cargarCitas(); 
-                    setInterval(cargarCitas, 12000); 
-                    setInterval(escucharDoctor, 4000);
+                    setInterval(cargarCitas, 10000); 
                 } else { alert("PIN Incorrecto"); }
-            } catch(e) { reportarError("Error acceso asistente", {id: docId}); }
+            } catch(e) { console.error(e); }
         }
 
         async function cargarCitas() {
-            try {
-                const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&pagado=eq.false&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-                const citas = await res.json();
-                const container = document.getElementById('tabla-citas-body');
-                
-                if(citas.length === 0) {
-                    container.innerHTML = '<div class="text-center py-20"><p class="text-slate-300 font-bold italic uppercase text-[10px]">No hay pacientes en lista</p></div>';
-                    return;
-                }
-
-                container.innerHTML = citas.map(c => `
-                    <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-[var(--main)] shadow-sm active:scale-95 transition cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora_cita}', '${c.telefono}')">
-                        <div class="flex gap-4 items-center">
-                            <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora_cita.slice(0,5)}</span>
-                            <p class="font-black text-xs uppercase text-slate-700 truncate max-w-[150px]">${c.nombre_paciente}</p>
-                        </div>
-                        <div class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            // SINCRONIZADO: Tabla "Citas", orden por "hora"
+            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const citas = await res.json();
+            const container = document.getElementById('tabla-citas-body');
+            
+            container.innerHTML = citas.map(c => `
+                <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-[var(--main)] shadow-sm active:scale-95 transition cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
+                    <div class="flex gap-4 items-center">
+                        <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora.slice(0,5)}</span>
+                        <p class="font-black text-xs uppercase text-slate-700">${c.nombre_paciente}</p>
                     </div>
-                `).join('');
-            } catch(e) { reportarError("Error cargando citas asistente", {id: docId}); }
+                    <div class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                </div>
+            `).join('') || '<p class="text-center py-20 italic opacity-40">Sin pacientes en espera</p>';
+        }
+
+        function seleccionar(id, nombre, hora, tel) {
+            currentId = id; pTel = tel;
+            document.getElementById('patient-display').innerText = nombre;
+            document.getElementById('patient-time-display').innerText = "Cita: " + hora.slice(0,5);
+            // El campo 'telefono' guarda las notas del Dr según el SQL
+            document.getElementById('last-doctor-response').innerText = tel.includes("DOCTOR DICE:") ? tel.replace("DOCTOR DICE:", "") : "Esperando nota...";
+        }
+
+        async function enviarNotaInterna() {
+            const n = document.getElementById('internal-note-input').value;
+            if(!currentId || !n) return alert("Selecciona paciente.");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
+                method: 'PATCH', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ telefono: "ASISTENTE: " + n.toUpperCase() }) 
+            });
+            document.getElementById('internal-note-input').value = "";
+            alert("Nota enviada.");
+        }
+
+        async function cobrarPaciente() {
+            if(!currentId) return alert("Selecciona paciente.");
+            const monto = prompt("Monto a cobrar:", "800");
+            if(monto) {
+                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
+                    method: 'PATCH', 
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ pagado: true, monto: parseFloat(monto) }) 
+                });
+                alert("✅ Cobro registrado.");
+                location.reload();
+            }
         }
 
         function initCalendar() {
@@ -205,52 +213,16 @@
         async function consultarHuecos(dia) {
             document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
             document.getElementById('day-'+dia).classList.add('selected');
-            const fecha = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const f = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             const slotCont = document.getElementById('slots-occupied');
-            slotCont.innerHTML = data.length > 0 ? data.map(c => `<span class="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-black border border-red-100">${c.hora_cita.slice(0,5)}</span>`).join('') : '<p class="text-[9px] font-black text-emerald-500 uppercase italic">Día libre para citas</p>';
-        }
-
-        function seleccionar(id, nombre, hora, tel) {
-            currentId = id; pTel = tel;
-            document.getElementById('patient-display').innerText = nombre;
-            document.getElementById('patient-time-display').innerText = "Hora reservada: " + hora.slice(0,5);
-        }
-
-        async function escucharDoctor() {
-            if(!currentId) return;
-            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const data = await res.json();
-            const status = data[0]?.status || "";
-            document.getElementById('last-doctor-response').innerText = status.includes("DOCTOR DICE:") ? status.replace("DOCTOR DICE:", "") : "En espera de respuesta...";
-        }
-
-        async function enviarNotaInterna() {
-            const n = document.getElementById('internal-note-input').value;
-            if(!currentId || !n) return alert("Selecciona un paciente primero.");
-            try {
-                await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: "ASISTENTE: " + n.toUpperCase() }) });
-                document.getElementById('internal-note-input').value = ""; 
-                alert("Nota enviada al Doctor.");
-            } catch(e) { reportarError("Error enviando nota asistente"); }
+            slotCont.innerHTML = data.length > 0 ? data.map(c => `<span class="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-black">${c.hora.slice(0,5)}</span>`).join('') : '<p class="text-emerald-500 text-[9px] font-bold">DÍA LIBRE</p>';
         }
 
         function contactarWhatsApp() {
-            if(!pTel) return alert("Selecciona un paciente.");
-            window.open(`https://wa.me/${pTel.replace('+', '')}`, '_blank');
-        }
-
-        async function cobrarPaciente() {
-            if(!currentId) return alert("Selecciona un paciente.");
-            const monto = prompt("Monto a cobrar ($):", "999");
-            if(monto) {
-                await fetch(`${URL}/rest/v1/Citas_Agendadas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: monto, status: "PAGADO" }) });
-                alert("✅ Pago registrado correctamente.");
-                currentId = null;
-                document.getElementById('patient-display').innerText = "---";
-                cargarCitas();
-            }
+            if(!pTel) return alert("Selecciona paciente.");
+            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
         }
 
         function switchView(v) {
@@ -260,11 +232,10 @@
             document.getElementById('nav-' + v).classList.add('active');
         }
 
-        async function cambiarPin() {
+        function cambiarPin() {
             const n = prompt("Nuevo PIN (4 dígitos):");
             if(n && n.length === 4) {
-                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pin_acceso: n }) });
-                alert("✅ PIN de seguridad actualizado.");
+                fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pin_acceso: n }) }).then(() => alert("PIN actualizado."));
             }
         }
     </script>
