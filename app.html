@@ -3,41 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Médico | K.B Tech Pro</title>
+    <title>K.B DOCTOR | NODO MAESTRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; transition: 0.5s; overflow-x: hidden; }
-        :root { --main-color: #6366f1; --bg-soft: #f5f3ff; }
-        .text-main { color: var(--main-color) !important; }
-        .bg-main { background-color: var(--main-color) !important; }
-        .border-main { border-color: var(--main-color) !important; }
-        .card-pro { transition: all 0.3s ease; border: 1px solid #f1f5f9; cursor: pointer; border-radius: 2rem; }
-        .card-pro:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); border-color: var(--main-color); }
-        .lock-screen { backdrop-filter: blur(30px); background: rgba(255,255,255,0.85); z-index: 99999; }
-        .input-dra { background: var(--bg-soft); border: 2px solid transparent; border-radius: 1rem; padding: 12px; width: 100%; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 700; }
-        .progress-bar { height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden; }
-        .progress-fill { height: 100%; transition: width 1s ease-in-out; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: background 0.5s ease; }
+        :root { --main-color: #6366f1; }
+        
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
+        .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
+        .card-appointment:hover { transform: scale(1.02) translateY(-5px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border-color: var(--main-color); }
+        
+        .alert-pulse { animation: pulse-alert 2s infinite; }
+        @keyframes pulse-alert { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
+        
+        .input-premium { background: #f1f5f9; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; width: 100%; outline: none; transition: 0.3s; font-weight: 700; }
+        .input-premium:focus { border-color: var(--main-color); background: #fff; }
+        
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; }
-        .alert-pulse { animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .lock-screen { backdrop-filter: blur(40px); background: rgba(255,255,255,0.9); z-index: 10000; }
+        .text-main { color: var(--main-color); }
+        .bg-main { background-color: var(--main-color); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="min-h-screen">
 
     <div id="pantalla-bloqueo" class="fixed inset-0 lock-screen flex items-center justify-center">
-        <div class="text-center p-10 bg-white rounded-[3rem] shadow-2xl border border-slate-100 max-w-sm w-full">
-            <span id="lock-icon" class="text-6xl mb-6 block">🩺</span>
-            <h2 class="text-xl font-black text-slate-800 mb-2 uppercase tracking-tighter italic">Nodo Médico</h2>
-            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-widest mb-8 font-bold italic">Validando Credenciales...</p>
-            <input type="password" id="pin-acceso" class="w-full p-5 rounded-2xl bg-slate-100 text-center text-3xl tracking-[0.8em] mb-6 outline-none" placeholder="****" maxlength="4">
-            <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg">Desbloquear</button>
+        <div class="text-center p-12 bg-white rounded-[3.5rem] shadow-2xl max-w-sm w-full border border-slate-100">
+            <div id="lock-icon" class="text-6xl mb-6">🩺</div>
+            <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2">Acceso Médico</h2>
+            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando con Ecosistema...</p>
+            <input type="password" id="pin-acceso" class="input-premium text-center text-4xl tracking-[0.6em] mb-6" placeholder="****" maxlength="4">
+            <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition">Desbloquear Nodo</button>
         </div>
     </div>
 
     <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
         <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-widest text-main mb-10 italic">Centro de Control K.B</h3>
+        <h3 class="text-xs font-black uppercase tracking-widest text-main mb-10 italic">Centro de Control</h3>
         <nav class="space-y-4">
             <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
                 <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
@@ -46,79 +49,73 @@
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
             </button>
             <button onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
-                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Inventario / Insumos</span>
+                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
             </button>
             <hr class="border-slate-800 my-6">
-            <button onclick="cambiarPin()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cambiar PIN de Acceso</button>
+            <button onclick="cambiarPin()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cambiar PIN</button>
         </nav>
     </div>
 
-    <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000">
-        <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 mb-8">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-black text-slate-900 tracking-tighter uppercase">K.B <span class="text-main italic" id="logo-tech">DOCTOR</span></h1>
-                    <p id="doc-esp-label" class="text-[9px] text-slate-400 uppercase tracking-[0.4em] font-bold italic"></p>
-                </div>
-                <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
-                    <div class="space-y-1.5">
-                        <div class="w-6 h-0.5 bg-white"></div><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-main"></div>
-                    </div>
-                </button>
+    <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000 max-w-7xl mx-auto p-6 md:p-10">
+        
+        <nav class="flex justify-between items-center mb-16">
+            <div>
+                <h1 class="text-4xl font-black italic tracking-tighter uppercase">K.B <span id="logo-tech" class="text-main">Doctor</span></h1>
+                <p id="doc-esp-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic"></p>
             </div>
+            <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
+                <div class="space-y-1.5">
+                    <div class="w-6 h-0.5 bg-white"></div><div id="menu-dot" class="w-4 h-0.5 bg-main"></div>
+                </div>
+            </button>
         </nav>
 
-        <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 pb-20">
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-6">
-                <div id="alerta-asistente" class="hidden bg-rose-50 border-2 border-rose-200 p-6 rounded-[2.5rem] alert-pulse">
+                <div id="alerta-asistente" class="hidden p-6 rounded-[2.5rem] bg-rose-50 border-2 border-rose-100 alert-pulse">
                     <div class="flex items-center gap-3 mb-2">
                         <span class="text-2xl">⚠️</span>
-                        <h3 class="text-[10px] font-black text-rose-600 uppercase italic">Aviso Urgente de Recepción</h3>
+                        <p class="text-[10px] font-black text-rose-600 uppercase italic">Aviso de Recepción</p>
                     </div>
-                    <p id="texto-alerta" class="text-sm font-bold text-rose-800 uppercase italic">---</p>
+                    <p id="texto-alerta" class="text-sm font-bold text-rose-900 uppercase italic leading-tight">---</p>
                 </div>
 
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-                    <h2 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-2 italic text-main uppercase">Intercom <span class="w-2 h-2 rounded-full bg-main animate-ping"></span></h2>
-                    <div class="mb-6 p-5 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">En Consulta:</p>
-                        <p id="dra-patient-name" class="text-lg font-bold text-slate-700 italic">---</p>
+                <div class="glass-panel p-8 shadow-sm">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-main">Intercomunicador</h3>
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200 mb-6 text-center">
+                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Paciente Actual:</p>
+                        <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase leading-none">---</p>
                     </div>
                     <div class="space-y-4">
-                        <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100">
-                            <p class="text-[8px] font-black text-main uppercase mb-1 italic">Mensaje de Recepción:</p>
-                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight font-bold">Sin mensajes...</p>
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                            <p class="text-[8px] font-black uppercase mb-1 italic text-main">Notas de Recepción:</p>
+                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight font-bold">Esperando selección...</p>
                         </div>
-                        <textarea id="dra-response-input" class="input-dra h-28" placeholder="Escribe instrucción para la asistente..."></textarea>
-                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:brightness-110 transition">Enviar al Nodo</button>
+                        <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucciones para asistente..."></textarea>
+                        <button id="btn-enviar" onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:brightness-110 transition">Enviar al Nodo</button>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
-                    <div id="prev-bg-card" class="absolute right-[-20px] top-[-20px] text-9xl opacity-10 pointer-events-none italic font-black">KB</div>
-                    <h3 class="text-[9px] font-black uppercase tracking-[0.3em] text-main mb-6 italic relative z-10">Balance del Turno (Estimado)</h3>
-                    <div class="grid grid-cols-2 gap-4 relative z-10">
+                <div class="bg-slate-900 p-8 rounded-[3rem] text-white relative overflow-hidden shadow-2xl border-t-4 border-main">
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance del Turno</p>
+                    <div class="space-y-4 relative z-10">
                         <div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">MX Pesos</p>
-                            <p class="text-2xl font-black tracking-tighter" id="ganancia-mxn">$0.00</p>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Total Pesos</p>
+                            <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
                         </div>
-                        <div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">US Dollars</p>
-                            <p class="text-2xl font-black tracking-tighter" id="ganancia-usd">$0.00</p>
+                        <div class="pt-4 border-t border-white/5">
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Total Dólares</p>
+                            <p class="text-2xl font-black italic tracking-tighter text-emerald-400" id="ganancia-usd">$0.00</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div class="flex justify-between items-end mb-8">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800 italic uppercase tracking-tighter leading-none">Agenda <span class="text-main">Live</span></h2>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mt-1">Sincronización en tiempo real con recepción</p>
-                    </div>
-                    <div class="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100">
-                        <div class="w-2 h-2 rounded-full bg-main animate-pulse"></div>
-                        <span class="text-[10px] font-black text-slate-700 uppercase">Hoy: <span id="total-hoy" class="text-main text-sm ml-1">0</span></span>
+                <div class="flex justify-between items-end mb-10 px-4">
+                    <h2 class="text-3xl font-black italic uppercase tracking-tighter">Agenda <span class="text-main">Live</span></h2>
+                    <div class="bg-slate-100 px-6 py-2 rounded-2xl text-[10px] font-black text-slate-600 uppercase italic border border-slate-200">
+                        Citas Hoy: <span id="total-hoy" class="text-main text-sm ml-1">0</span>
                     </div>
                 </div>
                 <div id="contenedor-citas" class="grid gap-4"></div>
@@ -131,118 +128,116 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentPatientId = null;
-        let doctorData = {};
 
-        // --- 🛡️ SENTINELA K.B (MINÚSCULAS) ---
-        async function sentinelaReportar(mensaje, codigo = "INFO") {
+        const CATALOGO_TEMAS = {
+            "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
+            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
+            "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
+            "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
+            "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
+        };
+
+        async function sentinela(mensaje, codigo = "info") {
             try {
                 await fetch(`${URL}/rest/v1/logs_sistema`, {
                     method: 'POST',
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo, mensaje_error: mensaje.toLowerCase() })
+                    body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo.toLowerCase(), mensaje_error: mensaje.toLowerCase() })
                 });
-            } catch (e) { console.error("sentinela desconectado"); }
+            } catch (e) { console.warn("Sentinela Offline"); }
         }
 
         async function verificarAcceso() {
-            const pinIngresado = document.getElementById('pin-acceso').value;
+            const pin = document.getElementById('pin-acceso').value;
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            doctorData = data[0];
-            
-            if(pinIngresado === (doctorData.pin_acceso || "0000")) {
+            const doctorData = data[0];
+
+            if(pin === (doctorData.pin_acceso || "0000")) {
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
                 
-                // Aplicar Tema
-                document.documentElement.style.setProperty('--main-color', '#6366f1'); // Dinámico si quieres
-                document.getElementById('doc-esp-label').innerText = doctorData.especialidad + " | Nodo Tijuana";
+                document.getElementById('doc-esp-label').innerText = doctorData.especialidad + " | Ecosistema K.B";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + doctorData.nombre_doctor;
                 
-                sentinelaReportar("acceso exitoso panel medico", "SEGURIDAD");
-                syncMaster(); setInterval(syncMaster, 15000);
+                // MODO CAMALEÓN DINÁMICO (30 TEMAS POSIBLES)
+                const esp = doctorData.especialidad || "General";
+                const palette = CATALOGO_TEMAS[esp] || CATALOGO_TEMAS["General"];
+                const colorIdx = (doctorData.template_id || 1) % 5;
+                const finalColor = palette[colorIdx];
+                
+                document.documentElement.style.setProperty('--main-color', finalColor);
+                document.getElementById('btn-unlock').style.backgroundColor = finalColor;
+                
+                sentinela("acceso médico validado", "seguridad");
+                syncMaster(); setInterval(syncMaster, 10000);
             } else { alert("PIN Incorrecto."); }
         }
 
         async function syncMaster() {
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
-            
-            let ingresosMXN = 0; let ingresosUSD = 0;
+            let mxn = 0; let usd = 0;
             document.getElementById('total-hoy').innerText = citas.length;
 
-            document.getElementById('contenedor-citas').innerHTML = citas.map(cita => {
-                // Cálculo de ingresos bi-moneda
-                if(cita.pagado) {
-                    if(cita.notas_asistente?.includes("USD")) ingresosUSD += cita.monto;
-                    else ingresosMXN += cita.monto;
+            document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
+                if(c.pagado) {
+                    if(c.notas_asistente?.includes("USD")) usd += c.monto;
+                    else mxn += c.monto;
                 }
 
-                // Detector de Alertas Silenciosas (⚠️)
-                if(cita.notas_asistente?.includes("⚠️")) {
+                if(c.notas_asistente?.includes("⚠️")) {
                     document.getElementById('alerta-asistente').classList.remove('hidden');
-                    document.getElementById('texto-alerta').innerText = cita.notas_asistente.replace("⚠️", "");
+                    document.getElementById('texto-alerta').innerText = c.notas_asistente.replace("⚠️", "");
                 }
 
                 return `
-                    <div class="card-pro bg-white p-6 flex items-center justify-between gap-6 shadow-sm border border-slate-100" onclick="enfocarpaciente('${cita.id}', '${cita.nombre_paciente}', '${cita.notas_asistente || 'Sin avisos'}')">
-                        <div class="flex items-center gap-8">
-                            <span class="text-xl font-black text-main w-14 tracking-tighter italic">${cita.hora.slice(0,5)}</span>
+                    <div class="card-appointment glass-panel p-6 flex items-center justify-between cursor-pointer" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}', '${c.notas_asistente || 'En sala'}')">
+                        <div class="flex items-center gap-10">
+                            <span class="text-2xl font-black italic tracking-tighter text-main w-16">${c.hora.slice(0,5)}</span>
                             <div>
-                                <h3 class="font-black text-slate-800 uppercase text-sm italic">${cita.nombre_paciente}</h3>
-                                <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest">${cita.notas_asistente || 'Esperando consulta'}</p>
+                                <h3 class="font-black text-slate-800 uppercase text-sm">${c.nombre_paciente}</h3>
+                                <p class="text-[8px] font-black uppercase text-slate-400 mt-1 italic tracking-widest">${c.notas_asistente || 'Sin avisos'}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="px-5 py-2 rounded-xl text-[9px] font-black uppercase ${cita.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'} italic">${cita.pagado ? 'Liquidado' : 'En Turno'}</span>
-                        </div>
+                        <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic ${c.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'}">${c.pagado ? 'Liquidado' : 'Pendiente'}</span>
                     </div>
                 `;
-            }).join('') || '<p class="text-center py-20 text-slate-400 italic">No hay pacientes registrados hoy.</p>';
+            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic uppercase">Nodo Vacío</p>';
 
-            document.getElementById('ganancia-mxn').innerText = `$${ingresosMXN.toLocaleString()}.00`;
-            document.getElementById('ganancia-usd').innerText = `$${ingresosUSD.toLocaleString()}.00`;
+            document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
+            document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
         }
 
         function enfocarpaciente(id, nombre, nota) {
             currentPatientId = id;
             document.getElementById('dra-patient-name').innerText = nombre;
             document.getElementById('dra-view-note').innerText = nota;
-            // Limpiar alerta si ya se atendió
             document.getElementById('alerta-asistente').classList.add('hidden');
         }
 
         async function enviarRespuestaDra() {
-            const respuesta = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !respuesta) return alert("Selecciona un paciente.");
+            const resp = document.getElementById('dra-response-input').value;
+            if(!currentPatientId || !resp) return alert("Seleccione paciente.");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ notas_doctor: respuesta.toUpperCase() }) 
+                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notas_doctor: resp.toUpperCase() }) 
             });
-            sentinelaReportar(`instruccion enviada a recepcion para ${currentPatientId}`, "COMMS");
-            alert("✅ Instrucción enviada.");
+            sentinela(`instruccion médica: ${resp}`, "comms");
+            alert("✅ Enviado a Recepción.");
             document.getElementById('dra-response-input').value = "";
             syncMaster();
         }
 
-        // --- FUNCIONES ADMINISTRATIVAS ---
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         async function abrirReporteLogistica() {
             const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const logs = await res.json();
-            alert("📋 LISTA DE INSUMOS REQUERIDOS:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
+            alert("📦 INSUMOS FALTANTES:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
         }
-
-        function copiarLinkCitas() {
-            const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
-            navigator.clipboard.writeText(link); alert("✅ Link Reservación Copiado.");
-        }
-        function copiarLinkAsistente() {
-            const link = window.location.origin + window.location.pathname.replace('app.html', 'asistente.html') + "?id=" + docId;
-            navigator.clipboard.writeText(link); alert("✅ Link Recepción Copiado.");
-        }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); alert("Link Copiado."); }
+        function copiarLinkAsistente() { navigator.clipboard.writeText(window.location.origin + "/asistente.html?id=" + docId); alert("Link Copiado."); }
         function cambiarPin() {
             const p = prompt("Nuevo PIN (4 dígitos):");
             if(p && p.length === 4) {
