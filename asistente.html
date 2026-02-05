@@ -14,13 +14,15 @@
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
         .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; font-size: 0.9rem; }
         .input-kb:focus { border-color: var(--main); background: white; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .status-wait { background: #94a3b8; box-shadow: 0 0 8px #94a3b8; }
-        .status-ok { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        
+        /* CANDADOS DE PLAN */
+        .plan-locked { position: relative; overflow: hidden; }
+        .locked-shield { position: absolute; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10; border-radius: inherit; }
+        .plan-locked.is-locked .locked-shield { display: flex; }
+
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; }
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
-        .currency-btn.active { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); color: var(--main); border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="p-4 md:p-10 pb-32">
@@ -59,10 +61,10 @@
             <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-indigo-600/20 border border-indigo-600/30 rounded-3xl text-indigo-400">
                 <div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nuevo Paciente</span>
             </button>
-            <button onclick="toggleMenu(); registrarGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl hover:bg-slate-700">
+            <button id="menu-gasto" onclick="toggleMenu(); registrarGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl hover:bg-slate-700">
                 <div class="text-2xl">💸</div><span class="text-[11px] font-black uppercase tracking-widest">Registrar Gasto</span>
             </button>
-            <button onclick="toggleMenu(); reportarInsumos()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl hover:bg-slate-700">
+            <button id="menu-insumo" onclick="toggleMenu(); reportarInsumos()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl hover:bg-slate-700">
                 <div class="text-2xl">📦</div><span class="text-[11px] font-black uppercase tracking-widest">Faltante Insumos</span>
             </button>
             <hr class="border-slate-800 my-8">
@@ -91,7 +93,13 @@
                     <h3 class="text-[11px] font-black uppercase text-slate-400 mb-8 tracking-widest italic">Paciente en Turno:</h3>
                     <p class="text-5xl font-extrabold text-slate-900 leading-none mb-3" id="patient-display">---</p>
                     <p id="patient-time-display" class="text-xs font-bold text-slate-500 uppercase italic">Seleccione de la lista</p>
-                    <div class="grid grid-cols-2 gap-4 mt-12">
+                    
+                    <div id="nota-del-doctor-panel" class="mt-6 p-4 bg-amber-50 rounded-2xl border-l-4 border-amber-400 hidden">
+                        <p class="text-[9px] font-black text-amber-600 uppercase mb-1">Instrucción del Dr:</p>
+                        <p id="txt-nota-doctor" class="text-xs font-bold text-amber-900 uppercase italic leading-tight">...</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mt-10">
                         <button onclick="contactarWhatsApp()" class="py-5 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[11px] uppercase tracking-widest">WhatsApp</button>
                         <button onclick="abrirCobro()" class="py-5 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-2xl">Cobrar</button>
                         <button onclick="editarCitaActual()" class="py-5 bg-slate-100 text-slate-600 rounded-2xl font-black text-[11px] uppercase tracking-widest col-span-2">✏️ Modificar Cita</button>
@@ -99,7 +107,7 @@
                 </div>
 
                 <div class="glass-panel p-10">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-5 italic">Avisos al Dr.</h3>
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-5 italic">Intercomunicador con Dr.</h3>
                     <div class="grid grid-cols-1 gap-3">
                         <button onclick="alertaSilenciosa('prisa')" class="py-4 bg-slate-50 text-slate-700 rounded-2xl font-bold text-[10px] uppercase border-2 border-transparent hover:border-amber-400 transition">⚠️ Tiene Prisa</button>
                         <button onclick="alertaSilenciosa('molesto')" class="py-4 bg-slate-50 text-slate-700 rounded-2xl font-bold text-[10px] uppercase border-2 border-transparent hover:border-rose-400 transition">😠 Molesto</button>
@@ -130,10 +138,48 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentPatient = null; 
+        let globalDocData = null;
         let selectedCurrency = 'MXN';
         let tipoCambio = 17.50;
 
-        // --- 🦎 MOTOR CAMALEÓN (30 TEMAS) ---
+        async function sentinela(mensaje, codigo = "info") {
+            try {
+                await fetch(`${URL}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: codigo.toLowerCase(), mensaje_error: mensaje.toLowerCase() })
+                });
+            } catch (e) { console.warn("Sentinela Offline"); }
+        }
+
+        async function verificarAcceso() {
+            const pin = document.getElementById('pin-acceso').value;
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const data = await res.json();
+            globalDocData = data[0];
+
+            if(pin === (globalDocData.pin_acceso || "0000")) {
+                document.getElementById('pantalla-bloqueo').style.display = 'none';
+                document.getElementById('contenido-panel').classList.remove('hidden');
+                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
+                
+                document.getElementById('doc-assigned').innerText = ` Nodo: Dr. ${globalDocData.nombre_doctor}`;
+                
+                // LÓGICA DE PLANES
+                const nivel = globalDocData.plan_nivel || 0;
+                if(nivel === 0) {
+                    document.documentElement.style.setProperty('--main', '#64748b');
+                    document.getElementById('menu-insumo').classList.add('hidden');
+                    document.getElementById('menu-gasto').classList.add('hidden');
+                } else {
+                    aplicarTema(globalDocData.especialidad, globalDocData.template_id);
+                }
+
+                sentinela("acceso asistente exitoso", "seguridad");
+                cargarCitas(); setInterval(cargarCitas, 10000);
+            } else { alert("PIN Incorrecto"); }
+        }
+
         function aplicarTema(esp, templateId) {
             const CATALOGO = {
                 "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
@@ -151,36 +197,10 @@
             document.getElementById('agenda-title').style.borderColor = color;
         }
 
-        async function sentinela(mensaje, codigo = "info") {
-            try {
-                await fetch(`${URL}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: codigo.toLowerCase(), mensaje_error: mensaje.toLowerCase() })
-                });
-            } catch (e) { console.warn("Sentinela Offline"); }
-        }
-
-        async function verificarAcceso() {
-            const pin = document.getElementById('pin-acceso').value;
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const data = await res.json();
-            const doctor = data[0];
-
-            if(pin === (doctor.pin_acceso || "0000")) {
-                document.getElementById('pantalla-bloqueo').style.display = 'none';
-                document.getElementById('contenido-panel').classList.remove('hidden');
-                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
-                document.getElementById('doc-assigned').innerText = ` Nodo: Dr. ${doctor.nombre_doctor}`;
-                aplicarTema(doctor.especialidad, doctor.template_id);
-                sentinela("acceso asistente exitoso", "seguridad");
-                cargarCitas(); setInterval(cargarCitas, 30000);
-            } else { alert("PIN Incorrecto"); }
-        }
-
         async function cargarCitas() {
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
+            
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
                 <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer shadow-sm active:scale-95" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
                     <div class="flex items-center gap-8">
@@ -189,52 +209,77 @@
                     </div>
                 </div>
             `).join('') || '<div class="text-center py-20 opacity-20 font-black italic text-2xl">AGENDA LIMPIA</div>';
+
+            // ACTUALIZAR NOTA DEL DR SI HAY PACIENTE SELECCIONADO
+            if(currentPatient) {
+                const refreshed = citas.find(c => c.id === currentPatient.id);
+                if(refreshed && refreshed.notas_doctor) {
+                    document.getElementById('nota-del-doctor-panel').classList.remove('hidden');
+                    document.getElementById('txt-nota-doctor').innerText = refreshed.notas_doctor;
+                } else {
+                    document.getElementById('nota-del-doctor-panel').classList.add('hidden');
+                }
+            }
         }
 
         function seleccionarPaciente(cita) {
             currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
             document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} hs - ${cita.fecha}`;
+            
+            if(cita.notas_doctor) {
+                document.getElementById('nota-del-doctor-panel').classList.remove('hidden');
+                document.getElementById('txt-nota-doctor').innerText = cita.notas_doctor;
+            } else {
+                document.getElementById('nota-del-doctor-panel').classList.add('hidden');
+            }
+        }
+
+        // --- 🛠️ FIX: WHATSAPP ---
+        function contactarWhatsApp() {
+            if(!currentPatient || !currentPatient.telefono) return alert("Seleccione paciente con teléfono válido.");
+            const tel = currentPatient.telefono.replace(/\D/g,'');
+            const msg = encodeURIComponent(`Hola ${currentPatient.nombre_paciente}, te contactamos de la recepción del Dr. ${globalDocData.nombre_doctor}. ¿Cómo te encuentras?`);
+            window.open(`https://wa.me/${tel}?text=${msg}`);
+        }
+
+        // --- 🛠️ FIX: NOTAS INTERNAS ---
+        async function enviarNotaInterna() {
+            const nota = document.getElementById('internal-note-input').value;
+            if(!currentPatient || !nota) return alert("Seleccione paciente y escriba nota.");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { 
+                method: 'PATCH', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ notas_asistente: nota.toUpperCase() }) 
+            });
+            alert("Nota enviada al Dr.");
+            document.getElementById('internal-note-input').value = "";
+            cargarCitas();
         }
 
         function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
         function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
 
-        // --- 🔎 BUSCADOR SIN PROMPTS ---
+        // --- 🔎 BUSCADOR ---
         function buscarPaciente() {
             document.getElementById('modal-icon').innerText = "🔎";
             document.getElementById('modal-title').innerText = "Buscador Pro";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="search-input" placeholder="Nombre del paciente..." class="input-kb">
-                <div id="search-results" class="mt-6 space-y-3"></div>
-            `;
+            document.getElementById('modal-body').innerHTML = `<input type="text" id="search-input" placeholder="Nombre..." class="input-kb"><div id="search-results" class="mt-6 space-y-3"></div>`;
             abrirModal();
             document.getElementById('modal-confirm-btn').style.display = 'none';
             document.getElementById('search-input').addEventListener('input', async (e) => {
                 const term = e.target.value.toLowerCase(); if(term.length < 3) return;
                 const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=ilike.*${term}*&doctor_id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
                 const data = await res.json();
-                document.getElementById('search-results').innerHTML = data.map(r => `
-                    <div class="p-5 bg-slate-50 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-slate-100" onclick='seleccionarPaciente(${JSON.stringify(r)}); cerrarModal();'>
-                        <span class="font-black uppercase text-xs">${r.nombre_paciente}</span>
-                        <span class="text-[9px] font-bold opacity-30">${r.fecha}</span>
-                    </div>
-                `).join('') || '<p class="text-center text-[10px] font-black text-rose-400">SIN RESULTADOS</p>';
+                document.getElementById('search-results').innerHTML = data.map(r => `<div class="p-5 bg-slate-50 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-slate-100" onclick='seleccionarPaciente(${JSON.stringify(r)}); cerrarModal();'><span class="font-black uppercase text-xs">${r.nombre_paciente}</span><span class="text-[9px] opacity-30">${r.fecha}</span></div>`).join('');
             });
         }
 
-        // --- ➕ NUEVO / ✏️ EDITAR ---
         function abrirNuevoPaciente() {
             document.getElementById('modal-icon').innerText = "👤";
-            document.getElementById('modal-title').innerText = "Alta de Paciente";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="new-p-nombre" class="input-kb mb-4" placeholder="Nombre Completo">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="new-p-fecha" class="input-kb" value="${new Date().toISOString().split('T')[0]}">
-                    <input type="time" id="new-p-hora" class="input-kb" value="12:00">
-                </div>
-            `;
+            document.getElementById('modal-title').innerText = "Alta Paciente";
+            document.getElementById('modal-body').innerHTML = `<input type="text" id="new-p-nombre" class="input-kb mb-4" placeholder="Nombre"><div class="grid grid-cols-2 gap-4"><input type="date" id="new-p-fecha" class="input-kb" value="${new Date().toISOString().split('T')[0]}"><input type="time" id="new-p-hora" class="input-kb" value="12:00"></div>`;
             abrirModal();
             document.getElementById('modal-confirm-btn').style.display = 'block';
             document.getElementById('modal-confirm-btn').onclick = async () => {
@@ -244,64 +289,37 @@
             };
         }
 
-        function editarCitaActual() {
-            if(!currentPatient) return alert("Selecciona paciente");
-            document.getElementById('modal-icon').innerText = "✏️";
-            document.getElementById('modal-title').innerText = "Modificar Cita";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="edit-nombre" class="input-kb mb-4" value="${currentPatient.nombre_paciente}">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="edit-fecha" class="input-kb" value="${currentPatient.fecha}">
-                    <input type="time" id="edit-hora" class="input-kb" value="${currentPatient.hora.slice(0,5)}">
-                </div>
-            `;
-            abrirModal();
-            document.getElementById('modal-confirm-btn').style.display = 'block';
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const u = { nombre_paciente: document.getElementById('edit-nombre').value.toUpperCase(), fecha: document.getElementById('edit-fecha').value, hora: document.getElementById('edit-hora').value + ":00" };
-                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(u) });
-                cerrarModal(); cargarCitas();
-            };
-        }
-
-        // --- 💰 COBRO CON CONVERSIÓN USD ---
         function abrirCobro() {
+            if(globalDocData.plan_nivel === 0) return alert("⚠️ Plan Básico no incluye módulo de cobro USD/Facturación.");
             if(!currentPatient) return alert("Selecciona paciente");
-            const base = currentPatient.monto || 0; 
-            const dep = currentPatient.deposito_pagado ? (base * 0.20) : 0;
-            
             document.getElementById('modal-icon').innerText = "💱";
-            document.getElementById('modal-title').innerText = "Cierre de Cuenta";
+            document.getElementById('modal-title').innerText = "Cobro Premium";
             document.getElementById('modal-body').innerHTML = `
                 <div class="flex gap-2 p-1 bg-slate-100 rounded-2xl mb-6">
                     <button onclick="setMoneda('MXN')" id="btn-mxn" class="flex-1 py-3 rounded-xl font-black text-[10px] bg-white shadow-sm border">MXN</button>
                     <button onclick="setMoneda('USD')" id="btn-usd" class="flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400">USD</button>
                 </div>
-                <input type="number" id="pay-amount" value="${base}" class="input-kb text-3xl text-center">
+                <input type="number" id="pay-amount" placeholder="Monto" class="input-kb text-3xl text-center">
                 <div id="div-conversion" class="hidden mt-6 p-6 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-black text-indigo-600 uppercase">T. Cambio TJM</span>
-                        <input type="number" id="t-cambio" value="${tipoCambio}" class="w-20 bg-transparent text-right font-black text-indigo-900 border-b-2 border-indigo-200 outline-none">
-                    </div>
-                    <div class="flex justify-between items-center pt-3 border-t border-indigo-200">
-                        <span class="text-[10px] font-black text-indigo-800 uppercase italic">Abono en Pesos:</span>
-                        <span id="txt-conversion" class="text-lg font-black text-indigo-900">$0.00 MXN</span>
-                    </div>
+                    <div class="flex justify-between items-center mb-3"><span>T. Cambio</span><input type="number" id="t-cambio" value="${tipoCambio}" class="w-20 bg-transparent text-right font-black"></div>
+                    <div class="flex justify-between items-center pt-3 border-t"><span class="text-[10px] font-black italic">Abono Pesos:</span><span id="txt-conversion" class="text-lg font-black">$0.00 MXN</span></div>
                 </div>
                 <select id="pay-method" class="input-kb mt-6"><option>EFECTIVO</option><option>TRANSFERENCIA</option><option>TARJETA</option></select>
-                <div class="flex items-center gap-3 mt-6 ml-2"><input type="checkbox" id="check-sat" class="w-5 h-5 accent-indigo-600"> <label class="text-[10px] font-black uppercase opacity-60">Requiere Factura SAT</label></div>
             `;
             abrirModal();
-            selectedCurrency = 'MXN';
             document.getElementById('pay-amount').addEventListener('input', calcularConversion);
-            document.getElementById('modal-confirm-btn').onclick = procesarLiquidacion;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const amt = parseFloat(document.getElementById('pay-amount').value);
+                const tc = parseFloat(document.getElementById('t-cambio')?.value || tipoCambio);
+                const final = selectedCurrency === 'USD' ? (amt * tc) : amt;
+                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: final, notas_asistente: `PAGO: ${document.getElementById('pay-method').value} (${selectedCurrency})` }) });
+                cerrarModal(); cargarCitas();
+            };
         }
 
         function setMoneda(m) {
             selectedCurrency = m;
             document.getElementById('div-conversion').classList.toggle('hidden', m === 'MXN');
-            document.getElementById('btn-mxn').className = m === 'MXN' ? "flex-1 py-3 rounded-xl font-black text-[10px] bg-white shadow-sm border" : "flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400";
-            document.getElementById('btn-usd').className = m === 'USD' ? "flex-1 py-3 rounded-xl font-black text-[10px] bg-white shadow-sm border" : "flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400";
             calcularConversion();
         }
 
@@ -311,62 +329,13 @@
             if(selectedCurrency === 'USD') document.getElementById('txt-conversion').innerText = `$${(amt * tc).toLocaleString()} MXN`;
         }
 
-        async function procesarLiquidacion() {
-            const amt = parseFloat(document.getElementById('pay-amount').value);
-            const tc = parseFloat(document.getElementById('t-cambio')?.value || tipoCambio);
-            const dep = currentPatient.deposito_pagado ? (amt * 0.20) : 0;
-            const final = selectedCurrency === 'USD' ? (amt * tc) - dep : amt - dep;
-            const met = document.getElementById('pay-method').value;
-            const sat = document.getElementById('check-sat').checked;
-
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: final, notas_asistente: `pago: ${met} (${selectedCurrency}) ${sat?'| sat':''}` }) });
-            generarPDF(currentPatient.nombre_paciente, amt, dep, final, met, selectedCurrency);
-            sentinela(`cobro liquidado: ${currentPatient.nombre_paciente} neto: $${final} mxn`, "fiscal");
-            cerrarModal(); cargarCitas();
-        }
-
-        function generarPDF(nom, tot, dep, net, met, curr) {
-            const doc = new jsPDF();
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("K.B TECH SOLUTIONS", 20, 28);
-            doc.autoTable({ startY: 60, head: [['CONCEPTO', 'MÉTODO', `TOTAL ${curr}`]], body: [['CONSULTA', met, `$${tot}`], ['DEPÓSITO 20%', '-', `-$${dep}`], ['NETO MXN', met, `$${net}`]], theme: 'striped' });
-            doc.save(`RECIBO_KB_${nom}.pdf`);
-        }
-
-        // --- ADMIN ---
-        function registrarGasto() {
-            document.getElementById('modal-icon').innerText = "💸";
-            document.getElementById('modal-title').innerText = "Gasto de Caja";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="g-c" placeholder="Concepto" class="input-kb mb-4"><input type="number" id="g-m" placeholder="Monto $" class="input-kb">`;
-            abrirModal();
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                await sentinela(`gasto: ${document.getElementById('g-c').value} - $${document.getElementById('g-m').value}`, "gasto");
-                cerrarModal(); alert("Gasto reportado.");
-            };
-        }
-
-        function reportarInsumos() {
-            document.getElementById('modal-icon').innerText = "📦";
-            document.getElementById('modal-title').innerText = "Faltante Insumo";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="i-i" placeholder="¿Qué insumo falta?" class="input-kb">`;
-            abrirModal();
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                await sentinela(`falta insumo: ${document.getElementById('i-i').value}`, "logistica");
-                cerrarModal(); alert("Enviado a Central.");
-            };
-        }
-
         async function alertaSilenciosa(tipo) {
             if(!currentPatient) return alert("Selecciona paciente");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ notas_asistente: "⚠️ " + tipo.toUpperCase() }) });
-            sentinela(`alerta silenciosa: ${tipo} para ${currentPatient.nombre_paciente}`, "comms");
-            alert("Aviso enviado al Doctor.");
+            alert("Aviso enviado.");
         }
 
-        // Reloj
-        setInterval(() => {
-            if(document.getElementById('live-clock')) document.getElementById('live-clock').innerText = new Date().toLocaleString().toUpperCase();
-        }, 1000);
+        verificarAcceso();
     </script>
 </body>
 </html>
