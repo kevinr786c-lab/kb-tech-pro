@@ -323,7 +323,31 @@
                 document.getElementById('txt-nota-doctor').innerText = cita.telefono;
             } else { document.getElementById('nota-del-doctor-panel').classList.add('hidden'); }
         }
-
+async function enviarNotaAlDr() {
+            const nota = document.getElementById('internal-note-input').value;
+            if(!currentPatient || !nota.trim()) {
+                return eliteAviso(currentPatient ? "ESCRIBA UN MENSAJE" : "SELECCIONE PACIENTE");
+            }
+            try {
+                const headers = { 
+                    'apikey': KEY_DB, 
+                    'Authorization': `Bearer ${KEY_DB}`, 
+                    'Content-Type': 'application/json' 
+                };
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
+                    method: 'PATCH',
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        telefono: "RECEPCIÓN DICE: " + nota.toUpperCase().trim() 
+                    })
+                });
+                eliteAviso("AVISO ENVIADO AL DOCTOR ✅");
+                document.getElementById('internal-note-input').value = "";
+                cargarCitas();
+            } catch (e) { 
+                eliteAviso("ERROR AL MANDAR NOTA"); 
+            }
+        }
         function buscarPaciente() {
             document.getElementById('modal-icon').innerText = "🔍";
             document.getElementById('modal-title').innerText = "Buscador Pro";
