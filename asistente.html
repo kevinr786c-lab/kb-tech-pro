@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K.B Assistant | Nodo Operativo Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         :root { --main: #6366f1; --bg: #f8fafc; }
@@ -16,106 +17,100 @@
         #side-menu { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000; }
         .translate-x-full { transform: translateX(100%); }
 
-        /* MODALES */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 3rem; padding: 2.5rem; position: relative; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 3rem; padding: 2.5rem; position: relative; }
         
-        .nav-icon { transition: 0.4s; filter: grayscale(1); opacity: 0.5; }
-        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1); filter: grayscale(0); opacity: 1; }
+        /* CALENDARIO MAESTRO */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.7rem; font-weight: 800; cursor: pointer; border: 1px solid #f1f5f9; position: relative; }
+        .cal-day:hover { background: #f8fafc; border-color: var(--main); }
+        .cal-day.has-cita::after { content: ''; width: 4px; height: 4px; background: var(--main); border-radius: 50%; position: absolute; bottom: 4px; }
+        .cal-day.selected { background: var(--main) !important; color: white !important; }
     </style>
 </head>
 <body class="p-4 md:p-8 pb-48 text-slate-800">
 
-    <div id="modal-container" class="modal-overlay" onclick="cerrarModalExterno(event)">
-        <div class="modal-content shadow-2xl border border-slate-100">
-            <header class="text-center mb-8">
-                <div id="modal-icon" class="text-5xl mb-4">💎</div>
-                <h2 id="modal-title" class="text-xl font-black uppercase tracking-tighter italic text-slate-800">Operación</h2>
-                <p id="modal-desc" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Captura de datos requerida</p>
+    <div id="modal-container" class="modal-overlay" onclick="if(event.target.id === 'modal-container') cerrarModal()">
+        <div class="modal-content shadow-2xl">
+            <header class="text-center mb-6">
+                <div id="modal-icon" class="text-5xl mb-2">💎</div>
+                <h2 id="modal-title" class="text-xl font-black uppercase italic">Operación</h2>
+                <p id="modal-desc" class="text-[9px] font-bold text-slate-400 uppercase italic">K.B Tech System</p>
             </header>
-            <div id="modal-body" class="space-y-4">
-                </div>
+            <div id="modal-body" class="space-y-4"></div>
             <div class="flex gap-4 mt-8">
-                <button onclick="cerrarModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase">Cancelar</button>
-                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Confirmar</button>
+                <button onclick="cerrarModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase">Cerrar</button>
+                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase">Confirmar</button>
             </div>
         </div>
     </div>
 
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[2000] flex items-center justify-center">
-        <div class="text-center p-8 glass-panel max-w-sm w-full border-2 border-slate-100 shadow-2xl">
-            <div id="lock-icon" class="text-5xl mb-4">👩‍💼</div>
-            <h2 class="text-xl font-black mb-6 uppercase tracking-widest">Recepción K.B</h2>
+        <div class="text-center p-8 glass-panel max-w-sm w-full">
+            <div class="text-5xl mb-4">👩‍💼</div>
+            <h2 class="text-xl font-black mb-6 uppercase">Recepción K.B</h2>
             <input type="password" id="pin-acceso" class="w-full p-5 rounded-2xl bg-slate-50 text-center text-3xl tracking-[0.8em] mb-6 outline-none" placeholder="****" maxlength="4">
-            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase shadow-lg">Acceder</button>
+            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase">Acceder</button>
         </div>
     </div>
 
     <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
-        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-[var(--main)]">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-[var(--main)] mb-10 italic">Centro Operativo</h3>
-        
+        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl">✕</button>
+        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-10 italic">Navegación Nodo</h3>
         <nav class="space-y-4">
-            <button onclick="toggleMenu(); facturarSAT()" class="flex items-center gap-4 w-full p-4 bg-blue-600/20 border border-blue-600/30 rounded-2xl hover:bg-blue-600/40 transition">
+            <button onclick="toggleMenu(); abrirCalendario()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700">
+                <div class="text-xl">📅</div>
+                <span class="text-[10px] font-black uppercase">Calendario Maestro</span>
+            </button>
+            <button onclick="toggleMenu(); facturarSAT()" class="flex items-center gap-4 w-full p-4 bg-blue-600/20 border border-blue-600/30 rounded-2xl">
                 <div class="text-xl">⚖️</div>
                 <span class="text-[10px] font-black uppercase">Facturación SAT</span>
             </button>
-            <button onclick="toggleMenu(); facturarUSA()" class="flex items-center gap-4 w-full p-4 bg-amber-600/20 border border-amber-600/30 rounded-2xl hover:bg-amber-600/40 transition">
-                <div class="text-xl">📑</div>
-                <span class="text-[10px] font-black uppercase">Superbill USA</span>
-            </button>
-            <button onclick="toggleMenu(); cobroManual()" class="flex items-center gap-4 w-full p-4 bg-emerald-600/20 border border-emerald-600/30 rounded-2xl hover:bg-emerald-600/40 transition">
+            <button onclick="toggleMenu(); cobroManual()" class="flex items-center gap-4 w-full p-4 bg-emerald-600/20 border border-emerald-600/30 rounded-2xl">
                 <div class="text-xl">💰</div>
                 <span class="text-[10px] font-black uppercase">Cobro Express</span>
             </button>
-            <div class="h-px bg-slate-800 my-4"></div>
-            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full p-3 text-slate-400">
-                <div class="text-lg">🔑</div>
-                <span class="text-[9px] font-black uppercase">Seguridad PIN</span>
+            <button onclick="location.reload()" class="flex items-center gap-4 w-full p-4 text-slate-400">
+                <div class="text-lg">🔄</div>
+                <span class="text-[9px] font-black uppercase">Sincronizar Nodo</span>
             </button>
         </nav>
     </div>
 
-    <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-700">
+    <div id="contenido-panel" class="hidden opacity-0">
         <header class="max-w-6xl mx-auto flex justify-between items-center mb-10">
             <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tighter italic leading-none">K.B <span id="brand-text" class="text-[var(--main)]">Assistant</span></h1>
-                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic"></p>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tighter italic leading-none">K.B <span id="brand-text" class="text-indigo-600">Assistant</span></h1>
+                <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1"></p>
             </div>
-            <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
+            <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl">
                 <div class="space-y-1.5">
-                    <div class="w-6 h-0.5 bg-white"></div>
-                    <div class="w-6 h-0.5 bg-white"></div>
-                    <div class="w-4 h-0.5 bg-[var(--main)]"></div>
+                    <div class="w-6 h-0.5 bg-white"></div><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-indigo-500"></div>
                 </div>
             </button>
         </header>
 
         <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
-                <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic tracking-widest">En Turno:</h3>
-                    <p class="text-3xl font-extrabold text-slate-800 leading-tight" id="patient-display">---</p>
-                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Seleccione de la lista</p>
+                <div class="glass-panel p-8 border-l-8 border-indigo-500">
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic">En Turno:</h3>
+                    <p class="text-3xl font-extrabold text-slate-800" id="patient-display">---</p>
+                    <p id="patient-time-display" class="text-[10px] font-bold text-indigo-500 uppercase mt-2 italic">Seleccione de la lista</p>
                     <div class="flex gap-4 mt-8">
                         <button onclick="contactarWhatsApp()" class="flex-1 py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase">WhatsApp</button>
-                        <button onclick="abrirCobro()" class="flex-1 py-4 bg-[var(--main)] text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Cobrar</button>
+                        <button onclick="abrirCobro()" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Cobrar</button>
                     </div>
                 </div>
-
                 <div class="glass-panel p-8">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic tracking-widest">Canal con Dr.</h3>
-                    <div class="bg-slate-50 p-4 rounded-2xl text-[11px] mb-4 border-l-4 border-[var(--main)]">
-                        <p id="last-doctor-response" class="text-slate-700 font-bold italic">Esperando...</p>
-                    </div>
-                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 text-[11px] font-bold mb-3 h-20 outline-none border-none" placeholder="Nota rápida al Dr..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest">Enviar Aviso</button>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4">Nota al Dr.</h3>
+                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 text-[11px] font-bold h-20 outline-none border-none" placeholder="Escribe aquí..."></textarea>
+                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase mt-2">Enviar</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div id="view-agenda" class="glass-panel p-8 md:p-10 min-h-[500px]">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Agenda del Día</h3>
+                <div id="view-agenda" class="glass-panel p-8 min-h-[500px]">
+                    <h3 class="text-[10px] font-black uppercase text-slate-800 mb-8 italic">Agenda del Día</h3>
                     <div id="tabla-citas-body" class="space-y-4"></div>
                 </div>
             </div>
@@ -123,28 +118,26 @@
     </div>
 
     <script>
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        const { jsPDF } = window.jspdf;
+        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
+        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-        let currentId = null; let pTel = "";
+        let currentId = null; let pTel = ""; let doctorData = {};
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
         function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
-        function cerrarModalExterno(e) { if(e.target.id === 'modal-container') cerrarModal(); }
 
         async function verificarAcceso() {
             try {
                 const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
                 const data = await res.json();
-                const doc = data[0];
-                if(document.getElementById('pin-acceso').value === (doc.pin_acceso || "0000")) {
+                doctorData = data[0];
+                if(document.getElementById('pin-acceso').value === (doctorData.pin_acceso || "0000")) {
                     document.getElementById('pantalla-bloqueo').classList.add('hidden');
                     document.getElementById('contenido-panel').classList.remove('hidden');
                     setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
-                    document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
-                    const colors = { "Pediatría": "#fb923c", "Ginecología": "#f43f5e", "General": "#1e3a8a", "Cardiología": "#e11d48" };
-                    document.documentElement.style.setProperty('--main', colors[doc.especialidad] || "#6366f1");
+                    document.getElementById('doc-assigned').innerText = "Dr. " + doctorData.nombre_doctor;
                     cargarCitas(); setInterval(cargarCitas, 10000);
                 } else { alert("PIN Incorrecto"); }
             } catch(e) { console.error(e); }
@@ -154,28 +147,81 @@
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
-                <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-[var(--main)] shadow-sm cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
+                <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-indigo-500 shadow-sm cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
                     <div class="flex gap-4">
-                        <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora.slice(0,5)}</span>
+                        <span class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-2 rounded-xl">${c.hora.slice(0,5)}</span>
                         <p class="font-black text-xs uppercase text-slate-700">${c.nombre_paciente}</p>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center py-20 italic">Sin citas pendientes</p>';
+            `).join('') || '<p class="text-center py-20 italic">Sin citas hoy</p>';
         }
 
         function seleccionar(id, nombre, hora, tel) {
             currentId = id; pTel = tel;
             document.getElementById('patient-display').innerText = nombre;
             document.getElementById('patient-time-display').innerText = "Cita a las: " + hora.slice(0,5);
-            document.getElementById('last-doctor-response').innerText = tel?.includes("DOCTOR DICE:") ? tel.replace("DOCTOR DICE:", "") : "Sin notas del Dr.";
         }
 
-        // --- INTERACCIONES REALES ---
+        // CALENDARIO MAESTRO
+        let currentCalMonth = new Date().getMonth();
+        let currentCalYear = new Date().getFullYear();
 
+        async function abrirCalendario() {
+            document.getElementById('modal-icon').innerText = "📅";
+            document.getElementById('modal-title').innerText = "Calendario Maestro";
+            renderCalendar();
+            abrirModal();
+            document.getElementById('modal-confirm-btn').innerText = "Reagendar";
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const diaSel = document.querySelector('.cal-day.selected')?.dataset.fecha;
+                if(!diaSel || !currentId) return alert("Selecciona paciente y nuevo día.");
+                const nuevaHora = prompt("Ingresa nueva hora (HH:MM):", "09:00");
+                if(nuevaHora) {
+                    await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
+                        method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fecha: diaSel, hora: nuevaHora + ":00" })
+                    });
+                    alert("✅ Reagendado."); location.reload();
+                }
+            };
+        }
+
+        function renderCalendar() {
+            const now = new Date(currentCalYear, currentCalMonth, 1);
+            const daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+            const startDay = now.getDay();
+            const monthName = now.toLocaleString('es-mx', {month: 'long', year: 'numeric'});
+            
+            document.getElementById('modal-body').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="changeMonth(-1)" class="text-indigo-600">◀</button>
+                    <span class="font-black uppercase text-xs">${monthName}</span>
+                    <button onclick="changeMonth(1)" class="text-indigo-600">▶</button>
+                </div>
+                <div class="cal-grid">
+                    <div class="text-center text-[8px] font-black opacity-30">D</div><div class="text-center text-[8px] font-black opacity-30">L</div>
+                    <div class="text-center text-[8px] font-black opacity-30">M</div><div class="text-center text-[8px] font-black opacity-30">M</div>
+                    <div class="text-center text-[8px] font-black opacity-30">J</div><div class="text-center text-[8px] font-black opacity-30">V</div>
+                    <div class="text-center text-[8px] font-black opacity-30">S</div>
+                    ${Array(startDay).fill('<div></div>').join('')}
+                    ${Array.from({length: daysInMonth}, (_, i) => {
+                        const dateStr = `${currentCalYear}-${String(currentCalMonth+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`;
+                        return `<div class="cal-day" data-fecha="${dateStr}" onclick="selectCalDay(this)">${i+1}</div>`;
+                    }).join('')}
+                </div>
+            `;
+        }
+        window.changeMonth = (val) => { currentCalMonth += val; renderCalendar(); }
+        window.selectCalDay = (el) => {
+            document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // COBROS Y PDF
         function abrirCobro() {
             if(!currentId) return alert("Selecciona un paciente.");
             document.getElementById('modal-icon').innerText = "💰";
-            document.getElementById('modal-title').innerText = "Módulo de Pago";
+            document.getElementById('modal-title').innerText = "Cerrar Cuenta";
             document.getElementById('modal-body').innerHTML = `
                 <input type="number" id="pay-amount" placeholder="Monto Total" class="input-kb">
                 <select id="pay-method" class="input-kb">
@@ -183,94 +229,63 @@
                     <option value="TRANSFERENCIA">Transferencia</option>
                     <option value="TARJETA">Tarjeta Bancaria</option>
                 </select>
+                <div class="flex items-center gap-2 p-2"><input type="checkbox" id="check-sat"> <label class="text-[10px] font-bold">Requiere Factura SAT</label></div>
             `;
             abrirModal();
             document.getElementById('modal-confirm-btn').onclick = ejecutarCobro;
         }
 
         async function ejecutarCobro() {
-            const m = document.getElementById('pay-amount').value;
-            const met = document.getElementById('pay-method').value;
-            if(!m) return alert("Ingresa el monto.");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
-                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ pagado: true, monto: parseFloat(m), telefono: `PAGO: ${met}` })
+            const monto = document.getElementById('pay-amount').value;
+            const metodo = document.getElementById('pay-method').value;
+            const sat = document.getElementById('check-sat').checked;
+            
+            if(!monto) return alert("Ingresa el monto.");
+
+            const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, {
+                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagado: true, monto: parseFloat(monto), telefono: `PAGO: ${metodo}${sat ? ' | SAT REQUERIDO' : ''}` })
             });
-            cerrarModal(); location.reload();
+
+            if(res.ok) {
+                generarPDF(document.getElementById('patient-display').innerText, monto, metodo, sat);
+                cerrarModal();
+                alert("✅ Pago registrado y PDF generado.");
+                location.reload();
+            }
         }
 
-        function facturarSAT() {
-            if(!currentId) return alert("Selecciona paciente.");
-            document.getElementById('modal-icon').innerText = "⚖️";
-            document.getElementById('modal-title').innerText = "Facturación SAT";
-            document.getElementById('modal-desc').innerText = "Captura de datos fiscales MX";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="rfc-input" placeholder="RFC del Paciente" class="input-kb uppercase">
-                <input type="email" id="rfc-email" placeholder="Email para envío de CFDI" class="input-kb">
-            `;
-            abrirModal();
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const rfc = document.getElementById('rfc-input').value;
-                if(!rfc) return alert("RFC Obligatorio");
-                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
-                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ telefono: `SOLICITÓ FACTURA SAT: ${rfc.toUpperCase()}` })
-                });
-                alert("✅ Solicitud Fiscal Registrada."); cerrarModal();
-            };
+        function generarPDF(paciente, monto, metodo, sat) {
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text(`K.B TECH SOLUTIONS - COMPROBANTE MÉDICO`, 20, 20);
+            doc.line(20, 25, 190, 25);
+            doc.setFontSize(10);
+            doc.text(`Dr. ${doctorData.nombre_doctor}`, 20, 35);
+            doc.text(`Especialidad: ${doctorData.especialidad}`, 20, 40);
+            doc.text(`Cédula: ${doctorData.cedula || '---'}`, 20, 45);
+            
+            doc.text(`PACIENTE: ${paciente}`, 20, 60);
+            doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 20, 65);
+            doc.text(`MONTO PAGADO: $${monto}`, 20, 75);
+            doc.text(`MÉTODO: ${metodo}`, 20, 80);
+            
+            if(sat) {
+                doc.text(`DATOS FISCALES DR: RFC ${doctorData.rfc || '---'}`, 20, 95);
+            }
+            
+            doc.text(`Powered by K.B Tech Solutions | Tijuana Nodo`, 20, 150);
+            doc.save(`Recibo_${paciente}.pdf`);
         }
 
-        function facturarUSA() {
-            if(!currentId) return alert("Selecciona paciente.");
-            document.getElementById('modal-icon').innerText = "📑";
-            document.getElementById('modal-title').innerText = "Superbill USA";
-            document.getElementById('modal-desc').innerText = "Datos de Aseguradora USA";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="ins-name" placeholder="Nombre Aseguradora (Aetna, BlueShield...)" class="input-kb">
-                <input type="text" id="ins-id" placeholder="Member ID / Policy Number" class="input-kb">
-            `;
-            abrirModal();
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const ins = document.getElementById('ins-name').value;
-                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
-                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ telefono: `SOLICITÓ SUPERBILL: ${ins}` })
-                });
-                alert("✅ Superbill en cola de generación."); cerrarModal();
-            };
+        function contactarWhatsApp() {
+            if(!pTel) return alert("Selecciona paciente.");
+            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
         }
 
-        function cobroManual() {
-            document.getElementById('modal-icon').innerText = "💰";
-            document.getElementById('modal-title').innerText = "Cobro Express";
-            document.getElementById('modal-desc').innerText = "Paciente sin cita previa";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="express-name" placeholder="Nombre del Paciente" class="input-kb uppercase">
-                <input type="number" id="express-monto" placeholder="Monto a cobrar" class="input-kb">
-            `;
-            abrirModal();
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const n = document.getElementById('express-name').value;
-                const m = document.getElementById('express-monto').value;
-                if(!n || !m) return alert("Datos incompletos");
-                // Inyectamos como cita express pagada directamente
-                await fetch(`${URL}/rest/v1/Citas`, { 
-                    method: 'POST', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ doctor_id: docId, nombre_paciente: n + " (EXPRESS)", pagado: true, monto: parseFloat(m), fecha: new Date().toISOString().split('T')[0], hora: new Date().toLocaleTimeString('en-GB') })
-                });
-                alert("✅ Pago Express Registrado."); cerrarModal(); location.reload();
-            };
-        }
-
-        async function enviarNotaInterna() {
-            const n = document.getElementById('internal-note-input').value;
-            if(!currentId || !n) return alert("Selecciona paciente.");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "ASISTENTE: " + n.toUpperCase() }) });
-            document.getElementById('internal-note-input').value = ""; alert("Nota enviada.");
-        }
-
-        function contactarWhatsApp() { if(pTel) window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank'); }
-        function switchView(v) { document.getElementById('view-agenda').classList.toggle('hidden', v !== 'agenda'); }
+        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
+        init();
+        async function init() { /* Lógica inicial si se requiere */ }
     </script>
 </body>
 </html>
