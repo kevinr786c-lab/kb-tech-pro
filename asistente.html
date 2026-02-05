@@ -202,15 +202,20 @@
                 if(c.telefono && c.telefono.includes("URGENTE")) semaforoClase = "u-rojo";
                 else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforoClase = "u-amarillo";
 
-                return `
+return `
                 <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
                     <div class="flex items-center gap-8 text-left">
                         <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
-                        <div><p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p><p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p></div>
+                        <div>
+                            <p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p>
+                            <p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/'/g, "&apos;")})" class="p-4 bg-slate-100 hover:bg-slate-200 rounded-2xl transition">✏️</button>
                     </div>
                 </div>`;
             }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía para este día</p>';
-        }
 
         function abrirCalendarioMaestro() {
             document.getElementById('modal-icon').innerText = "🗓️";
@@ -236,7 +241,11 @@
             for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
             for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
                 const esHoy = new Date().toDateString() === new Date(y, m, d).toDateString() ? 'today' : '';
-                container.innerHTML += `<div class="cal-day ${esHoy}" onclick="seleccionarDiaCal(${y}, ${m}, ${d})">${d}</div>`;
+     container.innerHTML += `
+                    <div class="cal-day ${esHoy} border-b-2 border-transparent hover:border-indigo-500" 
+                         onclick="seleccionarDiaCal(${y}, ${m}, ${d})">
+                        ${d}
+                    </div>`;
             }
         }
 
@@ -343,7 +352,45 @@ async function enviarNotaAlDr() {
                 });
                 eliteAviso("AVISO ENVIADO AL DOCTOR ✅");
                 document.getElementById('internal-note-input').value = "";
-                cargarCitas();
+                cargarCitas(); function abrirModificarCita(cita) {
+            document.getElementById('modal-icon').innerText = "⚙️";
+            document.getElementById('modal-title').innerText = "Modificar Cita";
+            document.getElementById('modal-body').innerHTML = `
+                <div class="space-y-4 text-left">
+                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Editando a: ${cita.nombre_paciente}</p>
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Hora de la Cita:</label>
+                    <input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}">
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Fecha de la Cita:</label>
+                    <input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}">
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nivel de Urgencia:</label>
+                    <select id="m-prioridad" class="input-kb">
+                        <option value="" ${!cita.telefono ? 'selected' : ''}>Normal (Verde)</option>
+                        <option value="PRIORIDAD" ${cita.telefono?.includes('PRIORIDAD') ? 'selected' : ''}>Prioridad (Amarillo)</option>
+                        <option value="URGENTE" ${cita.telefono?.includes('URGENTE') ? 'selected' : ''}>Urgente (Rojo)</option>
+                    </select>
+                </div>
+            `;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const nHora = document.getElementById('m-hora').value + ":00";
+                const nFecha = document.getElementById('m-fecha').value;
+                const nPrio = document.getElementById('m-prioridad').value;
+                
+                try {
+                    await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, {
+                        method: 'PATCH',
+                        headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ hora: nHora, fecha: nFecha, telefono: nPrio })
+                    });
+                    
+                    eliteAviso("CITA ACTUALIZADA CON ÉXITO ✅");
+                    cerrarModal();
+                    cargarCitas(); // Refresco instantáneo para Emily
+                } catch (e) {
+                    eliteAviso("ERROR EN EL NODO DE DATOS");
+                }
+            };
+            abrirModal();
+        }
             } catch (e) { 
                 eliteAviso("ERROR AL MANDAR NOTA"); 
             }
