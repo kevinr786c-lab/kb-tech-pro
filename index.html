@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH SOLUTIONS | Sistemas Médicos de Élite</title>
+    <title>K.B TECH SOLUTIONS | Infraestructura Médica de Élite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
@@ -12,15 +12,17 @@
         .kb-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f1f5f9; background: white; }
         .kb-card:hover { transform: translateY(-15px); box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.2); border-color: #6366f1; }
         .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .feature-icon { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
         .hero-mesh { background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0, transparent 50%); }
         .whatsapp-float { position: fixed; bottom: 30px; right: 30px; z-index: 100; transition: 0.3s; }
         .whatsapp-float:hover { transform: scale(1.1) rotate(5deg); }
+        
+        .emily-vision { opacity: 0.04; transition: 1.5s; cursor: default; }
+        .emily-vision:hover { opacity: 0.3; }
     </style>
 </head>
 <body class="hero-mesh text-left">
 
-    <a href="https://wa.me/526675527090?text=Hola%20K.B%20Tech!%20Vengo%20del%20Index%20y%20quiero%20información%20del%20Plan%20Dominio" target="_blank" class="whatsapp-float">
+    <a href="https://wa.me/526675527090?text=Solicito%20información%20sobre%20la%20activación%20de%20un%20Nodo%20Médico" target="_blank" class="whatsapp-float">
         <div class="bg-green-500 p-4 rounded-full shadow-2xl flex items-center justify-center">
             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.888 11.888-11.888 3.176 0 6.161 1.237 8.404 3.48s3.481 5.229 3.481 8.406c0 6.555-5.332 11.887-11.888 11.887-2.007 0-3.974-.506-5.717-1.47l-6.267 1.694zm6.103-3.784l.438.26c1.473.873 3.17 1.334 4.896 1.334 5.176 0 9.387-4.211 9.387-9.387 0-2.507-.977-4.864-2.75-6.637l-.001-.001c-1.772-1.772-4.128-2.748-6.635-2.748-5.176 0-9.386 4.212-9.386 9.387 0 2.06.541 4.061 1.564 5.815l.287.492-1.012 3.693 3.784-1.01z"/></svg>
         </div>
@@ -28,81 +30,91 @@
 
     <nav class="fixed top-0 w-full z-50 glass-nav">
         <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
-            <h1 id="master-logo" onclick="activarProtocoloSecreto()" class="text-3xl font-black italic tracking-tighter cursor-pointer select-none">
+            <h1 id="master-logo" onclick="activarProtocoloRestringido()" class="text-3xl font-black italic tracking-tighter cursor-pointer select-none">
                 K.B <span class="gradient-text">TECH</span>
             </h1>
             <div class="hidden md:flex space-x-10 items-center">
-                <a href="#planes" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Planes</a>
-                <a href="#tijuana" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Tijuana Pro</a>
-                <button onclick="window.location.href='registro.html'" class="px-8 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition active:scale-95">Registro Élite</button>
+                <a href="#proceso" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Hoy</a>
+                <a href="#planes" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Nodos</a>
+                <button onclick="window.location.href='planes.html'" class="px-8 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition active:scale-95">Activar Sistema</button>
             </div>
         </div>
     </nav>
 
     <section class="pt-48 pb-32 px-8 text-center max-w-5xl mx-auto">
-        <span class="inline-block px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.4em] mb-6 italic">Publicidad Ganadora: Potenciado por IA Gemini</span>
+        <span class="inline-block px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.4em] mb-6 italic">Integración Avanzada Gemini AI Engine</span>
         <h2 class="text-7xl md:text-8xl font-black tracking-tighter text-slate-900 mb-8 leading-none">
-            Evoluciona o quédate en el <span class="gradient-text italic">olvido digital.</span>
+            Evoluciona o quédate en el <span class="gradient-text italic">pasado.</span>
         </h2>
         <p class="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
-            Tijuana está cambiando. No permitas que la tecnología te arrebate tus pacientes. Toma el control total con el sistema diseñado para el futuro médico.
+            Las herramientas de hoy definen tu relevancia de mañana. No es opcional; el ecosistema médico de Tijuana exige una transición tecnológica absoluta. 
         </p>
     </section>
 
     <section id="tijuana" class="max-w-7xl mx-auto px-8 py-24">
-        <div class="bg-slate-900 rounded-[4rem] p-12 md:p-20 flex flex-col md:flex-row items-center gap-16 overflow-hidden relative shadow-2xl">
-            <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600/20 blur-[120px] rounded-full"></div>
+        <div class="bg-slate-900 rounded-[4rem] p-12 md:p-20 flex flex-col md:flex-row items-center gap-16 overflow-hidden relative shadow-2xl border border-white/5">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 blur-[120px] rounded-full"></div>
             <div class="flex-1 relative z-10 text-left">
-                <h3 class="text-white text-4xl font-black mb-6 tracking-tighter uppercase italic">Soporte Presencial en <span class="text-indigo-400">Tijuana.</span></h3>
-                <p class="text-slate-400 mb-8 text-lg font-medium leading-relaxed">¿Sigues dependiendo de una libreta de papel? Deja de ser un médico del pasado. Nuestro equipo te visita en tu consultorio para asegurar tu transición al futuro. Costo: $0.00 MXN.</p>
+                <h3 class="text-white text-4xl font-black mb-6 tracking-tighter uppercase italic">Soporte <span class="text-indigo-400">Presencial.</span></h3>
+                <p class="text-slate-400 mb-8 text-lg font-medium leading-relaxed">A diferencia de plataformas externas, nosotros operamos en tu terreno. Migramos tus datos y optimizamos tu Nodo físicamente en tu consultorio. Soporte local para resultados reales.</p>
                 <div class="p-4 bg-slate-800 rounded-2xl border border-slate-700 w-fit">
-                    <p class="text-xs text-white font-bold uppercase italic">Exclusivo: Zona Río / Grand Hotel</p>
+                    <p class="text-xs text-white font-bold uppercase italic tracking-widest">Cobertura: Zona Río / Otay / Aguacaliente</p>
                 </div>
             </div>
             <div class="flex-1 w-full bg-slate-800 h-64 rounded-3xl border border-slate-700 shadow-2xl flex items-center justify-center italic text-slate-300 font-bold text-sm text-center p-8">
-                "Digitalizar tu práctica no es una opción, es una necesidad de supervivencia en la frontera."
+                "La tecnología de punta es el motor que moderniza tu práctica. Si no aprendes a usarla hoy, el mercado te dejará atrás."
             </div>
         </div>
     </section>
 
     <section id="planes" class="max-w-7xl mx-auto px-8 py-32 text-center">
-        <h3 class="text-5xl font-black tracking-tighter mb-20 text-slate-900 italic uppercase">Elige tu <span class="gradient-text">Nivel.</span></h3>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <h3 class="text-5xl font-black tracking-tighter mb-20 text-slate-900 italic uppercase">Escalabilidad de <span class="gradient-text">Nodo.</span></h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-4xl mx-auto">
             
             <div class="kb-card p-12 rounded-[3.5rem] flex flex-col h-full text-left">
-                <div class="w-12 h-12 feature-icon rounded-2xl mb-8 flex items-center justify-center text-white text-2xl font-bold italic">01</div>
-                <h4 class="text-2xl font-black mb-1 italic uppercase">Plan Aspirante</h4>
+                <h4 class="text-2xl font-black mb-1 italic uppercase text-slate-400">Nodo Independiente</h4>
                 <p class="text-4xl font-black mb-8 italic">$999 <span class="text-xs text-slate-300">MXN/mes</span></p>
-                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <li class="flex items-center text-indigo-600 italic">✓ Agenda Camaleón</li>
-                    <li class="flex items-center text-indigo-600 italic">✓ IA Gemini Bio</li>
-                    <li class="text-slate-300">✕ Sin Soporte Presencial</li>
+                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    <li class="flex items-center gap-2">● Agenda Live Sincronizada</li>
+                    <li class="flex items-center gap-2">● IA Gemini Bio Generator</li>
+                    <li class="flex items-center gap-2">● Nodo de Reservación Web</li>
+                    <li class="opacity-30 line-through">✕ Sin Soporte Presencial</li>
                 </ul>
-                <button onclick="window.location.href='registro.html'" class="w-full py-5 border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition">Comenzar</button>
+                <button onclick="window.location.href='planes.html'" class="w-full py-5 border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition">Iniciar Evolución</button>
             </div>
 
             <div class="kb-card p-12 rounded-[3.5rem] flex flex-col h-full border-2 border-indigo-500 relative text-left z-10">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-6 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.3em] italic">Recomendado en TJ</div>
-                <div class="w-12 h-12 feature-icon rounded-2xl mb-8 flex items-center justify-center text-white text-2xl font-bold italic">05</div>
-                <h4 class="text-2xl font-black mb-1 italic uppercase">Plan Dominio</h4>
-                <p class="text-4xl font-black mb-8 text-indigo-600 italic">$1,599 <span class="text-xs text-slate-300">MXN/mes</span></p>
-                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-bold text-slate-900 uppercase tracking-widest">
-                    <li class="flex items-center text-indigo-600 italic">✓ 5 Licencias Médicas</li>
-                    <li class="flex items-center text-indigo-600 italic">✓ Soporte Físico en TJ</li>
-                    <li class="flex items-center text-indigo-600 italic">✓ IA de Escritura Élite</li>
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-6 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.3em] italic">Prioridad Técnica en TJ</div>
+                <h4 class="text-2xl font-black mb-1 italic uppercase text-indigo-600">Nodo Premium</h4>
+                <p class="text-4xl font-black mb-8 italic">$1,599 <span class="text-xs text-slate-300">MXN/mes</span></p>
+                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                    <li class="flex items-center gap-2 text-indigo-600">✓ Soporte Táctico Presencial In-Situ</li>
+                    <li class="flex items-center gap-2 text-indigo-600">✓ Modo Camaleón: Identidad de Lujo</li>
+                    <li class="flex items-center gap-2 text-indigo-600">✓ Migración Operación Transfusión</li>
+                    <li class="flex items-center gap-2 text-indigo-600">✓ Control Financiero Bi-Moneda</li>
                 </ul>
-                <button onclick="window.location.href='registro.html'" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition">Activar Ahora</button>
+                <button onclick="window.location.href='planes.html'" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition">Activar Poder Total</button>
             </div>
         </div>
     </section>
 
-    <footer class="pt-32 pb-10 px-8 border-t border-slate-100 bg-white">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-            <div class="text-left">
-                <h4 class="text-2xl font-black italic mb-4">K.B <span class="text-indigo-600">TECH</span></h4>
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] italic">Dominando Tijuana · 2026</p>
+    <footer class="pt-40 pb-16 px-8 bg-white border-t border-slate-50">
+        <div class="max-w-7xl mx-auto flex flex-col items-center gap-16">
+            
+            <div class="text-center space-y-4">
+                <h4 class="text-4xl font-black italic">K.B <span class="text-indigo-600">TECH</span></h4>
+                <p class="text-[9px] font-black text-slate-300 uppercase tracking-[0.5em] italic">Infraestructura Médica Tijuana · 2026</p>
             </div>
-            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-300">Powered by K.B Tech Solutions &copy;</p>
+
+            <div class="emily-vision text-center">
+                <h3 class="text-6xl font-black uppercase italic tracking-tighter">Hazlo por Emily</h3>
+                <p class="text-[10px] font-bold text-slate-400 tracking-[0.8em] uppercase mt-4">La razón de ser del ecosistema K.B Tech Solutions</p>
+            </div>
+
+            <div class="w-full flex justify-between pt-10 border-t border-slate-50">
+                <p class="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Arquitectura impulsada por Gemini Engine</p>
+                <p class="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Confidencialidad · Autonomía · Poder</p>
+            </div>
         </div>
     </footer>
 
@@ -110,40 +122,33 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
-        // --- SISTEMA CENTINELA (REPORTERO) ---
-        async function reportarActividad(msg) {
-            await fetch(`${URL_DB}/rest/v1/Logs_Sistema`, {
-                method: 'POST',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pagina_origen: "Index.html",
-                    codigo_error: "INDEX_EVENT",
-                    mensaje_error: msg,
-                    dispositivo_info: navigator.userAgent
-                })
-            });
+        async function registrarLog(msg) {
+            try {
+                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "Index.html", codigo_error: "INDEX_ACCESS", mensaje_error: msg })
+                });
+            } catch(e) { /* Modo sigilo activo */ }
         }
 
-        let clics = 0;
-        function activarProtocoloSecreto() {
-            clics++;
-            if (clics === 3) {
-                const pin = prompt("PROTOCOLO DE SEGURIDAD K.B ACTIVADO\nINGRESE CÓDIGO MAESTRO:");
-                if (pin === "2026") { 
-                    reportarActividad("Acceso concedido a Página Secreta");
+        let pulseCount = 0;
+        function activarProtocoloRestringido() {
+            pulseCount++;
+            if (pulseCount === 3) {
+                const access = prompt("ADMIN_COMMAND: INGRESE CÓDIGO DE AUTORIDAD");
+                if (access === "2026") { 
+                    registrarLog("Acceso a Terminal de Mando Global");
                     window.location.href = 'secreto.html'; 
-                } 
-                else { 
-                    reportarActividad("Intento fallido de acceso secreto");
+                } else { 
                     alert("ACCESO DENEGADO"); 
-                    clics = 0; 
+                    pulseCount = 0; 
                 }
             }
-            setTimeout(() => { clics = 0; }, 2000);
+            setTimeout(() => { pulseCount = 0; }, 2000);
         }
 
-        // Reportamos que el Index está vivo
-        window.onload = () => { reportarActividad("Index cargado correctamente"); };
+        window.onload = () => { registrarLog("Sistema Index Online"); };
     </script>
 </body>
 </html>
