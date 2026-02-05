@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Assistant | Nodo Camaleón Pro</title>
+    <title>K.B Assistant | Nodo Fiscal Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
@@ -11,24 +11,19 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; }
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         
-        .nav-icon { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); filter: grayscale(1); opacity: 0.5; }
-        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1) translateY(-10px); box-shadow: 0 15px 25px -5px var(--main); filter: grayscale(0); opacity: 1; }
+        /* ESTILO MENÚ LATERAL */
+        #side-menu { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000; }
+        .translate-x-full { transform: translateX(100%); }
+
+        .nav-icon { transition: 0.4s; filter: grayscale(1); opacity: 0.5; }
+        .nav-icon.active { background: var(--main); color: white; transform: scale(1.1); filter: grayscale(0); opacity: 1; }
         
         .bg-dr-msg { background: var(--bg); border-left: 4px solid var(--main); }
         
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; background: white; }
-        .day-box.selected { background: var(--main) !important; color: white !important; border-color: var(--main); box-shadow: 0 10px 15px -3px var(--main); }
+        .day-box.selected { background: var(--main) !important; color: white !important; box-shadow: 0 10px 15px -3px var(--main); }
         .day-name { text-align: center; font-size: 0.6rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; }
-
-        /* BARRA RETRÁCTIL ULTRA */
-        #main-nav { 
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 1000; 
-        }
-        .nav-hidden { transform: translate(-50%, 200%) !important; opacity: 0; }
     </style>
 </head>
 <body class="p-4 md:p-8 pb-48 text-slate-800">
@@ -43,13 +38,48 @@
         </div>
     </div>
 
+    <div id="side-menu" class="fixed inset-y-0 right-0 w-72 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
+        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-[var(--main)]">✕</button>
+        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-[var(--main)] mb-10 italic">Gestión de Nodo</h3>
+        
+        <nav class="space-y-6">
+            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full group text-left">
+                <div class="bg-slate-800 p-3 rounded-xl text-white group-hover:bg-[var(--main)] transition">🔑</div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Seguridad PIN</span>
+            </button>
+            <button onclick="location.reload()" class="flex items-center gap-4 w-full group text-left">
+                <div class="bg-indigo-500 p-3 rounded-xl text-white">🔄</div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Sincronizar Datos</span>
+            </button>
+            
+            <div class="pt-8 border-t border-slate-800">
+                <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Módulos Fiscales</p>
+                <button onclick="alert('Módulo SAT: Captura de RFC activo en cobro')" class="flex items-center gap-4 w-full mb-4 opacity-70">
+                    <div class="bg-blue-600 p-3 rounded-xl text-white">⚖️</div>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Facturación SAT</span>
+                </button>
+                <button onclick="alert('Módulo USA: Generador de Superbill activo')" class="flex items-center gap-4 w-full opacity-70">
+                    <div class="bg-amber-500 p-3 rounded-xl text-white">📑</div>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Superbill USA</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-700">
         <header class="max-w-6xl mx-auto flex justify-between items-center mb-10">
             <div>
                 <h1 class="text-3xl font-black text-slate-800 tracking-tighter italic leading-none">K.B <span id="brand-text" class="text-[var(--main)]">Assistant</span></h1>
                 <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic"></p>
             </div>
-            <button onclick="location.reload()" class="p-3 bg-white rounded-full shadow-sm border border-slate-100">🔄</button>
+            
+            <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
+                <div class="space-y-1.5">
+                    <div class="w-6 h-0.5 bg-white"></div>
+                    <div class="w-6 h-0.5 bg-white"></div>
+                    <div class="w-4 h-0.5 bg-[var(--main)]"></div>
+                </div>
+            </button>
         </header>
 
         <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -57,7 +87,7 @@
                 <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
                     <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic tracking-widest">Paciente en Turno:</h3>
                     <p class="text-3xl font-extrabold text-slate-800 leading-tight" id="patient-display">---</p>
-                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Selecciona de la lista</p>
+                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Seleccione de la lista</p>
                     <div class="flex gap-4 mt-8">
                         <button onclick="contactarWhatsApp()" class="flex-1 py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase active:scale-95 transition">WhatsApp</button>
                         <button onclick="cobrarPaciente()" class="flex-1 py-4 bg-[var(--main)] text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-indigo-100 active:scale-95 transition">Cobrar</button>
@@ -86,23 +116,18 @@
                         <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 italic">📅 Disponibilidad</h3>
                         <p id="month-name" class="text-xs font-black text-[var(--main)] uppercase italic"></p>
                     </div>
-                    <div class="grid grid-cols-7 gap-2 mb-4 text-center">
-                        <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
-                    </div>
                     <div id="calendar-body" class="calendar-grid mb-10"></div>
                     <div id="slots-occupied" class="flex flex-wrap gap-2 p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-                        <p class="text-[9px] font-black text-slate-400 uppercase italic">Selecciona un día para ver huecos...</p>
+                        <p class="text-[9px] font-black text-slate-400 uppercase italic">Selecciona un día...</p>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <nav id="main-nav" class="fixed bottom-8 bg-white/90 backdrop-blur-2xl border border-slate-200 p-3 rounded-full flex gap-4 shadow-2xl">
+    <nav id="main-nav" class="fixed bottom-8 bg-white/90 backdrop-blur-2xl border border-slate-200 p-3 rounded-full flex gap-4 shadow-2xl left-1/2 -translate-x-1/2">
         <div class="nav-icon active p-4 rounded-full cursor-pointer" id="nav-agenda" onclick="switchView('agenda')">📋</div>
         <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-calendar" onclick="switchView('calendar')">📅</div>
-        <div class="w-px h-6 bg-slate-200 self-center"></div>
-        <div class="p-4 rounded-full cursor-pointer hover:bg-slate-50 transition" onclick="cambiarPin()">🔑</div>
     </nav>
 
     <script>
@@ -111,27 +136,17 @@
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentId = null; let pTel = "";
 
-        // Lógica de Barra Retráctil
-        let lastScroll = 0;
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('main-nav');
-            const currentScroll = window.pageYOffset;
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                nav.classList.add('nav-hidden');
-            } else {
-                nav.classList.remove('nav-hidden');
-            }
-            lastScroll = currentScroll;
-        });
+        function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('translate-x-full');
+        }
 
         async function verificarAcceso() {
-            if(!docId) return alert("Error de Nodo.");
+            if(!docId) return alert("Nodo no válido.");
             try {
                 const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
                 const data = await res.json();
                 const doc = data[0];
                 document.getElementById('lock-doc-name').innerText = "Dr. " + doc.nombre_doctor;
-
                 if(document.getElementById('pin-acceso').value === (doc.pin_acceso || "0000")) {
                     document.getElementById('pantalla-bloqueo').classList.add('hidden');
                     document.getElementById('contenido-panel').classList.remove('hidden');
@@ -149,18 +164,15 @@
         }
 
         async function cargarCitas() {
-            // SINCRONIZADO: Tabla "Citas", orden por "hora"
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             const container = document.getElementById('tabla-citas-body');
-            
             container.innerHTML = citas.map(c => `
                 <div class="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-[var(--main)] shadow-sm active:scale-95 transition cursor-pointer" onclick="seleccionar('${c.id}', '${c.nombre_paciente}', '${c.hora}', '${c.telefono}')">
                     <div class="flex gap-4 items-center">
                         <span class="text-[10px] font-black text-[var(--main)] bg-slate-50 px-3 py-2 rounded-xl">${c.hora.slice(0,5)}</span>
                         <p class="font-black text-xs uppercase text-slate-700">${c.nombre_paciente}</p>
                     </div>
-                    <div class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
                 </div>
             `).join('') || '<p class="text-center py-20 italic opacity-40">Sin pacientes en espera</p>';
         }
@@ -169,34 +181,32 @@
             currentId = id; pTel = tel;
             document.getElementById('patient-display').innerText = nombre;
             document.getElementById('patient-time-display').innerText = "Cita: " + hora.slice(0,5);
-            // El campo 'telefono' guarda las notas del Dr según el SQL
             document.getElementById('last-doctor-response').innerText = tel.includes("DOCTOR DICE:") ? tel.replace("DOCTOR DICE:", "") : "Esperando nota...";
-        }
-
-        async function enviarNotaInterna() {
-            const n = document.getElementById('internal-note-input').value;
-            if(!currentId || !n) return alert("Selecciona paciente.");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
-                method: 'PATCH', 
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ telefono: "ASISTENTE: " + n.toUpperCase() }) 
-            });
-            document.getElementById('internal-note-input').value = "";
-            alert("Nota enviada.");
         }
 
         async function cobrarPaciente() {
             if(!currentId) return alert("Selecciona paciente.");
-            const monto = prompt("Monto a cobrar:", "800");
-            if(monto) {
-                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
-                    method: 'PATCH', 
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ pagado: true, monto: parseFloat(monto) }) 
-                });
-                alert("✅ Cobro registrado.");
-                location.reload();
+            const monto = prompt("Monto a cobrar ($):", "1200");
+            if(!monto) return;
+
+            const metodo = confirm("¿Pago Bancario? (Transferencia/Tarjeta)\n[Aceptar = Banco / Cancelar = Efectivo]") ? "BANCARIO" : "EFECTIVO";
+            
+            let rfc = "N/A";
+            if(confirm("¿Requiere Factura SAT (México)?")) {
+                rfc = prompt("Ingresa RFC del Paciente:", "XAXX010101000") || "N/A";
             }
+
+            const usa = confirm("¿Requiere Superbill para USA?");
+
+            const statusFinal = `PAGO: ${metodo}${rfc !== 'N/A' ? ' | RFC: ' + rfc.toUpperCase() : ''}${usa ? ' | +SUPERBILL USA' : ''}`;
+
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
+                method: 'PATCH', 
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ pagado: true, monto: parseFloat(monto), telefono: statusFinal }) 
+            });
+            alert("✅ Cobro registrado con éxito.");
+            location.reload();
         }
 
         function initCalendar() {
@@ -217,12 +227,7 @@
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${f}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
             const slotCont = document.getElementById('slots-occupied');
-            slotCont.innerHTML = data.length > 0 ? data.map(c => `<span class="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[9px] font-black">${c.hora.slice(0,5)}</span>`).join('') : '<p class="text-emerald-500 text-[9px] font-bold">DÍA LIBRE</p>';
-        }
-
-        function contactarWhatsApp() {
-            if(!pTel) return alert("Selecciona paciente.");
-            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
+            slotCont.innerHTML = data.length > 0 ? data.map(c => `<span class="px-3 py-1 bg-red-50 text-red-500 rounded-lg text-[9px] font-black">${c.hora.slice(0,5)}</span>`).join('') : '<p class="text-emerald-500 text-[9px] font-bold">DÍA LIBRE</p>';
         }
 
         function switchView(v) {
@@ -230,6 +235,11 @@
             document.getElementById('view-calendar').classList.toggle('hidden', v !== 'calendar');
             document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
             document.getElementById('nav-' + v).classList.add('active');
+        }
+
+        function contactarWhatsApp() {
+            if(!pTel) return alert("Selecciona paciente.");
+            window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank');
         }
 
         function cambiarPin() {
