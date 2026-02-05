@@ -7,11 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: background 0.5s ease; text-align: left; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: 0.5s ease; text-align: left; }
         :root { --main-color: #6366f1; }
         
-        /* NOTIFICADOR DIAMANTE (NOTAS CARAS) */
-        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(25px); padding: 1.2rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
+        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
@@ -33,20 +32,19 @@
         .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
         .locked-feature.is-locked .locked-overlay { display: flex; }
         .btn-ceo-gold { background: linear-gradient(135deg, #fbbf24, #d97706); animation: gold-pulse 2s infinite; }
-        @keyframes gold-pulse { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
     </style>
 </head>
 <body class="min-h-screen">
 
     <div id="elite-toast">
-        <p id="toast-msg" class="text-white font-black uppercase italic tracking-[0.2em] text-[9px]"></p>
+        <p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p>
     </div>
 
     <div id="pantalla-bloqueo" class="fixed inset-0 lock-screen flex items-center justify-center">
         <div class="text-center p-12 bg-white rounded-[3.5rem] shadow-2xl max-w-sm w-full border border-slate-100">
             <div id="lock-icon" class="text-6xl mb-6 text-slate-900">🩺</div>
             <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2">Acceso Médico</h2>
-            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando Nodo...</p>
+            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando Nodo Maestro...</p>
             <input type="password" id="pin-acceso" class="input-premium text-center text-4xl tracking-[0.6em] mb-6" placeholder="****" maxlength="4">
             <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition">Desbloquear Nodo</button>
         </div>
@@ -56,23 +54,23 @@
         <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-main mb-10 italic">Centro de Control</h3>
         <nav class="space-y-4">
-            <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl hover:bg-main transition group">
-                <div class="text-xl group-hover:scale-110 transition">🌐</div><span class="text-[10px] font-black uppercase">Ver Mi Sucursal Digital</span>
+            <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl hover:bg-main transition group text-left">
+                <div class="text-xl">🌐</div><span class="text-[10px] font-black uppercase">Mi Sucursal Digital</span>
             </button>
-            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
+            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition text-left">
                 <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
             </button>
-            <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
-                <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
+            <button onclick="abrirReporteGastos()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition text-left">
+                <div class="text-xl">💸</div><span class="text-[10px] font-black uppercase">Auditoría de Gastos</span>
             </button>
-            <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
-                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
-            </button>
-            <button id="btn-ceo-directo" onclick="contactarCEO()" class="hidden flex items-center gap-4 w-full p-4 btn-ceo-gold rounded-2xl text-black">
-                <div class="text-xl">👑</div><span class="text-[10px] font-black uppercase italic">Línea con el Comandante</span>
+            <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500 text-left">
+                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Reporte Insumos</span>
             </button>
             <hr class="border-slate-800 my-6">
-            <button onclick="location.reload()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cerrar Sesión</button>
+            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 text-left">
+                <div class="text-xl">🔐</div><span class="text-[10px] font-black uppercase">Seguridad (PIN)</span>
+            </button>
+            <button onclick="location.reload()" class="text-[10px] font-bold text-slate-500 uppercase ml-4">Cerrar Sesión</button>
         </nav>
     </div>
 
@@ -105,7 +103,7 @@
                         <span class="text-2xl">💎</span>
                         <div>
                             <p class="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Estatus VIP K.B</p>
-                            <p class="text-xs font-bold text-emerald-900 italic">-20% RECOMPENSA ACTIVA</p>
+                            <p class="text-xs font-bold text-emerald-900 italic">RECOMPENSA ACTIVA</p>
                         </div>
                     </div>
                 </div>
@@ -124,8 +122,8 @@
                             <p class="text-[8px] font-black uppercase mb-1 italic text-main">Notas de Recepción:</p>
                             <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight font-bold">Standby...</p>
                         </div>
-                        <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucciones para recepción..."></textarea>
-                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg">Enviar al Nodo</button>
+                        <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucción..."></textarea>
+                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Enviar al Nodo</button>
                     </div>
                 </div>
 
@@ -133,13 +131,13 @@
                     <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance del Turno</p>
                     <div class="space-y-4">
                         <div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Total Pesos</p>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Pesos Hoy</p>
                             <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
                         </div>
                         <div id="usd-container" class="pt-4 border-t border-white/5 locked-feature">
                             <div class="locked-overlay" style="background: rgba(15,23,42,0.85);"><p class="text-[7px] font-black text-amber-500 italic">USD PREMIUM</p></div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Total Dólares</p>
-                            <p class="text-2xl font-black italic tracking-tighter text-emerald-400" id="ganancia-usd">$0.00</p>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Dólares Hoy</p>
+                            <p class="text-2xl font-black italic text-emerald-400" id="ganancia-usd">$0.00</p>
                         </div>
                     </div>
                 </div>
@@ -214,7 +212,6 @@
                     document.getElementById('usd-container').classList.add('is-locked');
                     document.getElementById('btn-insumos-menu').classList.add('hidden');
                 }
-                if(nivel === 2) document.getElementById('btn-ceo-directo').classList.remove('hidden');
 
                 eliteAviso("NODO MAESTRO SINCRONIZADO");
                 sentinela("Médico autenticado", "seguridad");
@@ -248,7 +245,7 @@
                         </div>
                         <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic ${c.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'}">${c.pagado ? 'Liquidado' : 'Pendiente'}</span>
                     </div>`;
-            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda Limpia</p>';
+            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic uppercase">Agenda Limpia</p>';
 
             document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
             document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
@@ -270,35 +267,50 @@
                 headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() })
             });
-            eliteAviso("NOTIFICACIÓN ENVIADA A RECEPCIÓN");
+            eliteAviso("INSTRUCCIÓN ENVIADA A RECEPCIÓN");
             document.getElementById('dra-response-input').value = "";
             syncMaster();
         }
 
+        async function cambiarPin() {
+            const nuevo = prompt("Ingrese su nuevo PIN de 4 dígitos:");
+            if(nuevo && nuevo.length === 4) {
+                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin_acceso: nuevo })
+                });
+                eliteAviso("PIN DE SEGURIDAD ACTUALIZADO");
+            } else { eliteAviso("ERROR: PIN INVÁLIDO"); }
+        }
+
+        async function abrirReporteGastos() {
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTOS&order=created_at.desc`, { headers: { 'apikey': KEY } });
+            const logs = await res.json();
+            eliteAviso("AUDITANDO GASTOS...");
+            setTimeout(() => {
+                if(logs.length > 0) alert("💸 GASTOS REGISTRADOS:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
+                else alert("✅ Sin gastos registrados");
+            }, 800);
+        }
+
+        async function abrirReporteLogistica() {
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY } });
+            const logs = await res.json();
+            eliteAviso("CONSULTANDO ALMACÉN...");
+            setTimeout(() => {
+                if(logs.length > 0) alert("📦 MATERIAL FALTANTE:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
+                else alert("✅ Almacén surtido al 100%");
+            }, 800);
+        }
+
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
-        
         function copiarLinkCitas() { 
             const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
             navigator.clipboard.writeText(window.location.origin + path + "agendar.html?id=" + docId); 
             eliteAviso("LINK DE CITAS COPIADO"); 
         }
-        function copiarLinkAsistente() { 
-            const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-            navigator.clipboard.writeText(window.location.origin + path + "asistente.html?id=" + docId); 
-            eliteAviso("LINK DE RECEPCIÓN COPIADO"); 
-        }
-        
-        async function abrirReporteLogistica() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            eliteAviso("ABRIENDO REPORTE DE ALMACÉN...");
-            setTimeout(() => {
-                if(logs.length > 0) alert("📦 MATERIAL FALTANTE:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
-                else alert("✅ Almacén surtido al 100%");
-            }, 1000);
-        }
-        function contactarCEO() { window.open("https://wa.me/5216641234567?text=Solicito auditoría de Nodo Maestro."); }
     </script>
 </body>
 </html>
