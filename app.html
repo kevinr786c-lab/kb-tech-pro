@@ -25,7 +25,6 @@
         .text-main { color: var(--main-color); }
         .bg-main { background-color: var(--main-color); }
 
-        /* CANDADOS DE PLAN */
         .locked-feature { position: relative; overflow: hidden; }
         .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
         .locked-feature.is-locked .locked-overlay { display: flex; }
@@ -197,28 +196,24 @@
                 document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Ecosistema K.B";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
                 
-                // --- 🛡️ APLICAR LÓGICA DE PLANES ---
                 const nivel = globalDocData.plan_nivel || 0;
                 
-                if(nivel === 0) { // BÁSICO
+                if(nivel === 0) {
                     document.getElementById('panel-intercom').classList.add('is-locked');
                     document.getElementById('usd-container').classList.add('is-locked');
                     document.getElementById('btn-insumos-menu').classList.add('hidden');
-                    document.documentElement.style.setProperty('--main-color', '#64748b'); // Gris Neutro
+                    document.documentElement.style.setProperty('--main-color', '#64748b');
                 } else {
-                    // MODO CAMALEÓN PREMIUM
                     const esp = globalDocData.especialidad || "General";
                     const palette = CATALOGO_TEMAS[esp] || CATALOGO_TEMAS["General"];
                     const colorIdx = (globalDocData.template_id || 1) % 5;
                     const finalColor = palette[colorIdx];
                     document.documentElement.style.setProperty('--main-color', finalColor);
-                    
                     if(nivel === 2) document.getElementById('btn-ceo-directo').classList.remove('hidden');
                 }
                 
                 document.getElementById('btn-unlock').style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--main-color');
 
-                // RECOMPENSAS
                 const resRec = await fetch(`${URL}/rest/v1/Registro_Recomendados?recomendador_id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
                 if ((await resRec.json()).length > 0) document.getElementById('banner-recompensa').classList.remove('hidden');
 
@@ -279,11 +274,10 @@
             syncMaster();
         }
 
-        // --- FUNCIÓN AGREGADA: VER SUCURSAL DIGITAL ---
+        // --- REPARACIÓN TÁCTICA: Link a agendar.html ---
         function verMiSitio() {
             if(!docId) return alert("Nodo no identificado.");
-            // Abre la página que verían sus pacientes
-            window.open(`reservar.html?id=${docId}`, '_blank');
+            window.open(`agendar.html?id=${docId}`, '_blank');
         }
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
@@ -292,7 +286,14 @@
             const logs = await res.json();
             alert("📦 INSUMOS FALTANTES:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
         }
-        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); alert("Link Copiado."); }
+
+        // --- REPARACIÓN TÁCTICA: Link a agendar.html ---
+        function copiarLinkCitas() { 
+            const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
+            navigator.clipboard.writeText(link); 
+            alert("Link de Sucursal Copiado."); 
+        }
+
         function copiarLinkAsistente() { navigator.clipboard.writeText(window.location.origin + "/asistente.html?id=" + docId); alert("Link Copiado."); }
         function contactarCEO() { window.open("https://wa.me/5216641234567?text=Comandante, solicito auditoría de Nodo Corporativo."); }
         function cambiarPin() {
