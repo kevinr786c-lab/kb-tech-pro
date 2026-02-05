@@ -26,7 +26,7 @@
             <header class="flex justify-between items-start">
                 <div>
                     <h1 class="text-5xl font-black italic tracking-tighter mb-2 uppercase">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
-                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Forjando Infraestructura Médica</p>
+                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Gemini Engine ✦ Sincronizando Nodo</p>
                 </div>
                 <div id="plan-display-badge" class="badge-plan">Sincronizando...</div>
             </header>
@@ -100,9 +100,9 @@
                 </div>
             </div>
 
-            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, J.A.R.V.I.S. validará la transacción y activará tu Nodo Maestro automáticamente.</p>
+            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, Gemini Engine ✦ validará la transacción y activará tu Nodo Maestro automáticamente.</p>
             
-            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">Confirmar Transferencia</button>
+            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">He realizado la transferencia</button>
         </div>
     </div>
 
@@ -164,10 +164,9 @@
             const esp = document.getElementById('especialidad').value;
             const btn = document.getElementById('btn-activar');
             
-            btn.innerText = "FORJANDO NODO..."; 
+            btn.innerText = "GEMINI ✦: FORJANDO NODO..."; 
             btn.disabled = true;
 
-            // Sincronización con esquema SQL (según archivo compartido)
             const planFinal = infoPlanes[planElegido].nombre;
             const emailTecnico = `${nombre.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`;
 
@@ -176,7 +175,7 @@
                     nombre_doctor: nombre,
                     email: emailTecnico,
                     especialidad: esp,
-                    plan: planFinal, // Usamos 'plan' tipo texto
+                    plan: planFinal, 
                     template_id: String(currentSelection.template_id),
                     creado_en: new Date().toISOString()
                 };
@@ -200,13 +199,13 @@
                     document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
                 } else {
-                    console.error("Fallo de arquitectura:", data);
-                    alert("Error 400: El Sentinela detectó un fallo de esquema. Verifique los datos.");
+                    console.error("Fallo de esquema:", data);
+                    alert("Gemini Engine ✦: Error de Sincronización. Verifique sus datos.");
                     btn.disabled = false;
-                    btn.innerText = "Reintentar Activación";
+                    btn.innerText = "Reintentar";
                 }
             } catch (e) { 
-                alert("Fallo de enlace con el servidor central."); 
+                alert("Fallo de enlace con el servidor de Tijuana."); 
                 btn.disabled = false; 
             }
         });
@@ -214,9 +213,11 @@
         function irANodo() {
             if(ultimoIdGenerado) {
                 const btn = event.target;
-                btn.innerText = "SINCRO EN CURSO...";
+                btn.innerText = "GEMINI ✦: INICIANDO COCCIÓN...";
+                
+                // REDIRECCIÓN TÁCTICA AL CONFIGURADOR
                 setTimeout(() => {
-                    window.location.href = `app.html?id=${ultimoIdGenerado}`;
+                    window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
                 }, 1500);
             }
         }
