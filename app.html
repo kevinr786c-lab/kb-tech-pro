@@ -388,16 +388,43 @@
                     <p class="leading-tight text-slate-700 font-bold">${h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋')}</p>
                 </div>`).join('');
         }
-
-        async function enviarRespuestaDra() {
+async function enviarRespuestaDra() {
             const resp = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !resp) return eliteAviso("ESCRIBA UNA NOTA");
-            const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
-            eliteAviso("ENVIADO A RECEPCIÓN");
-            document.getElementById('dra-response-input').value = "";
-        }
+            
+            // VALIDACIÓN K.B TECH PRO
+            if(!currentPatientId || !resp.trim()) {
+                return eliteAviso(currentPatientId ? "ESCRIBA UNA NOTA" : "SELECCIONE PACIENTE");
+            }
 
+            const headers = { 
+                'apikey': KEY, 
+                'Authorization': `Bearer ${KEY}`, 
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal' // Optimiza la velocidad de respuesta
+            };
+
+            try {
+                const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { 
+                    method: 'PATCH', 
+                    headers: headers, 
+                    body: JSON.stringify({ 
+                        telefono: "DOCTOR DICE: " + resp.toUpperCase().trim() 
+                    }) 
+                });
+
+                if(res.ok) {
+                    eliteAviso("ENVIADO A RECEPCIÓN ✅");
+                    document.getElementById('dra-response-input').value = ""; // Limpia el área de dictado
+                    syncMaster(); // Refresca la agenda para confirmar visualmente
+                    sentinela("Nota enviada a asistente", "INTERCOM");
+                } else {
+                    eliteAviso("ERROR AL CONECTAR CON NODO");
+                }
+            } catch (e) {
+                console.error(e);
+                eliteAviso("FALLO CRÍTICO DE RED");
+            }
+        }
         function generarReceta() {
             if(!currentPatientId) return eliteAviso("SELECCIONE PACIENTE");
             const doc = new jsPDF();
