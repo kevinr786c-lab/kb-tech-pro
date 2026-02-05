@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; transition: 0.5s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; transition: 0.5s; overflow-x: hidden; }
         :root { --main-color: #6366f1; --bg-soft: #f5f3ff; }
         .text-main { color: var(--main-color) !important; }
         .bg-main { background-color: var(--main-color) !important; }
@@ -18,9 +18,16 @@
         .input-dra { background: var(--bg-soft); border: 2px solid transparent; border-radius: 1rem; padding: 12px; width: 100%; outline: none; transition: 0.3s; font-size: 0.8rem; }
         .progress-bar { height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden; }
         .progress-fill { height: 100%; transition: width 1s ease-in-out; }
+
+        /* ESTILOS DEL MENÚ LATERAL */
+        #side-menu { 
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 10000; 
+        }
+        .translate-x-full { transform: translateX(100%); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-32">
+<body class="bg-slate-50 min-h-screen">
 
     <div id="pantalla-bloqueo" class="fixed inset-0 lock-screen flex items-center justify-center">
         <div class="text-center p-10 bg-white rounded-[3rem] shadow-2xl border border-slate-100 max-w-sm w-full">
@@ -32,6 +39,35 @@
         </div>
     </div>
 
+    <div id="side-menu" class="fixed inset-y-0 right-0 w-72 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
+        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-main">✕</button>
+        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-main mb-10 italic">Centro de Control</h3>
+        
+        <nav class="space-y-6">
+            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full group text-left">
+                <div class="bg-main p-3 rounded-xl text-white group-hover:scale-110 transition">🔗</div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Link Reservación</span>
+            </button>
+            <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full group text-left">
+                <div class="bg-rose-500 p-3 rounded-xl text-white group-hover:scale-110 transition">👩‍💼</div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Link Asistente</span>
+            </button>
+            <button onclick="window.location.href='configurar-perfil.html?id='+docId" class="flex items-center gap-4 w-full group text-left">
+                <div class="bg-indigo-400 p-3 rounded-xl text-white group-hover:scale-110 transition">⚙️</div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Configurar Perfil</span>
+            </button>
+            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full group text-left">
+                <div class="bg-amber-400 p-3 rounded-xl text-white group-hover:scale-110 transition">🔑</div>
+                <span class="text-[10px] font-black uppercase tracking-widest">Cambiar PIN</span>
+            </button>
+        </nav>
+        
+        <div class="absolute bottom-10 left-8">
+            <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">K.B Tech Pro v2.0</p>
+            <p class="text-[10px] font-bold text-white/50 italic">Tijuana Nodo Elite</p>
+        </div>
+    </div>
+
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000">
         <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 mb-8">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -39,17 +75,30 @@
                     <h1 class="text-2xl font-extrabold text-slate-800 tracking-tighter uppercase leading-none">K.B <span class="text-main italic" id="logo-tech">DOCTOR</span></h1>
                     <p id="doc-esp-label" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold italic">Cargando...</p>
                 </div>
+                
                 <div class="flex items-center gap-4">
                     <div class="hidden md:block text-right">
                         <p id="level-name" class="text-[8px] font-black text-main uppercase italic">Analizando Nodo...</p>
                         <div class="progress-bar w-32 mt-1"><div id="level-progress" class="progress-fill bg-main" style="width: 10%"></div></div>
                     </div>
-                    <div id="doctor-avatar" class="h-12 w-12 bg-white rounded-full flex items-center justify-center text-2xl border-2 shadow-sm border-main">👨‍⚕️</div>
+                    
+                    <div class="flex items-center gap-3 bg-slate-50 p-1 pr-4 rounded-full border border-slate-100">
+                        <div id="doctor-avatar" class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-xl border-2 shadow-sm border-main">👨‍⚕️</div>
+                        <span id="nav-doc-name" class="text-[10px] font-black text-slate-700 uppercase italic">Dr. Cargando...</span>
+                    </div>
+
+                    <button onclick="toggleMenu()" class="p-3 bg-slate-900 text-white rounded-xl shadow-lg hover:scale-105 transition active:scale-95">
+                        <div class="space-y-1">
+                            <div class="w-5 h-0.5 bg-white"></div>
+                            <div class="w-5 h-0.5 bg-white"></div>
+                            <div class="w-5 h-0.5 bg-white"></div>
+                        </div>
+                    </button>
                 </div>
             </div>
         </nav>
 
-        <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 pb-20">
             <div class="lg:col-span-4 space-y-8">
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
                     <h2 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2 italic text-main">INTERCOM <span class="animate-ping h-2 w-2 rounded-full bg-main"></span></h2>
@@ -99,6 +148,10 @@
             "General": [{id:1,color:"#1e3a8a",icon:"⚖️"},{id:2,color:"#6366f1",icon:"🏥"},{id:3,color:"#10b981",icon:"🩺"},{id:4,color:"#be123c",icon:"🚑"},{id:5,color:"#4338ca",icon:"🏢"}]
         };
 
+        function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('translate-x-full');
+        }
+
         async function verificarAcceso() {
             if(!docId) return alert("Falta ID de Nodo.");
             try {
@@ -126,6 +179,7 @@
             document.getElementById('doctor-avatar').innerText = tema.icon;
             document.getElementById('prev-bg-card').innerText = tema.icon;
             document.getElementById('lock-doctor-name').innerText = "Dr. " + doc.nombre_doctor;
+            document.getElementById('nav-doc-name').innerText = "Dr. " + doc.nombre_doctor.split(' ')[0];
             document.getElementById('doc-esp-label').innerText = doc.especialidad + " | Nodo Activo";
             document.getElementById('btn-unlock').style.backgroundColor = tema.color;
             document.getElementById('logo-tech').style.color = tema.color;
@@ -142,7 +196,6 @@
 
         async function syncMaster() {
             try {
-                // SINCRONIZADO: Tabla "Citas", orden por "hora"
                 const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, { 
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } 
                 });
@@ -168,7 +221,6 @@
                     `).join('');
                 }
                 
-                // GANANCIA REAL: Suma de la columna "monto"
                 const ingresos = citas.reduce((acc, c) => acc + (parseFloat(c.monto) || 0), 0);
                 document.getElementById('ganancia-mes').innerText = `$${ingresos.toLocaleString()}.00`;
             } catch (e) { console.error(e); }
@@ -184,7 +236,6 @@
             const respuesta = document.getElementById('dra-response-input').value;
             if(!currentPatientId || !respuesta) return alert("Seleccione un paciente.");
             try {
-                // SINCRONIZADO: Se guarda en columna "telefono" como nota
                 await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
                     method: 'PATCH',
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
@@ -196,13 +247,12 @@
             } catch(e) { console.error(e); }
         }
 
-        // Links Dinámicos
         function copiarLinkCitas() {
-            const link = window.location.href.replace('app.html', 'agendar.html');
+            const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
             navigator.clipboard.writeText(link); alert("✅ Link Reservación Copiado.");
         }
         function copiarLinkAsistente() {
-            const link = window.location.href.replace('app.html', 'asistente.html');
+            const link = window.location.origin + window.location.pathname.replace('app.html', 'asistente.html') + "?id=" + docId;
             navigator.clipboard.writeText(link); alert("✅ Link Recepción Copiado.");
         }
         function cambiarPin() {
