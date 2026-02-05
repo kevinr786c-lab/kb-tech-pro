@@ -8,7 +8,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.8s; background-color: #f8fafc; }
-        :root { --main: #6366f1; }
+        :root { --main: #6366f1; } /* Color dinámico */
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.1); }
         .input-modern { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; transition: 0.3s; outline: none; }
         .input-modern:focus { border-color: var(--main); background: white; }
@@ -22,11 +22,14 @@
         .btn-hora { padding: 10px; border-radius: 1rem; font-weight: 800; font-size: 0.7rem; transition: 0.3s; text-align: center; cursor: pointer; }
         .hora-disponible { background: #f1f5f9; color: #475569; }
         .hora-seleccionada { background: var(--main) !important; color: white !important; }
+        
+        .border-main-heavy { border-top: 10px solid var(--main); }
+        .text-main { color: var(--main); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 pb-32 text-slate-800">
 
-    <div class="max-w-md w-full glass-card p-8 rounded-[3rem] relative z-10 border-t-[10px] border-indigo-500">
+    <div class="max-w-md w-full glass-card p-8 rounded-[3rem] relative z-10 border-main-heavy" id="main-container">
         <header class="text-center mb-6">
             <div id="icon-header" class="text-6xl mb-4">🏥</div>
             <h1 id="doc-name" class="text-2xl font-black text-slate-800 uppercase italic leading-tight">Cargando Nodo...</h1>
@@ -45,7 +48,7 @@
             </div>
 
             <div class="bg-slate-50 p-4 rounded-[2rem]">
-                <div id="month-name" class="text-[10px] font-black text-indigo-600 uppercase text-center mb-3"></div>
+                <div id="month-name" class="text-[10px] font-black text-main uppercase text-center mb-3"></div>
                 <div class="grid grid-cols-7 gap-1 mb-2">
                     <div class="day-name">D</div><div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div><div class="day-name">J</div><div class="day-name">V</div><div class="day-name">S</div>
                 </div>
@@ -65,7 +68,15 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
 
-        // --- SISTEMA CENTINELA (ANÁLISIS DE FALLOS) ---
+        const COLORES_ESPECIALIDAD = {
+            "Ginecología": "#f43f5e",
+            "Odontología": "#0ea5e9",
+            "Pediatría": "#fb923c",
+            "Cardiología": "#e11d48",
+            "Bienestar (Nutri/Psico)": "#059669",
+            "General": "#6366f1"
+        };
+
         async function reportarError(errorMsg, datos = {}) {
             try {
                 await fetch(`${URL}/rest/v1/Logs_Sistema`, {
@@ -73,7 +84,7 @@
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         pagina_origen: "agendar.html",
-                        codigo_error: "400_CRITICO",
+                        codigo_error: "400_ULTRA",
                         mensaje_error: errorMsg,
                         datos_enviados: datos,
                         dispositivo_info: navigator.userAgent
@@ -89,6 +100,11 @@
                 const data = await res.json();
                 if(data.length > 0) {
                     const config = data[0];
+                    
+                    // Sincronización de Color Maestro
+                    const colorTema = COLORES_ESPECIALIDAD[config.especialidad] || "#6366f1";
+                    document.documentElement.style.setProperty('--main', colorTema);
+                    
                     document.getElementById('doc-name').innerText = "Dr. " + config.nombre_doctor;
                     document.getElementById('doc-esp').innerText = config.especialidad;
                     renderCalendar();
@@ -115,7 +131,7 @@
             document.getElementById('d-'+d).classList.add('selected');
             document.getElementById('fecha-sel').value = fecha;
 
-            // --- CORREGIDO PARA APUNTAR A LA TABLA "Citas" ---
+            // Consulta a tabla unificada "Citas"
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
             const citas = await res.json();
             const ocupadas = citas.map(c => c.hora.slice(0,5));
@@ -149,22 +165,20 @@
             
             if(!h || !f) return alert("Selecciona el horario deseado.");
             
-            btn.innerText = "SINCRONIZANDO...";
+            btn.innerText = "PROCESANDO ENLACE...";
             btn.disabled = true;
 
-            // --- BLINDAJE AJUSTADO A TU TABLA "Citas" ---
             const payload = {
                 doctor_id: docId,
                 nombre_paciente: document.getElementById('nombre').value.trim().toUpperCase(),
-                fecha: f, // Columna real: fecha
-                hora: h,  // Columna real: hora
+                fecha: f,
+                hora: h,
                 telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value.replace(/\D/g,''),
                 pagado: false,
                 monto: 0
             };
 
             try {
-                // --- APUNTANDO A LA TABLA CORRECTA "Citas" ---
                 const res = await fetch(`${URL}/rest/v1/Citas`, {
                     method: 'POST',
                     headers: { 
@@ -181,8 +195,8 @@
                     location.reload(); 
                 } else { 
                     const errorTecnico = await res.json();
-                    await reportarError("Fallo en POST Citas", {payload, errorTecnico});
-                    alert("❌ Error de compatibilidad. Reporte enviado al Centinela.");
+                    await reportarError("Fallo en POST Citas Ultra", {payload, errorTecnico});
+                    alert("❌ Error de compatibilidad. El Centinela ya está analizando el reporte.");
                     btn.innerText = "Confirmar Reservación";
                     btn.disabled = false;
                 }
