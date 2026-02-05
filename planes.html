@@ -18,7 +18,6 @@
         .premium-glow { position: absolute; inset: -1px; background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.3), transparent); border-radius: 3.5rem; z-index: -1; }
         .badge-vip { background: #6366f1; color: white; padding: 6px 16px; border-radius: 99px; font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); }
 
-        /* Mi Estrella de Vida ✦ */
         .gemini-star { color: #6366f1; animation: blink-star 3s infinite; display: inline-block; }
         @keyframes blink-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
@@ -27,8 +26,8 @@
 
     <header class="text-center mb-16 space-y-6 relative">
         <div class="absolute -top-20 left-1/2 -translateX-1/2 w-64 h-64 bg-indigo-600/10 blur-[120px] rounded-full"></div>
-        <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none">El Futuro <br> <span class="text-indigo-500 text-glow">es hoy</span></h1>
-        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.6em] italic"><span class="gemini-star">✦</span> Infraestructura Médica • Nodo Tijuana</p>
+        <h1 class="text-6xl font-black italic tracking-tighter uppercase leading-none">El Futuro <br> <span class="text-indigo-500">es hoy</span></h1>
+        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.6em] italic"><span class="gemini-star">✦</span> Gemini Engine ✦ Sincronizando Nodo Tijuana</p>
     </header>
 
     <main class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl w-full relative z-10">
@@ -36,14 +35,14 @@
         <div class="glass-card p-12 flex flex-col h-full border-white/5">
             <div class="mb-10 text-center">
                 <div class="text-4xl mb-4">🩺</div>
-                <h2 class="text-2xl font-black italic uppercase mb-2">Independiente</h2>
-                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">Gestión Personal</p>
+                <h2 class="text-2xl font-black italic uppercase mb-2">Aspirante</h2>
+                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">Gestión de Inicio</p>
             </div>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-400">
                 <li class="flex items-center gap-3"><span class="text-emerald-500">✓</span> Agenda Live Digital</li>
-                <li class="flex items-center gap-3"><span class="text-emerald-500">✓</span> Web de Reservación IA</li>
+                <li class="flex items-center gap-3"><span class="text-emerald-500">✓</span> Sucursal Digital Gemini ✦</li>
                 <li class="flex items-center gap-3"><span class="text-emerald-500">✓</span> Seguridad SSL Básica</li>
-                <li class="flex items-center gap-3 opacity-20"><span class="text-slate-600">✕</span> Modo Camaleón Premium</li>
+                <li class="flex items-center gap-3 opacity-20"><span class="text-slate-600">✕</span> Modo Camaleón Élite</li>
                 <li class="flex items-center gap-3 opacity-20"><span class="text-slate-600">✕</span> Soporte Presencial TJ</li>
             </ul>
             <button onclick="seleccionarPlan(0)" class="w-full py-5 bg-white/5 rounded-[2rem] border border-white/10 font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition duration-500">Iniciar Evolución</button>
@@ -51,18 +50,18 @@
 
         <div class="glass-card p-12 border-indigo-500/30 bg-indigo-500/[0.03] flex flex-col h-full scale-105 relative">
             <div class="premium-glow animate-pulse"></div>
-            <span class="badge-vip">Tecnología de Punta</span>
+            <span class="badge-vip">Poder Gemini Engine ✦</span>
             <div class="mb-10 text-center">
                 <div class="text-4xl mb-4">🚀</div>
-                <h2 class="text-3xl font-black italic uppercase mb-2 text-indigo-400">Premium</h2>
+                <h2 class="text-3xl font-black italic uppercase mb-2 text-indigo-400">Dominio</h2>
                 <p class="text-[9px] text-indigo-300/50 font-bold uppercase tracking-widest italic">Ecosistema de Élite</p>
             </div>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-indigo-100/80">
                 <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Soporte Táctico Presencial TJ</li>
                 <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Modo Camaleón: 30 Identidades</li>
                 <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Finanzas Bi-Moneda (USD/MXN)</li>
-                <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Migración Operación Transfusión</li>
-                <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Intercomunicador Dr-Asistente</li>
+                <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Protocolo Operación Transfusión</li>
+                <li class="flex items-center gap-3"><span class="text-indigo-400">✓</span> Intercomunicador de Red</li>
             </ul>
             <button onclick="seleccionarPlan(1)" class="w-full py-6 btn-indigo rounded-[2rem] font-black text-[10px] uppercase tracking-widest active:scale-95 transition duration-500">Activar Poder Total</button>
         </div>
@@ -71,13 +70,13 @@
             <div class="mb-10 text-center">
                 <div class="text-4xl mb-4">👑</div>
                 <h2 class="text-2xl font-black italic uppercase mb-2 text-amber-500">Corporativo</h2>
-                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">Mando de Red</p>
+                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">Mando Central de Red</p>
             </div>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-400">
                 <li class="flex items-center gap-3"><span class="text-amber-500">✓</span> Control Multi-Nodo Global</li>
                 <li class="flex items-center gap-3"><span class="text-amber-500">✓</span> Central Intelligence CEO</li>
-                <li class="flex items-center gap-3"><span class="text-amber-500">✓</span> Auditoría de Insumos</li>
-                <li class="flex items-center gap-3 text-amber-500"><span class="animate-pulse">●</span> Línea Directa con Kevin</li>
+                <li class="flex items-center gap-3"><span class="text-amber-500">✓</span> Auditoría de Insumos Live</li>
+                <li class="flex items-center gap-3 text-amber-500"><span class="animate-pulse">●</span> Línea Directa con el Comando</li>
                 <li class="flex items-center gap-3"><span class="text-amber-500">✓</span> Prioridad Táctica Máxima</li>
             </ul>
             <button onclick="contactarCEO()" class="w-full py-5 btn-gold rounded-[2rem] font-black text-[10px] uppercase tracking-widest active:scale-95 transition duration-500">Consultoría Estratégica</button>
@@ -87,7 +86,7 @@
 
     <footer class="mt-20 text-center">
         <p class="text-[4rem] md:text-[6rem] font-black italic tracking-tighter uppercase opacity-5 select-none leading-none">Hazlo por Emily</p>
-        <p class="text-[9px] font-black text-slate-600 uppercase tracking-[0.8em] mt-4">K.B Tech Solutions • Sincronizando el Hoy</p>
+        <p class="text-[9px] font-black text-slate-600 uppercase tracking-[0.8em] mt-4">K.B Tech Solutions • Gemini Engine ✦ 2026</p>
     </footer>
 
     <script>
@@ -95,7 +94,7 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
 
         async function sentinelaPlan(nivel) {
-            const nombres = ["BÁSICO", "PREMIUM", "CORPORATIVO"];
+            const nombres = ["ASPIRANTE", "DOMINIO", "CORPORATIVO"];
             try {
                 await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
                     method: 'POST',
@@ -103,26 +102,21 @@
                     body: JSON.stringify({ 
                         pagina_origen: "planes.html", 
                         codigo_error: "INTERÉS_NODO", 
-                        mensaje_error: `prospecto interesado en nivel: ${nombres[nivel]}` 
+                        mensaje_error: `Gemini Engine ✦: Prospecto interesado en nivel: ${nombres[nivel]}` 
                     })
                 });
             } catch (e) { console.warn("Sentinela Offline"); }
         }
 
         async function seleccionarPlan(nivel) {
-            // Guardamos la elección para el Registro
             sessionStorage.setItem('kb_plan_elegido', nivel);
-            
-            // Enviamos reporte al Sentinela (sin esperar para no retrasar la carga)
             sentinelaPlan(nivel);
-
-            // Redirección inmediata al registro
             window.location.href = 'registro.html';
         }
 
         async function contactarCEO() {
             sentinelaPlan(2);
-            const msg = encodeURIComponent("Comandante Kevin, solicito integración de Nodo Corporativo para mi infraestructura médica.");
+            const msg = encodeURIComponent("Comandante Kevin, solicito integración de Nodo Corporativo Gemini Engine ✦ para mi infraestructura médica.");
             window.open(`https://wa.me/5216641234567?text=${msg}`);
         }
     </script>
