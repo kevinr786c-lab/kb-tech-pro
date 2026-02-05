@@ -14,24 +14,25 @@
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        /* Date Slider de Prestigio */
         .date-slider { display: flex; overflow-x: auto; gap: 12px; padding: 10px 5px; scrollbar-width: none; }
         .date-slider::-webkit-scrollbar { display: none; }
         .date-card { min-width: 65px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.5rem; border: 1px solid #f1f5f9; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
         .date-card.selected { background: var(--main); border-color: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 30px -10px var(--main); }
         
-        /* Cápsulas de Hora */
         .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 20px -5px var(--main); }
         .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; }
 
-        .btn-lujo { width: 100%; py: 1.25rem; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
+        .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
         .btn-lujo:hover { transform: translateY(-3px); }
         .modal-blur { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         
-        /* Versión Básica */
         .plan-basico .date-slider { display: block; }
         .plan-basico .date-card { width: 100%; height: auto; padding: 15px; margin-bottom: 5px; flex-direction: row; justify-content: space-between; padding-inline: 25px; }
+
+        /* Mi Estrella de Inteligencia ✦ */
+        .gemini-star { color: var(--main); animation: pulse 3s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -43,6 +44,8 @@
             <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
             <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none">---</h1>
             <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Cargando Nodo Médico...</p>
+            
+            <p id="doc-bio" class="text-[10px] text-slate-500 font-medium mt-6 px-4 leading-relaxed italic opacity-0 transition-opacity duration-1000"></p>
         </header>
 
         <form id="form-cita" class="space-y-6">
@@ -67,7 +70,7 @@
             </div>
 
             <div class="space-y-3">
-                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">Horario de Preferencia</p>
+                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">Horarios Disponibles</p>
                 <div id="time-grid" class="grid grid-cols-3 gap-3"></div>
                 <input type="hidden" id="hora-sel" required>
             </div>
@@ -81,12 +84,17 @@
 
             <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación</button>
         </form>
+
+        <footer class="mt-8 text-center">
+            <span class="gemini-star text-xs">✦</span>
+            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Tecnología K.B Solutions · Tijuana</p>
+        </footer>
     </div>
 
     <div id="modal-privacidad" class="modal-blur">
         <div class="bg-white p-10 rounded-[3rem] max-w-sm w-full shadow-2xl">
             <h2 class="font-black uppercase italic text-xl mb-4 tracking-tighter">Protección K.B</h2>
-            <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed">
+            <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed text-left">
                 <p>1. Datos bajo encriptación biométrica de grado médico.</p>
                 <p>2. El canal de comunicación será exclusivo vía WhatsApp Business.</p>
                 <p>3. Reservación garantizada bajo protocolo de seguridad de datos.</p>
@@ -96,10 +104,12 @@
     </div>
 
     <script>
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
+        const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
+        const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+        
         let planNivel = 0;
+        let configHoras = { inicio: "09:00", fin: "17:00" };
 
         const CATALOGO = {
             "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
@@ -111,15 +121,21 @@
 
         async function init() {
             if(!docId) return;
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
             const data = await res.json();
+            
             if(data[0]) {
                 const doc = data[0];
-                planNivel = doc.plan_nivel || 0;
+                // El plan nivel depende de lo que guardamos en registro (Dominio = 1, Aspirante = 0)
+                planNivel = doc.plan === 'Dominio' ? 1 : 0;
+                
+                // GUARDAR HORARIOS DE LA COCCIÓN
+                configHoras.inicio = doc.hora_inicio || "09:00";
+                configHoras.fin = doc.hora_fin || "17:00";
 
-                // --- 🛡️ LÓGICA DE PRESTIGIO POR PLAN ---
+                // --- MODO CAMALEÓN ---
                 if(planNivel === 0) {
-                    document.documentElement.style.setProperty('--main', '#64748b'); // Gris Básico
+                    document.documentElement.style.setProperty('--main', '#64748b');
                     document.getElementById('main-node-container').classList.add('plan-basico');
                 } else {
                     const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
@@ -129,6 +145,14 @@
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Nodo Verificado" : "");
+                
+                // MOSTRAR BIOGRAFÍA "COCINADA"
+                if(doc.biografia) {
+                    const bioEl = document.getElementById('doc-bio');
+                    bioEl.innerText = doc.biografia;
+                    bioEl.style.opacity = "1";
+                }
+
                 renderDateSlider();
             }
         }
@@ -138,7 +162,6 @@
             const now = new Date();
             document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
             
-            // Si es básico mostramos menos días (7), si es Premium mostramos 14
             const limiteDias = planNivel > 0 ? 14 : 7;
 
             for(let i=0; i < limiteDias; i++) {
@@ -162,20 +185,29 @@
 
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
-            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Sincronizando...</p>";
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Consultando Disponibilidad...</p>";
             
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
             const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
 
             grid.innerHTML = "";
-            const horas = ["09:00", "10:00", "11:00", "12:00", "13:00", "16:00", "17:00", "18:00"];
             
-            // En Premium agregamos medias horas para dar más opciones
-            if(planNivel > 0) {
-                horas.splice(1,0,"09:30"); horas.splice(3,0,"10:30"); horas.splice(5,0,"11:30");
+            // GENERAR HORARIOS BASADOS EN LA COCCIÓN DEL DOCTOR
+            const horasDisponibles = [];
+            let start = parseInt(configHoras.inicio.split(':')[0]);
+            let end = parseInt(configHoras.fin.split(':')[0]);
+
+            for(let h = start; h < end; h++) {
+                const hourStr = h < 10 ? `0${h}:00` : `${h}:00`;
+                horasDisponibles.push(hourStr);
+                // Si es premium, permitimos citas cada 30 min
+                if(planNivel > 0) {
+                    const halfStr = h < 10 ? `0${h}:30` : `${h}:30`;
+                    horasDisponibles.push(halfStr);
+                }
             }
 
-            horas.forEach(t => {
+            horasDisponibles.forEach(t => {
                 const isOcu = ocupadas.includes(t);
                 const pill = document.createElement('div');
                 pill.className = `time-pill ${isOcu ? 'disabled' : ''}`;
@@ -196,12 +228,12 @@
             if(!h || !f) return alert("Seleccione Fecha y Hora.");
 
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "Enlazando...";
+            btn.innerText = "ENLAZANDO CON NODO...";
             btn.disabled = true;
 
-            const res = await fetch(`${URL}/rest/v1/Citas`, {
+            const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
                 method: 'POST',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
@@ -212,13 +244,14 @@
             });
 
             if(res.ok) {
-                alert("✅ RESERVACIÓN EXITOSA.");
+                alert("✅ RESERVACIÓN CONFIRMADA.\nEl consultorio ha recibido tu señal.");
                 location.reload();
             }
         };
 
         function abrirPrivacidad() { document.getElementById('modal-privacidad').style.display = 'flex'; }
         function cerrarPrivacidad() { document.getElementById('modal-privacidad').style.display = 'none'; }
+        
         init();
     </script>
 </body>
