@@ -7,9 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: background 0.5s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: 0.5s ease; text-align: left; }
         :root { --main-color: #6366f1; }
         
+        /* NOTIFICACIONES DE LUJO (CARO) */
+        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-200%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        #elite-toast.active { transform: translateX(-50%) translateY(0); }
+
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
         .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
         .card-appointment:hover { transform: scale(1.02) translateY(-5px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border-color: var(--main-color); }
@@ -31,13 +35,17 @@
         .btn-ceo-gold { background: linear-gradient(135deg, #fbbf24, #d97706); animation: gold-pulse 2s infinite; }
     </style>
 </head>
-<body class="min-h-screen text-left">
+<body class="min-h-screen">
+
+    <div id="elite-toast">
+        <p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p>
+    </div>
 
     <div id="pantalla-bloqueo" class="fixed inset-0 lock-screen flex items-center justify-center">
         <div class="text-center p-12 bg-white rounded-[3.5rem] shadow-2xl max-w-sm w-full border border-slate-100">
             <div id="lock-icon" class="text-6xl mb-6">🩺</div>
             <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2">Acceso Médico</h2>
-            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic text-indigo-500">Gemini Engine ✦ Sincronizando Nodo...</p>
+            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando Nodo Maestro...</p>
             <input type="password" id="pin-acceso" class="input-premium text-center text-4xl tracking-[0.6em] mb-6" placeholder="****" maxlength="4">
             <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition">Desbloquear Nodo</button>
         </div>
@@ -56,11 +64,14 @@
             <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition text-left">
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
             </button>
+            <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500 text-left">
+                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
+            </button>
             <button id="btn-ceo-directo" onclick="contactarCEO()" class="hidden flex items-center gap-4 w-full p-4 btn-ceo-gold rounded-2xl text-black text-left">
-                <div class="text-xl">👑</div><span class="text-[10px] font-black uppercase italic">Línea con el Comandante</span>
+                <div class="text-xl">👑</div><span class="text-[10px] font-black uppercase italic">Línea Comandante</span>
             </button>
             <hr class="border-slate-800 my-6">
-            <button onclick="location.reload()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cerrar Sesión</button>
+            <button onclick="location.reload()" class="text-[10px] font-bold text-slate-500 uppercase">Cerrar Sesión</button>
         </nav>
     </div>
 
@@ -80,30 +91,64 @@
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-6 text-left">
+                <div id="alerta-asistente" class="hidden p-6 rounded-[2.5rem] bg-rose-50 border-2 border-rose-100 alert-pulse">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-2xl">⚠️</span>
+                        <p class="text-[10px] font-black text-rose-600 uppercase italic">Aviso Urgente</p>
+                    </div>
+                    <p id="texto-alerta" class="text-sm font-bold text-rose-900 uppercase italic leading-tight">---</p>
+                </div>
+
+                <div id="banner-recompensa" class="hidden p-6 rounded-[2.5rem] bg-emerald-50 border-2 border-emerald-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">💎</span>
+                        <div>
+                            <p class="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Estatus VIP K.B</p>
+                            <p class="text-xs font-bold text-emerald-900 italic">RECOMPENSA ACTIVA</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="panel-intercom" class="glass-panel p-8 shadow-sm locked-feature">
                     <div class="locked-overlay flex-col text-center p-4">
                         <span class="text-2xl mb-2">🔒</span>
-                        <p class="text-[8px] font-black uppercase text-slate-800">Premium Required</p>
+                        <p class="text-[8px] font-black uppercase text-slate-800">Intercom Pro</p>
                     </div>
-                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-main">Gemini Intercom</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-main font-black">Intercomunicador</h3>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200 mb-6 text-center">
-                        <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase leading-none">---</p>
+                        <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase">---</p>
                     </div>
-                    <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucciones..."></textarea>
-                    <button onclick="alert('Enviado')" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase mt-2 shadow-lg">Enviar al Nodo</button>
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-5 rounded-2xl">
+                            <p class="text-[8px] font-black uppercase mb-1 italic text-main">Nota Recepción:</p>
+                            <p id="dra-view-note" class="text-xs text-slate-600 italic font-bold">---</p>
+                        </div>
+                        <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucción..."></textarea>
+                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Enviar al Nodo</button>
+                    </div>
                 </div>
 
                 <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl border-t-4 border-main">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-indigo-400 mb-6 italic">Balance Diario</p>
-                    <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Gemini ✦</p>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Pesos Hoy</p>
+                            <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
+                        </div>
+                        <div id="usd-container" class="pt-4 border-t border-white/5 locked-feature">
+                            <div class="locked-overlay" style="background: rgba(15,23,42,0.8);"><p class="text-[7px] font-black text-amber-500 italic">USD LOCK</p></div>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Dólares Hoy</p>
+                            <p class="text-2xl font-black italic text-emerald-400" id="ganancia-usd">$0.00</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="lg:col-span-8 text-left">
                 <div class="flex justify-between items-end mb-10 px-4">
                     <h2 class="text-3xl font-black italic uppercase tracking-tighter">Agenda <span class="text-main">Live</span></h2>
-                    <div class="bg-slate-100 px-6 py-2 rounded-2xl text-[10px] font-black text-slate-600 uppercase italic">
-                        Hoy: <span id="total-hoy" class="text-sm ml-1 text-main">0</span>
+                    <div class="bg-slate-100 px-6 py-2 rounded-2xl text-[10px] font-black text-slate-600 uppercase border border-slate-200">
+                        Total Hoy: <span id="total-hoy" class="text-sm ml-1 text-main">0</span>
                     </div>
                 </div>
                 <div id="contenedor-citas" class="grid gap-4"></div>
@@ -115,7 +160,10 @@
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+        let currentPatientId = null;
+        let globalDocData = null;
 
+        // 🛡️ EL ESCUADRÓN DE LOS 30 TEMAS (6 ESPECIALIDADES)
         const CATALOGO_TEMAS = {
             "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
             "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
@@ -125,58 +173,115 @@
             "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
         };
 
+        function eliteAviso(msg) {
+            const toast = document.getElementById('elite-toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3500);
+        }
+
+        async function sentinela(mensaje, codigo = "info") {
+            try {
+                await fetch(`${URL}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo.toLowerCase(), mensaje_error: mensaje.toLowerCase() })
+                });
+            } catch (e) { console.warn("Sentinela Offline"); }
+        }
+
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            const doc = data[0];
+            globalDocData = data[0];
 
-            if(doc && pin === (doc.pin_acceso || "0000")) {
-                const palette = CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(doc.template_id || 1) % 5];
-                document.documentElement.style.setProperty('--main-color', color);
-
+            if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
                 
-                document.getElementById('doc-esp-label').innerText = doc.especialidad + " | Gemini Engine ✦";
-                document.getElementById('nav-doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                // 🦎 ACTIVAR 30 TEMAS
+                const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
+                const color = palette[(globalDocData.template_id || 1) % 5];
+                document.documentElement.style.setProperty('--main-color', color);
                 
-                if(doc.plan === "Aspirante") document.getElementById('panel-intercom').classList.add('is-locked');
-                if(doc.plan === "Corporativo") document.getElementById('btn-ceo-directo').classList.remove('hidden');
+                document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Nodo Maestro";
+                document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
+                
+                const nivel = globalDocData.plan_nivel || 0;
+                if(nivel === 0) {
+                    document.getElementById('panel-intercom').classList.add('is-locked');
+                    document.getElementById('usd-container').classList.add('is-locked');
+                    document.getElementById('btn-insumos-menu').classList.add('hidden');
+                }
+                if(nivel === 2) document.getElementById('btn-ceo-directo').classList.remove('hidden');
 
-                syncMaster(); setInterval(syncMaster, 15000);
-            } else { alert("PIN Incorrecto."); }
+                eliteAviso("ACCESO AL NODO MAESTRO VALIDADO");
+                sentinela("Médico autenticado", "seguridad");
+                syncMaster(); setInterval(syncMaster, 12000);
+            } else { eliteAviso("PIN INCORRECTO - ACCESO DENEGADO"); }
         }
 
         async function syncMaster() {
             const hoy = new Date().toISOString().split('T')[0];
-            // Sincronización con tabla Citas real
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
             const citas = await res.json();
-            
+            let mxn = 0, usd = 0;
+
+            document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
+                if(c.pagado) {
+                    if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
+                    else mxn += parseFloat(c.monto || 0);
+                }
+                
+                if(c.telefono && c.telefono.includes("RECEPCIÓN DICE:")) {
+                    document.getElementById('alerta-asistente').classList.remove('hidden');
+                    document.getElementById('texto-alerta').innerText = c.telefono.replace("RECEPCIÓN DICE:", "");
+                }
+
+                return `
+                    <div class="card-appointment glass-panel p-6 flex items-center justify-between cursor-pointer" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}', '${c.telefono || 'Sin notas'}')">
+                        <div class="flex items-center gap-10">
+                            <span class="text-2xl font-black italic text-main w-16">${c.hora.slice(0,5)}</span>
+                            <div>
+                                <h3 class="font-black text-slate-800 uppercase text-sm">${c.nombre_paciente}</h3>
+                                <p class="text-[8px] font-black uppercase text-slate-400 mt-1 italic">${c.telefono || 'Verificado'}</p>
+                            </div>
+                        </div>
+                        <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic ${c.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'}">${c.pagado ? 'Liquidado' : 'Pendiente'}</span>
+                    </div>`;
+            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda Limpia</p>';
+
+            document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
+            document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
             document.getElementById('total-hoy').innerText = citas.length;
-
-            const total = citas.filter(c => c.pagado === true || c.pagado === "true").reduce((s, c) => s + parseFloat(c.monto || 0), 0);
-            document.getElementById('ganancia-mxn').innerText = `$${total.toLocaleString()}.00`;
-
-            document.getElementById('contenedor-citas').innerHTML = citas.map(c => `
-                <div class="card-appointment glass-panel p-6 flex items-center justify-between cursor-pointer" onclick="document.getElementById('dra-patient-name').innerText='${c.nombre_paciente}'">
-                    <div class="flex items-center gap-10">
-                        <span class="text-2xl font-black italic text-main">${c.hora.slice(0,5)}</span>
-                        <h3 class="font-black text-slate-800 uppercase text-sm">${c.nombre_paciente}</h3>
-                    </div>
-                    <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic ${c.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-50 text-slate-400'}">${c.pagado ? 'LIQUIDADO' : 'EN ESPERA'}</span>
-                </div>
-            `).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Sin actividad hoy</p>';
         }
 
-        function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
-        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + window.location.pathname.replace("app.html", "agendar.html") + "?id=" + docId); alert("Link Copiado"); }
-        function copiarLinkAsistente() { navigator.clipboard.writeText(window.location.origin + window.location.pathname.replace("app.html", "asistente.html") + "?id=" + docId); alert("Link Copiado"); }
+        function enfocarpaciente(id, nombre, nota) {
+            currentPatientId = id;
+            document.getElementById('dra-patient-name').innerText = nombre;
+            document.getElementById('dra-view-note').innerText = nota;
+            document.getElementById('alerta-asistente').classList.add('hidden');
+        }
+
+        async function enviarRespuestaDra() {
+            const resp = document.getElementById('dra-response-input').value;
+            if(!currentPatientId || !resp) return eliteAviso("SELECCIONE PACIENTE");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() })
+            });
+            eliteAviso("INSTRUCCIÓN SINCRONIZADA CON RECEPCIÓN");
+            document.getElementById('dra-response-input').value = "";
+            syncMaster();
+        }
+
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        function contactarCEO() { window.open("https://wa.me/5216641234567?text=Solicito auditoría"); }
+        function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
+        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); eliteAviso("LINK DE CITAS COPIADO"); }
+        function copiarLinkAsistente() { navigator.clipboard.writeText(window.location.origin + "/asistente.html?id=" + docId); eliteAviso("LINK DE RECEPCIÓN COPIADO"); }
     </script>
 </body>
 </html>
