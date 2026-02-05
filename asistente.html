@@ -22,6 +22,12 @@
         .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; }
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
         
+        /* SEMÁFORO IA NEÓN */
+        .u-rojo { border-left: 12px solid #ef4444 !important; background: #fff1f2; animation: pulse-red 2s infinite; }
+        .u-amarillo { border-left: 12px solid #f59e0b !important; background: #fffbeb; }
+        .u-verde { border-left: 12px solid #10b981 !important; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.1); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
         .status-dot { width: 10px; height: 10px; border-radius: 50%; }
         .status-wait { background: #cbd5e1; }
         .status-ok { background: #10b981; }
@@ -105,8 +111,8 @@
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-8">
                 <div id="card-paciente" class="glass-panel p-10 border-l-[15px]">
-                    <h3 class="text-[11px] font-black uppercase text-slate-400 mb-8 tracking-widest italic">Paciente Seleccionado:</h3>
-                    <p class="text-5xl font-extrabold text-slate-900 leading-none mb-3" id="patient-display">---</p>
+                    <h3 class="text-[11px] font-black uppercase text-slate-400 mb-8 tracking-widest italic">Seleccionado:</h3>
+                    <p class="text-4xl font-extrabold text-slate-900 leading-none mb-3" id="patient-display">---</p>
                     <p id="patient-time-display" class="text-xs font-bold text-slate-500 uppercase italic">Standby</p>
                     <div id="nota-del-doctor-panel" class="mt-6 p-4 bg-amber-50 rounded-2xl border-l-4 border-amber-400 hidden">
                         <p class="text-[9px] font-black text-amber-600 uppercase mb-1 italic">Instrucción del Dr:</p>
@@ -137,7 +143,7 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-        let currentPatient = null, globalDocData = null, selectedCurrency = 'MXN', tc = 17.50;
+        let currentPatient = null, globalDocData = null, divisa = 'MXN', tc = 17.50;
         let fechaVisualizacion = new Date(), calFecha = new Date();
 
         const CATALOGO_TEMAS = {
@@ -190,14 +196,20 @@
             document.getElementById('fecha-actual-display').innerText = `📅 VIENDO: ${hoyStr}`;
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
             const citas = await res.json();
-            document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
-                <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
+            document.getElementById('tabla-citas-body').innerHTML = citas.map(c => {
+                // LÓGICA DE SEMÁFORO IA
+                let semaforoClase = "u-verde";
+                if(c.telefono && c.telefono.includes("URGENTE")) semaforoClase = "u-rojo";
+                else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforoClase = "u-amarillo";
+
+                return `
+                <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
                     <div class="flex items-center gap-8 text-left">
                         <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
                         <div><p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p><p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p></div>
                     </div>
-                </div>
-            `).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía para este día</p>';
+                </div>`;
+            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía para este día</p>';
         }
 
         function abrirCalendarioMaestro() {
@@ -234,22 +246,34 @@
         function abrirCobroPremium() {
             if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
             document.getElementById('modal-icon').innerText = "💒";
-            document.getElementById('modal-title').innerText = "Cobro Élite";
+            document.getElementById('modal-title').innerText = "Cobro Binacional";
             document.getElementById('modal-body').innerHTML = `
                 <div class="flex gap-2 p-1 bg-slate-100 rounded-2xl mb-6">
-                    <button onclick="selectedCurrency='MXN'" class="flex-1 py-3 rounded-xl font-black text-[10px] bg-white border">MXN</button>
-                    <button onclick="selectedCurrency='USD'" class="flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400">USD</button>
+                    <button onclick="divisa='MXN'" class="flex-1 py-3 rounded-xl font-black text-[10px] bg-white border">MXN</button>
+                    <button onclick="divisa='USD'" class="flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400">USD</button>
                 </div>
                 <input type="number" id="pay-amount" placeholder="MONTO" class="input-kb text-3xl text-center">
+                <select id="metodo-pago" class="input-kb mt-4 text-[10px]">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta (+3.5%)</option>
+                    <option value="Zelle">Zelle / Transf</option>
+                </select>
                 <input type="text" id="pay-rfc" placeholder="RFC FACTURA" class="input-kb mt-4">
             `;
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                const amt = document.getElementById('pay-amount').value;
+                let amt = parseFloat(document.getElementById('pay-amount').value);
+                const metodo = document.getElementById('metodo-pago').value;
                 const rfc = document.getElementById('pay-rfc').value || "PÚBLICO GENERAL";
+                
+                if(metodo === "Tarjeta") amt = amt * 1.035; // COMISIÓN 3.5%
+                
+                const montoFinal = divisa === 'USD' ? (amt * tc) : amt;
+                const nota = `PAGO: ${divisa} | METODO: ${metodo.toUpperCase()} | RFC: ${rfc.toUpperCase()}`;
+
                 await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
                     method: 'PATCH',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagado: true, monto: selectedCurrency === 'USD' ? (amt * tc) : amt, telefono: "PAGO: " + selectedCurrency + " | RFC: " + rfc.toUpperCase() })
+                    body: JSON.stringify({ pagado: true, monto: montoFinal, telefono: nota })
                 });
                 eliteAviso("LIQUIDACIÓN EXITOSA"); cerrarModal(); cargarCitas();
             };
