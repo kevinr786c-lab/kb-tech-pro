@@ -24,6 +24,13 @@
         .lock-screen { backdrop-filter: blur(40px); background: rgba(255,255,255,0.9); z-index: 10000; }
         .text-main { color: var(--main-color); }
         .bg-main { background-color: var(--main-color); }
+
+        /* CANDADOS DE PLAN */
+        .locked-feature { position: relative; overflow: hidden; }
+        .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
+        .locked-feature.is-locked .locked-overlay { display: flex; }
+        .btn-ceo-gold { background: linear-gradient(135deg, #fbbf24, #d97706); animation: gold-pulse 2s infinite; }
+        @keyframes gold-pulse { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
     </style>
 </head>
 <body class="min-h-screen">
@@ -48,9 +55,14 @@
             <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
             </button>
-            <button onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
+            <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
                 <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
             </button>
+            
+            <button id="btn-ceo-directo" onclick="contactarCEO()" class="hidden flex items-center gap-4 w-full p-4 btn-ceo-gold rounded-2xl text-black">
+                <div class="text-xl">👑</div><span class="text-[10px] font-black uppercase italic">Línea con el Comandante</span>
+            </button>
+
             <hr class="border-slate-800 my-6">
             <button onclick="cambiarPin()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cambiar PIN</button>
         </nav>
@@ -91,7 +103,12 @@
                     </div>
                 </div>
 
-                <div class="glass-panel p-8 shadow-sm">
+                <div id="panel-intercom" class="glass-panel p-8 shadow-sm locked-feature">
+                    <div class="locked-overlay flex-col text-center p-4">
+                        <span class="text-2xl mb-2">🔒</span>
+                        <p class="text-[8px] font-black uppercase text-slate-800 tracking-tighter">Intercomunicador Premium</p>
+                        <p class="text-[7px] font-bold text-slate-400 uppercase mt-1">Upgrade para activar</p>
+                    </div>
                     <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-main">Intercomunicador</h3>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200 mb-6 text-center">
                         <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Paciente Actual:</p>
@@ -114,7 +131,10 @@
                             <p class="text-[8px] font-bold text-slate-500 uppercase">Total Pesos</p>
                             <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
                         </div>
-                        <div class="pt-4 border-t border-white/5">
+                        <div id="usd-container" class="pt-4 border-t border-white/5 locked-feature">
+                            <div class="locked-overlay flex-col text-center" style="background: rgba(15,23,42,0.85);">
+                                <p class="text-[7px] font-black text-amber-500 uppercase tracking-tighter italic">USD LOCK • PLAN PREMIUM</p>
+                            </div>
                             <p class="text-[8px] font-bold text-slate-500 uppercase">Total Dólares</p>
                             <p class="text-2xl font-black italic tracking-tighter text-emerald-400" id="ganancia-usd">$0.00</p>
                         </div>
@@ -139,6 +159,7 @@
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentPatientId = null;
+        let globalDocData = null;
 
         const CATALOGO_TEMAS = {
             "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
@@ -162,34 +183,40 @@
             const pin = document.getElementById('pin-acceso').value;
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const data = await res.json();
-            const doctorData = data[0];
+            globalDocData = data[0];
 
-            if(pin === (doctorData.pin_acceso || "0000")) {
+            if(pin === (globalDocData.pin_acceso || "0000")) {
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
                 
-                document.getElementById('doc-esp-label').innerText = doctorData.especialidad + " | Ecosistema K.B";
-                document.getElementById('nav-doc-name').innerText = "Dr. " + doctorData.nombre_doctor;
+                document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Ecosistema K.B";
+                document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
                 
-                // MODO CAMALEÓN DINÁMICO (30 TEMAS)
-                const esp = doctorData.especialidad || "General";
-                const palette = CATALOGO_TEMAS[esp] || CATALOGO_TEMAS["General"];
-                const colorIdx = (doctorData.template_id || 1) % 5;
-                const finalColor = palette[colorIdx];
+                // --- 🛡️ APLICAR LÓGICA DE PLANES ---
+                const nivel = globalDocData.plan_nivel || 0;
                 
-                document.documentElement.style.setProperty('--main-color', finalColor);
-                document.getElementById('btn-unlock').style.backgroundColor = finalColor;
-                
-                // --- 💎 MODO RECOMPENSA (20% DESCUENTO) ---
-                const resRec = await fetch(`${URL}/rest/v1/Registro_Recomendados?recomendador_id=eq.${docId}`, { 
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } 
-                });
-                const recomendados = await resRec.json();
-                if (recomendados.length > 0) {
-                    document.getElementById('banner-recompensa').classList.remove('hidden');
-                    sentinela(`nodo con beneficio activo: 20% descuento por recomendados`, "fiscal");
+                if(nivel === 0) { // BÁSICO
+                    document.getElementById('panel-intercom').classList.add('is-locked');
+                    document.getElementById('usd-container').classList.add('is-locked');
+                    document.getElementById('btn-insumos-menu').classList.add('hidden');
+                    document.documentElement.style.setProperty('--main-color', '#64748b'); // Gris Neutro
+                } else {
+                    // MODO CAMALEÓN PREMIUM
+                    const esp = globalDocData.especialidad || "General";
+                    const palette = CATALOGO_TEMAS[esp] || CATALOGO_TEMAS["General"];
+                    const colorIdx = (globalDocData.template_id || 1) % 5;
+                    const finalColor = palette[colorIdx];
+                    document.documentElement.style.setProperty('--main-color', finalColor);
+                    
+                    if(nivel === 2) document.getElementById('btn-ceo-directo').classList.remove('hidden');
                 }
+                
+                document.getElementById('btn-unlock').style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--main-color');
+
+                // RECOMPENSAS
+                const resRec = await fetch(`${URL}/rest/v1/Registro_Recomendados?recomendador_id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+                if ((await resRec.json()).length > 0) document.getElementById('banner-recompensa').classList.remove('hidden');
 
                 sentinela("acceso médico validado", "seguridad");
                 syncMaster(); setInterval(syncMaster, 10000);
@@ -207,12 +234,10 @@
                     if(c.notas_asistente?.includes("USD")) usd += c.monto;
                     else mxn += c.monto;
                 }
-
                 if(c.notas_asistente?.includes("⚠️")) {
                     document.getElementById('alerta-asistente').classList.remove('hidden');
                     document.getElementById('texto-alerta').innerText = c.notas_asistente.replace("⚠️", "");
                 }
-
                 return `
                     <div class="card-appointment glass-panel p-6 flex items-center justify-between cursor-pointer" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}', '${c.notas_asistente || 'En sala'}')">
                         <div class="flex items-center gap-10">
@@ -227,10 +252,11 @@
             }).join('') || '<p class="text-center py-20 opacity-20 font-black italic uppercase">Nodo Vacío</p>';
 
             document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-            document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
+            if(!(globalDocData.plan_nivel === 0)) document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
         }
 
         function enfocarpaciente(id, nombre, nota) {
+            if(globalDocData.plan_nivel === 0) return;
             currentPatientId = id;
             document.getElementById('dra-patient-name').innerText = nombre;
             document.getElementById('dra-view-note').innerText = nota;
@@ -244,7 +270,6 @@
                 method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notas_doctor: resp.toUpperCase() }) 
             });
-            sentinela(`instruccion médica: ${resp}`, "comms");
             alert("✅ Enviado a Recepción.");
             document.getElementById('dra-response-input').value = "";
             syncMaster();
@@ -258,6 +283,7 @@
         }
         function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); alert("Link Copiado."); }
         function copiarLinkAsistente() { navigator.clipboard.writeText(window.location.origin + "/asistente.html?id=" + docId); alert("Link Copiado."); }
+        function contactarCEO() { window.open("https://wa.me/5216641234567?text=Comandante, solicito auditoría de Nodo Corporativo."); }
         function cambiarPin() {
             const p = prompt("Nuevo PIN (4 dígitos):");
             if(p && p.length === 4) {
