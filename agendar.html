@@ -43,7 +43,7 @@
         <header class="text-center mb-10">
             <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
             <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none">---</h1>
-            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Cargando Nodo Médico...</p>
+            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Gemini Engine ✦ Sincronizando Nodo...</p>
             
             <p id="doc-bio" class="text-[10px] text-slate-500 font-medium mt-6 px-4 leading-relaxed italic opacity-0 transition-opacity duration-1000"></p>
         </header>
@@ -87,7 +87,7 @@
 
         <footer class="mt-8 text-center">
             <span class="gemini-star text-xs">✦</span>
-            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Tecnología K.B Solutions · Tijuana</p>
+            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Gemini Engine ✦ K.B Solutions · Tijuana</p>
         </footer>
     </div>
 
@@ -95,7 +95,7 @@
         <div class="bg-white p-10 rounded-[3rem] max-w-sm w-full shadow-2xl">
             <h2 class="font-black uppercase italic text-xl mb-4 tracking-tighter">Protección K.B</h2>
             <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed text-left">
-                <p>1. Datos bajo encriptación biométrica de grado médico.</p>
+                <p>1. Datos bajo encriptación biométrica de Gemini Engine ✦.</p>
                 <p>2. El canal de comunicación será exclusivo vía WhatsApp Business.</p>
                 <p>3. Reservación garantizada bajo protocolo de seguridad de datos.</p>
             </div>
@@ -126,27 +126,24 @@
             
             if(data[0]) {
                 const doc = data[0];
-                // El plan nivel depende de lo que guardamos en registro (Dominio = 1, Aspirante = 0)
                 planNivel = doc.plan === 'Dominio' ? 1 : 0;
                 
-                // GUARDAR HORARIOS DE LA COCCIÓN
                 configHoras.inicio = doc.hora_inicio || "09:00";
                 configHoras.fin = doc.hora_fin || "17:00";
 
-                // --- MODO CAMALEÓN ---
                 if(planNivel === 0) {
                     document.documentElement.style.setProperty('--main', '#64748b');
                     document.getElementById('main-node-container').classList.add('plan-basico');
                 } else {
                     const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
-                    const color = palette[(doc.template_id || 1) % 5];
+                    const colorIdx = (doc.template_id || 1) % 5;
+                    const color = palette[colorIdx];
                     document.documentElement.style.setProperty('--main', color);
                 }
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Nodo Verificado" : "");
                 
-                // MOSTRAR BIOGRAFÍA "COCINADA"
                 if(doc.biografia) {
                     const bioEl = document.getElementById('doc-bio');
                     bioEl.innerText = doc.biografia;
@@ -185,14 +182,13 @@
 
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
-            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Consultando Disponibilidad...</p>";
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Gemini ✦ Consultando...</p>";
             
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
-            const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
+            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
+            const ocupadas = (await res.json()).map(c => c.hora_cita.slice(0,5));
 
             grid.innerHTML = "";
             
-            // GENERAR HORARIOS BASADOS EN LA COCCIÓN DEL DOCTOR
             const horasDisponibles = [];
             let start = parseInt(configHoras.inicio.split(':')[0]);
             let end = parseInt(configHoras.fin.split(':')[0]);
@@ -200,7 +196,6 @@
             for(let h = start; h < end; h++) {
                 const hourStr = h < 10 ? `0${h}:00` : `${h}:00`;
                 horasDisponibles.push(hourStr);
-                // Si es premium, permitimos citas cada 30 min
                 if(planNivel > 0) {
                     const halfStr = h < 10 ? `0${h}:30` : `${h}:30`;
                     horasDisponibles.push(halfStr);
@@ -228,23 +223,23 @@
             if(!h || !f) return alert("Seleccione Fecha y Hora.");
 
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "ENLAZANDO CON NODO...";
+            btn.innerText = "ENLAZANDO CON GEMINI ✦";
             btn.disabled = true;
 
-            const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
+            const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas`, {
                 method: 'POST',
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                    fecha: f, hora: h,
-                    telefono: "+" + document.getElementById('lada').value + document.getElementById('telefono').value.replace(/\D/g,''),
-                    pagado: false, monto: 0
+                    fecha_cita: f, 
+                    hora_cita: h,
+                    created_at: new Date().toISOString()
                 })
             });
 
             if(res.ok) {
-                alert("✅ RESERVACIÓN CONFIRMADA.\nEl consultorio ha recibido tu señal.");
+                alert("✅ GEMINI ENGINE ✦: RESERVACIÓN CONFIRMADA.");
                 location.reload();
             }
         };
