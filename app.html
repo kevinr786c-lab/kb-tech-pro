@@ -53,6 +53,11 @@
             <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
                 <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
             </button>
+            
+            <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
+                <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
+            </button>
+
             <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
                 <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
             </button>
@@ -127,6 +132,7 @@
             "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
             "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
             "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
+            "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
             "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
         };
 
@@ -144,7 +150,6 @@
                 document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Gemini Engine ✦";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
                 
-                // LÓGICA DE PLANES SEGUN SQL (plan = Dominio/Aspirante)
                 const planStr = globalDocData.plan || "Aspirante";
                 
                 if(planStr === "Aspirante") {
@@ -163,7 +168,6 @@
         }
 
         async function syncMaster() {
-            // Sincronización con tabla Citas_Agendadas (hora_cita, fecha_cita)
             const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('total-hoy').innerText = citas.length;
@@ -182,8 +186,9 @@
             `).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Sin actividad en el Nodo</p>';
         }
 
+        // REDIRECCIONES TÁCTICAS (SOLUCIÓN 404)
         function verMiSitio() {
-            if(!docId) return alert("Nodo no identificado.");
+            if(!docId) return alert("Gemini Engine ✦: Nodo no identificado.");
             window.open(`agendar.html?id=${docId}`, '_blank');
         }
 
@@ -191,13 +196,30 @@
             const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
             const link = window.location.origin + path + "agendar.html?id=" + docId;
             navigator.clipboard.writeText(link); 
-            alert("✅ Link Gemini ✦ Copiado."); 
+            alert("✅ Link Gemini ✦: Sucursal Copiada."); 
+        }
+
+        function copiarLinkAsistente() { 
+            if(!docId) return alert("Gemini Engine ✦: Nodo no identificado.");
+            const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            const link = window.location.origin + path + "asistente.html?id=" + docId;
+            navigator.clipboard.writeText(link); 
+            alert("✅ Link Gemini ✦: Acceso a Recepción Copiado."); 
         }
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarCEO() { window.open("https://wa.me/5216641234567?text=Comandante, solicito auditoría de Gemini Engine."); }
         function enfocarpaciente(id, nombre) { document.getElementById('dra-patient-name').innerText = nombre; }
         function enviarRespuestaDra() { alert("Gemini Engine ✦: Instrucción enviada."); }
+        function cambiarPin() {
+            const p = prompt("Nuevo PIN (4 dígitos):");
+            if(p && p.length === 4) {
+                fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin_acceso: p })
+                }).then(() => alert("PIN Gemini Actualizado."));
+            }
+        }
     </script>
 </body>
 </html>
