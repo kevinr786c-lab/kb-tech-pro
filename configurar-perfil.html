@@ -63,19 +63,20 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
 
-        // --- SISTEMA CENTINELA (REPORTERO) ---
         async function reportarError(errorMsg, datos = {}) {
-            await fetch(`${URL_DB}/rest/v1/Logs_Sistema`, {
-                method: 'POST',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pagina_origen: "configurar-perfil.html",
-                    codigo_error: "CONFIG_ERROR",
-                    mensaje_error: errorMsg,
-                    datos_enviados: datos,
-                    dispositivo_info: navigator.userAgent
-                })
-            });
+            try {
+                await fetch(`${URL_DB}/rest/v1/Logs_Sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pagina_origen: "configurar-perfil.html",
+                        codigo_error: "CONFIG_ERROR_ULTRA",
+                        mensaje_error: errorMsg,
+                        datos_enviados: datos,
+                        dispositivo_info: navigator.userAgent
+                    })
+                });
+            } catch(e) { console.error("Centinela Offline"); }
         }
 
         async function sugerirConIA() {
@@ -97,13 +98,15 @@
             const btn = document.getElementById('btn-save');
             btn.innerText = "ACTIVANDO NODO MÉDICO...";
             btn.disabled = true;
+            btn.style.opacity = "0.7";
 
+            // Aseguramos formato HH:MM:SS para evitar Error 400 en Supabase
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value,
                 url_logo: document.getElementById('url_logo').value,
-                hora_inicio: document.getElementById('h_inicio').value + ":00",
-                hora_fin: document.getElementById('h_fin').value + ":00",
+                hora_inicio: document.getElementById('h_inicio').value.length === 5 ? document.getElementById('h_inicio').value + ":00" : document.getElementById('h_inicio').value,
+                hora_fin: document.getElementById('h_fin').value.length === 5 ? document.getElementById('h_fin').value + ":00" : document.getElementById('h_fin').value,
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value
             };
@@ -125,15 +128,17 @@
                     window.location.href = `app.html?id=${docId}`;
                 } else {
                     const errorDetails = await response.json();
-                    reportarError("Fallo al guardar configuración", {payload, errorDetails});
-                    alert("Hubo un error al guardar. El reporte técnico fue enviado a la Central Intelligence.");
+                    await reportarError("Fallo al guardar configuración", {payload, errorDetails});
+                    alert("Error 400: Los datos de tiempo o formato no son compatibles.");
                     btn.innerText = "Guardar y Abrir Consultorio";
                     btn.disabled = false;
+                    btn.style.opacity = "1";
                 }
             } catch (err) {
-                reportarError("Excepción crítica en configuración", {id: docId, error: err.message});
+                await reportarError("Excepción crítica en configuración", {id: docId, error: err.message});
                 btn.innerText = "Guardar y Abrir Consultorio";
                 btn.disabled = false;
+                btn.style.opacity = "1";
             }
         });
     </script>
