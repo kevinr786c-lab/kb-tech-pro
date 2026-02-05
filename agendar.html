@@ -28,16 +28,20 @@
         .btn-lujo { width: 100%; py: 1.25rem; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
         .btn-lujo:hover { transform: translateY(-3px); }
         .modal-blur { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        
+        /* Versión Básica */
+        .plan-basico .date-slider { display: block; }
+        .plan-basico .date-card { width: 100%; height: auto; padding: 15px; margin-bottom: 5px; flex-direction: row; justify-content: space-between; padding-inline: 25px; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative overflow-hidden">
+    <div id="main-node-container" class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative overflow-hidden">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
         
         <header class="text-center mb-10">
             <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">---</h1>
+            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center leading-none">---</h1>
             <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Cargando Nodo Médico...</p>
         </header>
 
@@ -58,15 +62,13 @@
                     <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest italic">Seleccione Día</p>
                     <span id="current-month" class="text-[9px] font-black text-main uppercase"></span>
                 </div>
-                <div id="date-slider" class="date-slider">
-                    </div>
+                <div id="date-slider" class="date-slider"></div>
                 <input type="hidden" id="fecha-sel" required>
             </div>
 
             <div class="space-y-3">
                 <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">Horario de Preferencia</p>
-                <div id="time-grid" class="grid grid-cols-3 gap-3">
-                    </div>
+                <div id="time-grid" class="grid grid-cols-3 gap-3"></div>
                 <input type="hidden" id="hora-sel" required>
             </div>
 
@@ -77,7 +79,7 @@
                 </label>
             </div>
 
-            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Mi Espacio</button>
+            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación</button>
         </form>
     </div>
 
@@ -87,7 +89,7 @@
             <div class="text-[10px] text-slate-400 space-y-4 font-medium uppercase leading-relaxed">
                 <p>1. Datos bajo encriptación biométrica de grado médico.</p>
                 <p>2. El canal de comunicación será exclusivo vía WhatsApp Business.</p>
-                <p>3. Reservación garantizada bajo protocolo de depósito del 20%.</p>
+                <p>3. Reservación garantizada bajo protocolo de seguridad de datos.</p>
             </div>
             <button type="button" onclick="cerrarPrivacidad()" class="w-full mt-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase">Aceptar Términos</button>
         </div>
@@ -97,6 +99,7 @@
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+        let planNivel = 0;
 
         const CATALOGO = {
             "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
@@ -112,11 +115,20 @@
             const data = await res.json();
             if(data[0]) {
                 const doc = data[0];
-                const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
-                const color = palette[(doc.template_id || 1) % 5];
-                document.documentElement.style.setProperty('--main', color);
+                planNivel = doc.plan_nivel || 0;
+
+                // --- 🛡️ LÓGICA DE PRESTIGIO POR PLAN ---
+                if(planNivel === 0) {
+                    document.documentElement.style.setProperty('--main', '#64748b'); // Gris Básico
+                    document.getElementById('main-node-container').classList.add('plan-basico');
+                } else {
+                    const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
+                    const color = palette[(doc.template_id || 1) % 5];
+                    document.documentElement.style.setProperty('--main', color);
+                }
+
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad;
+                document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Nodo Verificado" : "");
                 renderDateSlider();
             }
         }
@@ -126,7 +138,10 @@
             const now = new Date();
             document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
             
-            for(let i=0; i<14; i++) {
+            // Si es básico mostramos menos días (7), si es Premium mostramos 14
+            const limiteDias = planNivel > 0 ? 14 : 7;
+
+            for(let i=0; i < limiteDias; i++) {
                 const d = new Date(); d.setDate(now.getDate() + i);
                 const dayName = d.toLocaleString('es-mx', {weekday:'short'}).replace('.','');
                 const dayNum = d.getDate();
@@ -147,14 +162,19 @@
 
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
-            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Buscando Espacios...</p>";
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Sincronizando...</p>";
             
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY, 'Authorization': `Bearer ${KEY}`} });
             const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
 
             grid.innerHTML = "";
-            const horas = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "16:00", "16:30", "17:00", "17:30"];
+            const horas = ["09:00", "10:00", "11:00", "12:00", "13:00", "16:00", "17:00", "18:00"];
             
+            // En Premium agregamos medias horas para dar más opciones
+            if(planNivel > 0) {
+                horas.splice(1,0,"09:30"); horas.splice(3,0,"10:30"); horas.splice(5,0,"11:30");
+            }
+
             horas.forEach(t => {
                 const isOcu = ocupadas.includes(t);
                 const pill = document.createElement('div');
@@ -176,7 +196,7 @@
             if(!h || !f) return alert("Seleccione Fecha y Hora.");
 
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "Sincronizando con Nodo...";
+            btn.innerText = "Enlazando...";
             btn.disabled = true;
 
             const res = await fetch(`${URL}/rest/v1/Citas`, {
@@ -192,7 +212,7 @@
             });
 
             if(res.ok) {
-                alert("✅ RESERVACIÓN SOLICITADA CON ÉXITO.");
+                alert("✅ RESERVACIÓN EXITOSA.");
                 location.reload();
             }
         };
