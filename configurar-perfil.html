@@ -9,11 +9,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
         .glass-card { background: white; border-radius: 2.5rem; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
-        .input-kb { width: 100%; padding: 1rem; border-radius: 1rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 600; outline: none; transition: 0.3s; }
+        .input-kb { width: 100%; padding: 1rem; border-radius: 1rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 600; outline: none; transition: 0.3s; font-size: 0.9rem; }
         .input-kb:focus { border-color: #6366f1; background: white; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body class="min-h-screen flex items-center justify-center p-6 text-slate-800">
 
     <div class="max-w-2xl w-full glass-card p-10 border-t-[12px] border-indigo-600">
         <header class="mb-10 text-center">
@@ -52,38 +52,50 @@
                 <textarea id="bio" rows="3" placeholder="Cuéntanos un poco de tu experiencia..." class="input-kb"></textarea>
             </div>
 
-            <button type="submit" id="btn-save" class="md:col-span-2 w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition-all shadow-xl">Guardar y Abrir Consultorio</button>
+            <button type="submit" id="btn-save" class="md:col-span-2 w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition-all shadow-xl active:scale-95 transition">Guardar y Abrir Consultorio</button>
         </form>
 
-        <p class="mt-8 text-center text-[10px] font-black text-slate-300 uppercase tracking-widest">Powered by K.B Tech Solutions</p>
+        <p class="mt-8 text-center text-[10px] font-black text-slate-300 uppercase tracking-widest">Powered by K.B Tech Solutions | Tijuana Nodo</p>
     </div>
 
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
-        
-        const params = new URLSearchParams(window.location.search);
-        const docId = params.get('id');
+        const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+
+        // --- SISTEMA CENTINELA (REPORTERO) ---
+        async function reportarError(errorMsg, datos = {}) {
+            await fetch(`${URL_DB}/rest/v1/Logs_Sistema`, {
+                method: 'POST',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pagina_origen: "configurar-perfil.html",
+                    codigo_error: "CONFIG_ERROR",
+                    mensaje_error: errorMsg,
+                    datos_enviados: datos,
+                    dispositivo_info: navigator.userAgent
+                })
+            });
+        }
 
         async function sugerirConIA() {
             const bio = document.getElementById('bio');
-            bio.placeholder = "Gemini está analizando tu especialidad...";
-            
+            bio.placeholder = "Gemini está analizando tu perfil...";
             setTimeout(() => {
-                bio.value = "Especialista comprometido con la salud integral, ofreciendo atención médica de vanguardia con calidez humana. Mi enfoque se centra en diagnósticos precisos y tratamientos personalizados para mejorar la calidad de vida de mis pacientes en Tijuana.";
-            }, 1200);
+                bio.value = "Especialista enfocado en brindar soluciones de salud con tecnología de vanguardia y un trato humano excepcional. Mi compromiso es garantizar diagnósticos precisos y una atención personalizada para cada paciente en Tijuana.";
+            }, 1000);
         }
 
         document.getElementById('form-config').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             if (!docId) {
-                alert("Error: No se detectó ID de médico. Por favor, regresa al registro.");
+                alert("Error: No se detectó ID del Nodo Médico.");
                 return;
             }
 
             const btn = document.getElementById('btn-save');
-            btn.innerText = "ACTIVANDO TU NODO DIGITAL...";
+            btn.innerText = "ACTIVANDO NODO MÉDICO...";
             btn.disabled = true;
 
             const payload = {
@@ -109,17 +121,17 @@
                 });
 
                 if (response.ok) {
-                    alert("¡Configuración Exitosa! Bienvenido a la élite de K.B Tech.");
-                    // REDIRECCIÓN CORREGIDA PARA EVITAR EL 404
+                    alert("¡Nodo Activado! Bienvenido a la red K.B Tech.");
                     window.location.href = `app.html?id=${docId}`;
                 } else {
-                    const errorData = await response.json();
-                    alert("Error al guardar: " + (errorData.message || "Problema de conexión"));
+                    const errorDetails = await response.json();
+                    reportarError("Fallo al guardar configuración", {payload, errorDetails});
+                    alert("Hubo un error al guardar. El reporte técnico fue enviado a la Central Intelligence.");
                     btn.innerText = "Guardar y Abrir Consultorio";
                     btn.disabled = false;
                 }
             } catch (err) {
-                alert("Error crítico de red.");
+                reportarError("Excepción crítica en configuración", {id: docId, error: err.message});
                 btn.innerText = "Guardar y Abrir Consultorio";
                 btn.disabled = false;
             }
