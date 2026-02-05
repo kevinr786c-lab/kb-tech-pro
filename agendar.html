@@ -104,8 +104,8 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         
-        // CORRECCIÓN MAESTRA: Forzar ID numérico
-        const docId = parseInt(new URLSearchParams(window.location.search).get('id'));
+        // EXTRAER ID (Flexible para Números o UUIDs)
+        const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         
         let planNivel = 0;
         let configHoras = { inicio: "09:00", fin: "17:00" };
@@ -119,7 +119,7 @@
         };
 
         async function init() {
-            if(isNaN(docId)) return alert("Error: Nodo de Doctor no identificado.");
+            if(!docId) return alert("Error: Nodo de Doctor no identificado.");
             
             try {
                 const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
@@ -127,7 +127,7 @@
                 });
                 const data = await res.json();
                 
-                if(data[0]) {
+                if(data && data.length > 0) {
                     const doc = data[0];
                     planNivel = (doc.plan === 'Dominio' || doc.plan === 'Corporativo') ? 1 : 0;
                     configHoras.inicio = doc.hora_inicio || "09:00";
@@ -183,12 +183,15 @@
             grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse text-indigo-500'>Sincronizando Nodo...</p>";
             
             try {
-                // Consulta a la tabla de citas
+                // Consulta a la tabla de citas agendadas
                 const res = await fetch(`${URL_DB}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&fecha_cita=eq.${fecha}`, { 
                     headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} 
                 });
+                
                 const data = await res.json();
-                const ocupadas = data.map(c => c.hora_cita.slice(0,5));
+                
+                // VALIDACIÓN DE ARRAY PARA EVITAR ERROR .MAP
+                const ocupadas = Array.isArray(data) ? data.map(c => c.hora_cita.slice(0,5)) : [];
 
                 grid.innerHTML = "";
                 const horasDisponibles = [];
@@ -219,6 +222,7 @@
                     grid.appendChild(pill);
                 });
             } catch (e) {
+                console.error("Error cargando horas:", e);
                 grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black text-rose-500 uppercase'>Fallo de Sincronización</p>";
             }
         }
@@ -254,7 +258,11 @@
                     btn.innerText = "Confirmar Reservación";
                     btn.disabled = false;
                 }
-            } catch (e) { alert("Error de Conexión."); btn.disabled = false; }
+            } catch (e) { 
+                alert("Error de Conexión."); 
+                btn.disabled = false; 
+                btn.innerText = "Confirmar Reservación";
+            }
         };
 
         function abrirPrivacidad() { document.getElementById('modal-privacidad').style.display = 'flex'; }
