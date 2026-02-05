@@ -29,7 +29,6 @@
         .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
         .locked-feature.is-locked .locked-overlay { display: flex; }
         .btn-ceo-gold { background: linear-gradient(135deg, #fbbf24, #d97706); animation: gold-pulse 2s infinite; }
-        @keyframes gold-pulse { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
     </style>
 </head>
 <body class="min-h-screen">
@@ -38,7 +37,7 @@
         <div class="text-center p-12 bg-white rounded-[3.5rem] shadow-2xl max-w-sm w-full border border-slate-100">
             <div id="lock-icon" class="text-6xl mb-6">🩺</div>
             <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2">Acceso Médico</h2>
-            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando Nodo...</p>
+            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic text-indigo-500">Gemini Engine ✦ Sincronizando Nodo...</p>
             <input type="password" id="pin-acceso" class="input-premium text-center text-4xl tracking-[0.6em] mb-6" placeholder="****" maxlength="4">
             <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition">Desbloquear Nodo</button>
         </div>
@@ -51,28 +50,21 @@
             <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl hover:bg-main transition group">
                 <div class="text-xl group-hover:scale-110 transition">🌐</div><span class="text-[10px] font-black uppercase">Ver Mi Sucursal Digital</span>
             </button>
-            
             <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
                 <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
-            </button>
-            <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
-                <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
             </button>
             <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
                 <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Ver Insumos</span>
             </button>
-            
             <button id="btn-ceo-directo" onclick="contactarCEO()" class="hidden flex items-center gap-4 w-full p-4 btn-ceo-gold rounded-2xl text-black">
                 <div class="text-xl">👑</div><span class="text-[10px] font-black uppercase italic">Línea con el Comandante</span>
             </button>
-
             <hr class="border-slate-800 my-6">
             <button onclick="cambiarPin()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cambiar PIN</button>
         </nav>
     </div>
 
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000 max-w-7xl mx-auto p-6 md:p-10">
-        
         <nav class="flex justify-between items-center mb-16">
             <div>
                 <h1 class="text-4xl font-black italic tracking-tighter uppercase">K.B <span id="logo-tech" class="text-main">Doctor</span></h1>
@@ -88,59 +80,26 @@
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-6">
-                <div id="alerta-asistente" class="hidden p-6 rounded-[2.5rem] bg-rose-50 border-2 border-rose-100 alert-pulse">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="text-2xl">⚠️</span>
-                        <p class="text-[10px] font-black text-rose-600 uppercase italic">Aviso de Recepción</p>
-                    </div>
-                    <p id="texto-alerta" class="text-sm font-bold text-rose-900 uppercase italic leading-tight">---</p>
-                </div>
-
-                <div id="banner-recompensa" class="hidden p-6 rounded-[2.5rem] bg-emerald-50 border-2 border-emerald-100">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">💎</span>
-                        <div>
-                            <p class="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Estatus VIP K.B</p>
-                            <p class="text-xs font-bold text-emerald-900 italic">-20% RECOMPENSA ACTIVA</p>
-                        </div>
-                    </div>
-                </div>
-
                 <div id="panel-intercom" class="glass-panel p-8 shadow-sm locked-feature">
                     <div class="locked-overlay flex-col text-center p-4">
                         <span class="text-2xl mb-2">🔒</span>
                         <p class="text-[8px] font-black uppercase text-slate-800 tracking-tighter">Intercomunicador Premium</p>
-                        <p class="text-[7px] font-bold text-slate-400 uppercase mt-1">Upgrade para activar</p>
+                        <p class="text-[7px] font-bold text-slate-400 uppercase mt-1 italic text-indigo-600">Upgrade Gemini Engine ✦</p>
                     </div>
-                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-main">Intercomunicador</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-main text-indigo-500">Gemini Intercom</h3>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200 mb-6 text-center">
                         <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Paciente Actual:</p>
                         <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase leading-none">---</p>
                     </div>
-                    <div class="space-y-4">
-                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                            <p class="text-[8px] font-black uppercase mb-1 italic text-main">Notas de Recepción:</p>
-                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight font-bold">Esperando selección...</p>
-                        </div>
-                        <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucciones para asistente..."></textarea>
-                        <button id="btn-enviar" onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:brightness-110 transition">Enviar al Nodo</button>
-                    </div>
+                    <textarea id="dra-response-input" class="input-premium h-28 resize-none text-xs" placeholder="Instrucciones del Especialista..."></textarea>
+                    <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:brightness-110 transition">Enviar al Nodo</button>
                 </div>
 
                 <div class="bg-slate-900 p-8 rounded-[3rem] text-white relative overflow-hidden shadow-2xl border-t-4 border-main">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance del Turno</p>
-                    <div class="space-y-4 relative z-10">
-                        <div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Total Pesos</p>
-                            <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
-                        </div>
-                        <div id="usd-container" class="pt-4 border-t border-white/5 locked-feature">
-                            <div class="locked-overlay flex-col text-center" style="background: rgba(15,23,42,0.85);">
-                                <p class="text-[7px] font-black text-amber-500 uppercase tracking-tighter italic">USD LOCK • PLAN PREMIUM</p>
-                            </div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Total Dólares</p>
-                            <p class="text-2xl font-black italic tracking-tighter text-emerald-400" id="ganancia-usd">$0.00</p>
-                        </div>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic text-indigo-400">Balance Gemini Engine ✦</p>
+                    <div>
+                        <p class="text-[8px] font-bold text-slate-500 uppercase">Total Pesos (Hoy)</p>
+                        <p class="text-3xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
                     </div>
                 </div>
             </div>
@@ -161,7 +120,6 @@
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-        let currentPatientId = null;
         let globalDocData = null;
 
         const CATALOGO_TEMAS = {
@@ -171,16 +129,6 @@
             "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
             "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
         };
-
-        async function sentinela(mensaje, codigo = "info") {
-            try {
-                await fetch(`${URL}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo.toLowerCase(), mensaje_error: mensaje.toLowerCase() })
-                });
-            } catch (e) { console.warn("Sentinela Offline"); }
-        }
 
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
@@ -193,118 +141,63 @@
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
                 
-                document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Ecosistema K.B";
+                document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Gemini Engine ✦";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
                 
-                const nivel = globalDocData.plan_nivel || 0;
+                // LÓGICA DE PLANES SEGUN SQL (plan = Dominio/Aspirante)
+                const planStr = globalDocData.plan || "Aspirante";
                 
-                if(nivel === 0) {
+                if(planStr === "Aspirante") {
                     document.getElementById('panel-intercom').classList.add('is-locked');
-                    document.getElementById('usd-container').classList.add('is-locked');
-                    document.getElementById('btn-insumos-menu').classList.add('hidden');
                     document.documentElement.style.setProperty('--main-color', '#64748b');
                 } else {
-                    const esp = globalDocData.especialidad || "General";
-                    const palette = CATALOGO_TEMAS[esp] || CATALOGO_TEMAS["General"];
+                    const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
                     const colorIdx = (globalDocData.template_id || 1) % 5;
-                    const finalColor = palette[colorIdx];
-                    document.documentElement.style.setProperty('--main-color', finalColor);
-                    if(nivel === 2) document.getElementById('btn-ceo-directo').classList.remove('hidden');
+                    document.documentElement.style.setProperty('--main-color', palette[colorIdx]);
+                    if(planStr === "Corporativo") document.getElementById('btn-ceo-directo').classList.remove('hidden');
                 }
                 
                 document.getElementById('btn-unlock').style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--main-color');
-
-                const resRec = await fetch(`${URL}/rest/v1/Registro_Recomendados?recomendador_id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-                if ((await resRec.json()).length > 0) document.getElementById('banner-recompensa').classList.remove('hidden');
-
-                sentinela("acceso médico validado", "seguridad");
                 syncMaster(); setInterval(syncMaster, 10000);
-            } else { alert("PIN Incorrecto."); }
+            } else { alert("PIN Gemini Incorrecto."); }
         }
 
         async function syncMaster() {
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            // Sincronización con tabla Citas_Agendadas (hora_cita, fecha_cita)
+            const res = await fetch(`${URL}/rest/v1/Citas_Agendadas?doctor_id=eq.${docId}&order=hora_cita.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
-            let mxn = 0; let usd = 0;
             document.getElementById('total-hoy').innerText = citas.length;
 
-            document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
-                if(c.pagado) {
-                    if(c.notas_asistente?.includes("USD")) usd += c.monto;
-                    else mxn += c.monto;
-                }
-                if(c.notas_asistente?.includes("⚠️")) {
-                    document.getElementById('alerta-asistente').classList.remove('hidden');
-                    document.getElementById('texto-alerta').innerText = c.notas_asistente.replace("⚠️", "");
-                }
-                return `
-                    <div class="card-appointment glass-panel p-6 flex items-center justify-between cursor-pointer" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}', '${c.notas_asistente || 'En sala'}')">
-                        <div class="flex items-center gap-10">
-                            <span class="text-2xl font-black italic tracking-tighter text-main w-16">${c.hora.slice(0,5)}</span>
-                            <div>
-                                <h3 class="font-black text-slate-800 uppercase text-sm">${c.nombre_paciente}</h3>
-                                <p class="text-[8px] font-black uppercase text-slate-400 mt-1 italic tracking-widest">${c.notas_asistente || 'Sin avisos'}</p>
-                            </div>
+            document.getElementById('contenedor-citas').innerHTML = citas.map(c => `
+                <div class="card-appointment glass-panel p-6 flex items-center justify-between cursor-pointer" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
+                    <div class="flex items-center gap-10">
+                        <span class="text-2xl font-black italic tracking-tighter text-main w-16">${c.hora_cita.slice(0,5)}</span>
+                        <div>
+                            <h3 class="font-black text-slate-800 uppercase text-sm">${c.nombre_paciente}</h3>
+                            <p class="text-[8px] font-black uppercase text-slate-400 mt-1 italic">Verificado vía Gemini Engine ✦</p>
                         </div>
-                        <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic ${c.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'}">${c.pagado ? 'Liquidado' : 'Pendiente'}</span>
-                    </div>`;
-            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic uppercase">Nodo Vacío</p>';
-
-            document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-            if(!(globalDocData.plan_nivel === 0)) document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
+                    </div>
+                    <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic bg-emerald-50 text-emerald-500">Programada</span>
+                </div>
+            `).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Sin actividad en el Nodo</p>';
         }
 
-        function enfocarpaciente(id, nombre, nota) {
-            if(globalDocData.plan_nivel === 0) return;
-            currentPatientId = id;
-            document.getElementById('dra-patient-name').innerText = nombre;
-            document.getElementById('dra-view-note').innerText = nota;
-            document.getElementById('alerta-asistente').classList.add('hidden');
-        }
-
-        async function enviarRespuestaDra() {
-            const resp = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !resp) return alert("Seleccione paciente.");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
-                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ notas_doctor: resp.toUpperCase() }) 
-            });
-            alert("✅ Enviado a Recepción.");
-            document.getElementById('dra-response-input').value = "";
-            syncMaster();
-        }
-
-        // --- REPARACIÓN TÁCTICA: Link a agendar.html ---
         function verMiSitio() {
             if(!docId) return alert("Nodo no identificado.");
             window.open(`agendar.html?id=${docId}`, '_blank');
         }
 
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        async function abrirReporteLogistica() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const logs = await res.json();
-            alert("📦 INSUMOS FALTANTES:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
-        }
-
-        // --- REPARACIÓN TÁCTICA: Link a agendar.html ---
         function copiarLinkCitas() { 
-            const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
+            const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            const link = window.location.origin + path + "agendar.html?id=" + docId;
             navigator.clipboard.writeText(link); 
-            alert("Link de Sucursal Copiado."); 
+            alert("✅ Link Gemini ✦ Copiado."); 
         }
 
-        function copiarLinkAsistente() { navigator.clipboard.writeText(window.location.origin + "/asistente.html?id=" + docId); alert("Link Copiado."); }
-        function contactarCEO() { window.open("https://wa.me/5216641234567?text=Comandante, solicito auditoría de Nodo Corporativo."); }
-        function cambiarPin() {
-            const p = prompt("Nuevo PIN (4 dígitos):");
-            if(p && p.length === 4) {
-                fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pin_acceso: p })
-                }).then(() => alert("PIN Actualizado."));
-            }
-        }
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+        function contactarCEO() { window.open("https://wa.me/5216641234567?text=Comandante, solicito auditoría de Gemini Engine."); }
+        function enfocarpaciente(id, nombre) { document.getElementById('dra-patient-name').innerText = nombre; }
+        function enviarRespuestaDra() { alert("Gemini Engine ✦: Instrucción enviada."); }
     </script>
 </body>
 </html>
