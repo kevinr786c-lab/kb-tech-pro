@@ -3,62 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B Assistant | Nodo Fiscal Pro</title>
+    <title>K.B Assistant | Nodo Operativo Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         :root { --main: #6366f1; --bg: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; }
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .input-kb { width: 100%; padding: 1rem; border-radius: 1.25rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 600; outline: none; transition: 0.3s; }
+        .input-kb:focus { border-color: var(--main); background: white; }
         
         #side-menu { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000; }
         .translate-x-full { transform: translateX(100%); }
 
+        /* MODALES */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 3rem; padding: 2.5rem; position: relative; }
+        
         .nav-icon { transition: 0.4s; filter: grayscale(1); opacity: 0.5; }
         .nav-icon.active { background: var(--main); color: white; transform: scale(1.1); filter: grayscale(0); opacity: 1; }
     </style>
 </head>
 <body class="p-4 md:p-8 pb-48 text-slate-800">
 
+    <div id="modal-container" class="modal-overlay" onclick="cerrarModalExterno(event)">
+        <div class="modal-content shadow-2xl border border-slate-100">
+            <header class="text-center mb-8">
+                <div id="modal-icon" class="text-5xl mb-4">💎</div>
+                <h2 id="modal-title" class="text-xl font-black uppercase tracking-tighter italic text-slate-800">Operación</h2>
+                <p id="modal-desc" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Captura de datos requerida</p>
+            </header>
+            <div id="modal-body" class="space-y-4">
+                </div>
+            <div class="flex gap-4 mt-8">
+                <button onclick="cerrarModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase">Cancelar</button>
+                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white/95 backdrop-blur-xl z-[2000] flex items-center justify-center">
         <div class="text-center p-8 glass-panel max-w-sm w-full border-2 border-slate-100 shadow-2xl">
             <div id="lock-icon" class="text-5xl mb-4">👩‍💼</div>
             <h2 class="text-xl font-black mb-6 uppercase tracking-widest">Recepción K.B</h2>
-            <input type="password" id="pin-acceso" class="w-full p-5 rounded-2xl bg-slate-50 text-center text-3xl tracking-[0.8em] mb-6 outline-none border-2 border-transparent focus:border-indigo-500" placeholder="****" maxlength="4">
-            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase">Acceder</button>
+            <input type="password" id="pin-acceso" class="w-full p-5 rounded-2xl bg-slate-50 text-center text-3xl tracking-[0.8em] mb-6 outline-none" placeholder="****" maxlength="4">
+            <button onclick="verificarAcceso()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase shadow-lg">Acceder</button>
         </div>
     </div>
 
     <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
         <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-[var(--main)]">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-[var(--main)] mb-10 italic">Centro de Control</h3>
+        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-[var(--main)] mb-10 italic">Centro Operativo</h3>
         
         <nav class="space-y-4">
-            <button onclick="location.reload()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700 transition">
-                <div class="text-xl">🔄</div>
-                <span class="text-[10px] font-black uppercase">Sincronizar Nodo</span>
-            </button>
-            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700 transition">
-                <div class="text-xl">🔑</div>
-                <span class="text-[10px] font-black uppercase">Seguridad PIN</span>
-            </button>
-            
-            <div class="h-px bg-slate-800 my-4"></div>
-            <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-4">Módulos Fiscales</p>
-            
-            <button onclick="alert('Facturación SAT: Los datos se jalan del registro del Dr.')" class="flex items-center gap-4 w-full p-4 bg-blue-600/20 border border-blue-600/30 rounded-2xl">
+            <button onclick="toggleMenu(); facturarSAT()" class="flex items-center gap-4 w-full p-4 bg-blue-600/20 border border-blue-600/30 rounded-2xl hover:bg-blue-600/40 transition">
                 <div class="text-xl">⚖️</div>
-                <span class="text-[10px] font-black uppercase">Facturación SAT (MXN)</span>
+                <span class="text-[10px] font-black uppercase">Facturación SAT</span>
             </button>
-            
-            <button onclick="alert('Módulo USA: Superbill Generador Activo')" class="flex items-center gap-4 w-full p-4 bg-amber-600/20 border border-amber-600/30 rounded-2xl">
+            <button onclick="toggleMenu(); facturarUSA()" class="flex items-center gap-4 w-full p-4 bg-amber-600/20 border border-amber-600/30 rounded-2xl hover:bg-amber-600/40 transition">
                 <div class="text-xl">📑</div>
-                <span class="text-[10px] font-black uppercase">Superbill (USA/USD)</span>
+                <span class="text-[10px] font-black uppercase">Superbill USA</span>
             </button>
-
-            <button onclick="cobroManual()" class="flex items-center gap-4 w-full p-4 bg-emerald-600/20 border border-emerald-600/30 rounded-2xl">
+            <button onclick="toggleMenu(); cobroManual()" class="flex items-center gap-4 w-full p-4 bg-emerald-600/20 border border-emerald-600/30 rounded-2xl hover:bg-emerald-600/40 transition">
                 <div class="text-xl">💰</div>
-                <span class="text-[10px] font-black uppercase">Cobro Manual Express</span>
+                <span class="text-[10px] font-black uppercase">Cobro Express</span>
+            </button>
+            <div class="h-px bg-slate-800 my-4"></div>
+            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full p-3 text-slate-400">
+                <div class="text-lg">🔑</div>
+                <span class="text-[9px] font-black uppercase">Seguridad PIN</span>
             </button>
         </nav>
     </div>
@@ -81,38 +94,33 @@
         <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-panel p-8 border-l-8 border-[var(--main)]">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic tracking-widest">Control de Turno:</h3>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-6 italic tracking-widest">En Turno:</h3>
                     <p class="text-3xl font-extrabold text-slate-800 leading-tight" id="patient-display">---</p>
-                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Selecciona de la lista</p>
+                    <p id="patient-time-display" class="text-[10px] font-bold text-[var(--main)] uppercase mt-2 italic">Seleccione de la lista</p>
                     <div class="flex gap-4 mt-8">
                         <button onclick="contactarWhatsApp()" class="flex-1 py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase">WhatsApp</button>
-                        <button onclick="cobrarPaciente()" class="flex-1 py-4 bg-[var(--main)] text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Cobrar</button>
+                        <button onclick="abrirCobro()" class="flex-1 py-4 bg-[var(--main)] text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Cobrar</button>
                     </div>
                 </div>
 
                 <div class="glass-panel p-8">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic tracking-widest">Canal del Dr.</h3>
-                    <div class="bg-slate-50 p-4 rounded-2xl text-[11px] border-l-4 border-[var(--main)] mb-4">
-                        <p id="last-doctor-response" class="text-slate-700 font-bold italic text-center">Esperando...</p>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4 italic tracking-widest">Canal con Dr.</h3>
+                    <div class="bg-slate-50 p-4 rounded-2xl text-[11px] mb-4 border-l-4 border-[var(--main)]">
+                        <p id="last-doctor-response" class="text-slate-700 font-bold italic">Esperando...</p>
                     </div>
-                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 text-[11px] font-bold mb-3 h-20 outline-none border-none" placeholder="Nota al Dr..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase">Enviar Aviso</button>
+                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 text-[11px] font-bold mb-3 h-20 outline-none border-none" placeholder="Nota rápida al Dr..."></textarea>
+                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest">Enviar Aviso</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
                 <div id="view-agenda" class="glass-panel p-8 md:p-10 min-h-[500px]">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Próximas Citas</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-800 mb-8 italic">Agenda del Día</h3>
                     <div id="tabla-citas-body" class="space-y-4"></div>
                 </div>
             </div>
         </main>
     </div>
-
-    <nav id="main-nav" class="fixed bottom-8 bg-white/90 backdrop-blur-2xl border border-slate-200 p-3 rounded-full flex gap-4 shadow-2xl left-1/2 -translate-x-1/2">
-        <div class="nav-icon active p-4 rounded-full cursor-pointer" id="nav-agenda" onclick="switchView('agenda')">📋</div>
-        <div class="nav-icon p-4 rounded-full cursor-pointer" id="nav-calendar" onclick="switchView('calendar')">📅</div>
-    </nav>
 
     <script>
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
@@ -121,6 +129,9 @@
         let currentId = null; let pTel = "";
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
+        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
+        function cerrarModalExterno(e) { if(e.target.id === 'modal-container') cerrarModal(); }
 
         async function verificarAcceso() {
             try {
@@ -132,7 +143,7 @@
                     document.getElementById('contenido-panel').classList.remove('hidden');
                     setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
                     document.getElementById('doc-assigned').innerText = "Dr. " + doc.nombre_doctor;
-                    const colors = { "Ginecología": "#f43f5e", "Odontología": "#0ea5e9", "Pediatría": "#fb923c", "Cardiología": "#e11d48", "Bienestar (Nutri/Psico)": "#059669", "General": "#1e3a8a" };
+                    const colors = { "Pediatría": "#fb923c", "Ginecología": "#f43f5e", "General": "#1e3a8a", "Cardiología": "#e11d48" };
                     document.documentElement.style.setProperty('--main', colors[doc.especialidad] || "#6366f1");
                     cargarCitas(); setInterval(cargarCitas, 10000);
                 } else { alert("PIN Incorrecto"); }
@@ -149,64 +160,117 @@
                         <p class="font-black text-xs uppercase text-slate-700">${c.nombre_paciente}</p>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center py-20 italic">Sin citas hoy</p>';
+            `).join('') || '<p class="text-center py-20 italic">Sin citas pendientes</p>';
         }
 
         function seleccionar(id, nombre, hora, tel) {
             currentId = id; pTel = tel;
             document.getElementById('patient-display').innerText = nombre;
-            document.getElementById('patient-time-display').innerText = "Hora: " + hora.slice(0,5);
-            document.getElementById('last-doctor-response').innerText = tel.includes("DOCTOR DICE:") ? tel.replace("DOCTOR DICE:", "") : "Esperando nota...";
+            document.getElementById('patient-time-display').innerText = "Cita a las: " + hora.slice(0,5);
+            document.getElementById('last-doctor-response').innerText = tel?.includes("DOCTOR DICE:") ? tel.replace("DOCTOR DICE:", "") : "Sin notas del Dr.";
         }
 
-        async function cobrarPaciente() {
+        // --- INTERACCIONES REALES ---
+
+        function abrirCobro() {
             if(!currentId) return alert("Selecciona un paciente.");
-            
-            const monto = prompt("Monto a cobrar ($):", "1000");
-            if(!monto) return;
+            document.getElementById('modal-icon').innerText = "💰";
+            document.getElementById('modal-title').innerText = "Módulo de Pago";
+            document.getElementById('modal-body').innerHTML = `
+                <input type="number" id="pay-amount" placeholder="Monto Total" class="input-kb">
+                <select id="pay-method" class="input-kb">
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TRANSFERENCIA">Transferencia</option>
+                    <option value="TARJETA">Tarjeta Bancaria</option>
+                </select>
+            `;
+            abrirModal();
+            document.getElementById('modal-confirm-btn').onclick = ejecutarCobro;
+        }
 
-            // SELECTOR DE PAGO POR NÚMERO
-            const opcionPago = prompt("Selecciona forma de pago:\n1. Efectivo\n2. Transferencia\n3. Tarjeta", "1");
-            const metodos = { "1": "EFECTIVO", "2": "TRANSFERENCIA", "3": "TARJETA" };
-            let metodo = metodos[opcionPago] || "EFECTIVO";
-
-            // FACTURACIÓN
-            const requiereSAT = confirm("¿El paciente requiere Factura SAT (México)?\n(Se usarán los datos fiscales del Dr. registrados)");
-            const requiereUSA = confirm("¿El paciente requiere Superbill (USA)?");
-
-            const statusFinal = `PAGO: ${metodo}${requiereSAT ? ' | REQUIERE FACTURA SAT' : ''}${requiereUSA ? ' | REQUIERE SUPERBILL USA' : ''}`;
-
+        async function ejecutarCobro() {
+            const m = document.getElementById('pay-amount').value;
+            const met = document.getElementById('pay-method').value;
+            if(!m) return alert("Ingresa el monto.");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
-                method: 'PATCH', 
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ pagado: true, monto: parseFloat(monto), telefono: statusFinal }) 
+                method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ pagado: true, monto: parseFloat(m), telefono: `PAGO: ${met}` })
             });
-            alert("✅ Cobro registrado."); location.reload();
+            cerrarModal(); location.reload();
+        }
+
+        function facturarSAT() {
+            if(!currentId) return alert("Selecciona paciente.");
+            document.getElementById('modal-icon').innerText = "⚖️";
+            document.getElementById('modal-title').innerText = "Facturación SAT";
+            document.getElementById('modal-desc').innerText = "Captura de datos fiscales MX";
+            document.getElementById('modal-body').innerHTML = `
+                <input type="text" id="rfc-input" placeholder="RFC del Paciente" class="input-kb uppercase">
+                <input type="email" id="rfc-email" placeholder="Email para envío de CFDI" class="input-kb">
+            `;
+            abrirModal();
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const rfc = document.getElementById('rfc-input').value;
+                if(!rfc) return alert("RFC Obligatorio");
+                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
+                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ telefono: `SOLICITÓ FACTURA SAT: ${rfc.toUpperCase()}` })
+                });
+                alert("✅ Solicitud Fiscal Registrada."); cerrarModal();
+            };
+        }
+
+        function facturarUSA() {
+            if(!currentId) return alert("Selecciona paciente.");
+            document.getElementById('modal-icon').innerText = "📑";
+            document.getElementById('modal-title').innerText = "Superbill USA";
+            document.getElementById('modal-desc').innerText = "Datos de Aseguradora USA";
+            document.getElementById('modal-body').innerHTML = `
+                <input type="text" id="ins-name" placeholder="Nombre Aseguradora (Aetna, BlueShield...)" class="input-kb">
+                <input type="text" id="ins-id" placeholder="Member ID / Policy Number" class="input-kb">
+            `;
+            abrirModal();
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const ins = document.getElementById('ins-name').value;
+                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { 
+                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ telefono: `SOLICITÓ SUPERBILL: ${ins}` })
+                });
+                alert("✅ Superbill en cola de generación."); cerrarModal();
+            };
         }
 
         function cobroManual() {
-            currentId = "MANUAL";
-            const nombre = prompt("Nombre del paciente (Express):");
-            if(nombre) {
-                document.getElementById('patient-display').innerText = nombre + " (EXPRESS)";
-                cobrarPaciente();
-            }
+            document.getElementById('modal-icon').innerText = "💰";
+            document.getElementById('modal-title').innerText = "Cobro Express";
+            document.getElementById('modal-desc').innerText = "Paciente sin cita previa";
+            document.getElementById('modal-body').innerHTML = `
+                <input type="text" id="express-name" placeholder="Nombre del Paciente" class="input-kb uppercase">
+                <input type="number" id="express-monto" placeholder="Monto a cobrar" class="input-kb">
+            `;
+            abrirModal();
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const n = document.getElementById('express-name').value;
+                const m = document.getElementById('express-monto').value;
+                if(!n || !m) return alert("Datos incompletos");
+                // Inyectamos como cita express pagada directamente
+                await fetch(`${URL}/rest/v1/Citas`, { 
+                    method: 'POST', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ doctor_id: docId, nombre_paciente: n + " (EXPRESS)", pagado: true, monto: parseFloat(m), fecha: new Date().toISOString().split('T')[0], hora: new Date().toLocaleTimeString('en-GB') })
+                });
+                alert("✅ Pago Express Registrado."); cerrarModal(); location.reload();
+            };
         }
 
         async function enviarNotaInterna() {
             const n = document.getElementById('internal-note-input').value;
             if(!currentId || !n) return alert("Selecciona paciente.");
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "ASISTENTE: " + n.toUpperCase() }) });
-            document.getElementById('internal-note-input').value = ""; alert("Enviado.");
-        }
-
-        function switchView(v) {
-            document.getElementById('view-agenda').classList.toggle('hidden', v !== 'agenda');
-            document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
-            document.getElementById('nav-' + v).classList.add('active');
+            document.getElementById('internal-note-input').value = ""; alert("Nota enviada.");
         }
 
         function contactarWhatsApp() { if(pTel) window.open(`https://wa.me/${pTel.replace(/\D/g,'')}`, '_blank'); }
+        function switchView(v) { document.getElementById('view-agenda').classList.toggle('hidden', v !== 'agenda'); }
     </script>
 </body>
 </html>
