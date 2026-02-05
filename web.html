@@ -1,36 +1,113 @@
-<div class="mt-12 space-y-6">
-    <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Instalaciones de Vanguardia</p>
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div class="h-32 bg-slate-200 rounded-3xl overflow-hidden border border-slate-100 shadow-inner flex items-center justify-center text-slate-400 italic text-[8px]">FOTO 1</div>
-        <div class="h-32 bg-slate-200 rounded-3xl overflow-hidden border border-slate-100 shadow-inner flex items-center justify-center text-slate-400 italic text-[8px]">FOTO 2</div>
-        <div class="h-32 bg-slate-200 rounded-3xl overflow-hidden border border-slate-100 shadow-inner flex items-center justify-center text-slate-400 italic text-[8px]">FOTO 3</div>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUCURSAL DIGITAL | K.B TECH PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; }
+        :root { --main: #6366f1; } 
 
-<div class="mt-16 p-8 bg-slate-50 rounded-[3rem] border border-slate-100 text-left">
-    <div class="flex items-center gap-4 mb-6">
-        <span class="text-3xl">📍</span>
-        <div>
-            <p class="text-[10px] font-black uppercase text-indigo-500 italic">Ubicación del Nodo</p>
-            <p id="doc-direccion" class="text-xs font-bold text-slate-700">Zona Río, Tijuana, B.C.</p>
-        </div>
-    </div>
-    <div class="w-full h-48 bg-slate-200 rounded-[2rem] border-2 border-dashed border-slate-300 flex items-center justify-center">
-        <p class="text-[9px] font-black text-slate-400 uppercase italic">Google Maps Engine ✦</p>
-    </div>
-</div>
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid white; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.05); }
+        .btn-lujo { background: var(--main); color: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px -10px var(--main); }
+        .btn-lujo:hover { transform: scale(1.02) translateY(-5px); filter: brightness(1.1); }
+        
+        .gallery-img { aspect-ratio: 16/9; background: #e2e8f0; border-radius: 2rem; overflow: hidden; border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: center; text-align: center; }
 
-<div class="mt-16 flex justify-center gap-8 opacity-40 grayscale hover:grayscale-0 transition duration-500">
-    <div class="text-center">
-        <p class="text-[7px] font-black uppercase mb-1">Encriptación</p>
-        <div class="font-bold text-xs text-indigo-600">SSL 256-bit</div>
+        .gemini-star { color: var(--main); animation: pulse 3s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.1); } }
+    </style>
+</head>
+<body class="py-10 md:py-20 px-4">
+
+    <div class="max-w-4xl mx-auto space-y-12">
+        
+        <header class="glass-card p-12 md:p-16 rounded-[4rem] text-center relative overflow-hidden">
+            <div id="doc-icon" class="text-7xl mb-6">🩺</div>
+            <div id="badge-verificado" class="mb-6">
+                <span class="bg-indigo-600 text-white text-[8px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full shadow-lg">Especialista Verificado K.B Tech</span>
+            </div>
+            <h1 id="doc-name" class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">---</h1>
+            <p id="doc-esp" class="text-xs font-bold text-slate-400 uppercase tracking-[0.5em] italic mt-4">Sincronizando Nodo...</p>
+            
+            <div class="mt-12 max-w-2xl mx-auto">
+                <p id="doc-bio" class="text-lg text-slate-600 font-medium leading-relaxed italic">
+                    Cargando perfil profesional...
+                </p>
+            </div>
+        </header>
+
+        <section class="glass-card p-12 rounded-[4rem] space-y-10">
+            <div class="text-center">
+                <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic">Infraestructura Médica</h3>
+                <h2 class="text-3xl font-black italic tracking-tighter uppercase mt-2">Tecnología y Confort</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="gallery-img">
+                    <p class="text-[10px] font-black text-slate-400 uppercase italic px-10">Espacio diseñado para su bienestar integral</p>
+                </div>
+                <div class="gallery-img">
+                    <p class="text-[10px] font-black text-slate-400 uppercase italic px-10">Equipamiento de última generación</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card p-12 rounded-[4rem] grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="text-4xl">📍</span>
+                <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación del Consultorio</h3>
+                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Encuéntrenos en la zona de mayor prestigio médico en Tijuana. Accesibilidad y seguridad para todos nuestros pacientes.</p>
+                <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                    <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
+                    <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider">Zona Río, Tijuana, B.C.</p>
+                </div>
+            </div>
+            <div class="h-64 bg-slate-200 rounded-[3rem] border-2 border-dashed border-slate-300 flex items-center justify-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase italic">Mapa en Proceso de Activación</p>
+            </div>
+        </section>
+
+        <footer class="text-center space-y-10">
+            <button onclick="window.location.href='agendar.html?id='+docId" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em]">
+                📅 Agendar Consulta Ahora
+            </button>
+            
+            <div class="pt-10 border-t border-slate-200">
+                <p class="text-[8px] font-black text-slate-300 uppercase tracking-[0.8em] italic">
+                    <span class="gemini-star">✦</span> Powered by K.B Tech Solutions <span class="gemini-star">✦</span>
+                </p>
+                <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-4">Tijuana Hub • 2026</p>
+            </div>
+        </footer>
     </div>
-    <div class="text-center">
-        <p class="text-[7px] font-black uppercase mb-1">Privacidad</p>
-        <div class="font-bold text-xs text-indigo-600">NOM-024-SSA3</div>
-    </div>
-    <div class="text-center border-l border-slate-300 pl-8">
-        <p class="text-[7px] font-black uppercase mb-1">Tecnología por</p>
-        <div class="font-black text-[10px] text-slate-900 italic tracking-tighter">K.B TECH</div>
-    </div>
-</div>
+
+    <script>
+        const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
+        const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
+        const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+
+        const CATALOGO_TEMAS = {
+            "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1"
+        };
+
+        async function init() {
+            if(!docId) return;
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
+            const data = await res.json();
+            
+            if(data[0]) {
+                const doc = data[0];
+                const color = CATALOGO_TEMAS[doc.especialidad] || "#6366f1";
+                document.documentElement.style.setProperty('--main', color);
+
+                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                document.getElementById('doc-esp').innerText = doc.especialidad + " | Certificado";
+                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica y el cuidado personalizado de su salud.";
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
