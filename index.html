@@ -3,26 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH SOLUTIONS | Infraestructura Médica de Élite</title>
+    <title>K.B TECH SOLUTIONS | Sistemas Médicos de Élite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #ffffff; color: #1e293b; scroll-behavior: smooth; overflow-x: hidden; }
         .gradient-text { background: linear-gradient(90deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .kb-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f1f5f9; background: white; }
-        .kb-card:hover { transform: translateY(-15px); box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.2); border-color: #6366f1; }
+        .kb-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f1f5f9; background: white; border-radius: 3rem; }
+        .kb-card:hover { transform: translateY(-15px); box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.1); border-color: #6366f1; }
         .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .hero-mesh { background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0, transparent 50%); }
+        .hero-mesh { background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0, transparent 50%); }
         .whatsapp-float { position: fixed; bottom: 30px; right: 30px; z-index: 100; transition: 0.3s; }
         .whatsapp-float:hover { transform: scale(1.1) rotate(5deg); }
         
-        .emily-vision { opacity: 0.04; transition: 1.5s; cursor: default; }
-        .emily-vision:hover { opacity: 0.3; }
+        /* Acordeón FAQ */
+        .faq-item { border-bottom: 1px solid #f1f5f9; padding: 1.5rem 0; cursor: pointer; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; color: #64748b; font-size: 0.9rem; }
+        .faq-item:hover .faq-answer { max-height: 150px; margin-top: 1rem; }
+
+        .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; }
+        @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.5; transform: scale(1); } }
     </style>
 </head>
 <body class="hero-mesh text-left">
 
-    <a href="https://wa.me/526675527090?text=Solicito%20información%20sobre%20la%20activación%20de%20un%20Nodo%20Médico" target="_blank" class="whatsapp-float">
+    <a href="https://wa.me/526675527090?text=Hola%20Kevin!%20Vengo%20del%20Index%20y%20quiero%20modernizar%20mi%20consultorio" target="_blank" class="whatsapp-float">
         <div class="bg-green-500 p-4 rounded-full shadow-2xl flex items-center justify-center">
             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.888 11.888-11.888 3.176 0 6.161 1.237 8.404 3.48s3.481 5.229 3.481 8.406c0 6.555-5.332 11.887-11.888 11.887-2.007 0-3.974-.506-5.717-1.47l-6.267 1.694zm6.103-3.784l.438.26c1.473.873 3.17 1.334 4.896 1.334 5.176 0 9.387-4.211 9.387-9.387 0-2.507-.977-4.864-2.75-6.637l-.001-.001c-1.772-1.772-4.128-2.748-6.635-2.748-5.176 0-9.386 4.212-9.386 9.387 0 2.06.541 4.061 1.564 5.815l.287.492-1.012 3.693 3.784-1.01z"/></svg>
         </div>
@@ -34,86 +39,90 @@
                 K.B <span class="gradient-text">TECH</span>
             </h1>
             <div class="hidden md:flex space-x-10 items-center">
-                <a href="#proceso" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Hoy</a>
-                <a href="#planes" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Nodos</a>
-                <button onclick="window.location.href='planes.html'" class="px-8 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition active:scale-95">Activar Sistema</button>
+                <a href="#tijuana" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">Soporte Local</a>
+                <a href="#preguntas" class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-indigo-600 transition">FAQ</a>
+                <button onclick="window.location.href='planes.html'" class="px-8 py-3 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition active:scale-95">Activar Nodo</button>
             </div>
         </div>
     </nav>
 
     <section class="pt-48 pb-32 px-8 text-center max-w-5xl mx-auto">
-        <span class="inline-block px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.4em] mb-6 italic">Integración Avanzada Gemini AI Engine</span>
+        <span class="inline-block px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase tracking-[0.4em] mb-6 italic">
+            <span class="gemini-star">✦</span> Infraestructura Médica de Vanguardia 2026
+        </span>
         <h2 class="text-7xl md:text-8xl font-black tracking-tighter text-slate-900 mb-8 leading-none">
             Evoluciona o quédate en el <span class="gradient-text italic">pasado.</span>
         </h2>
         <p class="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
-            Las herramientas de hoy definen tu relevancia de mañana. No es opcional; el ecosistema médico de Tijuana exige una transición tecnológica absoluta. 
+            Las herramientas de hoy definen tu relevancia de mañana. Tijuana se moderniza y tu consultorio debe ser el motor de ese cambio.
         </p>
     </section>
 
     <section id="tijuana" class="max-w-7xl mx-auto px-8 py-24">
-        <div class="bg-slate-900 rounded-[4rem] p-12 md:p-20 flex flex-col md:flex-row items-center gap-16 overflow-hidden relative shadow-2xl border border-white/5">
+        <div class="bg-slate-900 rounded-[4rem] p-12 md:p-20 flex flex-col md:flex-row items-center gap-16 overflow-hidden relative shadow-2xl">
             <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 blur-[120px] rounded-full"></div>
             <div class="flex-1 relative z-10 text-left">
                 <h3 class="text-white text-4xl font-black mb-6 tracking-tighter uppercase italic">Soporte <span class="text-indigo-400">Presencial.</span></h3>
-                <p class="text-slate-400 mb-8 text-lg font-medium leading-relaxed">A diferencia de plataformas externas, nosotros operamos en tu terreno. Migramos tus datos y optimizamos tu Nodo físicamente en tu consultorio. Soporte local para resultados reales.</p>
+                <p class="text-slate-400 mb-8 text-lg font-medium leading-relaxed">No somos un software remoto. Operamos en tu terreno. Migramos tus datos y optimizamos tu Nodo físicamente en tu consultorio en Tijuana.</p>
                 <div class="p-4 bg-slate-800 rounded-2xl border border-slate-700 w-fit">
-                    <p class="text-xs text-white font-bold uppercase italic tracking-widest">Cobertura: Zona Río / Otay / Aguacaliente</p>
+                    <p class="text-xs text-white font-bold uppercase italic tracking-widest">Cobertura Táctica: Zona Río / Otay / Aguacaliente</p>
                 </div>
             </div>
             <div class="flex-1 w-full bg-slate-800 h-64 rounded-3xl border border-slate-700 shadow-2xl flex items-center justify-center italic text-slate-300 font-bold text-sm text-center p-8">
-                "La tecnología de punta es el motor que moderniza tu práctica. Si no aprendes a usarla hoy, el mercado te dejará atrás."
+                "La tecnología no es una opción, es la base de tu crecimiento profesional hoy."
             </div>
         </div>
     </section>
 
-    <section id="planes" class="max-w-7xl mx-auto px-8 py-32 text-center">
-        <h3 class="text-5xl font-black tracking-tighter mb-20 text-slate-900 italic uppercase">Escalabilidad de <span class="gradient-text">Nodo.</span></h3>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-4xl mx-auto">
-            
-            <div class="kb-card p-12 rounded-[3.5rem] flex flex-col h-full text-left">
-                <h4 class="text-2xl font-black mb-1 italic uppercase text-slate-400">Nodo Independiente</h4>
-                <p class="text-4xl font-black mb-8 italic">$999 <span class="text-xs text-slate-300">MXN/mes</span></p>
-                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                    <li class="flex items-center gap-2">● Agenda Live Sincronizada</li>
-                    <li class="flex items-center gap-2">● IA Gemini Bio Generator</li>
-                    <li class="flex items-center gap-2">● Nodo de Reservación Web</li>
-                    <li class="opacity-30 line-through">✕ Sin Soporte Presencial</li>
-                </ul>
-                <button onclick="window.location.href='planes.html'" class="w-full py-5 border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition">Iniciar Evolución</button>
+    <section id="preguntas" class="max-w-4xl mx-auto px-8 py-32">
+        <header class="mb-16">
+            <h3 class="text-4xl font-black italic uppercase tracking-tighter">Resolviendo <span class="text-indigo-600">Dudas</span></h3>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Transparencia Total en tu Transición Digital</p>
+        </header>
+
+        <div class="space-y-2">
+            <div class="faq-item">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-sm font-black uppercase italic tracking-widest">¿Cómo migro mi información actual?</h4>
+                    <span class="text-indigo-600 font-black">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>No te preocupes por archivos complejos. Nuestro equipo se encarga de realizar la migración completa de tus expedientes antiguos a tu nuevo Nodo Maestro de forma segura y presencial.</p>
+                </div>
             </div>
 
-            <div class="kb-card p-12 rounded-[3.5rem] flex flex-col h-full border-2 border-indigo-500 relative text-left z-10">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-6 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.3em] italic">Prioridad Técnica en TJ</div>
-                <h4 class="text-2xl font-black mb-1 italic uppercase text-indigo-600">Nodo Premium</h4>
-                <p class="text-4xl font-black mb-8 italic">$1,599 <span class="text-xs text-slate-300">MXN/mes</span></p>
-                <ul class="space-y-4 mb-12 flex-1 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                    <li class="flex items-center gap-2 text-indigo-600">✓ Soporte Táctico Presencial In-Situ</li>
-                    <li class="flex items-center gap-2 text-indigo-600">✓ Modo Camaleón: Identidad de Lujo</li>
-                    <li class="flex items-center gap-2 text-indigo-600">✓ Migración Operación Transfusión</li>
-                    <li class="flex items-center gap-2 text-indigo-600">✓ Control Financiero Bi-Moneda</li>
-                </ul>
-                <button onclick="window.location.href='planes.html'" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition">Activar Poder Total</button>
+            <div class="faq-item">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-sm font-black uppercase italic tracking-widest">¿Qué pasa si falla la conexión?</h4>
+                    <span class="text-indigo-600 font-black">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>El sistema K.B Tech está optimizado para funcionar con el mínimo ancho de banda. Además, al ser locales en Tijuana, cuentas con soporte físico prioritario para asegurar que tu consulta nunca se detenga.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-sm font-black uppercase italic tracking-widest">¿Mis datos están seguros?</h4>
+                    <span class="text-indigo-600 font-black">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Absolutamente. Los datos están bajo encriptación de grado médico y tú eres el único dueño de la información. No compartimos ni procesamos datos con terceros con fines publicitarios.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer class="pt-40 pb-16 px-8 bg-white border-t border-slate-50">
-        <div class="max-w-7xl mx-auto flex flex-col items-center gap-16">
-            
-            <div class="text-center space-y-4">
+    <footer class="pt-32 pb-10 px-8 bg-white border-t border-slate-50 text-center">
+        <div class="max-w-7xl mx-auto space-y-12">
+            <div class="space-y-4">
                 <h4 class="text-4xl font-black italic">K.B <span class="text-indigo-600">TECH</span></h4>
-                <p class="text-[9px] font-black text-slate-300 uppercase tracking-[0.5em] italic">Infraestructura Médica Tijuana · 2026</p>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em] italic">Potenciando la Medicina en Tijuana · 2026</p>
             </div>
 
-            <div class="emily-vision text-center">
-                <h3 class="text-6xl font-black uppercase italic tracking-tighter">Hazlo por Emily</h3>
-                <p class="text-[10px] font-bold text-slate-400 tracking-[0.8em] uppercase mt-4">La razón de ser del ecosistema K.B Tech Solutions</p>
-            </div>
-
-            <div class="w-full flex justify-between pt-10 border-t border-slate-50">
-                <p class="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Arquitectura impulsada por Gemini Engine</p>
-                <p class="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Confidencialidad · Autonomía · Poder</p>
+            <div class="flex flex-col items-center">
+                <span class="gemini-star text-2xl">✦</span>
+                <p class="text-[8px] font-black text-slate-300 uppercase tracking-[0.4em] mt-4">Sincronización Inteligente K.B Solutions &copy;</p>
             </div>
         </div>
     </footer>
@@ -122,33 +131,28 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
 
-        async function registrarLog(msg) {
+        async function registrarHit(msg) {
             try {
                 await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
                     method: 'POST',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "Index.html", codigo_error: "INDEX_ACCESS", mensaje_error: msg })
+                    body: JSON.stringify({ pagina_origen: "Index.html", codigo_error: "INDEX_HIT", mensaje_error: msg })
                 });
-            } catch(e) { /* Modo sigilo activo */ }
+            } catch(e) {}
         }
 
-        let pulseCount = 0;
+        let adminClicks = 0;
         function activarProtocoloRestringido() {
-            pulseCount++;
-            if (pulseCount === 3) {
-                const access = prompt("ADMIN_COMMAND: INGRESE CÓDIGO DE AUTORIDAD");
-                if (access === "2026") { 
-                    registrarLog("Acceso a Terminal de Mando Global");
-                    window.location.href = 'secreto.html'; 
-                } else { 
-                    alert("ACCESO DENEGADO"); 
-                    pulseCount = 0; 
-                }
+            adminClicks++;
+            if (adminClicks === 3) {
+                const pin = prompt("PROTOCOLO DE SEGURIDAD: CÓDIGO MAESTRO");
+                if (pin === "2026") { window.location.href = 'secreto.html'; }
+                else { alert("ACCESO DENEGADO"); adminClicks = 0; }
             }
-            setTimeout(() => { pulseCount = 0; }, 2000);
+            setTimeout(() => { adminClicks = 0; }, 2000);
         }
 
-        window.onload = () => { registrarLog("Sistema Index Online"); };
+        window.onload = () => { registrarHit("Index Online"); };
     </script>
 </body>
 </html>
