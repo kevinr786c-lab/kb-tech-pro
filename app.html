@@ -12,19 +12,15 @@
         .text-main { color: var(--main-color) !important; }
         .bg-main { background-color: var(--main-color) !important; }
         .border-main { border-color: var(--main-color) !important; }
-        .card-pro { transition: all 0.3s ease; border: 1px solid #f1f5f9; cursor: pointer; }
+        .card-pro { transition: all 0.3s ease; border: 1px solid #f1f5f9; cursor: pointer; border-radius: 2rem; }
         .card-pro:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); border-color: var(--main-color); }
-        .lock-screen { backdrop-filter: blur(30px); background: rgba(255,255,255,0.85); z-index: 9999; }
-        .input-dra { background: var(--bg-soft); border: 2px solid transparent; border-radius: 1rem; padding: 12px; width: 100%; outline: none; transition: 0.3s; font-size: 0.8rem; }
+        .lock-screen { backdrop-filter: blur(30px); background: rgba(255,255,255,0.85); z-index: 99999; }
+        .input-dra { background: var(--bg-soft); border: 2px solid transparent; border-radius: 1rem; padding: 12px; width: 100%; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 700; }
         .progress-bar { height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden; }
         .progress-fill { height: 100%; transition: width 1s ease-in-out; }
-
-        /* ESTILOS DEL MENÚ LATERAL */
-        #side-menu { 
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-            z-index: 10000; 
-        }
-        .translate-x-full { transform: translateX(100%); }
+        #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; }
+        .alert-pulse { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -32,219 +28,210 @@
     <div id="pantalla-bloqueo" class="fixed inset-0 lock-screen flex items-center justify-center">
         <div class="text-center p-10 bg-white rounded-[3rem] shadow-2xl border border-slate-100 max-w-sm w-full">
             <span id="lock-icon" class="text-6xl mb-6 block">🩺</span>
-            <h2 class="text-xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Acceso Médico</h2>
-            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-widest mb-8 font-bold italic">Sincronizando Nodo...</p>
-            <input type="password" id="pin-acceso" class="w-full p-5 rounded-2xl bg-slate-100 text-center text-3xl tracking-[0.8em] mb-6 outline-none border-none focus:ring-2 transition-all" placeholder="****" maxlength="4">
-            <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg transition-all">Desbloquear</button>
+            <h2 class="text-xl font-black text-slate-800 mb-2 uppercase tracking-tighter italic">Nodo Médico</h2>
+            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-widest mb-8 font-bold italic">Validando Credenciales...</p>
+            <input type="password" id="pin-acceso" class="w-full p-5 rounded-2xl bg-slate-100 text-center text-3xl tracking-[0.8em] mb-6 outline-none" placeholder="****" maxlength="4">
+            <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg">Desbloquear</button>
         </div>
     </div>
 
-    <div id="side-menu" class="fixed inset-y-0 right-0 w-72 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
-        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-main">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-main mb-10 italic">Centro de Control</h3>
-        
-        <nav class="space-y-6">
-            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full group text-left">
-                <div class="bg-main p-3 rounded-xl text-white group-hover:scale-110 transition">🔗</div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Link Reservación</span>
+    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
+        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl">✕</button>
+        <h3 class="text-xs font-black uppercase tracking-widest text-main mb-10 italic">Centro de Control K.B</h3>
+        <nav class="space-y-4">
+            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
+                <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link de Citas</span>
             </button>
-            <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full group text-left">
-                <div class="bg-rose-500 p-3 rounded-xl text-white group-hover:scale-110 transition">👩‍💼</div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Link Asistente</span>
+            <button onclick="copiarLinkAsistente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-main transition">
+                <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Link Recepción</span>
             </button>
-            <button onclick="window.location.href='configurar-perfil.html?id='+docId" class="flex items-center gap-4 w-full group text-left">
-                <div class="bg-indigo-400 p-3 rounded-xl text-white group-hover:scale-110 transition">⚙️</div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Configurar Perfil</span>
+            <button onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500">
+                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Inventario / Insumos</span>
             </button>
-            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full group text-left">
-                <div class="bg-amber-400 p-3 rounded-xl text-white group-hover:scale-110 transition">🔑</div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Cambiar PIN</span>
-            </button>
+            <hr class="border-slate-800 my-6">
+            <button onclick="cambiarPin()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white">Cambiar PIN de Acceso</button>
         </nav>
-        
-        <div class="absolute bottom-10 left-8">
-            <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">K.B Tech Pro v2.0</p>
-            <p class="text-[10px] font-bold text-white/50 italic">Tijuana Nodo Elite</p>
-        </div>
     </div>
 
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000">
-        <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 mb-8">
+        <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 mb-8">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tighter uppercase leading-none">K.B <span class="text-main italic" id="logo-tech">DOCTOR</span></h1>
-                    <p id="doc-esp-label" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold italic">Cargando...</p>
+                    <h1 class="text-3xl font-black text-slate-900 tracking-tighter uppercase">K.B <span class="text-main italic" id="logo-tech">DOCTOR</span></h1>
+                    <p id="doc-esp-label" class="text-[9px] text-slate-400 uppercase tracking-[0.4em] font-bold italic"></p>
                 </div>
-                
-                <div class="flex items-center gap-4">
-                    <div class="hidden md:block text-right">
-                        <p id="level-name" class="text-[8px] font-black text-main uppercase italic">Analizando Nodo...</p>
-                        <div class="progress-bar w-32 mt-1"><div id="level-progress" class="progress-fill bg-main" style="width: 10%"></div></div>
+                <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
+                    <div class="space-y-1.5">
+                        <div class="w-6 h-0.5 bg-white"></div><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-main"></div>
                     </div>
-                    
-                    <div class="flex items-center gap-3 bg-slate-50 p-1 pr-4 rounded-full border border-slate-100">
-                        <div id="doctor-avatar" class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-xl border-2 shadow-sm border-main">👨‍⚕️</div>
-                        <span id="nav-doc-name" class="text-[10px] font-black text-slate-700 uppercase italic">Dr. Cargando...</span>
-                    </div>
-
-                    <button onclick="toggleMenu()" class="p-3 bg-slate-900 text-white rounded-xl shadow-lg hover:scale-105 transition active:scale-95">
-                        <div class="space-y-1">
-                            <div class="w-5 h-0.5 bg-white"></div>
-                            <div class="w-5 h-0.5 bg-white"></div>
-                            <div class="w-5 h-0.5 bg-white"></div>
-                        </div>
-                    </button>
-                </div>
+                </button>
             </div>
         </nav>
 
         <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 pb-20">
-            <div class="lg:col-span-4 space-y-8">
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
-                    <h2 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2 italic text-main">INTERCOM <span class="animate-ping h-2 w-2 rounded-full bg-main"></span></h2>
-                    <div class="mb-4 p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-center">
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Paciente Actual:</p>
-                        <p id="dra-patient-name" class="text-sm font-bold text-slate-700 italic">Seleccione de la lista</p>
+            <div class="lg:col-span-4 space-y-6">
+                <div id="alerta-asistente" class="hidden bg-rose-50 border-2 border-rose-200 p-6 rounded-[2.5rem] alert-pulse">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-2xl">⚠️</span>
+                        <h3 class="text-[10px] font-black text-rose-600 uppercase italic">Aviso Urgente de Recepción</h3>
+                    </div>
+                    <p id="texto-alerta" class="text-sm font-bold text-rose-800 uppercase italic">---</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                    <h2 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-2 italic text-main uppercase">Intercom <span class="w-2 h-2 rounded-full bg-main animate-ping"></span></h2>
+                    <div class="mb-6 p-5 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">En Consulta:</p>
+                        <p id="dra-patient-name" class="text-lg font-bold text-slate-700 italic">---</p>
                     </div>
                     <div class="space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <p class="text-[8px] font-black text-main uppercase mb-1 italic">Estado / Notas:</p>
-                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight">Esperando selección...</p>
+                        <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100">
+                            <p class="text-[8px] font-black text-main uppercase mb-1 italic">Mensaje de Recepción:</p>
+                            <p id="dra-view-note" class="text-xs text-slate-600 italic leading-tight font-bold">Sin mensajes...</p>
                         </div>
-                        <textarea id="dra-response-input" class="input-dra h-24" placeholder="Instrucción para recepción..."></textarea>
-                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 shadow-md">Enviar Instrucción</button>
+                        <textarea id="dra-response-input" class="input-dra h-28" placeholder="Escribe instrucción para la asistente..."></textarea>
+                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-main text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:brightness-110 transition">Enviar al Nodo</button>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
-                    <div id="prev-bg-card" class="absolute right-[-20px] top-[-20px] text-8xl opacity-10 pointer-events-none">🏥</div>
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-main mb-1 italic relative z-10">Ingresos Proyectados (Hoy)</p>
-                    <p class="text-4xl font-black tracking-tighter relative z-10" id="ganancia-mes">$0.00</p>
+                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
+                    <div id="prev-bg-card" class="absolute right-[-20px] top-[-20px] text-9xl opacity-10 pointer-events-none italic font-black">KB</div>
+                    <h3 class="text-[9px] font-black uppercase tracking-[0.3em] text-main mb-6 italic relative z-10">Balance del Turno (Estimado)</h3>
+                    <div class="grid grid-cols-2 gap-4 relative z-10">
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">MX Pesos</p>
+                            <p class="text-2xl font-black tracking-tighter" id="ganancia-mxn">$0.00</p>
+                        </div>
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">US Dollars</p>
+                            <p class="text-2xl font-black tracking-tighter" id="ganancia-usd">$0.00</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-black text-slate-800 italic uppercase tracking-tight">Agenda Live</h2>
-                    <div class="bg-white px-4 py-2 rounded-2xl shadow-sm text-xs font-bold text-slate-500 border border-slate-100">Hoy: <span id="total-hoy" class="text-main">0</span></div>
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800 italic uppercase tracking-tighter leading-none">Agenda <span class="text-main">Live</span></h2>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mt-1">Sincronización en tiempo real con recepción</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="w-2 h-2 rounded-full bg-main animate-pulse"></div>
+                        <span class="text-[10px] font-black text-slate-700 uppercase">Hoy: <span id="total-hoy" class="text-main text-sm ml-1">0</span></span>
+                    </div>
                 </div>
-                <div id="contenedor-citas" class="space-y-4"></div>
+                <div id="contenedor-citas" class="grid gap-4"></div>
             </div>
         </main>
     </div>
 
     <script>
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
+        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentPatientId = null;
+        let doctorData = {};
 
-        const CATALOGO_MAESTRO = {
-            "Ginecología": [{id:1,color:"#f43f5e",icon:"🌸"},{id:2,color:"#8b5cf6",icon:"🔮"},{id:3,color:"#fb7185",icon:"🌷"},{id:4,color:"#059669",icon:"🍃"},{id:5,color:"#1e293b",icon:"💎"}],
-            "Odontología": [{id:1,color:"#0ea5e9",icon:"💎"},{id:2,color:"#10b981",icon:"🌿"},{id:3,color:"#22d3ee",icon:"❄️"},{id:4,color:"#1e3a8a",icon:"🛡️"},{id:5,color:"#6366f1",icon:"⚡"}],
-            "Pediatría": [{id:1,color:"#fb923c",icon:"🧸"},{id:2,color:"#38bdf8",icon:"🚀"},{id:3,color:"#4ade80",icon:"🦖"},{id:4,color:"#f472b6",icon:"🍭"},{id:5,color:"#818cf8",icon:"🌙"}],
-            "Cardiología": [{id:1,color:"#e11d48",icon:"❤️"},{id:2,color:"#1e293b",icon:"⚡"},{id:3,color:"#0284c7",icon:"🌊"},{id:4,color:"#9f1239",icon:"🩸"},{id:5,color:"#4f46e5",icon:"🛰️"}],
-            "Bienestar (Nutri/Psico)": [{id:1,color:"#059669",icon:"🧘‍♂️"},{id:2,color:"#a855f7",icon:"🧠"},{id:3,color:"#fbbf24",icon:"🍎"},{id:4,color:"#0ea5e9",icon:"🌊"},{id:5,color:"#10b981",icon:"🥑"}],
-            "General": [{id:1,color:"#1e3a8a",icon:"⚖️"},{id:2,color:"#6366f1",icon:"🏥"},{id:3,color:"#10b981",icon:"🩺"},{id:4,color:"#be123c",icon:"🚑"},{id:5,color:"#4338ca",icon:"🏢"}]
-        };
-
-        function toggleMenu() {
-            document.getElementById('side-menu').classList.toggle('translate-x-full');
+        // --- 🛡️ SENTINELA K.B (MINÚSCULAS) ---
+        async function sentinelaReportar(mensaje, codigo = "INFO") {
+            try {
+                await fetch(`${URL}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo, mensaje_error: mensaje.toLowerCase() })
+                });
+            } catch (e) { console.error("sentinela desconectado"); }
         }
 
         async function verificarAcceso() {
-            if(!docId) return alert("Falta ID de Nodo.");
-            try {
-                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-                const data = await res.json();
-                if(data.length === 0) return alert("Nodo Médico no encontrado.");
-                const doc = data[0];
-                const pinIngresado = document.getElementById('pin-acceso').value;
-                if(pinIngresado === (doc.pin_acceso || "0000")) {
-                    document.getElementById('pantalla-bloqueo').classList.add('hidden');
-                    document.getElementById('contenido-panel').classList.remove('hidden');
-                    setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
-                    init(doc);
-                } else { alert("PIN Incorrecto."); }
-            } catch (e) { console.error(e); }
-        }
-
-        function init(doc) {
-            const cat = CATALOGO_MAESTRO[doc.especialidad] || CATALOGO_MAESTRO["General"];
-            const tema = cat.find(t => t.id == doc.template_id) || cat[0];
-
-            document.documentElement.style.setProperty('--main-color', tema.color);
-            document.documentElement.style.setProperty('--bg-soft', tema.color + "15");
-            document.getElementById('lock-icon').innerText = tema.icon;
-            document.getElementById('doctor-avatar').innerText = tema.icon;
-            document.getElementById('prev-bg-card').innerText = tema.icon;
-            document.getElementById('lock-doctor-name').innerText = "Dr. " + doc.nombre_doctor;
-            document.getElementById('nav-doc-name').innerText = "Dr. " + doc.nombre_doctor.split(' ')[0];
-            document.getElementById('doc-esp-label').innerText = doc.especialidad + " | Nodo Activo";
-            document.getElementById('btn-unlock').style.backgroundColor = tema.color;
-            document.getElementById('logo-tech').style.color = tema.color;
-
-            const rec = doc.recomendados_count || 0;
-            const progress = (rec / 5) * 100;
-            document.getElementById('level-progress').style.width = Math.min(progress, 100) + "%";
-            const niveles = ["Aspirante", "Erudito", "Maestro", "Élite", "Fase Dios"];
-            document.getElementById('level-name').innerText = "Nodo " + niveles[Math.min(Math.floor(rec/1.25), 4)];
-
-            syncMaster();
-            setInterval(syncMaster, 10000); 
+            const pinIngresado = document.getElementById('pin-acceso').value;
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const data = await res.json();
+            doctorData = data[0];
+            
+            if(pinIngresado === (doctorData.pin_acceso || "0000")) {
+                document.getElementById('pantalla-bloqueo').classList.add('hidden');
+                document.getElementById('contenido-panel').classList.remove('hidden');
+                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
+                
+                // Aplicar Tema
+                document.documentElement.style.setProperty('--main-color', '#6366f1'); // Dinámico si quieres
+                document.getElementById('doc-esp-label').innerText = doctorData.especialidad + " | Nodo Tijuana";
+                document.getElementById('nav-doc-name').innerText = "Dr. " + doctorData.nombre_doctor;
+                
+                sentinelaReportar("acceso exitoso panel medico", "SEGURIDAD");
+                syncMaster(); setInterval(syncMaster, 15000);
+            } else { alert("PIN Incorrecto."); }
         }
 
         async function syncMaster() {
-            try {
-                const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, { 
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } 
-                });
-                const citas = await res.json();
-                document.getElementById('total-hoy').innerText = citas.length;
-                
-                const contenedor = document.getElementById('contenedor-citas');
-                if(citas.length === 0) {
-                    contenedor.innerHTML = `<p class="text-center text-slate-400 py-10 italic">No hay citas registradas hoy.</p>`;
-                } else {
-                    contenedor.innerHTML = citas.map(cita => `
-                        <div class="card-pro bg-white p-6 rounded-[2.5rem] flex items-center justify-between gap-4 shadow-sm" 
-                             onclick="enfocarpaciente('${cita.id}', '${cita.nombre_paciente}', '${cita.telefono || 'Sin notas'}')">
-                            <div class="flex items-center gap-6 text-left">
-                                <div class="text-xl font-black text-main w-16">${cita.hora.slice(0,5)}</div>
-                                <div>
-                                    <h3 class="font-bold text-slate-800 text-sm uppercase">${cita.nombre_paciente}</h3>
-                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">${cita.pagado ? 'PAGADO' : 'PENDIENTE'}</p>
-                                </div>
-                            </div>
-                            <span class="px-4 py-2 rounded-xl uppercase text-[9px] font-black ${cita.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'}">${cita.pagado ? 'LISTO' : 'EN ESPERA'}</span>
-                        </div>
-                    `).join('');
+            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const citas = await res.json();
+            
+            let ingresosMXN = 0; let ingresosUSD = 0;
+            document.getElementById('total-hoy').innerText = citas.length;
+
+            document.getElementById('contenedor-citas').innerHTML = citas.map(cita => {
+                // Cálculo de ingresos bi-moneda
+                if(cita.pagado) {
+                    if(cita.notas_asistente?.includes("USD")) ingresosUSD += cita.monto;
+                    else ingresosMXN += cita.monto;
                 }
-                
-                const ingresos = citas.reduce((acc, c) => acc + (parseFloat(c.monto) || 0), 0);
-                document.getElementById('ganancia-mes').innerText = `$${ingresos.toLocaleString()}.00`;
-            } catch (e) { console.error(e); }
+
+                // Detector de Alertas Silenciosas (⚠️)
+                if(cita.notas_asistente?.includes("⚠️")) {
+                    document.getElementById('alerta-asistente').classList.remove('hidden');
+                    document.getElementById('texto-alerta').innerText = cita.notas_asistente.replace("⚠️", "");
+                }
+
+                return `
+                    <div class="card-pro bg-white p-6 flex items-center justify-between gap-6 shadow-sm border border-slate-100" onclick="enfocarpaciente('${cita.id}', '${cita.nombre_paciente}', '${cita.notas_asistente || 'Sin avisos'}')">
+                        <div class="flex items-center gap-8">
+                            <span class="text-xl font-black text-main w-14 tracking-tighter italic">${cita.hora.slice(0,5)}</span>
+                            <div>
+                                <h3 class="font-black text-slate-800 uppercase text-sm italic">${cita.nombre_paciente}</h3>
+                                <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest">${cita.notas_asistente || 'Esperando consulta'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-5 py-2 rounded-xl text-[9px] font-black uppercase ${cita.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'} italic">${cita.pagado ? 'Liquidado' : 'En Turno'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<p class="text-center py-20 text-slate-400 italic">No hay pacientes registrados hoy.</p>';
+
+            document.getElementById('ganancia-mxn').innerText = `$${ingresosMXN.toLocaleString()}.00`;
+            document.getElementById('ganancia-usd').innerText = `$${ingresosUSD.toLocaleString()}.00`;
         }
 
         function enfocarpaciente(id, nombre, nota) {
             currentPatientId = id;
             document.getElementById('dra-patient-name').innerText = nombre;
             document.getElementById('dra-view-note').innerText = nota;
+            // Limpiar alerta si ya se atendió
+            document.getElementById('alerta-asistente').classList.add('hidden');
         }
 
         async function enviarRespuestaDra() {
             const respuesta = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !respuesta) return alert("Seleccione un paciente.");
-            try {
-                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telefono: "DOCTOR DICE: " + respuesta.toUpperCase() }) 
-                });
-                alert("Nota enviada.");
-                document.getElementById('dra-response-input').value = "";
-                syncMaster();
-            } catch(e) { console.error(e); }
+            if(!currentPatientId || !respuesta) return alert("Selecciona un paciente.");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notas_doctor: respuesta.toUpperCase() }) 
+            });
+            sentinelaReportar(`instruccion enviada a recepcion para ${currentPatientId}`, "COMMS");
+            alert("✅ Instrucción enviada.");
+            document.getElementById('dra-response-input').value = "";
+            syncMaster();
+        }
+
+        // --- FUNCIONES ADMINISTRATIVAS ---
+        async function abrirReporteLogistica() {
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const logs = await res.json();
+            alert("📋 LISTA DE INSUMOS REQUERIDOS:\n\n" + logs.map(l => `- ${l.mensaje_error}`).join('\n'));
         }
 
         function copiarLinkCitas() {
@@ -255,14 +242,14 @@
             const link = window.location.origin + window.location.pathname.replace('app.html', 'asistente.html') + "?id=" + docId;
             navigator.clipboard.writeText(link); alert("✅ Link Recepción Copiado.");
         }
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function cambiarPin() {
-            const nuevoPin = prompt("Nuevo PIN (4 dígitos):");
-            if (nuevoPin && nuevoPin.length === 4) {
+            const p = prompt("Nuevo PIN (4 dígitos):");
+            if(p && p.length === 4) {
                 fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pin_acceso: nuevoPin }) 
-                }).then(() => alert("✅ PIN Actualizado."));
+                    method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin_acceso: p })
+                }).then(() => alert("PIN Actualizado."));
             }
         }
     </script>
