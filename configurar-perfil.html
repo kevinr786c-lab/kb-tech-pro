@@ -7,140 +7,137 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
-        .glass-card { background: white; border-radius: 2.5rem; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
-        .input-kb { width: 100%; padding: 1rem; border-radius: 1rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 600; outline: none; transition: 0.3s; font-size: 0.9rem; }
-        .input-kb:focus { border-color: #6366f1; background: white; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; transition: 0.5s; }
+        :root { --main-color: #6366f1; }
+        .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 3rem; }
+        .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: rgba(255,255,255,0.05); border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; color: white; }
+        .input-kb:focus { border-color: var(--main-color); background: rgba(255,255,255,0.1); }
+        .btn-ia { background: var(--main-color); opacity: 0.9; }
+        .btn-ia:hover { opacity: 1; transform: scale(1.05); }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-6">
 
-    <div class="max-w-2xl w-full glass-card p-10 border-t-[12px] border-indigo-600">
-        <header class="mb-10 text-center">
-            <span class="text-xs font-black uppercase tracking-[0.3em] text-indigo-500">Paso Final</span>
-            <h1 class="text-4xl font-black tracking-tighter text-slate-800 italic uppercase">Configura tu Poder</h1>
-            <p class="text-slate-400 font-medium mt-2">Personaliza tu consultorio digital en segundos.</p>
+    <div class="max-w-2xl w-full glass-card p-12 border-t-[12px]" style="border-color: var(--main-color);">
+        <header class="mb-12 text-center">
+            <div id="doc-preview-icon" class="text-6xl mb-4">🩺</div>
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Nodo de Configuración Final</span>
+            <h1 id="welcome-doc" class="text-4xl font-black tracking-tighter italic uppercase mt-2">Personaliza tu Poder</h1>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Ajusta los parámetros de tu Red K.B</p>
         </header>
 
-        <form id="form-config" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <h3 class="font-black text-xs uppercase text-slate-400 tracking-widest">🛡️ Identidad Legal</h3>
+        <form id="form-config" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-5">
+                <h3 class="font-black text-[10px] uppercase text-slate-500 tracking-[0.3em] mb-4">🛡️ Identidad Legal</h3>
                 <input type="text" id="cedula" placeholder="Cédula Profesional" class="input-kb" required>
                 <input type="text" id="cofepris" placeholder="Registro COFEPRIS (Opcional)" class="input-kb">
-                <input type="text" id="url_logo" placeholder="Link de tu Logo (URL)" class="input-kb">
+                <input type="text" id="url_logo" placeholder="URL de tu Logo Profesional" class="input-kb">
             </div>
 
-            <div class="space-y-4">
-                <h3 class="font-black text-xs uppercase text-slate-400 tracking-widest">📅 Horarios de Atención</h3>
-                <div class="flex gap-2">
-                    <input type="time" id="h_inicio" value="09:00" class="input-kb">
-                    <input type="time" id="h_fin" value="17:00" class="input-kb">
+            <div class="space-y-5">
+                <h3 class="font-black text-[10px] uppercase text-slate-500 tracking-[0.3em] mb-4">📅 Parámetros de Tiempo</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-black uppercase ml-2 text-slate-500">Apertura</label>
+                        <input type="time" id="h_inicio" value="09:00" class="input-kb">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-black uppercase ml-2 text-slate-500">Cierre</label>
+                        <input type="time" id="h_fin" value="18:00" class="input-kb">
+                    </div>
                 </div>
-                <select id="duracion" class="input-kb">
-                    <option value="20">20 min por cita</option>
-                    <option value="30" selected>30 min por cita</option>
-                    <option value="45">45 min por cita</option>
-                    <option value="60">1 hora por cita</option>
-                </select>
-            </div>
-
-            <div class="md:col-span-2 space-y-2">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-black text-xs uppercase text-slate-400 tracking-widest">📝 Biografía Profesional</h3>
-                    <button type="button" onclick="sugerirConIA()" class="text-[10px] font-black text-indigo-600 uppercase bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition">✨ Sugerir con Gemini</button>
+                <div class="space-y-1">
+                    <label class="text-[8px] font-black uppercase ml-2 text-slate-500">Frecuencia de Citas</label>
+                    <select id="duracion" class="input-kb appearance-none">
+                        <option value="20">20 MINUTOS</option>
+                        <option value="30" selected>30 MINUTOS</option>
+                        <option value="45">45 MINUTOS</option>
+                        <option value="60">1 HORA</option>
+                    </select>
                 </div>
-                <textarea id="bio" rows="3" placeholder="Cuéntanos un poco de tu experiencia..." class="input-kb"></textarea>
             </div>
 
-            <button type="submit" id="btn-save" class="md:col-span-2 w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition-all shadow-xl active:scale-95 transition">Guardar y Abrir Consultorio</button>
+            <div class="md:col-span-2 space-y-4">
+                <div class="flex justify-between items-center px-2">
+                    <h3 class="font-black text-[10px] uppercase text-slate-500 tracking-[0.3em]">📝 Biografía con IA</h3>
+                    <button type="button" onclick="sugerirConIA()" class="btn-ia text-[9px] font-black text-white px-4 py-2 rounded-full transition shadow-lg">✨ GENERAR CON GEMINI</button>
+                </div>
+                <textarea id="bio" rows="4" placeholder="Describe tu visión médica..." class="input-kb resize-none"></textarea>
+            </div>
+
+            <div class="md:col-span-2 pt-6">
+                <button type="submit" id="btn-save" class="w-full py-6 bg-white text-slate-900 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] hover:bg-indigo-500 hover:text-white transition-all shadow-2xl active:scale-95">Inaugurar Sucursal Digital</button>
+            </div>
         </form>
 
-        <p class="mt-8 text-center text-[10px] font-black text-slate-300 uppercase tracking-widest">Powered by K.B Tech Solutions | Tijuana Nodo</p>
+        <p class="mt-10 text-center text-[9px] font-black text-slate-600 uppercase tracking-[0.5em]">K.B Tech Solutions • Beyond Technology</p>
     </div>
 
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+        let currentDocData = null;
 
-        async function reportarError(errorMsg, datos = {}) {
-            try {
-                await fetch(`${URL_DB}/rest/v1/Logs_Sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        pagina_origen: "configurar-perfil.html",
-                        codigo_error: "CONFIG_ERROR_ULTRA",
-                        mensaje_error: errorMsg,
-                        datos_enviados: datos,
-                        dispositivo_info: navigator.userAgent
-                    })
-                });
-            } catch(e) { console.error("Centinela Offline"); }
+        const CATALOGO_TEMAS = {
+            "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1"
+        };
+
+        async function init() {
+            if (!docId) return alert("Error de Nodo.");
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
+            const data = await res.json();
+            currentDocData = data[0];
+
+            if (currentDocData) {
+                document.getElementById('welcome-doc').innerText = `Dr. ${currentDocData.nombre_doctor}`;
+                const color = CATALOGO_TEMAS[currentDocData.especialidad] || "#6366f1";
+                document.documentElement.style.setProperty('--main-color', color);
+            }
         }
 
         async function sugerirConIA() {
             const bio = document.getElementById('bio');
-            bio.placeholder = "Gemini está analizando tu perfil...";
+            bio.value = "Generando...";
+            const prompts = {
+                "Pediatría": "Especialista dedicado al crecimiento saludable y bienestar integral de los más pequeños, combinando calidez humana con medicina de precisión.",
+                "Ginecología": "Atención integral y empoderamiento de la salud femenina en todas sus etapas, con protocolos de vanguardia y máxima confidencialidad.",
+                "General": "Comprometido con la detección oportuna y el cuidado preventivo, integrando tecnología avanzada para transformar la salud de mis pacientes."
+            };
             setTimeout(() => {
-                bio.value = "Especialista enfocado en brindar soluciones de salud con tecnología de vanguardia y un trato humano excepcional. Mi compromiso es garantizar diagnósticos precisos y una atención personalizada para cada paciente en Tijuana.";
-            }, 1000);
+                bio.value = prompts[currentDocData.especialidad] || prompts["General"];
+            }, 800);
         }
 
         document.getElementById('form-config').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!docId) {
-                alert("Error: No se detectó ID del Nodo Médico.");
-                return;
-            }
-
             const btn = document.getElementById('btn-save');
-            btn.innerText = "ACTIVANDO NODO MÉDICO...";
+            btn.innerText = "CONFIGURANDO RED...";
             btn.disabled = true;
-            btn.style.opacity = "0.7";
 
-            // Aseguramos formato HH:MM:SS para evitar Error 400 en Supabase
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value,
                 url_logo: document.getElementById('url_logo').value,
-                hora_inicio: document.getElementById('h_inicio').value.length === 5 ? document.getElementById('h_inicio').value + ":00" : document.getElementById('h_inicio').value,
-                hora_fin: document.getElementById('h_fin').value.length === 5 ? document.getElementById('h_fin').value + ":00" : document.getElementById('h_fin').value,
+                hora_inicio: document.getElementById('h_inicio').value + ":00",
+                hora_fin: document.getElementById('h_fin').value + ":00",
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value
             };
 
-            try {
-                const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': KEY_DB,
-                        'Authorization': `Bearer ${KEY_DB}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-                if (response.ok) {
-                    alert("¡Nodo Activado! Bienvenido a la red K.B Tech.");
-                    window.location.href = `app.html?id=${docId}`;
-                } else {
-                    const errorDetails = await response.json();
-                    await reportarError("Fallo al guardar configuración", {payload, errorDetails});
-                    alert("Error 400: Los datos de tiempo o formato no son compatibles.");
-                    btn.innerText = "Guardar y Abrir Consultorio";
-                    btn.disabled = false;
-                    btn.style.opacity = "1";
-                }
-            } catch (err) {
-                await reportarError("Excepción crítica en configuración", {id: docId, error: err.message});
-                btn.innerText = "Guardar y Abrir Consultorio";
-                btn.disabled = false;
-                btn.style.opacity = "1";
+            if (response.ok) {
+                alert("🚀 Nodo Sincronizado. Entrando al Centro de Control.");
+                window.location.href = `app.html?id=${docId}`;
             }
         });
+
+        init();
     </script>
 </body>
 </html>
