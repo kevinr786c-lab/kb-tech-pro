@@ -32,7 +32,7 @@
         <div class="text-center p-12 bg-white rounded-[3.5rem] shadow-2xl max-w-sm w-full border border-slate-100">
             <div id="lock-icon" class="text-6xl mb-6">🩺</div>
             <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2">Acceso Médico</h2>
-            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando con Ecosistema...</p>
+            <p id="lock-doctor-name" class="text-[10px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">Sincronizando Nodo...</p>
             <input type="password" id="pin-acceso" class="input-premium text-center text-4xl tracking-[0.6em] mb-6" placeholder="****" maxlength="4">
             <button id="btn-unlock" onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition">Desbloquear Nodo</button>
         </div>
@@ -62,6 +62,7 @@
             <div>
                 <h1 class="text-4xl font-black italic tracking-tighter uppercase">K.B <span id="logo-tech" class="text-main">Doctor</span></h1>
                 <p id="doc-esp-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic"></p>
+                <p id="nav-doc-name" class="text-[10px] font-black text-slate-800 mt-1 uppercase"></p>
             </div>
             <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
                 <div class="space-y-1.5">
@@ -78,6 +79,16 @@
                         <p class="text-[10px] font-black text-rose-600 uppercase italic">Aviso de Recepción</p>
                     </div>
                     <p id="texto-alerta" class="text-sm font-bold text-rose-900 uppercase italic leading-tight">---</p>
+                </div>
+
+                <div id="banner-recompensa" class="hidden p-6 rounded-[2.5rem] bg-emerald-50 border-2 border-emerald-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">💎</span>
+                        <div>
+                            <p class="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Estatus VIP K.B</p>
+                            <p class="text-xs font-bold text-emerald-900 italic">-20% RECOMPENSA ACTIVA</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="glass-panel p-8 shadow-sm">
@@ -115,7 +126,7 @@
                 <div class="flex justify-between items-end mb-10 px-4">
                     <h2 class="text-3xl font-black italic uppercase tracking-tighter">Agenda <span class="text-main">Live</span></h2>
                     <div class="bg-slate-100 px-6 py-2 rounded-2xl text-[10px] font-black text-slate-600 uppercase italic border border-slate-200">
-                        Citas Hoy: <span id="total-hoy" class="text-main text-sm ml-1">0</span>
+                        Citas Hoy: <span id="total-hoy" class="text-sm ml-1">0</span>
                     </div>
                 </div>
                 <div id="contenedor-citas" class="grid gap-4"></div>
@@ -161,7 +172,7 @@
                 document.getElementById('doc-esp-label').innerText = doctorData.especialidad + " | Ecosistema K.B";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + doctorData.nombre_doctor;
                 
-                // MODO CAMALEÓN DINÁMICO (30 TEMAS POSIBLES)
+                // MODO CAMALEÓN DINÁMICO (30 TEMAS)
                 const esp = doctorData.especialidad || "General";
                 const palette = CATALOGO_TEMAS[esp] || CATALOGO_TEMAS["General"];
                 const colorIdx = (doctorData.template_id || 1) % 5;
@@ -170,6 +181,16 @@
                 document.documentElement.style.setProperty('--main-color', finalColor);
                 document.getElementById('btn-unlock').style.backgroundColor = finalColor;
                 
+                // --- 💎 MODO RECOMPENSA (20% DESCUENTO) ---
+                const resRec = await fetch(`${URL}/rest/v1/Registro_Recomendados?recomendador_id=eq.${docId}`, { 
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } 
+                });
+                const recomendados = await resRec.json();
+                if (recomendados.length > 0) {
+                    document.getElementById('banner-recompensa').classList.remove('hidden');
+                    sentinela(`nodo con beneficio activo: 20% descuento por recomendados`, "fiscal");
+                }
+
                 sentinela("acceso médico validado", "seguridad");
                 syncMaster(); setInterval(syncMaster, 10000);
             } else { alert("PIN Incorrecto."); }
@@ -202,8 +223,7 @@
                             </div>
                         </div>
                         <span class="px-4 py-2 rounded-xl text-[8px] font-black uppercase italic ${c.pagado ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'}">${c.pagado ? 'Liquidado' : 'Pendiente'}</span>
-                    </div>
-                `;
+                    </div>`;
             }).join('') || '<p class="text-center py-20 opacity-20 font-black italic uppercase">Nodo Vacío</p>';
 
             document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
