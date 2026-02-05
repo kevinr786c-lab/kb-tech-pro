@@ -10,63 +10,87 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
         :root { --main: #4f46e5; --bg: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; }
-        .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2rem; shadow-sm; transition: 0.3s; }
-        .input-kb { width: 100%; padding: 1rem; border-radius: 1rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; }
+        .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2rem; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
+        .input-kb { width: 100%; padding: 1rem; border-radius: 1.25rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; }
         .input-kb:focus { border-color: var(--main); background: white; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .status-wait { background: #94a3b8; box-shadow: 0 0 8px #94a3b8; }
         .status-ok { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 2.5rem; padding: 2.5rem; position: relative; }
-        .btn-main { background: var(--main); color: white; transition: 0.3s; font-weight: 800; border-radius: 1.25rem; }
-        .btn-main:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 2.5rem; padding: 2.5rem; }
+        .cal-day:hover { background: var(--main); color: white; }
+        #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
     </style>
 </head>
 <body class="p-4 md:p-8 pb-32">
 
     <div id="modal-container" class="modal-overlay" onclick="if(event.target.id==='modal-container') cerrarModal()">
-        <div class="modal-content shadow-2xl border border-slate-100">
+        <div class="modal-content shadow-2xl scale-up border border-slate-100">
             <header class="text-center mb-8">
                 <div id="modal-icon" class="text-5xl mb-3">💎</div>
-                <h2 id="modal-title" class="text-2xl font-black uppercase italic tracking-tighter">Acción K.B</h2>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em]">Infrastructure & Security</p>
+                <h2 id="modal-title" class="text-2xl font-black uppercase italic tracking-tighter">Nodo K.B</h2>
+                <p id="modal-desc" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em]">Operations Unit</p>
             </header>
-            <div id="modal-body" class="space-y-4"></div>
+            <div id="modal-body" class="max-h-[60vh] overflow-y-auto space-y-4 px-2"></div>
             <div class="flex gap-4 mt-10">
-                <button onclick="cerrarModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase">Cancelar</button>
-                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Ejecutar</button>
+                <button onclick="cerrarModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase">Cerrar</button>
+                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Confirmar</button>
             </div>
         </div>
     </div>
 
-    <div id="pantalla-bloqueo" class="fixed inset-0 bg-white z-[30000] flex items-center justify-center">
+    <div id="pantalla-bloqueo" class="fixed inset-0 bg-white z-[50000] flex items-center justify-center">
         <div class="text-center p-10 glass-panel max-w-sm w-full border-t-8 border-indigo-600">
             <div class="text-6xl mb-6">👩‍💼</div>
             <h2 class="text-2xl font-black mb-8 uppercase italic tracking-tighter">Recepción <span class="text-indigo-600">K.B</span></h2>
             <input type="password" id="pin-acceso" class="input-kb text-center text-4xl tracking-[0.4em] mb-6" placeholder="****" maxlength="4">
-            <button onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs">Desbloquear Nodo</button>
+            <button onclick="verificarAcceso()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs">Entrar al Nodo</button>
         </div>
     </div>
 
-    <div id="contenido-panel" class="hidden max-w-7xl mx-auto opacity-0 transition-opacity duration-500">
+    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white">
+        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl">✕</button>
+        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-10 italic">Herramientas Administrativas</h3>
+        <nav class="space-y-4">
+            <button onclick="toggleMenu(); buscarPaciente()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700">
+                <div class="text-xl">🔍</div><span class="text-[10px] font-black uppercase">Buscador Universal</span>
+            </button>
+            <button onclick="toggleMenu(); abrirCalendario()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700">
+                <div class="text-xl">📅</div><span class="text-[10px] font-black uppercase">Calendario Maestro</span>
+            </button>
+            <button onclick="toggleMenu(); registrarGasto()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700">
+                <div class="text-xl">💸</div><span class="text-[10px] font-black uppercase">Registrar Gasto</span>
+            </button>
+            <button onclick="toggleMenu(); reportarInsumos()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-slate-700">
+                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Faltante Insumos</span>
+            </button>
+            <hr class="border-slate-800 my-6">
+            <button onclick="toggleMenu(); corteDeCaja()" class="flex items-center gap-4 w-full p-4 bg-rose-600/20 border border-rose-600/30 rounded-2xl text-rose-400">
+                <div class="text-xl">📊</div><span class="text-[10px] font-black uppercase">Cierre de Caja Diario</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="contenido-panel" class="hidden max-w-7xl mx-auto opacity-0 transition-all duration-500">
         <header class="flex justify-between items-end mb-12">
             <div>
                 <h1 class="text-5xl font-black text-slate-900 italic tracking-tighter">K.B <span id="brand-text" class="text-indigo-600">Assistant</span></h1>
                 <p id="doc-assigned" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 px-1"></p>
             </div>
-            <div class="flex gap-4">
-                <button onclick="abrirCalendario()" class="p-5 bg-white border border-slate-200 rounded-3xl shadow-sm hover:border-indigo-500 transition">📅</button>
-                <button onclick="location.reload()" class="p-5 bg-slate-900 text-white rounded-3xl shadow-xl active:scale-95 transition">🔄</button>
-            </div>
+            <button onclick="toggleMenu()" class="p-5 bg-slate-900 text-white rounded-3xl shadow-xl active:scale-95 transition">
+                <div class="space-y-1.5">
+                    <div class="w-6 h-0.5 bg-white"></div><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-indigo-500"></div>
+                </div>
+            </button>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-6">
                 <div id="card-paciente" class="glass-panel p-8 border-l-[12px] border-indigo-600">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-6 tracking-widest italic">Paciente en Turno:</h3>
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 mb-6 tracking-widest italic">Paciente Seleccionado:</h3>
                     <p class="text-4xl font-extrabold text-slate-900 leading-none mb-2" id="patient-display">---</p>
-                    <p id="patient-time-display" class="text-[11px] font-bold text-indigo-500 uppercase italic">Esperando selección...</p>
+                    <p id="patient-time-display" class="text-[11px] font-bold text-indigo-500 uppercase italic">Seleccione de la lista</p>
                     <div class="grid grid-cols-2 gap-3 mt-10">
                         <button onclick="contactarWhatsApp()" class="py-4 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase">WhatsApp</button>
                         <button onclick="abrirCobro()" class="py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg">Cobrar Cita</button>
@@ -74,19 +98,23 @@
                 </div>
 
                 <div class="glass-panel p-8">
-                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4">Intercom Directo al Dr.</h3>
-                    <textarea id="internal-note-input" class="w-full p-4 rounded-2xl bg-slate-50 text-[11px] font-bold h-24 outline-none resize-none border-2 border-transparent focus:border-indigo-500" placeholder="Escribe un aviso..."></textarea>
-                    <button onclick="enviarNotaInterna()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase mt-4">Mandar Alerta</button>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 mb-4">Avisos al Dr.</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="alertaSilenciosa('prisa')" class="py-3 bg-slate-50 text-slate-600 rounded-xl font-bold text-[9px] uppercase border border-slate-100 hover:border-amber-500 transition">⚠️ Tiene Prisa</button>
+                        <button onclick="alertaSilenciosa('molesto')" class="py-3 bg-slate-50 text-slate-600 rounded-xl font-bold text-[9px] uppercase border border-slate-100 hover:border-rose-500 transition">😠 Molesto</button>
+                        <textarea id="internal-note-input" class="mt-2 w-full p-4 rounded-xl bg-slate-50 text-[11px] font-bold h-20 outline-none resize-none border-2 border-transparent focus:border-indigo-500" placeholder="Escribe otro aviso..."></textarea>
+                        <button onclick="enviarNotaInterna()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-black text-[9px] uppercase mt-2">Mandar Nota</button>
+                    </div>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
                 <div class="glass-panel p-10 min-h-[600px] border-t-4 border-slate-100">
                     <div class="flex justify-between items-center mb-10">
-                        <h3 class="text-sm font-black uppercase text-slate-800 italic tracking-widest">Flujo de Citas Hoy</h3>
+                        <h3 class="text-sm font-black uppercase text-slate-800 italic tracking-widest pb-2 border-b-2 border-indigo-600">Agenda Activa</h3>
                         <div class="flex gap-4 text-[9px] font-bold text-slate-400 uppercase">
-                            <span class="flex items-center gap-2"><div class="status-dot status-wait"></div> Pendiente Depósito</span>
-                            <span class="flex items-center gap-2"><div class="status-dot status-ok"></div> Garantía Validada</span>
+                            <span class="flex items-center gap-2"><div class="status-dot status-wait"></div> Pendiente</span>
+                            <span class="flex items-center gap-2"><div class="status-dot status-ok"></div> Garantía</span>
                         </div>
                     </div>
                     <div id="tabla-citas-body" class="grid gap-3"></div>
@@ -100,65 +128,49 @@
         const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-        let currentPatient = null;
-        let doctorData = {};
+        let currentPatient = null; let doctorData = {}; 
+        let calMonth = new Date().getMonth(); let calYear = new Date().getFullYear();
 
-        // --- 🛡️ SENTINELA (LOGS SISTEMA) ---
+        // --- 🛡️ SISTEMA SENTINELA ---
         async function sentinelaReportar(mensaje, codigo = "INFO") {
             try {
                 await fetch(`${URL}/rest/v1/logs_sistema`, {
                     method: 'POST',
                     headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        pagina_origen: "asistente.html",
-                        codigo_error: codigo,
-                        mensaje_error: mensaje.toLowerCase()
-                    })
+                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: codigo, mensaje_error: mensaje.toLowerCase() })
                 });
-            } catch (e) { console.error("Sentinela Offline"); }
+            } catch (e) { console.warn("Sentinela en modo offline"); }
         }
 
-        // --- 🤖 ALIADO IA: RECORDATORIOS ---
-        async function ejecutarIA_Recordatorios() {
+        // --- 🤖 IA DE RECORDATORIOS ---
+        async function motorIA_Recordatorios() {
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             const ahora = new Date();
-
             citas.forEach(cita => {
                 const citaFecha = new Date(`${cita.fecha}T${cita.hora}`);
-                const diffHoras = (citaFecha - ahora) / (1000 * 60 * 60);
-                if (diffHoras > 0 && diffHoras <= 2.5) {
-                    sentinelaReportar(`ia: recordatorio final enviado a ${cita.nombre_paciente}`, "IA_NOTIF");
-                }
+                const diff = (citaFecha - ahora) / (1000 * 60 * 60);
+                if (diff > 0 && diff <= 2) sentinelaReportar(`ia: recordatorio crítico enviado a ${cita.nombre_paciente}`, "IA_NOTIF");
             });
         }
 
-        // --- ACCESO Y SEGURIDAD ---
+        // --- ACCESO ---
         async function verificarAcceso() {
-            try {
-                const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-                const data = await res.json();
-                doctorData = data[0];
-                
-                if(document.getElementById('pin-acceso').value === (doctorData.pin_acceso || "0000")) {
-                    aplicarTema(doctorData.especialidad);
-                    document.getElementById('pantalla-bloqueo').style.display = 'none';
-                    document.getElementById('contenido-panel').classList.remove('hidden');
-                    setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
-                    document.getElementById('doc-assigned').innerText = ` Nodo Operativo: Dr. ${doctorData.nombre_doctor}`;
-                    sentinelaReportar("inicio de sesion exitoso", "SEGURIDAD");
-                    cargarCitas();
-                    setInterval(cargarCitas, 20000);
-                    setInterval(ejecutarIA_Recordatorios, 1800000); // IA cada 30 min
-                } else {
-                    sentinelaReportar("intento de pin fallido", "SEGURIDAD");
-                    alert("PIN Incorrecto");
-                }
-            } catch(e) { console.error(e); }
+            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const data = await res.json(); doctorData = data[0];
+            if(document.getElementById('pin-acceso').value === (doctorData.pin_acceso || "0000")) {
+                document.getElementById('pantalla-bloqueo').style.display = 'none';
+                document.getElementById('contenido-panel').classList.remove('hidden');
+                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
+                document.getElementById('doc-assigned').innerText = `Asistente: Dr. ${doctorData.nombre_doctor}`;
+                aplicarTema(doctorData.especialidad);
+                sentinelaReportar("acceso exitoso al nodo operativo", "SEGURIDAD");
+                cargarCitas(); setInterval(cargarCitas, 30000); setInterval(motorIA_Recordatorios, 1800000);
+            } else { alert("PIN Incorrecto"); sentinelaReportar("intento de acceso fallido", "SEGURIDAD"); }
         }
 
         function aplicarTema(esp) {
-            const temas = { "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#4f46e5" };
+            const temas = { "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48" };
             const color = temas[esp] || "#4f46e5";
             document.documentElement.style.setProperty('--main', color);
             document.getElementById('brand-text').style.color = color;
@@ -169,110 +181,107 @@
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.false&order=hora.asc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => `
-                <div class="flex items-center justify-between p-6 bg-white border border-slate-100 rounded-3xl hover:border-indigo-500 transition cursor-pointer shadow-sm active:scale-[0.98]" onclick="seleccionarPaciente(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+                <div class="flex items-center justify-between p-6 bg-white border border-slate-100 rounded-3xl hover:border-indigo-500 transition cursor-pointer shadow-sm active:scale-95" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
                     <div class="flex items-center gap-6">
                         <div class="status-dot ${c.deposito_pagado ? 'status-ok' : 'status-wait'}"></div>
-                        <div>
-                            <p class="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">${c.hora.slice(0,5)} HS</p>
-                            <p class="font-bold text-sm text-slate-800 uppercase tracking-tight">${c.nombre_paciente}</p>
-                        </div>
+                        <div><p class="text-[10px] font-black text-indigo-600 uppercase">${c.hora.slice(0,5)} HS</p><p class="font-bold text-sm text-slate-800 uppercase">${c.nombre_paciente}</p></div>
                     </div>
                 </div>
-            `).join('') || '<div class="text-center py-20 opacity-30 font-black italic uppercase text-xs">Agenda Limpia</div>';
+            `).join('') || '<div class="text-center py-20 opacity-20 font-black italic">AGENDA LIMPIA</div>';
         }
 
         function seleccionarPaciente(cita) {
             currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
-            document.getElementById('patient-time-display').innerText = `Programado para: ${cita.hora.slice(0,5)} hs`;
+            document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} hs`;
         }
 
-        // --- COBROS Y PDF CORPORATIVO ---
+        // --- MODAL Y FUNCIONES ---
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
+        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
+
+        // --- BUSCADOR ---
+        async function buscarPaciente() {
+            const term = prompt("Nombre del paciente:").toLowerCase(); if(!term) return;
+            const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=ilike.*${term}*&doctor_id=eq.${docId}`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const data = await res.json();
+            document.getElementById('modal-title').innerText = "Resultados";
+            document.getElementById('modal-body').innerHTML = data.map(r => `<div class="p-4 border-b text-sm font-bold flex justify-between cursor-pointer hover:bg-slate-50" onclick='seleccionarPaciente(${JSON.stringify(r)}); cerrarModal();'>${r.nombre_paciente} <span>${r.fecha}</span></div>`).join('');
+            abrirModal();
+        }
+
+        // --- COBROS ---
         function abrirCobro() {
             if(!currentPatient) return alert("Selecciona un paciente.");
-            const montoOriginal = currentPatient.monto || 0;
-            const deposito = currentPatient.deposito_pagado ? (montoOriginal * 0.20) : 0;
-            
-            document.getElementById('modal-icon').innerText = "💰";
+            const base = currentPatient.monto || 0; const dep = currentPatient.deposito_pagado ? (base * 0.20) : 0;
             document.getElementById('modal-title').innerText = "Cierre de Cuenta";
             document.getElementById('modal-body').innerHTML = `
-                <div class="space-y-5">
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Monto del Servicio ($)</label>
-                        <input type="number" id="pay-amount" value="${montoOriginal}" class="input-kb text-2xl">
-                    </div>
-                    ${deposito > 0 ? `<div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 flex justify-between items-center"><span class="text-[10px] font-black text-emerald-700 uppercase">Garantía Aplicada (20%)</span><span class="font-bold text-emerald-800">-$${deposito.toFixed(2)}</span></div>` : ''}
-                    <select id="pay-method" class="input-kb">
-                        <option value="EFECTIVO">Efectivo</option>
-                        <option value="TRANSFERENCIA">Transferencia</option>
-                        <option value="TARJETA">Tarjeta Bancaria</option>
-                    </select>
-                </div>
+                <input type="number" id="pay-amount" value="${base}" class="input-kb text-2xl">
+                ${dep > 0 ? `<div class="p-4 bg-emerald-50 text-emerald-700 rounded-2xl font-bold flex justify-between"><span>Garantía (20%)</span> <span>-$${dep.toFixed(2)}</span></div>` : ''}
+                <select id="pay-method" class="input-kb"><option>EFECTIVO</option><option>TRANSFERENCIA</option><option>TARJETA</option></select>
             `;
-            document.getElementById('modal-container').style.display = 'flex';
-            document.getElementById('modal-confirm-btn').onclick = procesarPago;
-        }
-
-        async function procesarPago() {
-            const base = parseFloat(document.getElementById('pay-amount').value);
-            const met = document.getElementById('pay-method').value;
-            if(!base) return alert("Ingresa el monto.");
-            
-            const dep = currentPatient.deposito_pagado ? (base * 0.20) : 0;
-            const final = base - dep;
-
-            const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pagado: true, monto: final, notas_asistente: `Cobro: ${met}` })
-            });
-
-            if(res.ok) {
-                sentinelaReportar(`cobro finalizado: ${currentPatient.nombre_paciente} | neto: ${final}`, "FISCAL");
+            abrirModal();
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const final = parseFloat(document.getElementById('pay-amount').value) - dep;
+                const met = document.getElementById('pay-method').value;
+                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: final, notas_asistente: `pago: ${met}` }) });
                 generarPDFPro(currentPatient.nombre_paciente, base, dep, final, met);
-                cerrarModal();
-                currentPatient = null;
-                document.getElementById('patient-display').innerText = "---";
-                cargarCitas();
-            }
+                sentinelaReportar(`cobro exitoso: ${currentPatient.nombre_paciente} neto: ${final}`, "FISCAL");
+                cerrarModal(); cargarCitas();
+            };
         }
 
         function generarPDFPro(nombre, total, dep, neto, met) {
             const doc = new jsPDF();
             doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(24); doc.setFont("helvetica", "bold"); doc.text("K.B TECH SOLUTIONS", 20, 28);
-            doc.setFontSize(8); doc.text("INFRAESTRUCTURA MÉDICA DE ALTA SEGURIDAD", 20, 36);
-            
-            doc.setTextColor(40, 40, 40); doc.setFontSize(10);
-            doc.text(`DR: ${doctorData.nombre_doctor.toUpperCase()}`, 20, 60);
-            doc.text(`PACIENTE: ${nombre.toUpperCase()}`, 20, 65);
-            doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 140, 60);
-
-            doc.autoTable({
-                startY: 80,
-                head: [['CONCEPTO', 'MÉTODO', 'TOTAL']],
-                body: [['CONSULTA ESPECIALIZADA', met, `$${total.toFixed(2)}`], ['GARANTÍA DE CITA (20%)', '-', `-$${dep.toFixed(2)}`], ['TOTAL NETO RECIBIDO', met, `$${neto.toFixed(2)}`]],
-                theme: 'striped', headStyles: { fillStyle: [15, 23, 42] }
-            });
-            doc.save(`RECIBO_KB_${nombre.replace(/\s/g, '_')}.pdf`);
+            doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("K.B TECH SOLUTIONS", 20, 28);
+            doc.autoTable({ startY: 60, head: [['CONCEPTO', 'MÉTODO', 'MONTO']], body: [['CONSULTA', met, `$${total}`], ['GARANTÍA 20%', '-', `-$${dep}`], ['TOTAL NETO', met, `$${neto}`]], theme: 'striped' });
+            doc.save(`RECIBO_KB_${nombre}.pdf`);
         }
 
-        async function enviarNotaInterna() {
-            const nota = document.getElementById('internal-note-input').value;
-            if(!currentPatient || !nota) return alert("Selecciona paciente.");
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ notas_asistente: "URGENTE: " + nota.toUpperCase() })
-            });
-            sentinelaReportar(`nota enviada al dr para ${currentPatient.nombre_paciente}`, "COMMS");
-            document.getElementById('internal-note-input').value = ""; alert("Aviso enviado.");
+        // --- ADMIN ---
+        async function registrarGasto() {
+            const c = prompt("Concepto:"); const m = prompt("Monto:"); if(!c || !m) return;
+            await sentinelaReportar(`gasto registrado: ${c} monto: $${m}`, "GASTO"); alert("Reportado.");
+        }
+        async function reportarInsumos() {
+            const i = prompt("¿Qué falta?"); if(!i) return;
+            await sentinelaReportar(`falta insumo: ${i}`, "LOGISTICA"); alert("Enviado a almacén.");
+        }
+        async function alertaSilenciosa(tipo) {
+            if(!currentPatient) return alert("Selecciona paciente.");
+            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ notas_asistente: "AVISO: " + tipo.toUpperCase() }) });
+            sentinelaReportar(`alerta silenciosa: ${tipo} para ${currentPatient.nombre_paciente}`, "COMMS");
+            alert("Doctor notificado.");
+        }
+        async function corteDeCaja() {
+            sentinelaReportar("asistente inicio corte de caja diario", "FINANZAS");
+            alert("Corte enviado a revisión. Los totales se calcularán en el panel del Doctor.");
         }
 
-        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
-        function contactarWhatsApp() {
-            if(!currentPatient?.telefono) return alert("Sin número.");
-            window.open(`https://wa.me/${currentPatient.telefono.replace(/\D/g,'')}`, '_blank');
+        // --- CALENDARIO ---
+        function abrirCalendario() {
+            renderCalendar(); abrirModal();
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const f = document.querySelector('.cal-day.selected')?.dataset.fecha;
+                if(!f || !currentPatient) return alert("Selecciona día y paciente.");
+                await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ fecha: f }) });
+                alert("Cita movida."); cerrarModal(); cargarCitas();
+            };
+        }
+        function renderCalendar() {
+            const dMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const start = new Date(calYear, calMonth, 1).getDay();
+            document.getElementById('modal-body').innerHTML = `
+                <div class="grid grid-cols-7 gap-1">
+                    ${Array(start).fill('<div></div>').join('')}
+                    ${Array.from({length: dMonth}, (_,i) => {
+                        const f = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`;
+                        return `<div class="cal-day p-3 border rounded-xl text-xs font-bold text-center cursor-pointer" data-fecha="${f}" onclick="document.querySelectorAll('.cal-day').forEach(d=>d.classList.remove('selected','bg-indigo-600','text-white')); this.classList.add('selected','bg-indigo-600','text-white')">${i+1}</div>`;
+                    }).join('')}
+                </div>
+            `;
         }
     </script>
 </body>
