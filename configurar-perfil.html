@@ -125,7 +125,6 @@
                 document.getElementById('welcome-doc').innerText = `Dr. ${currentDocData.nombre_doctor}`;
                 const color = CATALOGO_TEMAS[currentDocData.especialidad] || "#6366f1";
                 document.documentElement.style.setProperty('--main-color', color);
-                document.getElementById('btn-save').style.backgroundColor = 'white'; // Default state
             }
         }
 
@@ -168,8 +167,8 @@
 
             const payload = {
                 cedula: document.getElementById('cedula').value,
-                aviso_cofepris: document.getElementById('cofepris').value,
-                url_logo: document.getElementById('url_logo').value,
+                aviso_cofepris: document.getElementById('cofepris').value || null,
+                url_logo: document.getElementById('url_logo').value || null,
                 hora_inicio: document.getElementById('h_inicio').value + ":00",
                 hora_fin: document.getElementById('h_fin').value + ":00",
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
@@ -177,11 +176,11 @@
                 direccion_consultorio: document.getElementById('direccion').value,
                 latitud: parseFloat(document.getElementById('latitud').value) || null,
                 longitud: parseFloat(document.getElementById('longitud').value) || null,
-                url_foto_consultorio: document.getElementById('foto_consultorio').value,
-                url_foto_equipo: document.getElementById('foto_equipo').value,
+                url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
+                url_foto_equipo: document.getElementById('foto_equipo').value || null,
                 redes_sociales: JSON.stringify({
-                    instagram: document.getElementById('instagram').value,
-                    facebook: document.getElementById('facebook').value
+                    instagram: document.getElementById('instagram').value || "",
+                    facebook: document.getElementById('facebook').value || ""
                 })
             };
 
@@ -193,8 +192,8 @@
 
             if (response.ok) {
                 alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                // Redirección al Nodo Maestro del Doctor
-                window.location.href = `doctor.html?id=${docId}`;
+                // REDIRECCIÓN TÁCTICA A APP.HTML
+                window.location.href = `app.html?id=${docId}`;
             } else {
                 alert("Fallo en la sincronización del Nodo.");
                 btn.disabled = false;
