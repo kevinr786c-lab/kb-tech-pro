@@ -299,6 +299,102 @@
             };
             abrirModal();
         }
+    function abrirCobroPremium() {
+            if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
+            document.getElementById('modal-icon').innerText = "💒";
+            document.getElementById('modal-title').innerText = "Cobro Binacional";
+            document.getElementById('modal-body').innerHTML = `
+                <div class="flex gap-2 p-1 bg-slate-100 rounded-2xl mb-6">
+                    <button onclick="divisa='MXN'" class="flex-1 py-3 rounded-xl font-black text-[10px] bg-white border">MXN</button>
+                    <button onclick="divisa='USD'" class="flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400">USD</button>
+                </div>
+                <input type="number" id="pay-amount" placeholder="MONTO" class="input-kb text-3xl text-center">
+                <select id="metodo-pago" class="input-kb mt-4 text-[10px]">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta (+3.5%)</option>
+                    <option value="Zelle">Zelle / Transf</option>
+                </select>
+                <input type="text" id="pay-rfc" placeholder="RFC FACTURA" class="input-kb mt-4">`;
+            
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                let amt = parseFloat(document.getElementById('pay-amount').value);
+                const metodo = document.getElementById('metodo-pago').value;
+                if(metodo === "Tarjeta") amt = amt * 1.035;
+                const montoFinal = divisa === 'USD' ? (amt * tc) : amt;
+                
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagado: true, monto: montoFinal, telefono: `PAGO: ${divisa} | METODO: ${metodo.toUpperCase()}` })
+                });
+                eliteAviso("LIQUIDACIÓN EXITOSA ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
+        }
+
+        async function iniciarCierreCaja() {
+            eliteAviso("GENERANDO REPORTE...");
+            const d = fechaVisualizacion;
+            const hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
+            const data = await res.json();
+            const doc = new jsPDF();
+            doc.text("K.B ASSISTANT - REPORTE DE CAJA", 15, 20);
+            doc.autoTable({ 
+                head: [['HORA', 'PACIENTE', 'MONTO']], 
+                body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}.00`]), 
+                startY: 30 
+            });
+            doc.save(`CIERRE_${hoy}.pdf`);
+            eliteAviso("REPORTE DESCARGADO ✅");
+        }
+
+        function abrirGasto() {
+            document.getElementById('modal-icon').innerText = "💸";
+            document.getElementById('modal-title').innerText = "Registrar Gasto";
+            document.getElementById('modal-body').innerHTML = `
+                <input type="text" id="g-concepto" placeholder="CONCEPTO" class="input-kb mb-3 uppercase">
+                <input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const concepto = document.getElementById('g-concepto').value;
+                const monto = document.getElementById('g-monto').value;
+                // Aquí usamos la lógica de log para que el Dr lo vea
+                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: "GASTO", mensaje_error: `CONCEPTO: ${concepto} - MONTO: $${monto}` })
+                });
+                eliteAviso("GASTO REGISTRADO ✅"); cerrarModal();
+            };
+            abrirModal();
+        }
+
+        function abrirInsumo() {
+            document.getElementById('modal-icon').innerText = "📦";
+            document.getElementById('modal-title').innerText = "Reportar Faltante";
+            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32" placeholder="Ej: Faltan gasas, anestesia..."></textarea>`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const msg = document.getElementById('ins-txt').value;
+                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: "INSUMO", mensaje_error: msg })
+                });
+                eliteAviso("REPORTE ENVIADO ✅"); cerrarModal();
+            };
+            abrirModal();
+        }
+
+        // Función auxiliar para logs si no estaba definida
+        async function sentinela(mensaje, codigo = "info") {
+            try {
+                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: codigo.toUpperCase(), mensaje_error: mensaje.toLowerCase() })
+                });
+            } catch (e) { }
+        }
     </script>
 </body>
 </html>
