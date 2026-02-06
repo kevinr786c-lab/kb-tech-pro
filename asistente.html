@@ -228,7 +228,8 @@ function filtrarAgendaLocal() {
 
                 const tarjeta = document.createElement('div');
               // Así debe quedar la línea 230:
-tarjeta.className = `flex items-center justify-between p-10 bg-white border border-slate-100 rounded-[3rem] hover:border-slate-900 transition cursor-pointer w-full shadow-sm ${semaforoClase}`;
+// Así se vería la corrección en la línea 231:
+tarjeta.className = `flex items-center justify-between p-10 bg-white border border-slate-100 rounded-[1.5rem] hover:border-slate-900 transition cursor-pointer w-full shadow-sm ${semaforoClase}`;
                 
                 // Evento para seleccionar paciente
                 tarjeta.onclick = () => seleccionarPaciente(c);
