@@ -192,16 +192,20 @@
                 if(c.telefono && c.telefono.includes("URGENTE")) semaforoClase = "u-rojo";
                 else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforoClase = "u-amarillo";
                 return `
-                <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
+                <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}" onclick="seleccionarPaciente(${JSON.stringify(c).replace(/'/g, "&apos;")})">
                     <div class="flex items-center gap-8 text-left">
                         <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
-                        <div><p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p><p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p></div>
+                        <div>
+                            <p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p>
+                            <p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p>
+                        </div>
                     </div>
-                    <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/'/g, "&apos;")})" class="p-4 bg-slate-100 hover:bg-slate-200 rounded-2xl transition">✏️</button>
+                    <div class="flex gap-3">
+                        <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/'/g, "&apos;")})" class="p-4 bg-slate-100 hover:bg-indigo-100 rounded-2xl transition">✏️</button>
+                    </div>
                 </div>`;
             }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía</p>';
         }
-
         function seleccionarPaciente(cita) {
             currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
