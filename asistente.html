@@ -226,28 +226,31 @@ function filtrarAgendaLocal() {
                     semaforoClase = "u-amarillo"; // ATENCIÓN
                 }
 
-                const tarjeta = document.createElement('div');
-              // Así debe quedar la línea 230:
-// Así se vería la corrección en la línea 231:
-tarjeta.className = `flex items-center justify-between p-10 bg-white border border-slate-100 rounded-[1.5rem] hover:border-slate-900 transition cursor-pointer w-full shadow-sm ${semaforoClase}`;
+              const tarjeta = document.createElement('div');
                 
-                // Evento para seleccionar paciente
+                // AJUSTE LÍNEA 231: Bordes suaves (rounded-2xl) y ancho total (w-full)
+                // Usamos shadow-md para ese efecto de "flotado" elegante
+                tarjeta.className = `flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[1.5rem] hover:border-indigo-500 transition-all duration-300 cursor-pointer w-full shadow-md mb-2 ${semaforoClase}`;
+                
                 tarjeta.onclick = () => seleccionarPaciente(c);
 
-tarjeta.innerHTML = `
-                    <div class="flex items-center gap-8 text-left flex-1">
-                        <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
+                tarjeta.innerHTML = `
+                    <div class="flex items-center gap-6 text-left flex-1">
+                        <div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-300'} shadow-sm"></div>
+                        
                         <div>
-                            <p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p>
-                            <p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p>
-                            <p class="text-[9px] font-black ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic">
-                                ${c.pagado ? '✓ LIQUIDADO' : '⏳ PENDIENTE'}
+                            <p class="text-[11px] font-black uppercase tracking-wider text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p>
+                            <p class="font-black text-xl text-slate-800 uppercase leading-none mb-1">${c.nombre_paciente}</p>
+                            <p class="text-[10px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">
+                                ${c.pagado ? '✓ Liquidado' : '⏳ Cobro Pendiente'}
                             </p>
                         </div>
                     </div>
+
                     <div class="flex gap-3">
-                        <button id="btn-edit-${c.id}" class="p-4 bg-slate-100 hover:bg-indigo-100 rounded-2xl transition">✏️</button>
-                        <button id="btn-pay-${c.id}" class="p-4 ${c.pagado ? 'bg-emerald-100 opacity-50' : 'bg-slate-900'} rounded-2xl transition shadow-lg">💰</button>
+                        <button id="btn-edit-${c.id}" class="w-14 h-14 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button>
+                        
+                        <button id="btn-pay-${c.id}" class="w-14 h-14 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-600 opacity-50' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg">💰</button>
                     </div>
                 `;
 
