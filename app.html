@@ -105,6 +105,7 @@
                         </div>
                         <textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta..."></textarea>
                         <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg active:scale-95 transition">Guardar Nota</button>
+                        <button onclick="generarReceta()" class="w-full py-4 border-2 border-indigo-600 text-indigo-600 rounded-2xl font-black text-[10px] uppercase hover:bg-indigo-600 hover:text-white transition active:scale-95 flex items-center justify-center gap-2"><span>🖨️</span> Generar Receta Oficial ✦</button>
                     </div>
                 </div>
 
@@ -268,26 +269,62 @@
             }
         }
 
+        // --- MOTOR DE RECETA DINÁMICA K.B TECH SOLUTIONS ✦ ---
+        function generarReceta() {
+            if(!currentPatientId || !globalDocData) return eliteAviso("DATOS DE MÉDICO O PACIENTE NO CARGADOS");
+            const doc = new jsPDF();
+            const nombrePaciente = document.getElementById('dra-patient-name').innerText;
+            const notas = document.getElementById('dra-response-input').value;
+            const fecha = new Date().toLocaleDateString('es-MX');
+
+            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(30, 41, 59); 
+            doc.text("K.B", 105, 20, { align: "center" });
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text("TECH SOLUTIONS ✦", 105, 27, { align: "center" });
+            doc.setDrawColor(99, 102, 241); doc.setLineWidth(1); doc.line(20, 35, 190, 35);
+
+            doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+            doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 50);
+            doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100);
+            doc.text(`${globalDocData.especialidad.toUpperCase()}`, 20, 56);
+            doc.text(`CÉDULA PROFESIONAL: ${globalDocData.cedula || 'VERIFICADA'}`, 20, 61);
+
+            doc.setFillColor(248, 250, 252); doc.rect(20, 70, 170, 15, 'F');
+            doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(30, 41, 59);
+            doc.text(`PACIENTE: ${nombrePaciente.toUpperCase()}`, 25, 79);
+            doc.text(`FECHA: ${fecha}`, 150, 79);
+
+            doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text("RX / INDICACIONES:", 20, 105);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(50);
+            const splitNotas = doc.splitTextToSize(notas.toUpperCase(), 160);
+            doc.text(splitNotas, 20, 115);
+
+            doc.setDrawColor(203, 213, 225); doc.line(70, 240, 140, 240); 
+            doc.setFontSize(8); doc.text("FIRMA DEL MÉDICO RESPONSABLE", 105, 245, { align: "center" });
+
+            doc.setDrawColor(99, 102, 241); doc.line(20, 265, 190, 265);
+            doc.setFontSize(8); doc.setTextColor(148, 163, 184); 
+            doc.text("DOCUMENTO GENERADO POR K.B TECH SOLUTIONS ✦", 105, 275, { align: "center" });
+            doc.text(`NODO MAESTRO ID: ${docId}`, 105, 280, { align: "center" });
+
+            doc.save(`Receta_${nombrePaciente.replace(/\s+/g, '_')}_KB.pdf`);
+            eliteAviso("RECETA GENERADA CON ÉXITO ✦");
+        }
+
         function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); eliteAviso("LINK COPIADO"); }
         function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
         function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
 
-        // --- MOTOR DE CO-PILOTO POR VOZ K.B TECH ---
         function activarDictado() {
             const btn = document.getElementById('btn-dictado');
             const input = document.getElementById('dra-response-input');
             const micText = document.getElementById('mic-text');
             const micIcon = document.getElementById('mic-icon');
-            
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
             if (!SpeechRecognition) return eliteAviso("NAVEGADOR NO COMPATIBLE");
-
             const recognition = new SpeechRecognition();
-            recognition.lang = 'es-MX';
-            recognition.interimResults = false;
-
+            recognition.lang = 'es-MX'; recognition.interimResults = false;
             recognition.onstart = () => {
                 btn.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
                 btn.classList.remove('bg-indigo-50', 'text-indigo-600');
@@ -295,20 +332,17 @@
                 if(micIcon) micIcon.innerText = "🛑";
                 eliteAviso("MICRÓFONO ACTIVO");
             };
-
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 input.value += (input.value ? ". " : "") + transcript.toUpperCase();
                 eliteAviso("VOZ PROCESADA ✅");
             };
-
             recognition.onend = () => {
                 btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
                 btn.classList.add('bg-indigo-50', 'text-indigo-600');
                 if(micText) micText.innerText = "DICTAR POR VOZ";
                 if(micIcon) micIcon.innerText = "🎤";
             };
-
             recognition.start();
         }
     </script>
