@@ -136,7 +136,7 @@
     </div>
 
     <h3 id="agenda-title" class="text-lg font-black uppercase text-slate-800 italic tracking-widest pb-3 border-b-4 border-slate-900 mb-12">Agenda</h3>
-    <div id="tabla-citas-body" class="grid gap-4"></div>
+    <div id="tabla-citas-body" class="flex flex-col gap-6 w-full items-stretch"></div>
 </div>
         </main>
     </div>
@@ -227,13 +227,14 @@ function filtrarAgendaLocal() {
                 }
 
                 const tarjeta = document.createElement('div');
-                tarjeta.className = `flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}`;
+              // Así debe quedar la línea 230:
+tarjeta.className = `flex items-center justify-between p-10 bg-white border border-slate-100 rounded-[3rem] hover:border-slate-900 transition cursor-pointer w-full shadow-sm ${semaforoClase}`;
                 
                 // Evento para seleccionar paciente
                 tarjeta.onclick = () => seleccionarPaciente(c);
 
 tarjeta.innerHTML = `
-                    <div class="flex items-center gap-8 text-left">
+                    <div class="flex items-center gap-8 text-left flex-1">
                         <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
                         <div>
                             <p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p>
@@ -360,38 +361,92 @@ tarjeta.innerHTML = `
             abrirModal();
         }// --- MÓDULO DE LOGÍSTICA Y FINANZAS ---
 
-        function abrirCobroPremium() {
-            if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
-            document.getElementById('modal-icon').innerText = "💒";
-            document.getElementById('modal-title').innerText = "Cobro Binacional";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="flex gap-2 p-1 bg-slate-100 rounded-2xl mb-6">
-                    <button onclick="divisa='MXN'" class="flex-1 py-3 rounded-xl font-black text-[10px] bg-white border">MXN</button>
-                    <button onclick="divisa='USD'" class="flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400">USD</button>
-                </div>
-                <input type="number" id="pay-amount" placeholder="MONTO" class="input-kb text-3xl text-center">
-                <select id="metodo-pago" class="input-kb mt-4 text-[10px]">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Tarjeta">Tarjeta (+3.5%)</option>
-                    <option value="Zelle">Zelle / Transf</option>
-                </select>`;
+       // --- TERMINAL BINACIONAL CON SENSOR DE MERCADO ---
+        function abrirCobroPremium(cita) {
+            const p = cita || currentPatient;
+            if(!p) return eliteAviso("SELECCIONE PACIENTE");
             
+            divisa = 'MXN'; // Reset por seguridad
+            document.getElementById('modal-icon').innerText = "🏢";
+            document.getElementById('modal-title').innerText = "Terminal Binacional";
+            
+            // Ancho Élite para el modal
+            document.querySelector('.modal-content').style.maxWidth = "650px";
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="space-y-6">
+                    <div class="p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl border-b-4 border-indigo-500 relative group">
+                        <p class="text-[10px] font-black uppercase opacity-60 tracking-widest text-center">Tipo de Cambio Activo</p>
+                        <p class="text-3xl font-black text-center mt-1">1 USD = <span class="text-emerald-400">$${tc}</span> MXN</p>
+                        <button onclick="ajustarTipoCambio()" class="absolute top-4 right-6 text-[10px] font-black bg-white/10 px-3 py-1 rounded-full hover:bg-emerald-500 transition">⚙️ AJUSTAR</button>
+                    </div>
+
+                    <div class="flex gap-3 p-2 bg-slate-100 rounded-[2.2rem]">
+                        <button id="btn-mxn" onclick="seleccionarDivisa('MXN')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900">🇲🇽 PESOS MXN</button>
+                        <button id="btn-usd" onclick="seleccionarDivisa('USD')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50">🇺🇸 DÓLARES USD</button>
+                    </div>
+
+                    <input type="number" id="pay-amount" placeholder="0.00" class="input-kb text-center text-5xl font-black py-10 bg-slate-50 border-none rounded-[2.5rem] focus:ring-0">
+
+                    <select id="metodo-pago" class="input-kb font-bold text-center appearance-none cursor-pointer">
+                        <option value="Efectivo">💵 EFECTIVO</option>
+                        <option value="Tarjeta">💳 TARJETA (+3.5% COMISIÓN)</option>
+                        <option value="Transferencia">🏦 ZELLE / TRANSFERENCIA</option>
+                    </select>
+                </div>`;
+
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 let amt = parseFloat(document.getElementById('pay-amount').value);
                 const metodo = document.getElementById('metodo-pago').value;
-                if(metodo === "Tarjeta") amt = amt * 1.035;
-                const montoFinal = divisa === 'USD' ? (amt * tc) : amt;
-                
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
+                if(!amt) return eliteAviso("INGRESE MONTO");
+
+                if(metodo.includes("Tarjeta")) amt = amt * 1.035;
+                const montoFinal = (divisa === 'USD') ? (amt * tc) : amt;
+
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, {
                     method: 'PATCH',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagado: true, monto: montoFinal, telefono: `PAGO: ${divisa} | ${metodo.toUpperCase()}` })
+                    body: JSON.stringify({ 
+                        pagado: true, 
+                        monto: Math.round(montoFinal), 
+                        telefono: `PAGO: ${divisa} | ${metodo.toUpperCase()} (TC: ${tc})` 
+                    })
                 });
-                eliteAviso("LIQUIDACIÓN EXITOSA ✅"); cerrarModal(); cargarCitas();
+
+                eliteAviso("COBRO REGISTRADO CON ÉXITO ✅");
+                cerrarModal();
+                cargarCitas();
             };
             abrirModal();
         }
 
+        // --- MOTOR DE DIVISAS ---
+        function seleccionarDivisa(tipo) {
+            divisa = tipo;
+            const btnMXN = document.getElementById('btn-mxn');
+            const btnUSD = document.getElementById('btn-usd');
+
+            if(tipo === 'MXN') {
+                btnMXN.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900";
+                btnUSD.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50 border-2 border-transparent";
+            } else {
+                btnUSD.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-slate-900 shadow-lg border-indigo-500 border-2 transition-all scale-105 text-white";
+                btnMXN.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50 border-2 border-transparent";
+            }
+        }
+
+        function ajustarTipoCambio() {
+            const nuevoTC = prompt("🛰️ ACTUALIZACIÓN DE MERCADO: Ingrese el nuevo valor del dólar:", tc);
+            if (nuevoTC && !isNaN(nuevoTC)) {
+                tc = parseFloat(nuevoTC);
+                eliteAviso(`DÓLAR ACTUALIZADO: $${tc} MXN`);
+                // Si la terminal está abierta, refrescamos el dato visualmente
+                if(document.getElementById('modal-container').style.display === 'flex') {
+                    abrirCobroPremium();
+                }
+            }
+        }
+      
         async function iniciarCierreCaja() {
             eliteAviso("GENERANDO REPORTE...");
             const d = fechaVisualizacion;
