@@ -18,7 +18,6 @@
         .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
         .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color); }
         
-        /* SEMÁFORO DE URGENCIAS IA NEÓN */
         .u-rojo { border-left: 15px solid #ef4444 !important; background: #fef2f2; animation: pulse-red 2s infinite; }
         .u-amarillo { border-left: 15px solid #f59e0b !important; background: #fffbeb; }
         .u-verde { border-left: 15px solid #10b981 !important; }
@@ -32,7 +31,6 @@
         .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
 
         #btn-ingresos { position: fixed; bottom: 2rem; right: 2rem; width: 4rem; height: 4rem; background: linear-gradient(135deg, #fbbf24, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); transition: 0.3s; }
-        #btn-ingresos:hover { transform: scale(1.1) rotate(15deg); }
 
         .timeline-item { position: relative; padding-left: 2rem; border-left: 2px solid #e2e8f0; margin-bottom: 1rem; }
         .timeline-item::before { content: ''; position: absolute; left: -0.45rem; top: 0.25rem; width: 0.8rem; height: 0.8rem; background: var(--main-color); border-radius: 50%; }
@@ -69,6 +67,9 @@
             <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl text-amber-500 hover:bg-amber-600 hover:text-white transition text-left">
                 <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Insumos Almacén</span>
             </button>
+            <button onclick="window.location.href='asistente.html?id=' + docId" class="flex items-center gap-4 w-full p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl hover:bg-emerald-600 transition text-left text-emerald-500 hover:text-white">
+                <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Volver a Recepción</span>
+            </button>
             <hr class="border-slate-800 my-6">
             <button onclick="cambiarPin()" class="flex items-center gap-4 w-full p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 hover:bg-rose-600 hover:text-white transition text-left">
                 <div class="text-xl">🔐</div><span class="text-[10px] font-black uppercase">Cambiar PIN</span>
@@ -102,9 +103,9 @@
                     <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-indigo-200 mb-6 text-center">
                         <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase leading-none tracking-tighter">---</p>
                     </div>
-                    <div id="timeline-expediente" class="max-h-48 overflow-y-auto mb-6 px-2">
-                        <p class="text-[8px] font-black uppercase mb-4 text-slate-400 italic">Historial Timeline:</p>
-                        <div id="timeline-content" class="text-[10px] font-bold text-slate-600 uppercase italic">Seleccione paciente...</div>
+                    <div id="timeline-expediente" class="max-h-48 overflow-y-auto mb-6 px-2 text-[10px]">
+                        <p class="text-[8px] font-black uppercase mb-4 text-slate-400 italic">Historial:</p>
+                        <div id="timeline-content" class="font-bold text-slate-600 uppercase italic">Seleccione paciente...</div>
                     </div>
                     <div class="space-y-4 pt-4 border-t border-slate-100">
                         <textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta o nota..."></textarea>
@@ -113,16 +114,16 @@
                             <button onclick="enviarRespuestaDra()" class="w-14 py-4 bg-indigo-50 text-indigo-600 rounded-2xl font-black text-lg shadow-sm hover:bg-indigo-600 transition">✉️</button>
                         </div>
                     </div>
-                </div><div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden hidden" id="balance-display">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Financiero Hoy</p>
+                </div>
+                <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden hidden" id="balance-display">
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Hoy</p>
                     <div class="space-y-6">
-                        <div><p class="text-[8px] font-bold text-slate-500 uppercase">Pesos Hoy</p><p class="text-4xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p></div>
+                        <div><p class="text-[8px] font-bold text-slate-500 uppercase">Pesos</p><p class="text-4xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p></div>
                         <div id="usd-container" class="locked-feature pt-5 border-t border-white/10">
-                            <div class="locked-overlay" style="background:rgba(15,23,42,0.98)"><p class="text-[7px] font-black text-amber-500 uppercase tracking-widest">USD PREMIUM ACTIVE</p></div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Dólares Hoy</p><p class="text-3xl font-black italic text-emerald-400 tracking-tighter" id="ganancia-usd">$0.00</p>
+                            <div class="locked-overlay" style="background:rgba(15,23,42,0.98)"><p class="text-[7px] font-black text-amber-500 uppercase tracking-widest">USD PREMIUM</p></div>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Dólares</p><p class="text-3xl font-black italic text-emerald-400 tracking-tighter" id="ganancia-usd">$0.00</p>
                         </div>
                     </div>
-                    <button onclick="mostrarBalance()" class="mt-6 text-[8px] font-black uppercase text-indigo-400 underline">Cerrar Balance</button>
                 </div>
             </div>
 
@@ -161,16 +162,9 @@
             setTimeout(() => toast.classList.remove('active'), 4000);
         }
 
-        async function sentinela(mensaje, codigo = "info") {
-            try {
-                const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-                await fetch(`${URL}/rest/v1/logs_sistema`, { method: 'POST', headers: headers, body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo.toUpperCase(), mensaje_error: mensaje.toUpperCase() }) });
-            } catch (e) { console.error("Sentinela Error"); }
-        }
-
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
-            if(!docId) return eliteAviso("ID DE MÉDICO NO ENCONTRADO");
+            if(!docId) return eliteAviso("ID NO ENCONTRADO");
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
             const data = await res.json();
             globalDocData = data[0];
@@ -188,61 +182,68 @@
                     document.getElementById('usd-container').classList.add('is-locked');
                     document.getElementById('btn-insumos-menu').classList.add('hidden');
                 }
-                eliteAviso("ACCESO CONCEDIDO - MODO MAESTRO ACTIVO");
+                eliteAviso("ACCESO CONCEDIDO");
                 syncMaster(); setInterval(syncMaster, 15000);
             } else { eliteAviso("PIN INVÁLIDO"); }
         }
 
         async function syncMaster() {
-            const hoy = new Date().toISOString().split('T')[0];
+            const ahora = new Date();
+            const hoy = ahora.getFullYear() + '-' + String(ahora.getMonth() + 1).padStart(2, '0') + '-' + String(ahora.getDate()).padStart(2, '0');
+            
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
             const citas = await res.json();
             let mxn = 0, usd = 0;
+            
             document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
                 if(c.pagado) {
                     if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
                     else mxn += parseFloat(c.monto || 0);
                 }
                 let semaforo = "u-verde";
-                if(c.telefono && c.telefono.includes("URGENTE")) semaforo = "u-rojo";
+                if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) semaforo = "u-rojo";
                 else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforo = "u-amarillo";
+                
                 return `
-                    <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}', '${c.telefono || 'PACIENTE REGULAR'}')">
+                    <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
                         <div class="flex items-center gap-14 text-left">
                             <span class="text-4xl font-black italic text-indigo-600 w-24 tracking-tighter">${c.hora.slice(0,5)}</span>
                             <div>
                                 <h3 class="font-black text-slate-800 uppercase text-lg tracking-tight leading-none mb-1">${c.nombre_paciente}</h3>
-                                <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'VERIFICADO'}</p>
+                                <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'PACIENTE REGULAR'}</p>
                             </div>
                         </div>
-                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
+                        <div class="flex items-center gap-4">
+                            <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
+                            <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition shadow-sm">📹</button>
+                        </div>
                     </div>`;
             }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
+            
             document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
             document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
             document.getElementById('total-hoy').innerText = citas.length;
         }
 
-        async function enfocarpaciente(id, nombre, nota) {
-            if(globalDocData.plan_nivel === 0) return eliteAviso("ACTUALICE PLAN PARA EXPEDIENTES");
+        async function enfocarpaciente(id, nombre) {
+            if(globalDocData.plan_nivel === 0) return eliteAviso("PLAN ÉLITE REQUERIDO");
             currentPatientId = id;
             document.getElementById('dra-patient-name').innerText = nombre;
-            eliteAviso("CARGANDO HISTORIAL...");
             const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
             const historial = await res.json();
             document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
                 <div class="timeline-item">
-                    <p class="text-[8px] text-slate-400 font-black uppercase mb-1">${h.fecha}</p>
-                    <p class="leading-tight text-slate-700 font-bold">${h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋')}</p>
+                    <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
+                    <p class="leading-tight text-slate-700 font-bold">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
                 </div>`).join('');
         }
 
         async function enviarRespuestaDra() {
             const resp = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !resp) return eliteAviso("ESCRIBA UNA NOTA");
+            if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
             const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
-            eliteAviso("ENVIADO A RECEPCIÓN");
+            eliteAviso("ENVIADO ✅");
             document.getElementById('dra-response-input').value = "";
         }
 
@@ -263,25 +264,15 @@
         }
 
         async function abrirReporteGastos() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTOS&order=created_at.desc`, { headers: { 'apikey': KEY } });
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
             const logs = await res.json();
-            alert("💸 AUDITORÍA GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
+            alert("💸 GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
         }
 
         async function abrirReporteLogistica() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY } });
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
             const logs = await res.json();
-            alert("📦 FALTANTES NODO:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
-        }
-
-        async function cambiarPin() {
-            const n = prompt("Nuevo PIN (4 dígitos):");
-            if(n && n.length === 4) {
-                const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
-                eliteAviso("PIN ACTUALIZADO");
-                sentinela("Cambio de PIN realizado", "SEGURIDAD");
-            }
+            alert("📦 LOGÍSTICA:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
         }
 
         function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
@@ -290,182 +281,4 @@
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
     </script>
 </body>
-</html><script>
-        const { jsPDF } = window.jspdf;
-        const URL = "https://dgatsbnqgplalxwewpvs.supabase.co";
-        const KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
-        const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-        let currentPatientId = null, globalDocData = null;
-
-        const CATALOGO_TEMAS = {
-            "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
-            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
-            "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
-            "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
-            "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
-            "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
-        };
-
-        function eliteAviso(msg) {
-            const toast = document.getElementById('elite-toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 4000);
-        }
-
-        async function sentinela(mensaje, codigo = "info") {
-            try {
-                const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-                await fetch(`${URL}/rest/v1/logs_sistema`, { method: 'POST', headers: headers, body: JSON.stringify({ pagina_origen: "app.html", codigo_error: codigo.toUpperCase(), mensaje_error: mensaje.toUpperCase() }) });
-            } catch (e) { console.error("Sentinela Error"); }
-        }
-
-        async function verificarAcceso() {
-            const pin = document.getElementById('pin-acceso').value;
-            if(!docId) return eliteAviso("ID DE MÉDICO NO ENCONTRADO");
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
-            const data = await res.json();
-            globalDocData = data[0];
-            if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-                const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(globalDocData.template_id || 1) % 5];
-                document.documentElement.style.setProperty('--main-color', color);
-                document.getElementById('pantalla-bloqueo').classList.add('hidden');
-                document.getElementById('contenido-panel').classList.remove('hidden');
-                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
-                document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Nodo Maestro";
-                document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
-                if(globalDocData.plan_nivel === 0) {
-                    document.getElementById('panel-intercom').classList.add('is-locked');
-                    document.getElementById('usd-container').classList.add('is-locked');
-                    document.getElementById('btn-insumos-menu').classList.add('hidden');
-                }
-                eliteAviso("ACCESO CONCEDIDO - MODO MAESTRO ACTIVO");
-                syncMaster(); setInterval(syncMaster, 15000);
-            } else { eliteAviso("PIN INVÁLIDO"); }
-        }
-
-        async function syncMaster() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
-            const citas = await res.json();
-            let mxn = 0, usd = 0;
-            document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
-                if(c.pagado) {
-                    if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
-                    else mxn += parseFloat(c.monto || 0);
-                }
-                let semaforo = "u-verde";
-                if(c.telefono && c.telefono.includes("URGENTE")) semaforo = "u-rojo";
-                else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforo = "u-amarillo";
-                return `
-                    <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}', '${c.telefono || 'PACIENTE REGULAR'}')">
-                        <div class="flex items-center gap-14 text-left">
-                            <span class="text-4xl font-black italic text-indigo-600 w-24 tracking-tighter">${c.hora.slice(0,5)}</span>
-                            <div>
-                                <h3 class="font-black text-slate-800 uppercase text-lg tracking-tight leading-none mb-1">${c.nombre_paciente}</h3>
-                                <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'VERIFICADO'}</p>
-                            </div>
-                        </div>
-                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
-                    </div>`;
-            }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
-            document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-            document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
-            document.getElementById('total-hoy').innerText = citas.length;
-        }
-
-        async function enfocarpaciente(id, nombre, nota) {
-            if(globalDocData.plan_nivel === 0) return eliteAviso("ACTUALICE PLAN PARA EXPEDIENTES");
-            currentPatientId = id;
-            document.getElementById('dra-patient-name').innerText = nombre;
-            eliteAviso("CARGANDO HISTORIAL...");
-            const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
-            const historial = await res.json();
-            document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
-                <div class="timeline-item">
-                    <p class="text-[8px] text-slate-400 font-black uppercase mb-1">${h.fecha}</p>
-                    <p class="leading-tight text-slate-700 font-bold">${h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋')}</p>
-                </div>`).join('');
-        }
-async function enviarRespuestaDra() {
-            const resp = document.getElementById('dra-response-input').value;
-            
-            // VALIDACIÓN K.B TECH PRO
-            if(!currentPatientId || !resp.trim()) {
-                return eliteAviso(currentPatientId ? "ESCRIBA UNA NOTA" : "SELECCIONE PACIENTE");
-            }
-
-            const headers = { 
-                'apikey': KEY, 
-                'Authorization': `Bearer ${KEY}`, 
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal' // Optimiza la velocidad de respuesta
-            };
-
-            try {
-                const res = await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { 
-                    method: 'PATCH', 
-                    headers: headers, 
-                    body: JSON.stringify({ 
-                        telefono: "DOCTOR DICE: " + resp.toUpperCase().trim() 
-                    }) 
-                });
-
-                if(res.ok) {
-                    eliteAviso("ENVIADO A RECEPCIÓN ✅");
-                    document.getElementById('dra-response-input').value = ""; // Limpia el área de dictado
-                    syncMaster(); // Refresca la agenda para confirmar visualmente
-                    sentinela("Nota enviada a asistente", "INTERCOM");
-                } else {
-                    eliteAviso("ERROR AL CONECTAR CON NODO");
-                }
-            } catch (e) {
-                console.error(e);
-                eliteAviso("FALLO CRÍTICO DE RED");
-            }
-        }
-        function generarReceta() {
-            if(!currentPatientId) return eliteAviso("SELECCIONE PACIENTE");
-            const doc = new jsPDF();
-            const nombre = document.getElementById('dra-patient-name').innerText;
-            const notas = document.getElementById('dra-response-input').value;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(99, 102, 241);
-            doc.text(`DR. ${globalDocData.nombre_doctor}`, 20, 30);
-            doc.setFontSize(10); doc.setTextColor(150); doc.text(globalDocData.especialidad.toUpperCase(), 20, 37);
-            doc.line(20, 45, 190, 45);
-            doc.setTextColor(50); doc.setFontSize(12); doc.text(`FECHA: ${new Date().toLocaleDateString()} | PACIENTE: ${nombre}`, 20, 60);
-            doc.setFontSize(14); doc.text("PRESCRIPCIÓN MÉDICA:", 20, 80);
-            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.text(notas || "Sin prescripción", 20, 90);
-            doc.save(`RECETA_${nombre}.pdf`);
-            eliteAviso("RECETA GENERADA");
-        }
-
-        async function abrirReporteGastos() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTOS&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            alert("💸 AUDITORÍA GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
-        }
-
-        async function abrirReporteLogistica() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.LOGISTICA&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            alert("📦 FALTANTES NODO:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
-        }
-
-        async function cambiarPin() {
-            const n = prompt("Nuevo PIN (4 dígitos):");
-            if(n && n.length === 4) {
-                const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
-                eliteAviso("PIN ACTUALIZADO");
-                sentinela("Cambio de PIN realizado", "SEGURIDAD");
-            }
-        }
-
-        function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
-        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); eliteAviso("LINK COPIADO"); }
-        function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        verificarAcceso();
-    </script>
+</html>
