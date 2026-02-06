@@ -35,7 +35,27 @@
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
         .cal-day:hover { background: var(--main); color: white; }
-        .cal-day.today { background: #0f172a; color: white; }
+        .cal-day.today { background: #0f172a; color: white; } 
+        /* --- EXPANSIÓN TOTAL DEL BÚNKER --- */
+    .glass-panel {
+        width: 100% !important;
+        max-width: 1400px !important; /* Forzamos a que respire */
+        padding: 2rem !important;     /* Bajamos el p-12 que asfixiaba */
+        margin: 0 auto !important;
+    }
+
+    #tabla-citas-body {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1.5rem !important;
+    }
+
+    /* Asegura que el contenedor de la tarjeta no tenga límites */
+    #tabla-citas-body > div {
+        width: 100% !important;
+    }
     </style>
 </head>
 <body class="p-4 md:p-10 pb-32">
