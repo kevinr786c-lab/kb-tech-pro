@@ -279,7 +279,7 @@
             abrirModal();
         }
 
-        // --- TERMINAL BINACIONAL ACTUALIZADA CON FACTURACIÓN ---
+        // --- TERMINAL BINACIONAL ACTUALIZADA: CERO PROMPTS ---
         function abrirCobroPremium(cita) {
             const p = cita || currentPatient;
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
@@ -291,26 +291,41 @@
                 <div class="space-y-6">
                     <div class="p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl border-b-4 border-indigo-500 relative">
                         <p class="text-[10px] font-black uppercase opacity-60 tracking-widest text-center">Tipo de Cambio</p>
-                        <p class="text-3xl font-black text-center mt-1">1 USD = <span class="text-emerald-400">$${tc}</span> MXN</p>
-                        <button onclick="ajustarTipoCambio()" class="absolute top-4 right-6 text-[10px] font-black bg-white/10 px-3 py-1 rounded-full hover:bg-emerald-500 transition">⚙️ AJUSTAR</button>
+                        <div class="flex items-center justify-center gap-2 mt-1">
+                            <span class="text-3xl font-black">1 USD = </span>
+                            <input type="number" id="tc-input" value="${tc}" step="0.1" class="bg-transparent text-emerald-400 text-3xl font-black w-24 outline-none border-b-2 border-emerald-400/30 text-center">
+                            <span class="text-3xl font-black">MXN</span>
+                        </div>
                     </div>
                     <div class="flex gap-3 p-2 bg-slate-100 rounded-[2.2rem]">
                         <button id="btn-mxn" onclick="seleccionarDivisa('MXN')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900">🇲🇽 PESOS MXN</button>
                         <button id="btn-usd" onclick="seleccionarDivisa('USD')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50">🇺🇸 DÓLARES USD</button>
                     </div>
                     <input type="number" id="pay-amount" placeholder="0.00" class="input-kb text-center text-5xl font-black py-10 bg-slate-50 border-none rounded-[2.5rem] focus:ring-0">
+                    
+                    <div class="space-y-4 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                        <p class="text-[9px] font-black uppercase text-indigo-600 tracking-widest mb-2 italic">Datos de Facturación</p>
+                        <input type="text" id="billing-data" placeholder="RFC (MX) / INSURANCE ID (USA)" class="input-kb !bg-white text-center uppercase">
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="generarFacturaSAT_Premium()" class="py-4 bg-emerald-500 text-white rounded-2xl font-black text-[9px] uppercase hover:scale-105 transition shadow-lg shadow-emerald-200">
+                                🇲🇽 Factura SAT
+                            </button>
+                            <button onclick="generarSuperbillUSA_Premium()" class="py-4 bg-blue-600 text-white rounded-2xl font-black text-[9px] uppercase hover:scale-105 transition shadow-lg shadow-blue-200">
+                                🇺🇸 Insurance Claim
+                            </button>
+                        </div>
+                    </div>
+
                     <select id="metodo-pago" class="input-kb font-bold text-center appearance-none cursor-pointer">
                         <option value="Efectivo">💵 EFECTIVO</option>
                         <option value="Tarjeta">💳 TARJETA (+3.5% COMISIÓN)</option>
                         <option value="Transferencia">🏦 ZELLE / TRANSFERENCIA</option>
                     </select>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="generarFacturaSAT()" class="py-4 bg-slate-50 border border-emerald-500 text-emerald-600 rounded-2xl font-black text-[9px] uppercase hover:bg-emerald-500 hover:text-white transition">🇲🇽 Factura SAT</button>
-                        <button onclick="generarSuperbillUSA()" class="py-4 bg-slate-50 border border-blue-600 text-blue-600 rounded-2xl font-black text-[9px] uppercase hover:bg-blue-600 hover:text-white transition">🇺🇸 Insurance Claim</button>
-                    </div>
                 </div>`;
 
             document.getElementById('modal-confirm-btn').onclick = async () => {
+                tc = parseFloat(document.getElementById('tc-input').value) || tc;
                 let amt = parseFloat(document.getElementById('pay-amount').value);
                 const metodo = document.getElementById('metodo-pago').value;
                 if(!amt) return eliteAviso("INGRESE MONTO");
@@ -332,11 +347,6 @@
                 btnUSD.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-slate-900 shadow-lg border-indigo-500 border-2 transition-all scale-105 text-white";
                 btnMXN.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50 border-2 border-transparent";
             }
-        }
-
-        function ajustarTipoCambio() {
-            const nuevoTC = prompt("🛰️ TIPO DE CAMBIO:", tc);
-            if (nuevoTC && !isNaN(nuevoTC)) { tc = parseFloat(nuevoTC); eliteAviso(`TC: $${tc} MXN`); if(document.getElementById('modal-container').style.display === 'flex') abrirCobroPremium(); }
         }
       
         async function iniciarCierreCaja() {
@@ -374,39 +384,48 @@
             abrirModal();
         }
 
-        // --- MOTOR DE FACTURACIÓN HÍBRIDA K.B TECH ---
-        function generarFacturaSAT() {
+        // --- MOTORES DE FACTURACIÓN PREMIUM (CERO PROMPTS) ---
+        function generarFacturaSAT_Premium() {
             const p = currentPatient;
-            if(!p) return eliteAviso("SELECT PATIENT");
-            const rfc = prompt("RFC DEL PACIENTE:", "XAXX010101000");
+            const rfc = document.getElementById('billing-data').value || "XAXX010101000";
             const amt = document.getElementById('pay-amount').value || 0;
+            if(!p) return eliteAviso("SELECCIONE PACIENTE");
             const doc = new jsPDF();
-            doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text("CFDI - COMPROBANTE FISCAL", 105, 20, {align:"center"});
-            doc.setFontSize(10); doc.text(`EMISOR: DR. ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 40);
-            doc.text(`RFC EMISOR: ${globalDocData.cedula || 'REGISTRO K.B'}`, 20, 45);
-            doc.text(`RECEPTOR: ${p.nombre_paciente.toUpperCase()}`, 20, 60);
-            doc.text(`RFC RECEPTOR: ${rfc.toUpperCase()}`, 20, 65);
-            doc.rect(20, 80, 170, 20); doc.text(`CONCEPTO: CONSULTA MÉDICA PROFESIONAL`, 25, 92);
-            doc.text(`TOTAL: $${amt} MXN`, 150, 110);
-            doc.setFontSize(8); doc.text("ESTA ES UNA REPRESENTACIÓN IMPRESA DE UN CFDI GENERADA POR K.B TECH SOLUTIONS ✦", 105, 280, {align:"center"});
+            doc.setFillColor(30, 41, 59); doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255); doc.setFontSize(20); doc.text("FACTURA FISCAL (CFDI)", 105, 25, {align:"center"});
+            doc.setTextColor(0); doc.setFontSize(10);
+            doc.text("EMISOR (DATOS DEL DOCTOR):", 20, 50);
+            doc.setFont("helvetica", "bold"); doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 55);
+            doc.text(`CÉDULA/RFC: ${globalDocData.cedula || 'REGISTRO ACTIVO'}`, 20, 60);
+            doc.setFont("helvetica", "normal"); doc.text("RECEPTOR (PACIENTE):", 20, 80);
+            doc.text(`NOMBRE: ${p.nombre_paciente.toUpperCase()}`, 20, 85);
+            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 90);
+            doc.setDrawColor(200); doc.line(20, 100, 190, 100);
+            doc.text(`CONCEPTO: SERVICIOS MÉDICOS PROFESIONALES`, 20, 110);
+            doc.setFontSize(14); doc.text(`TOTAL: $${amt} MXN`, 150, 110);
+            doc.setFontSize(8); doc.setTextColor(150);
+            doc.text("ESTE DOCUMENTO ES UNA REPRESENTACIÓN IMPRESA DE UN CFDI - K.B TECH ✦", 105, 280, {align:"center"});
             doc.save(`SAT_${p.nombre_paciente}.pdf`);
+            eliteAviso("FACTURA SAT GENERADA ✦");
         }
 
-        function generarSuperbillUSA() {
+        function generarSuperbillUSA_Premium() {
             const p = currentPatient;
+            const insuranceId = document.getElementById('billing-data').value || "PENDING";
+            const amt = document.getElementById('pay-amount').value || 0;
             if(!p) return eliteAviso("SELECT PATIENT");
-            const ins = prompt("INSURANCE NAME:", "BCBS");
-            const icd = prompt("ICD-10 CODE:", "Z00.00");
             const doc = new jsPDF();
-            doc.setFont("courier", "bold"); doc.setFontSize(16); doc.text("HEALTH INSURANCE CLAIM FORM (SUPERBILL)", 105, 20, {align:"center"});
-            doc.setFontSize(10); doc.text(`PROVIDER: ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 40);
+            doc.setFont("courier", "bold"); doc.setFontSize(16); doc.text("HEALTH INSURANCE CLAIM FORM", 105, 20, {align:"center"});
+            doc.setFontSize(10); doc.text(`PHYSICIAN: ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 40);
             doc.text(`SPECIALTY: ${globalDocData.especialidad.toUpperCase()}`, 20, 45);
-            doc.text(`PATIENT NAME: ${p.nombre_paciente.toUpperCase()}`, 20, 60);
-            doc.text(`INSURANCE: ${ins.toUpperCase()}`, 20, 65);
-            doc.text(`DIAGNOSIS (ICD-10): ${icd}`, 20, 70);
-            doc.rect(20, 80, 170, 30); doc.text("SERVICE: OFFICE VISIT / PROFESSIONAL EVALUATION", 25, 95);
-            doc.setFontSize(8); doc.text("DOCUMENT GENERATED BY K.B TECH SOLUTIONS ✦ FOR INTERNATIONAL REIMBURSEMENT", 105, 280, {align:"center"});
+            doc.line(20, 55, 190, 55);
+            doc.text(`PATIENT: ${p.nombre_paciente.toUpperCase()}`, 20, 65);
+            doc.text(`INSURANCE ID/POLICY: ${insuranceId.toUpperCase()}`, 20, 70);
+            doc.rect(20, 80, 170, 30); doc.text("SERVICE: OFFICE VISIT / CONSULTATION", 25, 95);
+            doc.text(`AMOUNT PAID: $${(amt/tc).toFixed(2)} USD`, 25, 105);
+            doc.setFontSize(8); doc.text("GENERATED BY K.B TECH SOLUTIONS INTERNATIONAL HUB ✦", 105, 280, {align:"center"});
             doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
+            eliteAviso("USA SUPERBILL GENERATED ✦");
         }
     </script>
 </body>
