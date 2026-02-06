@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -176,7 +177,7 @@
                     email: emailTecnico,
                     especialidad: esp,
                     plan: planFinal, 
-                    template_id: String(currentSelection.template_id),
+                    template_id: parseInt(currentSelection.template_id), // Enviado como número para evitar errores
                     creado_en: new Date().toISOString()
                 };
 
@@ -199,11 +200,14 @@
                     document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
                 } else {
-                    alert("Error de Sincronización. Intente de nuevo.");
+                    const errorMsg = await res.text();
+                    console.error("Fallo de esquema:", errorMsg);
+                    alert("Error de Sincronización. Verifique que todos los campos sean correctos.");
                     btn.disabled = false;
                     btn.innerText = "Reintentar";
                 }
             } catch (e) { 
+                console.error("Error crítico:", e);
                 alert("Fallo de enlace con el servidor de Tijuana."); 
                 btn.disabled = false; 
             }
