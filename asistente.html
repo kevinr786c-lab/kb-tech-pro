@@ -37,44 +37,46 @@
         .cal-day:hover { background: var(--main); color: white; }
         .cal-day.today { background: #0f172a; color: white; } 
      /* Eliminamos el !important del ancho aquí para que el PIN respire */
-/* 1. Base para paneles normales (Login, Notas, etc) */
-.glass-panel { 
-    background: white; 
-    border: 1px solid rgba(0,0,0,0.05); 
-    border-radius: 2.5rem; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.02); 
-    /* Quitamos el width 100% de aquí para que no rompa el login */
-}
-
-/* 2. Contenedor Principal de la App */
+/* 1. Liberamos el contenedor de la aplicación */
 #contenido-panel {
-    max-width: none !important; /* Eliminamos el límite de los 1450px */
-    width: 95% !important;
+    max-width: none !important; /* Eliminamos el límite de 1450px */
+    width: 98% !important; /* Casi todo el ancho de la pantalla */
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
-/* 3. Liberación Total de la Agenda */
-#panel-principal-agenda {
-    width: 100% !important;
+/* 2. El Grid Maestro debe permitir que la agenda crezca */
+main.grid {
+    display: flex !important; /* Cambiamos a Flex para mejor control de estiramiento */
+    gap: 2.5rem;
+    align-items: flex-start;
+}
+
+/* 3. Panel Izquierdo (Fijo) y Panel Derecho (Expandible) */
+.lg\:col-span-4 { width: 400px !important; flex-shrink: 0; } /* El panel de control se queda fijo */
+#panel-principal-agenda { 
+    flex-grow: 1 !important; /* ¡ESTA ES LA LLAVE! Fuerza a la agenda a llenar el resto del monitor */
+    width: auto !important;
     max-width: none !important;
-    min-width: 100% !important;
 }
 
-/* 4. Motor de Estiramiento de Burbujas */
+/* 4. Motor de Estiramiento de Tarjetas */
 #tabla-citas-body {
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: stretch !important; /* Fuerza a las tarjetas a tocar los bordes */
-    gap: 1.2rem !important;
+    align-items: stretch !important; /* Obliga a las tarjetas a tocar los bordes del panel derecho */
+    gap: 1.5rem !important;
 }
 
-/* 5. La Tarjeta Individual (Gimena, Victor, etc) */
+/* 5. Ajuste de la Tarjeta (Gimena, Victor, etc.) */
 #tabla-citas-body > div {
     width: 100% !important;
     max-width: none !important;
     display: flex !important;
-    justify-content: space-between; /* Envía el nombre a la izquierda y los botones a la derecha */
+    justify-content: space-between; /* Nombre a la izquierda, botones a la derecha */
+    padding: 1.5rem 2.5rem !important; /* Más espacio interno para que luzca Élite */
 }
     </style>
 </head>
