@@ -22,7 +22,6 @@
         .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; }
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
         
-        /* SEMÁFORO IA NEÓN */
         .u-rojo { border-left: 12px solid #ef4444 !important; background: #fff1f2; animation: pulse-red 2s infinite; }
         .u-amarillo { border-left: 12px solid #f59e0b !important; background: #fffbeb; }
         .u-verde { border-left: 12px solid #10b981 !important; }
@@ -36,55 +35,18 @@
         .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
         .cal-day:hover { background: var(--main); color: white; }
         .cal-day.today { background: #0f172a; color: white; } 
-     /* Eliminamos el !important del ancho aquí para que el PIN respire */
-/* 1. Liberamos el contenedor de la aplicación */
-#contenido-panel {
-    max-width: none !important; /* Eliminamos el límite de 1450px */
-    width: 98% !important; /* Casi todo el ancho de la pantalla */
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-}
 
-/* 2. El Grid Maestro debe permitir que la agenda crezca */
-main.grid {
-    display: flex !important; /* Cambiamos a Flex para mejor control de estiramiento */
-    gap: 2.5rem;
-    align-items: flex-start;
-}
-
-/* 3. Panel Izquierdo (Fijo) y Panel Derecho (Expandible) */
-.lg\:col-span-4 { width: 400px !important; flex-shrink: 0; } /* El panel de control se queda fijo */
-#panel-principal-agenda { 
-    flex-grow: 1 !important; /* ¡ESTA ES LA LLAVE! Fuerza a la agenda a llenar el resto del monitor */
-    width: auto !important;
-    max-width: none !important;
-}
-
-/* 4. Motor de Estiramiento de Tarjetas */
-#tabla-citas-body {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important; /* Obliga a las tarjetas a tocar los bordes del panel derecho */
-    gap: 1.5rem !important;
-}
-
-/* 5. Ajuste de la Tarjeta (Gimena, Victor, etc.) */
-#tabla-citas-body > div {
-    width: 100% !important;
-    max-width: none !important;
-    display: flex !important;
-    justify-content: space-between; /* Nombre a la izquierda, botones a la derecha */
-    padding: 1.5rem 2.5rem !important; /* Más espacio interno para que luzca Élite */
-}
+        #contenido-panel { max-width: none !important; width: 98% !important; margin: 0 auto; display: flex; flex-direction: column; }
+        main.grid { display: flex !important; gap: 2.5rem; align-items: flex-start; }
+        .lg\:col-span-4 { width: 400px !important; flex-shrink: 0; }
+        #panel-principal-agenda { flex-grow: 1 !important; width: auto !important; max-width: none !important; }
+        #tabla-citas-body { width: 100% !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 1.5rem !important; }
+        #tabla-citas-body > div { width: 100% !important; max-width: none !important; display: flex !important; justify-content: space-between; padding: 1.5rem 2.5rem !important; }
     </style>
 </head>
 <body class="p-4 md:p-10 pb-32">
 
-    <div id="elite-toast">
-        <p id="toast-msg" class="text-white font-black uppercase italic tracking-[0.2em] text-[9px]"></p>
-    </div>
+    <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-[0.2em] text-[9px]"></p></div>
 
     <div id="modal-container" class="modal-overlay" onclick="if(event.target.id==='modal-container') cerrarModal()">
         <div class="modal-content shadow-2xl border border-slate-100 text-center">
@@ -114,25 +76,13 @@ main.grid {
         <button onclick="toggleMenu()" class="absolute top-8 right-8 text-2xl">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-12 italic">Herramientas Pro</h3>
         <nav class="space-y-4">
-            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl">
-                <div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Calendario 12 Meses</span>
-            </button>
-            <button onclick="toggleMenu(); buscarPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl">
-                <div class="text-2xl">🔍</div><span class="text-[11px] font-black uppercase tracking-widest">Buscador Pro</span>
-            </button>
-            <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl">
-                <div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span>
-            </button>
-            <button onclick="toggleMenu(); abrirGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl">
-                <div class="text-2xl">💸</div><span class="text-[11px] font-black uppercase tracking-widest">Registrar Gasto</span>
-            </button>
-            <button onclick="toggleMenu(); abrirInsumo()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl">
-                <div class="text-2xl">📦</div><span class="text-[11px] font-black uppercase tracking-widest">Almacén</span>
-            </button>
+            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Calendario 12 Meses</span></button>
+            <button onclick="toggleMenu(); buscarPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">🔍</div><span class="text-[11px] font-black uppercase tracking-widest">Buscador Pro</span></button>
+            <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span></button>
+            <button onclick="toggleMenu(); abrirGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">💸</div><span class="text-[11px] font-black uppercase tracking-widest">Registrar Gasto</span></button>
+            <button onclick="toggleMenu(); abrirInsumo()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">📦</div><span class="text-[11px] font-black uppercase tracking-widest">Almacén</span></button>
             <hr class="border-slate-800 my-4">
-            <button onclick="toggleMenu(); iniciarCierreCaja()" class="flex items-center gap-5 w-full p-5 bg-rose-600/20 border border-rose-600/30 rounded-3xl text-rose-400">
-                <div class="text-2xl">📊</div><span class="text-[11px] font-black uppercase tracking-widest">Cierre de Caja</span>
-            </button>
+            <button onclick="toggleMenu(); iniciarCierreCaja()" class="flex items-center gap-5 w-full p-5 bg-rose-600/20 border border-rose-600/30 rounded-3xl text-rose-400"><div class="text-2xl">📊</div><span class="text-[11px] font-black uppercase tracking-widest">Cierre de Caja</span></button>
         </nav>
     </div>
 
@@ -144,9 +94,7 @@ main.grid {
                 <p id="fecha-actual-display" class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-2 px-1"></p>
             </div>
             <button onclick="toggleMenu()" class="p-6 bg-slate-900 text-white rounded-[2rem] shadow-2xl transition">
-                <div class="space-y-2">
-                    <div class="w-8 h-1 bg-white"></div><div id="menu-dot" class="w-5 h-1 bg-white opacity-40"></div>
-                </div>
+                <div class="space-y-2"><div class="w-8 h-1 bg-white"></div><div id="menu-dot" class="w-5 h-1 bg-white opacity-40"></div></div>
             </button>
         </header>
 
@@ -171,19 +119,18 @@ main.grid {
                     <button onclick="enviarNotaAlDr()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase mt-3">Mandar Nota</button>
                 </div>
             </div>
-         <div id="panel-principal-agenda" class="glass-panel !p-8 !max-w-none w-full shadow-2xl">
-    <div class="relative mb-10">
-        <input type="text" id="quick-filter" oninput="filtrarAgendaLocal()" placeholder="FILTRAR POR NOMBRE O ESTADO (PAGADO/PENDIENTE)..." class="input-kb !bg-white border-2 border-slate-100 focus:border-indigo-600 text-[10px] tracking-widest pl-12 uppercase italic transition-all">
-        <div class="absolute left-5 top-1/2 -translate-y-1/2 opacity-30 text-xl">🔍</div>
-    </div>
-
-    <h3 id="agenda-title" class="text-lg font-black uppercase text-slate-800 italic tracking-widest pb-3 border-b-4 border-slate-900 mb-12">Agenda</h3>
-    <div id="tabla-citas-body" class="flex flex-col gap-6 w-full items-stretch"></div>
-</div>
+            <div id="panel-principal-agenda" class="glass-panel !p-8 !max-w-none w-full shadow-2xl">
+                <div class="relative mb-10">
+                    <input type="text" id="quick-filter" oninput="filtrarAgendaLocal()" placeholder="FILTRAR POR NOMBRE O ESTADO..." class="input-kb !bg-white border-2 border-slate-100 focus:border-indigo-600 text-[10px] tracking-widest pl-12 uppercase italic transition-all">
+                    <div class="absolute left-5 top-1/2 -translate-y-1/2 opacity-30 text-xl">🔍</div>
+                </div>
+                <h3 id="agenda-title" class="text-lg font-black uppercase text-slate-800 italic tracking-widest pb-3 border-b-4 border-slate-900 mb-12">Agenda</h3>
+                <div id="tabla-citas-body" class="flex flex-col gap-6 w-full items-stretch"></div>
+            </div>
         </main>
     </div>
 
-  <script>
+    <script>
         const { jsPDF } = window.jspdf;
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
@@ -206,16 +153,12 @@ main.grid {
             toast.classList.add('active');
             setTimeout(() => toast.classList.remove('active'), 3500);
         }
-function filtrarAgendaLocal() {
+
+        function filtrarAgendaLocal() {
             const term = document.getElementById('quick-filter').value.toLowerCase();
             const tarjetas = document.querySelectorAll('#tabla-citas-body > div');
-
             tarjetas.forEach(t => {
-                // El radar analiza todo el texto de la tarjeta
                 const contenido = t.innerText.toLowerCase();
-                
-                // Si hay coincidencia, la tarjeta se mantiene visible (flex)
-                // Si no, se oculta (none) para limpiar la pantalla
                 t.style.display = contenido.includes(term) ? "flex" : "none";
             });
         }
@@ -240,69 +183,27 @@ function filtrarAgendaLocal() {
             } else { eliteAviso("PIN INCORRECTO"); }
         }
 
-      async function cargarCitas() {
+        async function cargarCitas() {
             const hoyStr = `${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}`;
             document.getElementById('fecha-actual-display').innerText = `📅 AGENDA: ${hoyStr}`;
-            
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
             const citas = await res.json();
-            
-            // Limpiamos y preparamos el contenedor
             const contenedor = document.getElementById('tabla-citas-body');
             contenedor.innerHTML = ""; 
-
-            if (citas.length === 0) {
-                contenedor.innerHTML = '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía</p>';
-                return;
-            }
-
+            if (citas.length === 0) { contenedor.innerHTML = '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía</p>'; return; }
             citas.forEach(c => {
-               // --- RADAR TÁCTICO DE PRIORIDAD ---
                 let semaforoClase = "u-verde"; 
                 const notaPaciente = (c.telefono || "").toLowerCase();
+                if (notaPaciente.match(/dolor|sangre|fuerte|urgente|grave|emergencia/)) semaforoClase = "u-rojo";
+                else if (notaPaciente.includes("prioridad")) semaforoClase = "u-amarillo";
 
-                // Detector de Palabras Clave de Emergencia
-                if (notaPaciente.match(/dolor|sangre|fuerte|urgente|grave|emergencia/)) {
-                    semaforoClase = "u-rojo"; // ALERTA MÁXIMA
-                } else if (notaPaciente.includes("prioridad") || notaPaciente.includes("pendiente")) {
-                    semaforoClase = "u-amarillo"; // ATENCIÓN
-                }
-
-              const tarjeta = document.createElement('div');
-                
-                // AJUSTE LÍNEA 231: Bordes suaves (rounded-2xl) y ancho total (w-full)
-                // Usamos shadow-md para ese efecto de "flotado" elegante
+                const tarjeta = document.createElement('div');
                 tarjeta.className = `flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[1.5rem] hover:border-indigo-500 transition-all duration-300 cursor-pointer w-full shadow-md mb-2 ${semaforoClase}`;
-                
                 tarjeta.onclick = () => seleccionarPaciente(c);
-
-                tarjeta.innerHTML = `
-                    <div class="flex items-center gap-6 text-left flex-1">
-                        <div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-300'} shadow-sm"></div>
-                        
-                        <div>
-                            <p class="text-[11px] font-black uppercase tracking-wider text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p>
-                            <p class="font-black text-xl text-slate-800 uppercase leading-none mb-1">${c.nombre_paciente}</p>
-                            <p class="text-[10px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">
-                                ${c.pagado ? '✓ Liquidado' : '⏳ Cobro Pendiente'}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button id="btn-edit-${c.id}" class="w-14 h-14 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button>
-                        
-                        <button id="btn-pay-${c.id}" class="w-14 h-14 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-600 opacity-50' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg">💰</button>
-                    </div>
-                `;
-
+                tarjeta.innerHTML = `<div class="flex items-center gap-6 text-left flex-1"><div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-300'} shadow-sm"></div><div><p class="text-[11px] font-black uppercase tracking-wider text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p><p class="font-black text-xl text-slate-800 uppercase leading-none mb-1">${c.nombre_paciente}</p><p class="text-[10px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">${c.pagado ? '✓ Liquidado' : '⏳ Cobro Pendiente'}</p></div></div><div class="flex gap-3"><button id="btn-edit-${c.id}" class="w-14 h-14 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button><button id="btn-pay-${c.id}" class="w-14 h-14 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-600 opacity-50' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg">💰</button></div>`;
                 contenedor.appendChild(tarjeta);
-
-                // Evento para el lápiz (separado para que no falle)
-                document.getElementById(`btn-edit-${c.id}`).onclick = (e) => {
-                    e.stopPropagation();
-                    abrirModificarCita(c);
-                };
+                document.getElementById(`btn-edit-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirModificarCita(c); };
+                document.getElementById(`btn-pay-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirCobroPremium(c); };
             });
         } 
       
@@ -320,27 +221,10 @@ function filtrarAgendaLocal() {
         function abrirModificarCita(cita) {
             document.getElementById('modal-icon').innerText = "⚙️";
             document.getElementById('modal-title').innerText = "Modificar Cita";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="space-y-4 text-left">
-                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Paciente: ${cita.nombre_paciente}</p>
-                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Hora:</label>
-                    <input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}">
-                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Fecha:</label>
-                    <input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}">
-                </div>`;
-            
+            document.getElementById('modal-body').innerHTML = `<div class="space-y-4 text-left"><p class="text-[10px] font-black uppercase text-slate-400 italic">Paciente: ${cita.nombre_paciente}</p><label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Hora:</label><input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}"><label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Fecha:</label><input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}"></div>`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                const nHora = document.getElementById('m-hora').value + ":00";
-                const nFecha = document.getElementById('m-fecha').value;
-                
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ hora: nHora, fecha: nFecha })
-                });
-                eliteAviso("CITA ACTUALIZADA ✅");
-                cerrarModal();
-                cargarCitas();
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ hora: document.getElementById('m-hora').value + ":00", fecha: document.getElementById('m-fecha').value }) });
+                eliteAviso("CITA ACTUALIZADA ✅"); cerrarModal(); cargarCitas();
             };
             abrirModal();
         }
@@ -348,14 +232,8 @@ function filtrarAgendaLocal() {
         async function enviarNotaAlDr() {
             const nota = document.getElementById('internal-note-input').value;
             if(!currentPatient || !nota.trim()) return eliteAviso("SELECCIONE PACIENTE");
-            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + nota.toUpperCase().trim() })
-            });
-            eliteAviso("NOTA ENVIADA ✅");
-            document.getElementById('internal-note-input').value = "";
-            cargarCitas();
+            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + nota.toUpperCase().trim() }) });
+            eliteAviso("NOTA ENVIADA ✅"); document.getElementById('internal-note-input').value = ""; cargarCitas();
         }
 
         async function buscarPaciente() {
@@ -392,86 +270,61 @@ function filtrarAgendaLocal() {
             const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             document.getElementById('modal-icon').innerText = "🗓️";
             document.getElementById('modal-title').innerText = "Control de Fecha";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="flex justify-between items-center mb-6 px-2">
-                    <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="font-bold">‹</button>
-                    <h4 class="font-black uppercase text-xl">${mesNombres[m]} ${y}</h4>
-                    <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="font-bold">›</button>
-                </div>
-                <div class="cal-grid" id="days-container"></div>`;
+            document.getElementById('modal-body').innerHTML = `<div class="flex justify-between items-center mb-6 px-2"><button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="font-bold">‹</button><h4 class="font-black uppercase text-xl">${mesNombres[m]} ${y}</h4><button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="font-bold">›</button></div><div class="cal-grid" id="days-container"></div>`;
             const container = document.getElementById('days-container');
             for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
             for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
                 container.innerHTML += `<div class="cal-day" onclick="fechaVisualizacion = new Date(${y}, ${m}, ${d}); cargarCitas(); cerrarModal();">${d}</div>`;
             }
             abrirModal();
-        }// --- MÓDULO DE LOGÍSTICA Y FINANZAS ---
+        }
 
-       // --- TERMINAL BINACIONAL CON SENSOR DE MERCADO ---
+        // --- TERMINAL BINACIONAL ACTUALIZADA CON FACTURACIÓN ---
         function abrirCobroPremium(cita) {
             const p = cita || currentPatient;
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
-            
-            divisa = 'MXN'; // Reset por seguridad
+            divisa = 'MXN';
             document.getElementById('modal-icon').innerText = "🏢";
             document.getElementById('modal-title').innerText = "Terminal Binacional";
-            
-            // Ancho Élite para el modal
             document.querySelector('.modal-content').style.maxWidth = "650px";
-
             document.getElementById('modal-body').innerHTML = `
                 <div class="space-y-6">
-                    <div class="p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl border-b-4 border-indigo-500 relative group">
-                        <p class="text-[10px] font-black uppercase opacity-60 tracking-widest text-center">Tipo de Cambio Activo</p>
+                    <div class="p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl border-b-4 border-indigo-500 relative">
+                        <p class="text-[10px] font-black uppercase opacity-60 tracking-widest text-center">Tipo de Cambio</p>
                         <p class="text-3xl font-black text-center mt-1">1 USD = <span class="text-emerald-400">$${tc}</span> MXN</p>
                         <button onclick="ajustarTipoCambio()" class="absolute top-4 right-6 text-[10px] font-black bg-white/10 px-3 py-1 rounded-full hover:bg-emerald-500 transition">⚙️ AJUSTAR</button>
                     </div>
-
                     <div class="flex gap-3 p-2 bg-slate-100 rounded-[2.2rem]">
                         <button id="btn-mxn" onclick="seleccionarDivisa('MXN')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900">🇲🇽 PESOS MXN</button>
                         <button id="btn-usd" onclick="seleccionarDivisa('USD')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50">🇺🇸 DÓLARES USD</button>
                     </div>
-
                     <input type="number" id="pay-amount" placeholder="0.00" class="input-kb text-center text-5xl font-black py-10 bg-slate-50 border-none rounded-[2.5rem] focus:ring-0">
-
                     <select id="metodo-pago" class="input-kb font-bold text-center appearance-none cursor-pointer">
                         <option value="Efectivo">💵 EFECTIVO</option>
                         <option value="Tarjeta">💳 TARJETA (+3.5% COMISIÓN)</option>
                         <option value="Transferencia">🏦 ZELLE / TRANSFERENCIA</option>
                     </select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="generarFacturaSAT()" class="py-4 bg-slate-50 border border-emerald-500 text-emerald-600 rounded-2xl font-black text-[9px] uppercase hover:bg-emerald-500 hover:text-white transition">🇲🇽 Factura SAT</button>
+                        <button onclick="generarSuperbillUSA()" class="py-4 bg-slate-50 border border-blue-600 text-blue-600 rounded-2xl font-black text-[9px] uppercase hover:bg-blue-600 hover:text-white transition">🇺🇸 Insurance Claim</button>
+                    </div>
                 </div>`;
 
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 let amt = parseFloat(document.getElementById('pay-amount').value);
                 const metodo = document.getElementById('metodo-pago').value;
                 if(!amt) return eliteAviso("INGRESE MONTO");
-
                 if(metodo.includes("Tarjeta")) amt = amt * 1.035;
                 const montoFinal = (divisa === 'USD') ? (amt * tc) : amt;
-
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        pagado: true, 
-                        monto: Math.round(montoFinal), 
-                        telefono: `PAGO: ${divisa} | ${metodo.toUpperCase()} (TC: ${tc})` 
-                    })
-                });
-
-                eliteAviso("COBRO REGISTRADO CON ÉXITO ✅");
-                cerrarModal();
-                cargarCitas();
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: Math.round(montoFinal), telefono: `PAGO: ${divisa} | ${metodo.toUpperCase()} (TC: ${tc})` }) });
+                eliteAviso("COBRO REGISTRADO ✅"); cerrarModal(); cargarCitas();
             };
             abrirModal();
         }
 
-        // --- MOTOR DE DIVISAS ---
         function seleccionarDivisa(tipo) {
             divisa = tipo;
-            const btnMXN = document.getElementById('btn-mxn');
-            const btnUSD = document.getElementById('btn-usd');
-
+            const btnMXN = document.getElementById('btn-mxn'), btnUSD = document.getElementById('btn-usd');
             if(tipo === 'MXN') {
                 btnMXN.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900";
                 btnUSD.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50 border-2 border-transparent";
@@ -482,72 +335,79 @@ function filtrarAgendaLocal() {
         }
 
         function ajustarTipoCambio() {
-            const nuevoTC = prompt("🛰️ ACTUALIZACIÓN DE MERCADO: Ingrese el nuevo valor del dólar:", tc);
-            if (nuevoTC && !isNaN(nuevoTC)) {
-                tc = parseFloat(nuevoTC);
-                eliteAviso(`DÓLAR ACTUALIZADO: $${tc} MXN`);
-                // Si la terminal está abierta, refrescamos el dato visualmente
-                if(document.getElementById('modal-container').style.display === 'flex') {
-                    abrirCobroPremium();
-                }
-            }
+            const nuevoTC = prompt("🛰️ TIPO DE CAMBIO:", tc);
+            if (nuevoTC && !isNaN(nuevoTC)) { tc = parseFloat(nuevoTC); eliteAviso(`TC: $${tc} MXN`); if(document.getElementById('modal-container').style.display === 'flex') abrirCobroPremium(); }
         }
       
         async function iniciarCierreCaja() {
             eliteAviso("GENERANDO REPORTE...");
-            const d = fechaVisualizacion;
-            const hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const d = fechaVisualizacion, hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
             const data = await res.json();
             const doc = new jsPDF();
             doc.text("K.B ASSISTANT - REPORTE DE CAJA", 15, 20);
-            doc.autoTable({ 
-                head: [['HORA', 'PACIENTE', 'MONTO']], 
-                body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}.00`]), 
-                startY: 30 
-            });
-            doc.save(`CIERRE_${hoy}.pdf`);
-            eliteAviso("REPORTE DESCARGADO ✅");
+            doc.autoTable({ head: [['HORA', 'PACIENTE', 'MONTO']], body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}.00`]), startY: 30 });
+            doc.save(`CIERRE_${hoy}.pdf`); eliteAviso("REPORTE DESCARGADO ✅");
         }
 
-    function abrirGasto() {
-    document.getElementById('modal-icon').innerText = "💸";
-    document.getElementById('modal-title').innerText = "Gasto Administrativo";
-    document.getElementById('modal-body').innerHTML = `
-        <input type="text" id="g-concepto" placeholder="CONCEPTO (Ej: Renta)" class="input-kb mb-3 uppercase">
-        <input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
-    document.getElementById('modal-confirm-btn').onclick = async () => {
-        const concepto = document.getElementById('g-concepto').value.toUpperCase();
-        const monto = document.getElementById('g-monto').value;
-        if(!concepto || !monto) return eliteAviso("FALTAN DATOS");
+        function abrirGasto() {
+            document.getElementById('modal-icon').innerText = "💸"; document.getElementById('modal-title').innerText = "Gasto Administrativo";
+            document.getElementById('modal-body').innerHTML = `<input type="text" id="g-concepto" placeholder="CONCEPTO" class="input-kb mb-3 uppercase"><input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const concepto = document.getElementById('g-concepto').value.toUpperCase(), monto = document.getElementById('g-monto').value;
+                if(!concepto || !monto) return eliteAviso("FALTAN DATOS");
+                await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "GASTO", concepto: concepto, monto: monto }) });
+                eliteAviso("REGISTRADO ✅"); cerrarModal();
+            };
+            abrirModal();
+        }
 
-        await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, {
-            method: 'POST',
-            headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ doctor_id: docId, categoria: "GASTO", concepto: concepto, monto: monto })
-        });
-        eliteAviso("GASTO REGISTRADO ✅"); cerrarModal();
-    };
-    abrirModal();
-}
+        function abrirInsumo() {
+            document.getElementById('modal-icon').innerText = "📦"; document.getElementById('modal-title').innerText = "Reportar Faltante";
+            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32 uppercase" placeholder="Ej: Faltan hojas..."></textarea>`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const msg = document.getElementById('ins-txt').value.toUpperCase();
+                if(!msg) return eliteAviso("ESCRIBA EL FALTANTE");
+                await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "INSUMO", concepto: msg, monto: 0 }) });
+                eliteAviso("NOTIFICADO ✅"); cerrarModal();
+            };
+            abrirModal();
+        }
 
-function abrirInsumo() {
-    document.getElementById('modal-icon').innerText = "📦";
-    document.getElementById('modal-title').innerText = "Reportar Faltante";
-    document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32 uppercase" placeholder="Ej: Faltan hojas, gasas..."></textarea>`;
-    document.getElementById('modal-confirm-btn').onclick = async () => {
-        const msg = document.getElementById('ins-txt').value.toUpperCase();
-        if(!msg) return eliteAviso("ESCRIBA EL FALTANTE");
+        // --- MOTOR DE FACTURACIÓN HÍBRIDA K.B TECH ---
+        function generarFacturaSAT() {
+            const p = currentPatient;
+            if(!p) return eliteAviso("SELECT PATIENT");
+            const rfc = prompt("RFC DEL PACIENTE:", "XAXX010101000");
+            const amt = document.getElementById('pay-amount').value || 0;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text("CFDI - COMPROBANTE FISCAL", 105, 20, {align:"center"});
+            doc.setFontSize(10); doc.text(`EMISOR: DR. ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 40);
+            doc.text(`RFC EMISOR: ${globalDocData.cedula || 'REGISTRO K.B'}`, 20, 45);
+            doc.text(`RECEPTOR: ${p.nombre_paciente.toUpperCase()}`, 20, 60);
+            doc.text(`RFC RECEPTOR: ${rfc.toUpperCase()}`, 20, 65);
+            doc.rect(20, 80, 170, 20); doc.text(`CONCEPTO: CONSULTA MÉDICA PROFESIONAL`, 25, 92);
+            doc.text(`TOTAL: $${amt} MXN`, 150, 110);
+            doc.setFontSize(8); doc.text("ESTA ES UNA REPRESENTACIÓN IMPRESA DE UN CFDI GENERADA POR K.B TECH SOLUTIONS ✦", 105, 280, {align:"center"});
+            doc.save(`SAT_${p.nombre_paciente}.pdf`);
+        }
 
-        await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, {
-            method: 'POST',
-            headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ doctor_id: docId, categoria: "INSUMO", concepto: msg, monto: 0 })
-        });
-        eliteAviso("NOTIFICADO AL DOCTOR ✅"); cerrarModal();
-    };
-    abrirModal();
-}
+        function generarSuperbillUSA() {
+            const p = currentPatient;
+            if(!p) return eliteAviso("SELECT PATIENT");
+            const ins = prompt("INSURANCE NAME:", "BCBS");
+            const icd = prompt("ICD-10 CODE:", "Z00.00");
+            const doc = new jsPDF();
+            doc.setFont("courier", "bold"); doc.setFontSize(16); doc.text("HEALTH INSURANCE CLAIM FORM (SUPERBILL)", 105, 20, {align:"center"});
+            doc.setFontSize(10); doc.text(`PROVIDER: ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 40);
+            doc.text(`SPECIALTY: ${globalDocData.especialidad.toUpperCase()}`, 20, 45);
+            doc.text(`PATIENT NAME: ${p.nombre_paciente.toUpperCase()}`, 20, 60);
+            doc.text(`INSURANCE: ${ins.toUpperCase()}`, 20, 65);
+            doc.text(`DIAGNOSIS (ICD-10): ${icd}`, 20, 70);
+            doc.rect(20, 80, 170, 30); doc.text("SERVICE: OFFICE VISIT / PROFESSIONAL EVALUATION", 25, 95);
+            doc.setFontSize(8); doc.text("DOCUMENT GENERATED BY K.B TECH SOLUTIONS ✦ FOR INTERNATIONAL REIMBURSEMENT", 105, 280, {align:"center"});
+            doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
+        }
     </script>
 </body>
 </html>
