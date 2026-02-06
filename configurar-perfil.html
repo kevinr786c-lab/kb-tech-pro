@@ -164,7 +164,7 @@
             btn.innerText = "GEMINI ✦: CONFIGURANDO RED...";
             btn.disabled = true;
 
-            // --- CONSTRUCCIÓN DE PAYLOAD COMPATIBLE CON TU SQL ---
+            // --- PAYLOAD SINCRONIZADO CON TU SQL ---
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value || null,
@@ -173,22 +173,13 @@
                 hora_fin: document.getElementById('h_fin').value + ":00",
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
-                direccion_consultorio: document.getElementById('direccion').value,
                 url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
-                // Redes sociales enviadas como objeto puro para evitar error 400
+                // Redes enviadas como objeto puro para evitar Error 400
                 redes_sociales: {
                     instagram: document.getElementById('instagram').value || "",
                     facebook: document.getElementById('facebook').value || ""
                 }
             };
-
-            // Solo enviamos GPS si se capturó para evitar colapso numérico
-            const lat = document.getElementById('latitud').value;
-            const lon = document.getElementById('longitud').value;
-            if (lat && lon) {
-                payload.latitud = parseFloat(lat);
-                payload.longitud = parseFloat(lon);
-            }
 
             try {
                 const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
@@ -204,7 +195,6 @@
 
                 if (response.ok) {
                     alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                    // REDIRECCIÓN TÁCTICA FINAL A APP.HTML
                     window.location.href = `app.html?id=${docId}`;
                 } else {
                     const errorMsg = await response.json();
