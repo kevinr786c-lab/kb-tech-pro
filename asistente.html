@@ -496,40 +496,44 @@ function filtrarAgendaLocal() {
             eliteAviso("REPORTE DESCARGADO ✅");
         }
 
-        function abrirGasto() {
-            document.getElementById('modal-icon').innerText = "💸";
-            document.getElementById('modal-title').innerText = "Gasto Administrativo";
-            document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="g-concepto" placeholder="CONCEPTO" class="input-kb mb-3 uppercase">
-                <input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const concepto = document.getElementById('g-concepto').value;
-                const monto = document.getElementById('g-monto').value;
-                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: "GASTO", mensaje_error: `${concepto}: $${monto}` })
-                });
-                eliteAviso("GASTO REGISTRADO ✅"); cerrarModal();
-            };
-            abrirModal();
-        }
+    function abrirGasto() {
+    document.getElementById('modal-icon').innerText = "💸";
+    document.getElementById('modal-title').innerText = "Gasto Administrativo";
+    document.getElementById('modal-body').innerHTML = `
+        <input type="text" id="g-concepto" placeholder="CONCEPTO (Ej: Renta)" class="input-kb mb-3 uppercase">
+        <input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
+    document.getElementById('modal-confirm-btn').onclick = async () => {
+        const concepto = document.getElementById('g-concepto').value.toUpperCase();
+        const monto = document.getElementById('g-monto').value;
+        if(!concepto || !monto) return eliteAviso("FALTAN DATOS");
 
-        function abrirInsumo() {
-            document.getElementById('modal-icon').innerText = "📦";
-            document.getElementById('modal-title').innerText = "Reportar Faltante";
-            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32" placeholder="Ej: Faltan hojas, gasas..."></textarea>`;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const msg = document.getElementById('ins-txt').value;
-                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: "INSUMO", mensaje_error: msg })
-                });
-                eliteAviso("NOTIFICADO AL DOCTOR ✅"); cerrarModal();
-            };
-            abrirModal();
-        }
+        await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, {
+            method: 'POST',
+            headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ doctor_id: docId, categoria: "GASTO", concepto: concepto, monto: monto })
+        });
+        eliteAviso("GASTO REGISTRADO ✅"); cerrarModal();
+    };
+    abrirModal();
+}
+
+function abrirInsumo() {
+    document.getElementById('modal-icon').innerText = "📦";
+    document.getElementById('modal-title').innerText = "Reportar Faltante";
+    document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32 uppercase" placeholder="Ej: Faltan hojas, gasas..."></textarea>`;
+    document.getElementById('modal-confirm-btn').onclick = async () => {
+        const msg = document.getElementById('ins-txt').value.toUpperCase();
+        if(!msg) return eliteAviso("ESCRIBA EL FALTANTE");
+
+        await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, {
+            method: 'POST',
+            headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ doctor_id: docId, categoria: "INSUMO", concepto: msg, monto: 0 })
+        });
+        eliteAviso("NOTIFICADO AL DOCTOR ✅"); cerrarModal();
+    };
+    abrirModal();
+}
     </script>
 </body>
 </html>
