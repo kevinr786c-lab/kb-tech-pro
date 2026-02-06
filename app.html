@@ -18,6 +18,7 @@
         .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
         .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color); }
         
+        /* SEMÁFORO IA */
         .u-rojo { border-left: 15px solid #ef4444 !important; background: #fef2f2; animation: pulse-red 2s infinite; }
         .u-amarillo { border-left: 15px solid #f59e0b !important; background: #fffbeb; }
         .u-verde { border-left: 15px solid #10b981 !important; }
@@ -30,8 +31,6 @@
         .locked-feature.is-locked .locked-overlay { display: flex; }
         .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
 
-        #btn-ingresos { position: fixed; bottom: 2rem; right: 2rem; width: 4rem; height: 4rem; background: linear-gradient(135deg, #fbbf24, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); transition: 0.3s; }
-
         .timeline-item { position: relative; padding-left: 2rem; border-left: 2px solid #e2e8f0; margin-bottom: 1rem; }
         .timeline-item::before { content: ''; position: absolute; left: -0.45rem; top: 0.25rem; width: 0.8rem; height: 0.8rem; background: var(--main-color); border-radius: 50%; }
         .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 8px; font-weight: 900; text-transform: uppercase; }
@@ -39,7 +38,6 @@
 </head>
 <body class="min-h-screen">
     <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p></div>
-    <div id="btn-ingresos" onclick="mostrarBalance()">💰</div>
 
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white z-[50000] flex items-center justify-center">
         <div class="text-center p-12 glass-panel max-w-sm w-full border border-slate-100 shadow-2xl">
@@ -55,19 +53,13 @@
         <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-indigo-400">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-10 italic">Centro de Control</h3>
         <nav class="space-y-4">
-            <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl hover:bg-indigo-600 transition text-left">
-                <div class="text-xl">🌐</div><span class="text-[10px] font-black uppercase">Ver Sucursal Digital</span>
-            </button>
-            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-indigo-600 transition text-left">
-                <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link para Pacientes</span>
-            </button>
             <button onclick="abrirReporteGastos()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-indigo-600 transition text-left">
                 <div class="text-xl">💸</div><span class="text-[10px] font-black uppercase">Auditoría Gastos</span>
             </button>
-            <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl text-amber-500 hover:bg-amber-600 hover:text-white transition text-left">
+            <button onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl text-amber-500 hover:bg-amber-600 hover:text-white transition text-left">
                 <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Insumos Almacén</span>
             </button>
-            <button onclick="window.location.href='asistente.html?id=' + docId" class="flex items-center gap-4 w-full p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl hover:bg-emerald-600 transition text-left text-emerald-500 hover:text-white">
+            <button onclick="window.location.href='asistente.html?id=' + docId" class="flex items-center gap-4 w-full p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl hover:bg-emerald-600 transition text-left text-emerald-500 hover:text-white mt-4">
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Volver a Recepción</span>
             </button>
             <hr class="border-slate-800 my-6">
@@ -86,42 +78,27 @@
                 <p id="nav-doc-name" class="text-[10px] font-black text-slate-800 mt-1 uppercase"></p>
             </div>
             <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
-                <div class="space-y-1.5">
-                    <div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-indigo-500"></div>
-                </div>
+                <div class="space-y-1.5"><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-indigo-500"></div></div>
             </button>
         </nav>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-6">
                 <div id="panel-intercom" class="glass-panel p-8 shadow-sm border border-slate-100 locked-feature">
-                    <div class="locked-overlay flex-col text-center">
-                        <span class="text-3xl mb-3">🔒</span>
-                        <p class="text-[9px] font-black uppercase text-slate-900 italic tracking-widest">Módulo Élite ✦ Expediente IA</p>
-                    </div>
+                    <div class="locked-overlay flex-col text-center"><span class="text-3xl mb-3">🔒</span><p class="text-[9px] font-black uppercase italic tracking-widest">Plan Élite Requerido</p></div>
                     <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-indigo-600">Expediente Maestro</h3>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-indigo-200 mb-6 text-center">
                         <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase leading-none tracking-tighter">---</p>
                     </div>
-                    <div id="timeline-expediente" class="max-h-48 overflow-y-auto mb-6 px-2 text-[10px]">
-                        <p class="text-[8px] font-black uppercase mb-4 text-slate-400 italic">Historial:</p>
-                        <div id="timeline-content" class="font-bold text-slate-600 uppercase italic">Seleccione paciente...</div>
+                    <div id="timeline-expediente" class="max-h-48 overflow-y-auto mb-6 px-2">
+                        <p class="text-[8px] font-black uppercase mb-4 text-slate-400 italic">Historial Timeline:</p>
+                        <div id="timeline-content" class="text-[10px] font-bold text-slate-600 uppercase italic">Seleccione paciente...</div>
                     </div>
                     <div class="space-y-4 pt-4 border-t border-slate-100">
-                        <textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta o nota..."></textarea>
+                        <textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta..."></textarea>
                         <div class="flex gap-2">
-                            <button onclick="generarReceta()" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-lg hover:bg-indigo-600 transition">Receta PDF</button>
+                            <button onclick="generarReceta()" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-lg hover:bg-indigo-600 transition">Generar Receta</button>
                             <button onclick="enviarRespuestaDra()" class="w-14 py-4 bg-indigo-50 text-indigo-600 rounded-2xl font-black text-lg shadow-sm hover:bg-indigo-600 transition">✉️</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden hidden" id="balance-display">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Hoy</p>
-                    <div class="space-y-6">
-                        <div><p class="text-[8px] font-bold text-slate-500 uppercase">Pesos</p><p class="text-4xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p></div>
-                        <div id="usd-container" class="locked-feature pt-5 border-t border-white/10">
-                            <div class="locked-overlay" style="background:rgba(15,23,42,0.98)"><p class="text-[7px] font-black text-amber-500 uppercase tracking-widest">USD PREMIUM</p></div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Dólares</p><p class="text-3xl font-black italic text-emerald-400 tracking-tighter" id="ganancia-usd">$0.00</p>
                         </div>
                     </div>
                 </div>
@@ -131,7 +108,7 @@
                 <div class="flex justify-between items-end mb-10 px-4">
                     <h2 class="text-4xl font-black italic uppercase tracking-tighter">Agenda <span class="text-indigo-600">Live</span></h2>
                     <div class="bg-white shadow-sm px-6 py-2 rounded-2xl text-[10px] font-black text-slate-600 uppercase border border-slate-100">
-                        Citas: <span id="total-hoy" class="text-sm ml-2 text-indigo-600">0</span>
+                        Citas Hoy: <span id="total-hoy" class="text-sm ml-2 text-indigo-600">0</span>
                     </div>
                 </div>
                 <div id="contenedor-citas" class="grid gap-5"></div>
@@ -147,12 +124,8 @@
         let currentPatientId = null, globalDocData = null;
 
         const CATALOGO_TEMAS = {
-            "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
-            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
-            "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
-            "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
-            "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
-            "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
+            "Ginecología": ["#f43f5e"], "Pediatría": ["#fb923c"], "Odontología": ["#0ea5e9"],
+            "Cardiología": ["#e11d48"], "General": ["#6366f1"]
         };
 
         function eliteAviso(msg) {
@@ -164,42 +137,32 @@
 
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
-            if(!docId) return eliteAviso("ID NO ENCONTRADO");
+            if(!docId) return eliteAviso("ID DE MÉDICO NO ENCONTRADO");
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
             const data = await res.json();
             globalDocData = data[0];
             if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-                const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(globalDocData.template_id || 1) % 5];
-                document.documentElement.style.setProperty('--main-color', color);
+                document.documentElement.style.setProperty('--main-color', CATALOGO_TEMAS[globalDocData.especialidad]?.[0] || "#6366f1");
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
                 document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Nodo Maestro";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
-                if(globalDocData.plan_nivel === 0) {
-                    document.getElementById('panel-intercom').classList.add('is-locked');
-                    document.getElementById('usd-container').classList.add('is-locked');
-                    document.getElementById('btn-insumos-menu').classList.add('hidden');
-                }
+                if(globalDocData.plan_level === 0) document.getElementById('panel-intercom').classList.add('is-locked');
                 eliteAviso("ACCESO CONCEDIDO");
                 syncMaster(); setInterval(syncMaster, 15000);
             } else { eliteAviso("PIN INVÁLIDO"); }
         }
 
         async function syncMaster() {
+            // SINCRO BINARIA: FECHA LOCAL REAL
             const ahora = new Date();
             const hoy = ahora.getFullYear() + '-' + String(ahora.getMonth() + 1).padStart(2, '0') + '-' + String(ahora.getDate()).padStart(2, '0');
             
             const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
             const citas = await res.json();
-            let mxn = 0, usd = 0;
             
             document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
-                if(c.pagado) {
-                    if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
-                    else mxn += parseFloat(c.monto || 0);
-                }
                 let semaforo = "u-verde";
                 if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) semaforo = "u-rojo";
                 else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforo = "u-amarillo";
@@ -209,7 +172,7 @@
                         <div class="flex items-center gap-14 text-left">
                             <span class="text-4xl font-black italic text-indigo-600 w-24 tracking-tighter">${c.hora.slice(0,5)}</span>
                             <div>
-                                <h3 class="font-black text-slate-800 uppercase text-lg tracking-tight leading-none mb-1">${c.nombre_paciente}</h3>
+                                <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">${c.nombre_paciente}</h3>
                                 <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'PACIENTE REGULAR'}</p>
                             </div>
                         </div>
@@ -219,14 +182,10 @@
                         </div>
                     </div>`;
             }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
-            
-            document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-            document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
             document.getElementById('total-hoy').innerText = citas.length;
         }
 
         async function enfocarpaciente(id, nombre) {
-            if(globalDocData.plan_nivel === 0) return eliteAviso("PLAN ÉLITE REQUERIDO");
             currentPatientId = id;
             document.getElementById('dra-patient-name').innerText = nombre;
             const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
@@ -240,68 +199,45 @@
 
         async function enviarRespuestaDra() {
             const resp = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
+            if(!currentPatientId || !resp) return eliteAviso("ESCRIBA UNA NOTA");
             const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
             await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
-            eliteAviso("ENVIADO ✅");
+            eliteAviso("NOTA ENVIADA ✅");
             document.getElementById('dra-response-input').value = "";
         }
 
-        function generarReceta() {
-            if(!currentPatientId) return eliteAviso("SELECCIONE PACIENTE");
-            const doc = new jsPDF();
-            const nombre = document.getElementById('dra-patient-name').innerText;
-            const notas = document.getElementById('dra-response-input').value;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(99, 102, 241);
-            doc.text(`DR. ${globalDocData.nombre_doctor}`, 20, 30);
-            doc.setFontSize(10); doc.setTextColor(150); doc.text(globalDocData.especialidad.toUpperCase(), 20, 37);
-            doc.line(20, 45, 190, 45);
-            doc.setTextColor(50); doc.setFontSize(12); doc.text(`FECHA: ${new Date().toLocaleDateString()} | PACIENTE: ${nombre}`, 20, 60);
-            doc.setFontSize(14); doc.text("PRESCRIPCIÓN MÉDICA:", 20, 80);
-            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.text(notas || "Sin prescripción", 20, 90);
-            doc.save(`RECETA_${nombre}.pdf`);
-            eliteAviso("RECETA GENERADA");
+        async function abrirReporteGastos() {
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+            const logs = await res.json();
+            if(logs.length === 0) return alert("💸 SIN GASTOS HOY");
+            alert("💸 REPORTE DE GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
         }
 
-      async function abrirReporteGastos() {
-    // Sincronización exacta con el código de error 'GASTO'
-    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-    const logs = await res.json();
-    if(logs.length === 0) return alert("💸 NO HAY GASTOS REPORTADOS HOY");
-    
-    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
-    alert("💸 AUDITORÍA DE GASTOS K.B:\n\n" + lista);
-}
+        async function abrirReporteLogistica() {
+            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+            const logs = await res.json();
+            if(logs.length === 0) return alert("📦 ALMACÉN EN ORDEN");
+            alert("📦 FALTANTES REPORTADOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
+        }
 
-       async function abrirReporteLogistica() {
-    // Rastrero de alertas de almacén
-    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-    const logs = await res.json();
-    if(logs.length === 0) return alert("📦 ALMACÉN EN ORDEN - SIN REPORTES");
-    
-    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
-    alert("📦 FALTANTES NODO MAESTRO:\n\n" + lista);
-}
         async function cambiarPin() {
-    const n = prompt("NUEVO PIN MAESTRO (4 DÍGITOS):");
-    if(n && n.length === 4) {
-        const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-        // PATCH actualiza el PIN en la fila del Doctor actual
-        await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
-            method: 'PATCH', 
-            headers: headers, 
-            body: JSON.stringify({ pin_acceso: n }) 
-        });
-        eliteAviso("SEGURIDAD ACTUALIZADA - PIN CAMBIADO ✅");
-        sentinela("CAMBIO DE PIN EXITOSO", "SEGURIDAD");
-    } else {
-        eliteAviso("EL PIN DEBE SER DE 4 NÚMEROS");
-    }
-}
+            const n = prompt("NUEVO PIN (4 DÍGITOS):");
+            if(n && n.length === 4) {
+                const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
+                eliteAviso("PIN ACTUALIZADO ✅");
+            }
+        }
 
-        function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
-        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); eliteAviso("LINK COPIADO"); }
-        function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
+        function generarReceta() {
+            if(!currentPatientId) return eliteAviso("ELIJA PACIENTE");
+            const doc = new jsPDF();
+            doc.text(`DR. ${globalDocData.nombre_doctor}`, 20, 30);
+            doc.text(`PACIENTE: ${document.getElementById('dra-patient-name').innerText}`, 20, 50);
+            doc.text(`INDICACIONES: ${document.getElementById('dra-response-input').value}`, 20, 70);
+            doc.save("Receta_KB.pdf");
+        }
+
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
     </script>
 </body>
