@@ -229,34 +229,42 @@
             eliteAviso("ENVIADO ✅");
             document.getElementById('dra-response-input').value = "";
         }
-// REPORTE DE GASTOS
 async function abrirReporteGastos() {
-    // Buscamos solo los que Emily marcó como "GASTO"
-    const res = await fetch(`${URL_DB}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { 
-        headers: { 'apikey': KEY_DB } 
-    });
-    const logs = await res.json();
-    
-    if(logs.length === 0) return alert("💸 NO HAY GASTOS EN EL REGISTRO");
-
-    // Aquí está el truco: usamos l.mensaje_error porque ahí es donde se guardó
-    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
-    alert("💸 AUDITORÍA DE GASTOS:\n\n" + lista);
+    try {
+        // Cambiado URL_DB por URL para que coincida con tu script
+        const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { 
+            headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } 
+        });
+        const logs = await res.json();
+        
+        if (!Array.isArray(logs)) return alert("❌ ERROR DE CONEXIÓN");
+        if (logs.length === 0) return alert("💸 NO HAY GASTOS REGISTRADOS");
+        
+        const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
+        alert("💸 AUDITORÍA GASTOS:\n\n" + lista);
+    } catch (e) {
+        console.error(e);
+        alert("🚨 FALLO CRÍTICO EN NODO");
+    }
 }
 
-// REPORTE DE INSUMOS
 async function abrirReporteLogistica() {
-    // Buscamos solo los que Emily marcó como "INSUMO"
-    const res = await fetch(`${URL_DB}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { 
-        headers: { 'apikey': KEY_DB } 
-    });
-    const logs = await res.json();
-    
-    if(logs.length === 0) return alert("📦 NO HAY REPORTES DE INSUMOS");
+    try {
+        // Cambiado URL_DB por URL y ajustado a 'INSUMO'
+        const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { 
+            headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } 
+        });
+        const logs = await res.json();
+        
+        if (!Array.isArray(logs)) return alert("❌ ERROR DE COMUNICACIÓN");
+        if (logs.length === 0) return alert("📦 TODO EN ORDEN EN ALMACÉN");
 
-    // Volvemos a leer de l.mensaje_error
-    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
-    alert("📦 FALTANTES EN ALMACÉN:\n\n" + lista);
+        const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
+        alert("📦 FALTANTES NODO:\n\n" + lista);
+    } catch (e) {
+        console.error(e);
+        alert("🚨 ERROR DE SINCRONIZACIÓN");
+    }
 }
 
         async function cambiarPin() {
