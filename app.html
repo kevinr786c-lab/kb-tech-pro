@@ -98,13 +98,13 @@
                         <div id="timeline-content" class="font-bold text-slate-600 uppercase italic">Seleccione paciente...</div>
                     </div>
                     <div class="space-y-4 pt-4 border-t border-slate-100">
-                        <textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta..."></textarea>
-                        <div class="flex gap-2">
-                            <button onclick="generarReceta()" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-lg hover:bg-indigo-600 transition">Receta PDF</button>
-                            <button onclick="enviarRespuestaDra()" class="w-14 py-4 bg-indigo-50 text-indigo-600 rounded-2xl font-black text-lg hover:bg-indigo-600 transition">✉️</button>
-                        </div>
-                    </div>
-                </div>
+                        <div class="flex justify-between items-center mb-2">
+    <label class="text-[9px] font-black uppercase text-indigo-600 italic tracking-widest">Receta y Notas</label>
+    <button onclick="activarDictado()" id="btn-dictado" class="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full font-black text-[8px] uppercase hover:bg-indigo-600 hover:text-white transition shadow-sm active:scale-95 border border-indigo-100">
+        <span id="mic-icon">🎤</span> <span id="mic-text">Dictar por Voz</span>
+    </button>
+</div>
+<textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta..."></textarea>
 
                 <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden hidden" id="balance-display">
                     <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Hoy</p>
@@ -285,6 +285,54 @@ async function abrirReporteLogistica() {
         function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
         function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-    </script>
+        function activarDictado() {
+    const btn = document.getElementById('btn-dictado');
+    const input = document.getElementById('dra-response-input');
+    const micText = document.getElementById('mic-text');
+    const micIcon = document.getElementById('mic-icon');
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) return eliteAviso("NAVEGADOR NO COMPATIBLE"); 
+    // --- MOTOR DE CO-PILOTO POR VOZ K.B TECH ---
+    function activarDictado() {
+        const btn = document.getElementById('btn-dictado');
+        const input = document.getElementById('dra-response-input');
+        const micText = document.getElementById('mic-text');
+        const micIcon = document.getElementById('mic-icon');
+        
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) return eliteAviso("NAVEGADOR NO COMPATIBLE");
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-MX';
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            btn.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
+            btn.classList.remove('bg-indigo-50', 'text-indigo-600');
+            if(micText) micText.innerText = "ESCUCHANDO...";
+            if(micIcon) micIcon.innerText = "🛑";
+            eliteAviso("MICRÓFONO ACTIVO");
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            input.value += (input.value ? ". " : "") + transcript.toUpperCase();
+            eliteAviso("VOZ PROCESADA ✅");
+        };
+
+        recognition.onend = () => {
+            btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
+            btn.classList.add('bg-indigo-50', 'text-indigo-600');
+            if(micText) micText.innerText = "DICTAR POR VOZ";
+            if(micIcon) micIcon.innerText = "🎤";
+        };
+
+        recognition.start();
+    }
+</script>
+
 </body>
 </html>
