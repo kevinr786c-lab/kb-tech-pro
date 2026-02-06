@@ -162,33 +162,26 @@
             setTimeout(() => toast.classList.remove('active'), 3500);
         }
 
-        async function sentinela(mensaje, codigo = "info") {
-            try {
-                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "asistente.html", codigo_error: codigo.toUpperCase(), mensaje_error: mensaje.toLowerCase() })
-                });
-            } catch (e) { }
-        }
-
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB } });
-            const data = await res.json();
-            globalDocData = data[0];
-            if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-                const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(globalDocData.template_id || 1) % 5];
-                document.documentElement.style.setProperty('--main', color);
-                document.getElementById('brand-text').style.color = color;
-                document.getElementById('card-paciente').style.borderColor = color;
-                document.getElementById('pantalla-bloqueo').style.display = 'none';
-                document.getElementById('contenido-panel').classList.remove('hidden');
-                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
-                document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${globalDocData.nombre_doctor}`;
-                cargarCitas(); setInterval(cargarCitas, 30000);
-            } else { eliteAviso("PIN INCORRECTO"); }
+            if(!docId) return eliteAviso("ID DE MÉDICO NO ENCONTRADO");
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB } });
+                const data = await res.json();
+                globalDocData = data[0];
+                if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
+                    const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
+                    const color = palette[(globalDocData.template_id || 1) % 5];
+                    document.documentElement.style.setProperty('--main', color);
+                    document.getElementById('brand-text').style.color = color;
+                    document.getElementById('pantalla-bloqueo').style.display = 'none';
+                    document.getElementById('contenido-panel').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
+                    document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${globalDocData.nombre_doctor}`;
+                    cargarCitas(); 
+                    setInterval(cargarCitas, 30000);
+                } else { eliteAviso("PIN INCORRECTO"); }
+            } catch (e) { eliteAviso("ERROR DE CONEXIÓN"); }
         }
 
         async function cargarCitas() {
@@ -197,32 +190,81 @@
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
             const citas = await res.json();
             document.getElementById('tabla-citas-body').innerHTML = citas.map(c => {
-                // LÓGICA DE SEMÁFORO IA
                 let semaforoClase = "u-verde";
                 if(c.telefono && c.telefono.includes("URGENTE")) semaforoClase = "u-rojo";
                 else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforoClase = "u-amarillo";
-
-return `
+                return `
                 <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}" onclick='seleccionarPaciente(${JSON.stringify(c)})'>
                     <div class="flex items-center gap-8 text-left">
                         <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
-                        <div>
-                            <p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p>
-                            <p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p>
-                        </div>
+                        <div><p class="text-[12px] font-black uppercase italic" style="color: var(--main)">${c.hora.slice(0,5)} HS</p><p class="font-extrabold text-base text-slate-800 uppercase">${c.nombre_paciente}</p></div>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/'/g, "&apos;")})" class="p-4 bg-slate-100 hover:bg-slate-200 rounded-2xl transition">✏️</button>
-                    </div>
+                    <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/'/g, "&apos;")})" class="p-4 bg-slate-100 hover:bg-slate-200 rounded-2xl transition">✏️</button>
                 </div>`;
-            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía para este día</p>';
-
-        function abrirCalendarioMaestro() {
-            document.getElementById('modal-icon').innerText = "🗓️";
-            document.getElementById('modal-title').innerText = "Centro de Control";
-            renderizarCalendarioBase(); abrirModal();
+            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía</p>';
         }
 
+        function abrirModificarCita(cita) {
+            document.getElementById('modal-icon').innerText = "⚙️";
+            document.getElementById('modal-title').innerText = "Modificar Cita";
+            document.getElementById('modal-body').innerHTML = `
+                <div class="space-y-4 text-left">
+                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Paciente: ${cita.nombre_paciente}</p>
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Hora de la Cita:</label>
+                    <input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}">
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Fecha de la Cita:</label>
+                    <input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}">
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nivel de Urgencia:</label>
+                    <select id="m-prioridad" class="input-kb">
+                        <option value="" ${!cita.telefono ? 'selected' : ''}>Normal (Verde)</option>
+                        <option value="PRIORIDAD" ${cita.telefono?.includes('PRIORIDAD') ? 'selected' : ''}>Prioridad (Amarillo)</option>
+                        <option value="URGENTE" ${cita.telefono?.includes('URGENTE') ? 'selected' : ''}>Urgente (Rojo)</option>
+                    </select>
+                </div>`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                const nHora = document.getElementById('m-hora').value + ":00";
+                const nFecha = document.getElementById('m-fecha').value;
+                const nPrio = document.getElementById('m-prioridad').value;
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hora: nHora, fecha: nFecha, telefono: nPrio })
+                });
+                eliteAviso("ACTUALIZADO ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
+        }
+
+        async function enviarNotaAlDr() {
+            const nota = document.getElementById('internal-note-input').value;
+            if(!currentPatient || !nota.trim()) return eliteAviso("SELECCIONE PACIENTE");
+            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + nota.toUpperCase().trim() })
+            });
+            eliteAviso("NOTA ENVIADA ✅");
+            document.getElementById('internal-note-input').value = "";
+            cargarCitas();
+        }
+
+        function seleccionarPaciente(cita) {
+            currentPatient = cita;
+            document.getElementById('patient-display').innerText = cita.nombre_paciente;
+            document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} HS`;
+            const notaDoc = document.getElementById('nota-del-doctor-panel');
+            if(cita.telefono && cita.telefono.includes("DOCTOR DICE:")) {
+                notaDoc.classList.remove('hidden');
+                document.getElementById('txt-nota-doctor').innerText = cita.telefono;
+            } else { notaDoc.classList.add('hidden'); }
+        }
+
+        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
+        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+
+        // Módulos Extra (Calendario, Cobro, etc)
+        function abrirCalendarioMaestro() { renderizarCalendarioBase(); abrirModal(); }
         function renderizarCalendarioBase() {
             const m = calFecha.getMonth(), y = calFecha.getFullYear();
             const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -235,216 +277,27 @@ return `
                 <div class="cal-grid text-center text-[10px] font-black text-slate-300 mb-2">
                     <div>DOM</div><div>LUN</div><div>MAR</div><div>MIE</div><div>JUE</div><div>VIE</div><div>SAB</div>
                 </div>
-                <div class="cal-grid" id="days-container"></div>
-            `;
+                <div class="cal-grid" id="days-container"></div>`;
             const container = document.getElementById('days-container');
             for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
             for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
                 const esHoy = new Date().toDateString() === new Date(y, m, d).toDateString() ? 'today' : '';
-     container.innerHTML += `
-                    <div class="cal-day ${esHoy} border-b-2 border-transparent hover:border-indigo-500" 
-                         onclick="seleccionarDiaCal(${y}, ${m}, ${d})">
-                        ${d}
-                    </div>`;
+                container.innerHTML += `<div class="cal-day ${esHoy}" onclick="seleccionarDiaCal(${y}, ${m}, ${d})">${d}</div>`;
             }
         }
-
         function cambiarMesCal(v) { calFecha.setMonth(calFecha.getMonth() + v); renderizarCalendarioBase(); }
-        function seleccionarDiaCal(y, m, d) { fechaVisualizacion = new Date(y, m, d); cargarCitas(); cerrarModal(); eliteAviso(`AGENDA: ${d}/${m+1}`); }
-
-        function abrirCobroPremium() {
-            if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
-            document.getElementById('modal-icon').innerText = "💒";
-            document.getElementById('modal-title').innerText = "Cobro Binacional";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="flex gap-2 p-1 bg-slate-100 rounded-2xl mb-6">
-                    <button onclick="divisa='MXN'" class="flex-1 py-3 rounded-xl font-black text-[10px] bg-white border">MXN</button>
-                    <button onclick="divisa='USD'" class="flex-1 py-3 rounded-xl font-black text-[10px] text-slate-400">USD</button>
-                </div>
-                <input type="number" id="pay-amount" placeholder="MONTO" class="input-kb text-3xl text-center">
-                <select id="metodo-pago" class="input-kb mt-4 text-[10px]">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Tarjeta">Tarjeta (+3.5%)</option>
-                    <option value="Zelle">Zelle / Transf</option>
-                </select>
-                <input type="text" id="pay-rfc" placeholder="RFC FACTURA" class="input-kb mt-4">
-            `;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                let amt = parseFloat(document.getElementById('pay-amount').value);
-                const metodo = document.getElementById('metodo-pago').value;
-                const rfc = document.getElementById('pay-rfc').value || "PÚBLICO GENERAL";
-                
-                if(metodo === "Tarjeta") amt = amt * 1.035; // COMISIÓN 3.5%
-                
-                const montoFinal = divisa === 'USD' ? (amt * tc) : amt;
-                const nota = `PAGO: ${divisa} | METODO: ${metodo.toUpperCase()} | RFC: ${rfc.toUpperCase()}`;
-
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagado: true, monto: montoFinal, telefono: nota })
-                });
-                eliteAviso("LIQUIDACIÓN EXITOSA"); cerrarModal(); cargarCitas();
-            };
-            abrirModal();
-        }
-
-        function abrirGasto() {
-            document.getElementById('modal-icon').innerText = "💸";
-            document.getElementById('modal-title').innerText = "Gasto Administrativo";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="g-concepto" placeholder="CONCEPTO" class="input-kb mb-3"><input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                await sentinela(`GASTO: ${document.getElementById('g-concepto').value} - $${document.getElementById('g-monto').value}`, "GASTOS");
-                eliteAviso("REGISTRADO"); cerrarModal();
-            };
-            abrirModal();
-        }
-
-        function abrirInsumo() {
-            document.getElementById('modal-icon').innerText = "📦";
-            document.getElementById('modal-title').innerText = "Reportar Faltante";
-            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32" placeholder="DESCRIPCIÓN..."></textarea>`;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                await sentinela(document.getElementById('ins-txt').value, "LOGISTICA");
-                eliteAviso("DOCTOR NOTIFICADO"); cerrarModal();
-            };
-            abrirModal();
-        }
-
-        async function iniciarCierreCaja() {
-            eliteAviso("GENERANDO PDF...");
-            const d = fechaVisualizacion;
-            const hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
-            const data = await res.json();
-            const doc = new jsPDF();
-            doc.text("K.B TECH SOLUTIONS - REPORTE", 15, 20);
-            doc.autoTable({ head: [['HORA', 'PACIENTE', 'MONTO']], body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}.00`]), startY: 30 });
-            doc.save(`CIERRE_${hoy}.pdf`); eliteAviso("DESCARGADO");
-        }
-
-        function seleccionarPaciente(cita) {
-            currentPatient = cita;
-            document.getElementById('patient-display').innerText = cita.nombre_paciente;
-            document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} HS`;
-            if(cita.telefono && cita.telefono.includes("DOCTOR DICE:")) {
-                document.getElementById('nota-del-doctor-panel').classList.remove('hidden');
-                document.getElementById('txt-nota-doctor').innerText = cita.telefono;
-            } else { document.getElementById('nota-del-doctor-panel').classList.add('hidden'); }
-        }
-async function enviarNotaAlDr() {
-            const nota = document.getElementById('internal-note-input').value;
-            if(!currentPatient || !nota.trim()) {
-                return eliteAviso(currentPatient ? "ESCRIBA UN MENSAJE" : "SELECCIONE PACIENTE");
-            }
-            try {
-                const headers = { 
-                    'apikey': KEY_DB, 
-                    'Authorization': `Bearer ${KEY_DB}`, 
-                    'Content-Type': 'application/json' 
-                };
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, {
-                    method: 'PATCH',
-                    headers: headers,
-                    body: JSON.stringify({ 
-                        telefono: "RECEPCIÓN DICE: " + nota.toUpperCase().trim() 
-                    })
-                });
-                eliteAviso("AVISO ENVIADO AL DOCTOR ✅");
-                document.getElementById('internal-note-input').value = "";
-                cargarCitas(); function abrirModificarCita(cita) {
-            document.getElementById('modal-icon').innerText = "⚙️";
-            document.getElementById('modal-title').innerText = "Modificar Cita";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="space-y-4 text-left">
-                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Editando a: ${cita.nombre_paciente}</p>
-                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Hora de la Cita:</label>
-                    <input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}">
-                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Fecha de la Cita:</label>
-                    <input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}">
-                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nivel de Urgencia:</label>
-                    <select id="m-prioridad" class="input-kb">
-                        <option value="" ${!cita.telefono ? 'selected' : ''}>Normal (Verde)</option>
-                        <option value="PRIORIDAD" ${cita.telefono?.includes('PRIORIDAD') ? 'selected' : ''}>Prioridad (Amarillo)</option>
-                        <option value="URGENTE" ${cita.telefono?.includes('URGENTE') ? 'selected' : ''}>Urgente (Rojo)</option>
-                    </select>
-                </div>
-            `;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                const nHora = document.getElementById('m-hora').value + ":00";
-                const nFecha = document.getElementById('m-fecha').value;
-                const nPrio = document.getElementById('m-prioridad').value;
-                
-                try {
-                    await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, {
-                        method: 'PATCH',
-                        headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ hora: nHora, fecha: nFecha, telefono: nPrio })
-                    });
-                    
-                    eliteAviso("CITA ACTUALIZADA CON ÉXITO ✅");
-                    cerrarModal();
-                    cargarCitas(); // Refresco instantáneo para Emily
-                } catch (e) {
-                    eliteAviso("ERROR EN EL NODO DE DATOS");
-                }
-            };
-            abrirModal();
-        }
-            } catch (e) { 
-                eliteAviso("ERROR AL MANDAR NOTA"); 
-            }
-        }
-        function buscarPaciente() {
-            document.getElementById('modal-icon').innerText = "🔍";
-            document.getElementById('modal-title').innerText = "Buscador Pro";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="s-input" placeholder="Nombre..." class="input-kb"><div id="s-results" class="mt-6 space-y-3"></div>`;
-            document.getElementById('s-input').oninput = async (e) => {
-                if(e.target.value.length < 3) return;
-                const res = await fetch(`${URL_DB}/rest/v1/Citas?nombre_paciente=ilike.*${e.target.value}*&doctor_id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
-                const data = await res.json();
-                document.getElementById('s-results').innerHTML = data.map(r => `<div class="p-4 bg-slate-50 rounded-2xl font-black uppercase text-xs cursor-pointer hover:bg-slate-100" onclick='seleccionarPaciente(${JSON.stringify(r)}); cerrarModal();'>${r.nombre_paciente}</div>`).join('');
-            };
-            abrirModal();
-        }
-
-        function abrirNuevoPaciente() {
+        function seleccionarDiaCal(y, m, d) { fechaVisualizacion = new Date(y, m, d); cargarCitas(); cerrarModal(); }
+        function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/5216641234567?text=Hola ${currentPatient.nombre_paciente}`); }
+        
+        async function abrirNuevoPaciente() {
             document.getElementById('modal-icon').innerText = "👤";
             document.getElementById('modal-title').innerText = "Nueva Cita";
             document.getElementById('modal-body').innerHTML = `<input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase"><input type="time" id="n-hora" class="input-kb mb-3" value="12:00"><input type="date" id="n-fecha" class="input-kb" value="${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}">`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
-                eliteAviso("AGENDADO"); cerrarModal(); cargarCitas();
+                eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas();
             };
             abrirModal();
-        }
-
-    function contactarWhatsApp() { 
-            if(currentPatient) window.open(`https://wa.me/5216641234567?text=Hola ${currentPatient.nombre_paciente}`); 
-        }
-
-        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
-        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-
-        async function verificarAcceso() {
-            const pin = document.getElementById('pin-acceso').value;
-            if(!docId) return eliteAviso("ID DE MÉDICO NO ENCONTRADO");
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB } });
-            const data = await res.json();
-            globalDocData = data[0];
-            if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-                const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(globalDocData.template_id || 1) % 5];
-                document.documentElement.style.setProperty('--main', color);
-                document.getElementById('brand-text').style.color = color;
-                document.getElementById('pantalla-bloqueo').style.display = 'none';
-                document.getElementById('contenido-panel').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('contenido-panel').style.opacity = "1"; }, 50);
-                document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${globalDocData.nombre_doctor}`;
-                cargarCitas(); 
-                setInterval(cargarCitas, 30000); 
-            } else { eliteAviso("PIN INCORRECTO"); }
         }
     </script>
 </body>
