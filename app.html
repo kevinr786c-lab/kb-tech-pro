@@ -11,12 +11,12 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: 0.5s ease; text-align: left; }
         :root { --main-color: #6366f1; }
         
-        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.2rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
+        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
         .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
-        .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color); }
+        .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color) !important; }
         
         .u-rojo { border-left: 15px solid #ef4444 !important; background: #fef2f2; animation: pulse-red 2s infinite; }
         .u-amarillo { border-left: 15px solid #f59e0b !important; background: #fffbeb; }
@@ -77,7 +77,7 @@
                     <input type="text" id="edit-direccion" placeholder="DIRECCIÓN CONSULTORIO" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase">
                     <textarea id="edit-bio" placeholder="BIOGRAFÍA PROFESIONAL" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase h-20 resize-none"></textarea>
                     <input type="text" id="edit-insta" placeholder="USUARIO INSTAGRAM" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500">
-                    <button onclick="actualizarConfiguracionWeb()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-indigo-500 transition shadow-lg">Actualizar Sucursal Digital ✦</button>
+                    <button id="btn-update-web" onclick="actualizarConfiguracionWeb()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-indigo-500 transition shadow-lg">Actualizar Sucursal Digital ✦</button>
                 </div>
             </div>
 
@@ -178,17 +178,24 @@
             const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
             const data = await res.json();
             globalDocData = data[0];
+            
             if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
+                // --- MOTOR DE TEMAS INTEGRADO ---
                 const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(globalDocData.template_id || 0) % 5];
-                document.documentElement.style.setProperty('--main-color', color);
+                const colorIndex = (parseInt(globalDocData.template_id) - 1) || 0;
+                const colorVip = palette[colorIndex] || palette[0];
+                
+                document.documentElement.style.setProperty('--main-color', colorVip);
+                document.getElementById('logo-tech').style.color = colorVip;
+                document.getElementById('btn-update-web').style.backgroundColor = colorVip;
+
                 document.getElementById('pantalla-bloqueo').classList.add('hidden');
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
+                
                 document.getElementById('doc-esp-label').innerText = globalDocData.especialidad + " | Nodo Maestro";
                 document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
                 
-                // Llenar campos de configuración lateral
                 document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
                 document.getElementById('edit-bio').value = globalDocData.biografia || "";
                 if(globalDocData.redes_sociales) {
@@ -247,7 +254,7 @@
                 return `
                     <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
                         <div class="flex items-center gap-14 text-left">
-                            <span class="text-4xl font-black italic text-indigo-600 w-24 tracking-tighter">${c.hora.slice(0,5)}</span>
+                            <span class="text-4xl font-black italic w-24 tracking-tighter" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
                             <div>
                                 <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">${c.nombre_paciente}</h3>
                                 <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'VERIFICADO'}</p>
@@ -271,9 +278,9 @@
             const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
             const historial = await res.json();
             document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
-                <div class="timeline-item">
+                <div class="timeline-item mb-4 pb-2 border-b border-slate-50">
                     <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
-                    <p class="leading-tight text-slate-700 font-bold">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
+                    <p class="leading-tight text-slate-700 font-bold uppercase">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
                 </div>`).join('');
         }
 
@@ -326,33 +333,27 @@
             const fecha = new Date().toLocaleDateString('es-MX');
             doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(30, 41, 59); 
             doc.text("K.B", 105, 20, { align: "center" });
-            doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text("TECH SOLUTIONS ✦", 105, 27, { align: "center" });
-            doc.setDrawColor(99, 102, 241); doc.setLineWidth(1); doc.line(20, 35, 190, 35);
-            doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-            doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 50);
-            doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.setTextColor(100);
-            doc.text(`${globalDocData.especialidad.toUpperCase()}`, 20, 56);
-            doc.text(`CÉDULA PROFESIONAL: ${globalDocData.cedula || 'VERIFICADA'}`, 20, 61);
-            doc.setFillColor(248, 250, 252); doc.rect(20, 70, 170, 15, 'F');
-            doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(30, 41, 59);
-            doc.text(`PACIENTE: ${nombrePaciente.toUpperCase()}`, 25, 79);
-            doc.text(`FECHA: ${fecha}`, 150, 79);
-            doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text("RX / INDICACIONES:", 20, 105);
-            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(50);
+            doc.setFontSize(10); doc.text("TECH SOLUTIONS ✦", 105, 27, { align: "center" });
+            doc.line(20, 35, 190, 35);
+            doc.setFontSize(16); doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 50);
+            doc.setFontSize(10); doc.text(`${globalDocData.especialidad.toUpperCase()}`, 20, 56);
+            doc.text(`CÉDULA: ${globalDocData.cedula || 'VERIFICADA'}`, 20, 61);
+            doc.rect(20, 70, 170, 15); doc.text(`PACIENTE: ${nombrePaciente.toUpperCase()}`, 25, 79);
             const splitNotas = doc.splitTextToSize(notas.toUpperCase(), 160);
             doc.text(splitNotas, 20, 115);
-            doc.setDrawColor(203, 213, 225); doc.line(70, 240, 140, 240); 
-            doc.setFontSize(8); doc.text("FIRMA DEL MÉDICO RESPONSABLE", 105, 245, { align: "center" });
-            doc.setDrawColor(99, 102, 241); doc.line(20, 265, 190, 265);
-            doc.setFontSize(8); doc.setTextColor(148, 163, 184); 
-            doc.text("DOCUMENTO GENERADO POR K.B TECH SOLUTIONS ✦", 105, 275, { align: "center" });
-            doc.text(`NODO MAESTRO ID: ${docId}`, 105, 280, { align: "center" });
             doc.save(`Receta_${nombrePaciente.replace(/\s+/g, '_')}_KB.pdf`);
-            eliteAviso("RECETA GENERADA CON ÉXITO ✦");
+            eliteAviso("RECETA GENERADA ✦");
         }
 
-        function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); eliteAviso("LINK COPIADO"); }
+        // --- CORRECCIÓN DE LINK PARA PACIENTES (REPARA EL 404) ---
+        function copiarLinkCitas() { 
+            const currentPath = window.location.pathname;
+            const directory = currentPath.substring(0, currentPath.lastIndexOf('/'));
+            const fullLink = window.location.origin + directory + "/agendar.html?id=" + docId;
+            navigator.clipboard.writeText(fullLink); 
+            eliteAviso("LINK COPIADO ✅"); 
+        }
+
         function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
         function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
@@ -368,7 +369,6 @@
             recognition.lang = 'es-MX'; recognition.interimResults = false;
             recognition.onstart = () => {
                 btn.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
-                btn.classList.remove('bg-indigo-50', 'text-indigo-600');
                 if(micText) micText.innerText = "ESCUCHANDO...";
                 if(micIcon) micIcon.innerText = "🛑";
                 eliteAviso("MICRÓFONO ACTIVO");
@@ -380,7 +380,6 @@
             };
             recognition.onend = () => {
                 btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
-                btn.classList.add('bg-indigo-50', 'text-indigo-600');
                 if(micText) micText.innerText = "DICTAR POR VOZ";
                 if(micIcon) micIcon.innerText = "🎤";
             };
