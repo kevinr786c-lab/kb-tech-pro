@@ -37,32 +37,37 @@
         .cal-day:hover { background: var(--main); color: white; }
         .cal-day.today { background: #0f172a; color: white; } 
      /* Eliminamos el !important del ancho aquí para que el PIN respire */
+/* 1. Base para paneles normales (Login, Notas, etc) */
 .glass-panel { 
     background: white; 
     border: 1px solid rgba(0,0,0,0.05); 
     border-radius: 2.5rem; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.02); 
-    width: 100%;
+    /* Quitamos el width 100% de aquí para que no rompa el login */
 }
-    /* Buscamos el panel que contiene la agenda para que ese sí crezca */
-    main .glass-panel {
-        max-width: 1400px !important; 
-    }
-    #tabla-citas-body {
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 1.5rem !important;
-    }
 
-    /* Asegura que el contenedor de la tarjeta no tenga límites */
-    #tabla-citas-body > div {
-        width: 100% !important;
-    }
-        #panel-principal-agenda {
-    max-width: 100% !important;
+/* 2. Liberación Total de la Agenda */
+#panel-principal-agenda {
     width: 100% !important;
+    max-width: none !important; /* Rompemos el límite de los 1400px */
+    min-width: 100% !important;
+}
+
+/* 3. Motor de Estiramiento de Burbujas */
+#tabla-citas-body {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important; /* Las obliga a tocar los bordes */
+    gap: 1.2rem !important;
+}
+
+/* 4. La Tarjeta Individual (Gimena, Victor, etc) */
+#tabla-citas-body > div {
+    width: 100% !important;
+    max-width: none !important;
+    display: flex !important;
+    justify-content: space-between; /* Manda el nombre a la izquierda y botones a la derecha */
 }
     </style>
 </head>
