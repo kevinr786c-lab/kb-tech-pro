@@ -182,17 +182,34 @@
             } else { eliteAviso("PIN INCORRECTO"); }
         }
 
-        async function cargarCitas() {
+      async function cargarCitas() {
             const hoyStr = `${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}`;
             document.getElementById('fecha-actual-display').innerText = `📅 AGENDA: ${hoyStr}`;
+            
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
             const citas = await res.json();
-            document.getElementById('tabla-citas-body').innerHTML = citas.map(c => {
+            
+            // Limpiamos y preparamos el contenedor
+            const contenedor = document.getElementById('tabla-citas-body');
+            contenedor.innerHTML = ""; 
+
+            if (citas.length === 0) {
+                contenedor.innerHTML = '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía</p>';
+                return;
+            }
+
+            citas.forEach(c => {
                 let semaforoClase = "u-verde";
                 if(c.telefono && c.telefono.includes("URGENTE")) semaforoClase = "u-rojo";
                 else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforoClase = "u-amarillo";
-                return `
-                <div class="flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}" onclick="seleccionarPaciente(${JSON.stringify(c).replace(/'/g, "&apos;")})">
+
+                const tarjeta = document.createElement('div');
+                tarjeta.className = `flex items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] hover:border-slate-900 transition cursor-pointer ${semaforoClase}`;
+                
+                // Evento para seleccionar paciente
+                tarjeta.onclick = () => seleccionarPaciente(c);
+
+                tarjeta.innerHTML = `
                     <div class="flex items-center gap-8 text-left">
                         <div class="status-dot ${c.pagado ? 'status-ok' : 'status-wait'}"></div>
                         <div>
@@ -201,11 +218,20 @@
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/'/g, "&apos;")})" class="p-4 bg-slate-100 hover:bg-indigo-100 rounded-2xl transition">✏️</button>
+                        <button id="btn-edit-${c.id}" class="p-4 bg-slate-100 hover:bg-indigo-100 rounded-2xl transition">✏️</button>
                     </div>
-                </div>`;
-            }).join('') || '<p class="text-center py-20 opacity-20 font-black italic">Agenda vacía</p>';
-        }
+                `;
+
+                contenedor.appendChild(tarjeta);
+
+                // Evento para el lápiz (separado para que no falle)
+                document.getElementById(`btn-edit-${c.id}`).onclick = (e) => {
+                    e.stopPropagation();
+                    abrirModificarCita(c);
+                };
+            });
+        } 
+      
         function seleccionarPaciente(cita) {
             currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
