@@ -46,28 +46,35 @@
     /* Quitamos el width 100% de aquí para que no rompa el login */
 }
 
-/* 2. Liberación Total de la Agenda */
+/* 2. Contenedor Principal de la App */
+#contenido-panel {
+    max-width: none !important; /* Eliminamos el límite de los 1450px */
+    width: 95% !important;
+    margin: 0 auto;
+}
+
+/* 3. Liberación Total de la Agenda */
 #panel-principal-agenda {
     width: 100% !important;
-    max-width: none !important; /* Rompemos el límite de los 1400px */
+    max-width: none !important;
     min-width: 100% !important;
 }
 
-/* 3. Motor de Estiramiento de Burbujas */
+/* 4. Motor de Estiramiento de Burbujas */
 #tabla-citas-body {
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: stretch !important; /* Las obliga a tocar los bordes */
+    align-items: stretch !important; /* Fuerza a las tarjetas a tocar los bordes */
     gap: 1.2rem !important;
 }
 
-/* 4. La Tarjeta Individual (Gimena, Victor, etc) */
+/* 5. La Tarjeta Individual (Gimena, Victor, etc) */
 #tabla-citas-body > div {
     width: 100% !important;
     max-width: none !important;
     display: flex !important;
-    justify-content: space-between; /* Manda el nombre a la izquierda y botones a la derecha */
+    justify-content: space-between; /* Envía el nombre a la izquierda y los botones a la derecha */
 }
     </style>
 </head>
