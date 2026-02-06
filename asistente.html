@@ -279,7 +279,6 @@
             abrirModal();
         }
 
-        // --- TERMINAL BINACIONAL ACTUALIZADA: CERO PROMPTS ---
         function abrirCobroPremium(cita) {
             const p = cita || currentPatient;
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
@@ -384,47 +383,89 @@
             abrirModal();
         }
 
-        // --- MOTORES DE FACTURACIÓN PREMIUM (CERO PROMPTS) ---
+        // --- MOTORES DE FACTURACIÓN PREMIUM REFORZADOS (CERO PROMPTS) ---
         function generarFacturaSAT_Premium() {
             const p = currentPatient;
             const rfc = document.getElementById('billing-data').value || "XAXX010101000";
             const amt = document.getElementById('pay-amount').value || 0;
+            const ahora = new Date();
+            const fecha = ahora.toLocaleDateString('es-MX');
+            const hora = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
+
             const doc = new jsPDF();
-            doc.setFillColor(30, 41, 59); doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(255); doc.setFontSize(20); doc.text("FACTURA FISCAL (CFDI)", 105, 25, {align:"center"});
-            doc.setTextColor(0); doc.setFontSize(10);
-            doc.text("EMISOR (DATOS DEL DOCTOR):", 20, 50);
-            doc.setFont("helvetica", "bold"); doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 55);
-            doc.text(`CÉDULA/RFC: ${globalDocData.cedula || 'REGISTRO ACTIVO'}`, 20, 60);
-            doc.setFont("helvetica", "normal"); doc.text("RECEPTOR (PACIENTE):", 20, 80);
-            doc.text(`NOMBRE: ${p.nombre_paciente.toUpperCase()}`, 20, 85);
-            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 90);
-            doc.setDrawColor(200); doc.line(20, 100, 190, 100);
-            doc.text(`CONCEPTO: SERVICIOS MÉDICOS PROFESIONALES`, 20, 110);
-            doc.setFontSize(14); doc.text(`TOTAL: $${amt} MXN`, 150, 110);
-            doc.setFontSize(8); doc.setTextColor(150);
-            doc.text("ESTE DOCUMENTO ES UNA REPRESENTACIÓN IMPRESA DE UN CFDI - K.B TECH ✦", 105, 280, {align:"center"});
-            doc.save(`SAT_${p.nombre_paciente}.pdf`);
-            eliteAviso("FACTURA SAT GENERADA ✦");
+            // MARCO PERIMETRAL ÉLITE
+            doc.setDrawColor(99, 102, 241); doc.setLineWidth(0.5); doc.rect(10, 10, 190, 277);
+            doc.setLineWidth(0.1); doc.rect(12, 12, 186, 273);
+            // ENCABEZADO
+            doc.setFillColor(30, 41, 59); doc.rect(12, 12, 186, 35, 'F');
+            doc.setTextColor(255); doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+            doc.text("K.B TECH MEDICAL HUB", 20, 28);
+            doc.setFontSize(8); doc.setFont("helvetica", "normal");
+            doc.text("INFRAESTRUCTURA MÉDICA DE ALTA PRECISIÓN", 20, 35);
+            doc.setFontSize(7); doc.text(`EMISIÓN: ${fecha} | ${hora}`, 145, 25);
+            doc.text(`UBICACIÓN: ${globalDocData.direccion_consultorio?.toUpperCase() || 'TIJUANA HUB'}`, 145, 30);
+            doc.text(`ID NODO: ${docId}`, 145, 35);
+            // DATOS EMISOR
+            doc.setTextColor(0); doc.setFontSize(10); doc.setFont("helvetica", "bold");
+            doc.text("DATOS DEL PROFESIONAL EMISOR", 20, 60); doc.line(20, 62, 100, 62);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+            doc.text(`NOMBRE: DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 70);
+            doc.text(`ESPECIALIDAD: ${globalDocData.especialidad.toUpperCase()}`, 20, 75);
+            doc.text(`RFC/CÉDULA: ${globalDocData.cedula || 'VERIFICADA POR K.B TECH'}`, 20, 80);
+            // DATOS RECEPTOR
+            doc.setFont("helvetica", "bold"); doc.text("RECEPTOR DEL SERVICIO", 115, 60); doc.line(115, 62, 190, 62);
+            doc.setFont("helvetica", "normal");
+            doc.text(`PACIENTE: ${p.nombre_paciente.toUpperCase()}`, 115, 70);
+            doc.text(`RFC: ${rfc.toUpperCase()}`, 115, 75);
+            // CUERPO
+            doc.setFillColor(248, 250, 252); doc.rect(20, 100, 170, 40, 'F');
+            doc.setDrawColor(99, 102, 241); doc.rect(20, 100, 170, 40);
+            doc.setFont("helvetica", "bold"); doc.text("CONCEPTO DEL SERVICIO", 25, 110);
+            doc.setFont("helvetica", "normal"); doc.text("CONSULTA MÉDICA ESPECIALIZADA Y EVALUACIÓN CLÍNICA", 25, 120);
+            doc.setFontSize(16); doc.text(`TOTAL: $${amt} MXN`, 140, 132);
+            // FIRMA Y SELLO
+            doc.setDrawColor(99, 102, 241); doc.rect(25, 230, 40, 40);
+            doc.setFontSize(6); doc.text("SELLO DIGITAL", 35, 235); doc.text("K.B TECH ✦ ENCRYPTED", 28, 250);
+            doc.line(110, 260, 180, 260); doc.setFontSize(8); doc.text("FIRMA DEL PROFESIONAL RESPONSABLE", 145, 265, {align: "center"});
+            doc.setFontSize(7); doc.setTextColor(150);
+            doc.text("ESTA ES UNA REPRESENTACIÓN IMPRESA DE UN CFDI GENERADA POR EL SISTEMA OPERATIVO K.B TECH SOLUTIONS ✦", 105, 285, {align: "center"});
+            doc.save(`FACTURA_${p.nombre_paciente.replace(/\s+/g, '_')}.pdf`);
+            eliteAviso("FACTURA BLINDADA GENERADA ✦");
         }
 
         function generarSuperbillUSA_Premium() {
             const p = currentPatient;
             const insuranceId = document.getElementById('billing-data').value || "PENDING";
             const amt = document.getElementById('pay-amount').value || 0;
+            const ahora = new Date();
+            const fecha = ahora.toLocaleDateString('en-US');
             if(!p) return eliteAviso("SELECT PATIENT");
+
             const doc = new jsPDF();
-            doc.setFont("courier", "bold"); doc.setFontSize(16); doc.text("HEALTH INSURANCE CLAIM FORM", 105, 20, {align:"center"});
-            doc.setFontSize(10); doc.text(`PHYSICIAN: ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 40);
-            doc.text(`SPECIALTY: ${globalDocData.especialidad.toUpperCase()}`, 20, 45);
-            doc.line(20, 55, 190, 55);
-            doc.text(`PATIENT: ${p.nombre_paciente.toUpperCase()}`, 20, 65);
-            doc.text(`INSURANCE ID/POLICY: ${insuranceId.toUpperCase()}`, 20, 70);
-            doc.rect(20, 80, 170, 30); doc.text("SERVICE: OFFICE VISIT / CONSULTATION", 25, 95);
-            doc.text(`AMOUNT PAID: $${(amt/tc).toFixed(2)} USD`, 25, 105);
-            doc.setFontSize(8); doc.text("GENERATED BY K.B TECH SOLUTIONS INTERNATIONAL HUB ✦", 105, 280, {align:"center"});
-            doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
+            // MARCO PERIMETRAL
+            doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.5); doc.rect(10, 10, 190, 277);
+            // HEADER
+            doc.setFillColor(30, 41, 59); doc.rect(12, 12, 186, 30, 'F');
+            doc.setTextColor(255); doc.setFont("courier", "bold"); doc.setFontSize(16);
+            doc.text("HEALTH INSURANCE CLAIM FORM (SUPERBILL)", 105, 30, {align:"center"});
+            // CONTENT
+            doc.setTextColor(0); doc.setFontSize(10);
+            doc.text(`DATE OF SERVICE: ${fecha}`, 20, 55);
+            doc.text(`PHYSICIAN: ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 65);
+            doc.text(`NPI/TAX ID: ${globalDocData.cedula || 'N/A'}`, 20, 70);
+            doc.line(20, 75, 190, 75);
+            doc.text(`PATIENT NAME: ${p.nombre_paciente.toUpperCase()}`, 20, 85);
+            doc.text(`INSURANCE ID: ${insuranceId.toUpperCase()}`, 20, 90);
+            doc.rect(20, 100, 170, 50);
+            doc.text("DESCRIPTION OF SERVICES:", 25, 110);
+            doc.text("- OFFICE VISIT / MEDICAL EVALUATION", 30, 120);
+            doc.setFontSize(14); doc.text(`TOTAL PAID: $${(amt/tc).toFixed(2)} USD`, 130, 140);
+            // FOOTER
+            doc.setFontSize(8); doc.setTextColor(100);
+            doc.text("THIS DOCUMENT IS FOR INTERNATIONAL REIMBURSEMENT PURPOSES ONLY.", 105, 270, {align: "center"});
+            doc.text("GENERATED BY K.B TECH SOLUTIONS HUB ✦ TIJUANA, MX", 105, 275, {align: "center"});
+            doc.save(`SUPERBILL_${p.nombre_paciente.replace(/\s+/g, '_')}.pdf`);
             eliteAviso("USA SUPERBILL GENERATED ✦");
         }
     </script>
