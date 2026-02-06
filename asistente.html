@@ -36,14 +36,20 @@
         .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
         .cal-day:hover { background: var(--main); color: white; }
         .cal-day.today { background: #0f172a; color: white; } 
-        /* --- EXPANSIÓN TOTAL DEL BÚNKER --- */
+        /* --- AJUSTE INTELIGENTE DE PANELES --- */
     .glass-panel {
         width: 100% !important;
-        max-width: 1400px !important; /* Forzamos a que respire */
-        padding: 2rem !important;     /* Bajamos el p-12 que asfixiaba */
-        margin: 0 auto !important;
+        max-width: 600px; /* Por defecto para el PIN, se queda centrado */
+        padding: 2rem !important;
+        margin: 2rem auto !important;
+        transition: max-width 0.5s ease;
     }
 
+    /* ESTA REGLA SOLO ACTÚA EN LA AGENDA */
+    /* Buscamos el panel que contiene la agenda para que ese sí crezca */
+    main .glass-panel {
+        max-width: 1400px !important; 
+    }
     #tabla-citas-body {
         width: 100% !important;
         display: flex !important;
