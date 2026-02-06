@@ -131,7 +131,6 @@
         function capturarUbicacion() {
             const status = document.getElementById('gps-status');
             if (!navigator.geolocation) return status.innerText = "Error: GPS no soportado.";
-            
             status.innerText = "Sincronizando Satélites...";
             status.classList.add('animate-pulse');
 
@@ -174,8 +173,9 @@
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
                 direccion_consultorio: document.getElementById('direccion').value,
-                latitud: parseFloat(document.getElementById('latitud').value) || null,
-                longitud: parseFloat(document.getElementById('longitud').value) || null,
+                // Blindaje numérico para evitar Error 400
+                latitud: document.getElementById('latitud').value ? parseFloat(document.getElementById('latitud').value) : null,
+                longitud: document.getElementById('longitud').value ? parseFloat(document.getElementById('longitud').value) : null,
                 url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
                 url_foto_equipo: document.getElementById('foto_equipo').value || null,
                 redes_sociales: JSON.stringify({
@@ -192,10 +192,10 @@
 
             if (response.ok) {
                 alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                // REDIRECCIÓN TÁCTICA A APP.HTML
+                // REDIRECCIÓN TÁCTICA FINAL A APP.HTML
                 window.location.href = `app.html?id=${docId}`;
             } else {
-                alert("Fallo en la sincronización del Nodo.");
+                alert("Fallo en la sincronización del Nodo. Verifique su conexión.");
                 btn.disabled = false;
                 btn.innerText = "Inaugurar Sucursal Digital";
             }
