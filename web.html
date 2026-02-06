@@ -14,10 +14,16 @@
         .btn-lujo { background: var(--main); color: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px -10px var(--main); }
         .btn-lujo:hover { transform: scale(1.02) translateY(-5px); filter: brightness(1.1); }
         
-        .gallery-img { aspect-ratio: 16/9; background: #e2e8f0; border-radius: 2rem; overflow: hidden; border: 1px solid #f1f5f9; background-size: cover; background-position: center; }
+        .gallery-img { aspect-ratio: 16/9; background: #e2e8f0; border-radius: 2rem; overflow: hidden; border: 1px solid #f1f5f9; background-size: cover; background-position: center; transition: 0.5s; }
+        .gallery-img:hover { transform: scale(1.02); }
 
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.1); } }
+        
+        /* Divisa Switch */
+        .currency-switch { background: #f1f5f9; border-radius: 1rem; padding: 4px; display: inline-flex; gap: 4px; border: 1px solid #e2e8f0; }
+        .currency-btn { padding: 6px 12px; border-radius: 0.75rem; font-size: 9px; font-weight: 800; transition: 0.3s; color: #94a3b8; }
+        .currency-btn.active { background: white; color: var(--main); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="py-10 md:py-20 px-4">
@@ -25,19 +31,44 @@
     <div class="max-w-4xl mx-auto space-y-12">
         
         <header class="glass-card p-12 md:p-16 rounded-[4rem] text-center relative overflow-hidden">
+            <div class="absolute top-8 right-8 flex items-center gap-2">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                <span class="text-[8px] font-black uppercase tracking-widest text-emerald-600">Nodo Activo</span>
+            </div>
+
             <div id="doc-icon" class="text-7xl mb-6">🩺</div>
             <div id="badge-verificado" class="mb-6">
                 <span class="bg-indigo-600 text-white text-[8px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full shadow-lg">Especialista Verificado K.B Tech</span>
             </div>
-            <h1 id="doc-name" class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">---</h1>
+            <h1 id="doc-name" class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Cargando...</h1>
             <p id="doc-esp" class="text-xs font-bold text-slate-400 uppercase tracking-[0.5em] italic mt-4">Sincronizando Nodo...</p>
             
             <div class="mt-12 max-w-2xl mx-auto">
                 <p id="doc-bio" class="text-lg text-slate-600 font-medium leading-relaxed italic">
-                    Cargando perfil profesional...
+                    Conectando con la infraestructura médica...
                 </p>
             </div>
+
+            <div class="mt-10 flex justify-center gap-6" id="social-container">
+                </div>
         </header>
+
+        <section class="glass-card p-10 rounded-[3rem] flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-left">
+                <h3 class="text-[9px] font-black uppercase text-indigo-500 tracking-[0.3em] italic">Inversión en Salud</h3>
+                <p class="text-xl font-black italic tracking-tighter uppercase mt-1">Consulta Especializada</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <p id="precio-display" class="text-3xl font-black text-slate-900 tracking-tighter">$1,200 MXN</p>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Aceptamos Seguros USA</p>
+                </div>
+                <div class="currency-switch">
+                    <button id="btn-mxn" onclick="toggleMoneda('MXN')" class="currency-btn active">MXN</button>
+                    <button id="btn-usd" onclick="toggleMoneda('USD')" class="currency-btn">USD</button>
+                </div>
+            </div>
+        </section>
 
         <section class="glass-card p-12 rounded-[4rem] space-y-10">
             <div class="text-center">
@@ -45,8 +76,8 @@
                 <h2 class="text-3xl font-black italic tracking-tighter uppercase mt-2">Tecnología y Confort</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="galeria-contenedor">
-                <div id="img-1" class="gallery-img"></div>
-                <div id="img-2" class="gallery-img"></div>
+                <div id="img-1" class="gallery-img shadow-xl"></div>
+                <div id="img-2" class="gallery-img shadow-xl"></div>
             </div>
         </section>
 
@@ -54,10 +85,10 @@
             <div>
                 <span class="text-4xl">📍</span>
                 <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación del Consultorio</h3>
-                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Infraestructura médica de alta precisión ubicada estratégicamente para su comodidad.</p>
+                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado estratégicamente en el Hub médico de Tijuana para su fácil acceso.</p>
                 <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                     <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
-                    <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">---</p>
+                    <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">Buscando coordenadas...</p>
                 </div>
                 <div class="flex gap-4 mt-6">
                     <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Google Maps</a>
@@ -87,6 +118,8 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+        let precioMXN = 1200;
+        const TC = 17.50;
 
         const CATALOGO_TEMAS = {
             "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1"
@@ -104,25 +137,46 @@
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + " | Certificado";
-                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica.";
+                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica y el bienestar integral.";
                 document.getElementById('doc-direccion').innerText = doc.direccion_consultorio || "Tijuana, Baja California";
-
-                // SINCRONIZACIÓN DE MAPA REAL ✦
-                if(doc.latitud && doc.longitud) {
-                    const lat = doc.latitud;
-                    const lon = doc.longitud;
-                    document.getElementById('google-map-iframe').src = `https://www.google.com/maps/embed/v1/place?key=REEMPLAZAR_CON_TU_API_KEY&q=${lat},${lon}&zoom=16`;
-                    document.getElementById('link-maps').href = `https://www.google.com/maps?q=${lat},${lon}`;
-                    document.getElementById('link-waze').href = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
-                } else {
-                    document.getElementById('mapa-wrapper').innerHTML = "<div class='flex items-center justify-center h-full text-[9px] font-black text-slate-400 uppercase italic'>Mapa no vinculado</div>";
+                
+                // Redes Sociales
+                if(doc.redes_sociales) {
+                    const redes = JSON.parse(doc.redes_sociales);
+                    const container = document.getElementById('social-container');
+                    if(redes.instagram) container.innerHTML += `<a href="https://instagram.com/${redes.instagram.replace('@','')}" target="_blank" class="text-[9px] font-black uppercase text-slate-400 hover:text-indigo-500 transition">Instagram</a>`;
+                    if(redes.facebook) container.innerHTML += `<a href="${redes.facebook}" target="_blank" class="text-[9px] font-black uppercase text-slate-400 hover:text-indigo-500 transition">Facebook</a>`;
                 }
 
-                // GALERÍA DINÁMICA
+                // Sincronización de Mapa
+                if(doc.latitud && doc.longitud) {
+                    document.getElementById('google-map-iframe').src = `https://www.google.com/maps/embed/v1/view?key=YOUR_API_KEY&center=${doc.latitud},${doc.longitud}&zoom=16`;
+                    document.getElementById('link-maps').href = `https://www.google.com/maps?q=${doc.latitud},${doc.longitud}`;
+                    document.getElementById('link-waze').href = `https://waze.com/ul?ll=${doc.latitud},${doc.longitud}&navigate=yes`;
+                }
+
                 if(doc.url_foto_consultorio) document.getElementById('img-1').style.backgroundImage = `url('${doc.url_foto_consultorio}')`;
                 if(doc.url_foto_equipo) document.getElementById('img-2').style.backgroundImage = `url('${doc.url_foto_equipo}')`;
             }
         }
+
+        function toggleMoneda(tipo) {
+            const display = document.getElementById('precio-display');
+            const btnMXN = document.getElementById('btn-mxn');
+            const btnUSD = document.getElementById('btn-usd');
+
+            if(tipo === 'USD') {
+                const totalUSD = (precioMXN / TC).toFixed(0);
+                display.innerText = `$${totalUSD} USD`;
+                btnUSD.classList.add('active');
+                btnMXN.classList.remove('active');
+            } else {
+                display.innerText = `$${precioMXN.toLocaleString()} MXN`;
+                btnMXN.classList.add('active');
+                btnUSD.classList.remove('active');
+            }
+        }
+
         init();
     </script>
 </body>
