@@ -164,6 +164,7 @@
             btn.innerText = "GEMINI ✦: CONFIGURANDO RED...";
             btn.disabled = true;
 
+            // --- CONSTRUCCIÓN DE PAYLOAD COMPATIBLE CON TU SQL ---
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value || null,
@@ -173,31 +174,48 @@
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
                 direccion_consultorio: document.getElementById('direccion').value,
-                // Blindaje numérico para evitar Error 400
-                latitud: document.getElementById('latitud').value ? parseFloat(document.getElementById('latitud').value) : null,
-                longitud: document.getElementById('longitud').value ? parseFloat(document.getElementById('longitud').value) : null,
                 url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
-                url_foto_equipo: document.getElementById('foto_equipo').value || null,
-                redes_sociales: JSON.stringify({
+                // Redes sociales enviadas como objeto puro para evitar error 400
+                redes_sociales: {
                     instagram: document.getElementById('instagram').value || "",
                     facebook: document.getElementById('facebook').value || ""
-                })
+                }
             };
 
-            const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            // Solo enviamos GPS si se capturó para evitar colapso numérico
+            const lat = document.getElementById('latitud').value;
+            const lon = document.getElementById('longitud').value;
+            if (lat && lon) {
+                payload.latitud = parseFloat(lat);
+                payload.longitud = parseFloat(lon);
+            }
 
-            if (response.ok) {
-                alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                // REDIRECCIÓN TÁCTICA FINAL A APP.HTML
-                window.location.href = `app.html?id=${docId}`;
-            } else {
-                alert("Fallo en la sincronización del Nodo. Verifique su conexión.");
+            try {
+                const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'apikey': KEY_DB, 
+                        'Authorization': `Bearer ${KEY_DB}`, 
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal' 
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
+                    // REDIRECCIÓN TÁCTICA FINAL A APP.HTML
+                    window.location.href = `app.html?id=${docId}`;
+                } else {
+                    const errorMsg = await response.json();
+                    console.error("DETALLE ERROR:", errorMsg);
+                    alert("Fallo en la sincronización: " + (errorMsg.message || "Error de formato"));
+                    btn.disabled = false;
+                    btn.innerText = "Inaugurar Sucursal Digital";
+                }
+            } catch (err) {
+                alert("Interferencia crítica en la conexión.");
                 btn.disabled = false;
-                btn.innerText = "Inaugurar Sucursal Digital";
             }
         });
 
