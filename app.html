@@ -229,28 +229,34 @@
             eliteAviso("ENVIADO ✅");
             document.getElementById('dra-response-input').value = "";
         }
-
-       // SUSTITUYE TU FUNCIÓN POR ESTA:
+// REPORTE DE GASTOS
 async function abrirReporteGastos() {
-    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+    // Buscamos solo los que Emily marcó como "GASTO"
+    const res = await fetch(`${URL_DB}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { 
+        headers: { 'apikey': KEY_DB } 
+    });
     const logs = await res.json();
     
-    // Si la respuesta es un error de Supabase, evitamos que el sistema truene
-    if(!Array.isArray(logs)) return alert("❌ ERROR DE CONEXIÓN CON LA BASE DE DATOS");
-    if(logs.length === 0) return alert("💸 NO HAY GASTOS REGISTRADOS");
+    if(logs.length === 0) return alert("💸 NO HAY GASTOS EN EL REGISTRO");
 
-    alert("💸 AUDITORÍA GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
+    // Aquí está el truco: usamos l.mensaje_error porque ahí es donde se guardó
+    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
+    alert("💸 AUDITORÍA DE GASTOS:\n\n" + lista);
 }
 
-        // SUSTITUYE TU FUNCIÓN POR ESTA:
+// REPORTE DE INSUMOS
 async function abrirReporteLogistica() {
-    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+    // Buscamos solo los que Emily marcó como "INSUMO"
+    const res = await fetch(`${URL_DB}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { 
+        headers: { 'apikey': KEY_DB } 
+    });
     const logs = await res.json();
     
-    if(!Array.isArray(logs)) return alert("❌ ERROR DE CONEXIÓN CON ALMACÉN");
     if(logs.length === 0) return alert("📦 NO HAY REPORTES DE INSUMOS");
 
-    alert("📦 FALTANTES NODO:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
+    // Volvemos a leer de l.mensaje_error
+    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
+    alert("📦 FALTANTES EN ALMACÉN:\n\n" + lista);
 }
 
         async function cambiarPin() {
