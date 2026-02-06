@@ -263,17 +263,41 @@
             eliteAviso("RECETA GENERADA");
         }
 
-        async function abrirReporteGastos() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            alert("💸 GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
-        }
+      async function abrirReporteGastos() {
+    // Sincronización exacta con el código de error 'GASTO'
+    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+    const logs = await res.json();
+    if(logs.length === 0) return alert("💸 NO HAY GASTOS REPORTADOS HOY");
+    
+    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
+    alert("💸 AUDITORÍA DE GASTOS K.B:\n\n" + lista);
+}
 
-        async function abrirReporteLogistica() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            alert("📦 LOGÍSTICA:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
-        }
+       async function abrirReporteLogistica() {
+    // Rastrero de alertas de almacén
+    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+    const logs = await res.json();
+    if(logs.length === 0) return alert("📦 ALMACÉN EN ORDEN - SIN REPORTES");
+    
+    const lista = logs.map(l => `• ${l.mensaje_error}`).join('\n');
+    alert("📦 FALTANTES NODO MAESTRO:\n\n" + lista);
+}
+        async function cambiarPin() {
+    const n = prompt("NUEVO PIN MAESTRO (4 DÍGITOS):");
+    if(n && n.length === 4) {
+        const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+        // PATCH actualiza el PIN en la fila del Doctor actual
+        await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
+            method: 'PATCH', 
+            headers: headers, 
+            body: JSON.stringify({ pin_acceso: n }) 
+        });
+        eliteAviso("SEGURIDAD ACTUALIZADA - PIN CAMBIADO ✅");
+        sentinela("CAMBIO DE PIN EXITOSO", "SEGURIDAD");
+    } else {
+        eliteAviso("EL PIN DEBE SER DE 4 NÚMEROS");
+    }
+}
 
         function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
         function copiarLinkCitas() { navigator.clipboard.writeText(window.location.origin + "/agendar.html?id=" + docId); eliteAviso("LINK COPIADO"); }
