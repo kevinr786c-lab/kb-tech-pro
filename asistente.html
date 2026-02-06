@@ -217,25 +217,26 @@
             document.getElementById('modal-icon').innerText = "⚙️";
             document.getElementById('modal-title').innerText = "Modificar Cita";
             document.getElementById('modal-body').innerHTML = `
-                <div class="space-y-4">
+                <div class="space-y-4 text-left">
+                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Paciente: ${cita.nombre_paciente}</p>
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Hora:</label>
                     <input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}">
+                    <label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Fecha:</label>
                     <input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}">
-                    <select id="m-prioridad" class="input-kb">
-                        <option value="">Normal (Verde)</option>
-                        <option value="PRIORIDAD">Prioridad (Amarillo)</option>
-                        <option value="URGENTE">Urgente (Rojo)</option>
-                    </select>
                 </div>`;
+            
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 const nHora = document.getElementById('m-hora').value + ":00";
                 const nFecha = document.getElementById('m-fecha').value;
-                const nPrio = document.getElementById('m-prioridad').value;
+                
                 await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, {
                     method: 'PATCH',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ hora: nHora, fecha: nFecha, telefono: nPrio })
+                    body: JSON.stringify({ hora: nHora, fecha: nFecha })
                 });
-                eliteAviso("ACTUALIZADO ✅"); cerrarModal(); cargarCitas();
+                eliteAviso("CITA ACTUALIZADA ✅");
+                cerrarModal();
+                cargarCitas();
             };
             abrirModal();
         }
