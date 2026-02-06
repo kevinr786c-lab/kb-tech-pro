@@ -199,8 +199,7 @@
                     document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
                 } else {
-                    console.error("Fallo de esquema:", data);
-                    alert("Gemini Engine ✦: Error de Sincronización. Verifique sus datos.");
+                    alert("Error de Sincronización. Intente de nuevo.");
                     btn.disabled = false;
                     btn.innerText = "Reintentar";
                 }
@@ -214,8 +213,6 @@
             if(ultimoIdGenerado) {
                 const btn = event.target;
                 btn.innerText = "GEMINI ✦: INICIANDO COCCIÓN...";
-                
-                // REDIRECCIÓN TÁCTICA AL CONFIGURADOR
                 setTimeout(() => {
                     window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
                 }, 1500);
