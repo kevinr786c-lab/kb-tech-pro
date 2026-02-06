@@ -67,9 +67,12 @@
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Ir a Recepción</span>
             </button>
             <hr class="border-slate-800 my-6">
-            <button onclick="cambiarPin()" class="flex items-center gap-4 w-full p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 hover:bg-rose-600 hover:text-white transition text-left">
-                <div class="text-xl">🔐</div><span class="text-[10px] font-black uppercase">Cambiar PIN</span>
-            </button>
+            
+            <div class="p-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl space-y-3">
+                <p class="text-[8px] font-black uppercase text-rose-500 tracking-widest italic">Seguridad del Nodo</p>
+                <input type="password" id="nuevo-pin-input" placeholder="NUEVO PIN (4)" maxlength="4" class="w-full bg-slate-800 border-none rounded-xl p-3 text-center text-xl tracking-[0.5em] font-black outline-none focus:ring-1 focus:ring-rose-500">
+                <button onclick="cambiarPin()" class="w-full py-3 bg-rose-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-rose-500 transition shadow-lg">Actualizar Acceso 🔐</button>
+            </div>
         </nav>
     </div>
 
@@ -260,16 +263,20 @@
             } catch (e) { eliteAviso("FALLO EN NODO ALMACÉN"); }
         }
 
+        // --- CAMBIO DE PIN PREMIUM (CERO PROMPTS) ---
         async function cambiarPin() {
-            const n = prompt("NUEVO PIN (4 DÍGITOS):");
+            const n = document.getElementById('nuevo-pin-input').value;
             if(n && n.length === 4) {
                 const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
                 await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
                 eliteAviso("PIN ACTUALIZADO ✅");
+                document.getElementById('nuevo-pin-input').value = "";
+                toggleMenu(); // Cerrar menú al terminar
+            } else {
+                eliteAviso("PIN DEBE SER DE 4 DÍGITOS");
             }
         }
 
-        // --- MOTOR DE RECETA DINÁMICA K.B TECH SOLUTIONS ✦ ---
         function generarReceta() {
             if(!currentPatientId || !globalDocData) return eliteAviso("DATOS DE MÉDICO O PACIENTE NO CARGADOS");
             const doc = new jsPDF();
