@@ -116,7 +116,7 @@
         };
 
         async function init() {
-            if (!docId) return alert("Error de Nodo Gemini.");
+            if (!docId) return alert("Error: ID de Nodo no detectado.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
             currentDocData = data[0];
@@ -125,6 +125,7 @@
                 document.getElementById('welcome-doc').innerText = `Dr. ${currentDocData.nombre_doctor}`;
                 const color = CATALOGO_TEMAS[currentDocData.especialidad] || "#6366f1";
                 document.documentElement.style.setProperty('--main-color', color);
+                document.getElementById('btn-save').style.backgroundColor = 'white'; // Default state
             }
         }
 
@@ -139,8 +140,8 @@
                 document.getElementById('latitud').value = pos.coords.latitude;
                 document.getElementById('longitud').value = pos.coords.longitude;
                 status.innerText = "✅ Ubicación Vinculada con Precisión";
-                status.classList.remove('animate-pulse');
-                status.classList.add('gps-active');
+                status.classList.remove('animate-pulse', 'text-slate-500');
+                status.classList.add('gps-active', 'text-emerald-400');
             }, () => {
                 status.innerText = "⚠️ Activa el GPS para mayor precisión.";
             });
@@ -174,9 +175,10 @@
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
                 direccion_consultorio: document.getElementById('direccion').value,
-                latitud: document.getElementById('latitud').value,
-                longitud: document.getElementById('longitud').value,
+                latitud: parseFloat(document.getElementById('latitud').value) || null,
+                longitud: parseFloat(document.getElementById('longitud').value) || null,
                 url_foto_consultorio: document.getElementById('foto_consultorio').value,
+                url_foto_equipo: document.getElementById('foto_equipo').value,
                 redes_sociales: JSON.stringify({
                     instagram: document.getElementById('instagram').value,
                     facebook: document.getElementById('facebook').value
@@ -190,8 +192,13 @@
             });
 
             if (response.ok) {
-                alert("🚀 Gemini Engine ✦: Nodo Sincronizado. Lanzando Sucursal Digital.");
-                window.location.href = `app.html?id=${docId}`;
+                alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
+                // Redirección al Nodo Maestro del Doctor
+                window.location.href = `doctor.html?id=${docId}`;
+            } else {
+                alert("Fallo en la sincronización del Nodo.");
+                btn.disabled = false;
+                btn.innerText = "Inaugurar Sucursal Digital";
             }
         });
 
