@@ -230,17 +230,28 @@
             document.getElementById('dra-response-input').value = "";
         }
 
-        async function abrirReporteGastos() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            alert("💸 GASTOS:\n\n" + (logs.map(l => `• ${l.mensaje_error}`).join('\n') || "SIN REGISTROS"));
-        }
+       // SUSTITUYE TU FUNCIÓN POR ESTA:
+async function abrirReporteGastos() {
+    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+    const logs = await res.json();
+    
+    // Si la respuesta es un error de Supabase, evitamos que el sistema truene
+    if(!Array.isArray(logs)) return alert("❌ ERROR DE CONEXIÓN CON LA BASE DE DATOS");
+    if(logs.length === 0) return alert("💸 NO HAY GASTOS REGISTRADOS");
 
-        async function abrirReporteLogistica() {
-            const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-            const logs = await res.json();
-            alert("📦 INSUMOS:\n\n" + (logs.map(l => `• ${l.mensaje_error}`).join('\n') || "SIN REGISTROS"));
-        }
+    alert("💸 AUDITORÍA GASTOS:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
+}
+
+        // SUSTITUYE TU FUNCIÓN POR ESTA:
+async function abrirReporteLogistica() {
+    const res = await fetch(`${URL}/rest/v1/logs_sistema?codigo_error=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+    const logs = await res.json();
+    
+    if(!Array.isArray(logs)) return alert("❌ ERROR DE CONEXIÓN CON ALMACÉN");
+    if(logs.length === 0) return alert("📦 NO HAY REPORTES DE INSUMOS");
+
+    alert("📦 FALTANTES NODO:\n\n" + logs.map(l => `• ${l.mensaje_error}`).join('\n'));
+}
 
         async function cambiarPin() {
             const n = prompt("NUEVO PIN (4 DÍGITOS):");
