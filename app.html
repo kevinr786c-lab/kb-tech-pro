@@ -9,14 +9,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: 0.5s ease; text-align: left; }
-        :root { --main-color: #6366f1; }
+        :root { --main-color: #6366f1; --main-glow: rgba(99, 102, 241, 0.2); }
         
         #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
         .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
-        .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color) !important; }
+        .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color) !important; box-shadow: 0 20px 40px var(--main-glow); }
         
         .u-rojo { border-left: 15px solid #ef4444 !important; background: #fef2f2; animation: pulse-red 2s infinite; }
         .u-amarillo { border-left: 15px solid #f59e0b !important; background: #fffbeb; }
@@ -24,7 +24,7 @@
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         
         .input-premium { background: #f1f5f9; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; width: 100%; outline: none; transition: 0.3s; font-weight: 700; }
-        .input-premium:focus { border-color: var(--main-color); background: #fff; }
+        .input-premium:focus { border-color: var(--main-color); background: #fff; box-shadow: 0 0 20px var(--main-glow); }
         
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; overflow-y: auto; }
         .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 8px; font-weight: 900; text-transform: uppercase; }
@@ -41,7 +41,7 @@
 
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white z-[50000] flex items-center justify-center">
         <div class="text-center p-12 glass-panel max-w-sm w-full border border-slate-100 shadow-2xl">
-            <div class="text-7xl mb-6">🩺</div>
+            <div id="lock-icon" class="text-7xl mb-6">🩺</div>
             <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2">Acceso Maestro</h2>
             <p class="text-[9px] text-slate-400 uppercase tracking-[0.4em] font-bold mb-8 italic">K.B Tech Pro Solutions</p>
             <input type="password" id="pin-acceso" class="input-premium text-center text-4xl tracking-[0.6em] mb-6 shadow-inner" placeholder="****" maxlength="4">
@@ -150,279 +150,214 @@
     </div>
 
     <script>
+    const URL = "https://dgatsbnqgplalxwewpvs.supabase.co", KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
+    const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+    let currentPatientId = null, globalDocData = null;
+
     const CATALOGO_TEMAS = {
-    "Ginecología": [
-        { id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral" },
-        { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique" },
-        { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal" },
-        { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico" },
-        { id: 5, color: "#1e293b", icon: "💎", tag: "Élite" }
-    ],
-    "Odontología": [
-        { id: 1, color: "#0ea5e9", icon: "💎", tag: "Clínico" },
-        { id: 2, color: "#10b981", icon: "🌿", tag: "Orgánico" },
-        { id: 3, color: "#22d3ee", icon: "❄️", tag: "Estético" },
-        { id: 4, color: "#1e3a8a", icon: "🛡️", tag: "Cirugía" },
-        { id: 5, color: "#6366f1", icon: "⚡", tag: "Tech" }
-    ],
-    "Pediatría": [
-        { id: 1, color: "#fb923c", icon: "🧸", tag: "Infantil" },
-        { id: 2, color: "#38bdf8", icon: "🚀", tag: "Lúdico" },
-        { id: 3, color: "#4ade80", icon: "🦖", tag: "Aventura" },
-        { id: 4, color: "#f472b6", icon: "🍭", tag: "Tierno" },
-        { id: 5, color: "#818cf8", icon: "🌙", tag: "Paz" }
-    ],
-    "Cardiología": [
-        { id: 1, color: "#e11d48", icon: "❤️", tag: "Precisión" },
-        { id: 2, color: "#1e293b", icon: "⚡", tag: "Digital" },
-        { id: 3, color: "#0284c7", icon: "🌊", tag: "Vascular" },
-        { id: 4, color: "#9f1239", icon: "🩸", tag: "Hema" },
-        { id: 5, color: "#4f46e5", icon: "🛰️", tag: "Remoto" }
-    ],
-    "Bienestar (Nutri/Psico)": [
-        { id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen" },
-        { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental" },
-        { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri" },
-        { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia" },
-        { id: 5, color: "#10b981", icon: "🥑", tag: "Fit" }
-    ],
-    "General": [
-        { id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" },
-        { id: 2, color: "#6366f1", icon: "🏥", tag: "Moderno" },
-        { id: 3, color: "#10b981", icon: "🩺", tag: "Básico" },
-        { id: 4, color: "#be123c", icon: "🚑", tag: "Urgencia" },
-        { id: 5, color: "#4338ca", icon: "🏢", tag: "Corp" }
-    ]
-};
+        "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite" }],
+        "Odontología": [{ id: 1, color: "#0ea5e9", icon: "💎", tag: "Clínico" }, { id: 2, color: "#10b981", icon: "🌿", tag: "Orgánico" }, { id: 3, color: "#22d3ee", icon: "❄️", tag: "Estético" }, { id: 4, color: "#1e3a8a", icon: "🛡️", tag: "Cirugía" }, { id: 5, color: "#6366f1", icon: "⚡", tag: "Tech" }],
+        "Pediatría": [{ id: 1, color: "#fb923c", icon: "🧸", tag: "Infantil" }, { id: 2, color: "#38bdf8", icon: "🚀", tag: "Lúdico" }, { id: 3, color: "#4ade80", icon: "🦖", tag: "Aventura" }, { id: 4, color: "#f472b6", icon: "🍭", tag: "Tierno" }, { id: 5, color: "#818cf8", icon: "🌙", tag: "Paz" }],
+        "Cardiología": [{ id: 1, color: "#e11d48", icon: "❤️", tag: "Precisión" }, { id: 2, color: "#1e293b", icon: "⚡", tag: "Digital" }, { id: 3, color: "#0284c7", icon: "🌊", tag: "Vascular" }, { id: 4, color: "#9f1239", icon: "🩸", tag: "Hema" }, { id: 5, color: "#4f46e5", icon: "🛰️", tag: "Remoto" }],
+        "Bienestar (Nutri/Psico)": [{ id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen" }, { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental" }, { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri" }, { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia" }, { id: 5, color: "#10b981", icon: "🥑", tag: "Fit" }],
+        "General": [{ id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" }, { id: 2, color: "#6366f1", icon: "🏥", tag: "Moderno" }, { id: 3, color: "#10b981", icon: "🩺", tag: "Básico" }, { id: 4, color: "#be123c", icon: "🚑", tag: "Urgencia" }, { id: 5, color: "#4338ca", icon: "🏢", tag: "Corp" }]
+    };
 
-        function eliteAviso(msg) {
-            const toast = document.getElementById('elite-toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 4000);
-        }
+    function eliteAviso(msg) {
+        const toast = document.getElementById('elite-toast');
+        document.getElementById('toast-msg').innerText = msg;
+        toast.classList.add('active');
+        setTimeout(() => toast.classList.remove('active'), 4000);
+    }
 
-        async function verificarAcceso() {
-            const pin = document.getElementById('pin-acceso').value;
-            if(!docId) return eliteAviso("ID NO ENCONTRADO");
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
-            const data = await res.json();
-            globalDocData = data[0];
+    async function verificarAcceso() {
+        const pin = document.getElementById('pin-acceso').value;
+        const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
+        const data = await res.json();
+        globalDocData = data[0];
+        
+        if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
+            const opciones = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
+            const temaElegido = opciones.find(t => t.id == globalDocData.template_id) || opciones[0];
+
+            document.documentElement.style.setProperty('--main-color', temaElegido.color);
+            document.documentElement.style.setProperty('--main-glow', temaElegido.color + "33");
+            document.getElementById('logo-tech').style.color = temaElegido.color;
+            document.getElementById('lock-icon').innerText = temaElegido.icon;
+            document.getElementById('doc-esp-label').innerText = `${globalDocData.especialidad} | ${temaElegido.tag}`;
+            document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
             
-            if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-               // --- MOTOR DE TEMAS DE PERSONALIDAD K.B TECH ---
-    const opciones = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-    // Buscamos el tema exacto que el doctor eligió por su ID (template_id)
-    const temaElegido = opciones.find(t => t.id == globalDocData.template_id) || opciones[0];
+            if(document.getElementById('btn-update-web')) document.getElementById('btn-update-web').style.backgroundColor = temaElegido.color;
 
-    // Aplicamos Identidad Visual Completa
-    document.documentElement.style.setProperty('--main-color', temaElegido.color);
-    document.documentElement.style.setProperty('--main-glow', temaElegido.color + "33"); // Brillo 20%
-    
-    document.getElementById('logo-tech').style.color = temaElegido.color;
-    document.getElementById('lock-icon').innerText = temaElegido.icon; // Cambia el 🩺 por su icono (🧸, 🌸, ⚡)
-    
-    const btnUpdate = document.getElementById('btn-update-web');
-    if(btnUpdate) btnUpdate.style.backgroundColor = temaElegido.color;
-
-    // Activamos Paneles
-    document.getElementById('pantalla-bloqueo').classList.add('hidden');
-    document.getElementById('contenido-panel').classList.remove('hidden');
-    setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
-
-    // Etiqueta con Identidad: Especialidad + Personalidad (Ej: Pediatría | Lúdico)
-    document.getElementById('doc-esp-label').innerText = `${globalDocData.especialidad} | ${temaElegido.tag}`;
-    document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
-                
-                document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
-                document.getElementById('edit-bio').value = globalDocData.biografia || "";
-                if(globalDocData.redes_sociales) {
-                    try {
-                        const redes = JSON.parse(globalDocData.redes_sociales);
-                        document.getElementById('edit-insta').value = redes.instagram || "";
-                    } catch(e) { document.getElementById('edit-insta').value = ""; }
-                }
-
-                if(globalDocData.plan_nivel === 0) document.getElementById('panel-intercom').classList.add('is-locked');
-                eliteAviso("ACCESO CONCEDIDO");
-                syncMaster(); setInterval(syncMaster, 15000);
-            } else { eliteAviso("PIN INVÁLIDO"); }
-        }
-
-        async function actualizarConfiguracionWeb() {
-            const dir = document.getElementById('edit-direccion').value;
-            const bio = document.getElementById('edit-bio').value;
-            const insta = document.getElementById('edit-insta').value;
-            const redesObj = { instagram: insta, facebook: "" };
+            document.getElementById('pantalla-bloqueo').classList.add('hidden');
+            document.getElementById('contenido-panel').classList.remove('hidden');
+            setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
             
-            const payload = {
-                direccion_consultorio: dir,
-                biografia: bio,
-                redes_sociales: JSON.stringify(redesObj)
-            };
+            document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
+            document.getElementById('edit-bio').value = globalDocData.biografia || "";
+            if(globalDocData.redes_sociales) {
+                try {
+                    const redes = JSON.parse(globalDocData.redes_sociales);
+                    document.getElementById('edit-insta').value = redes.instagram || "";
+                } catch(e) { document.getElementById('edit-insta').value = ""; }
+            }
 
-            const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            if(globalDocData.plan_nivel === 0) document.getElementById('panel-intercom').classList.add('is-locked');
+            eliteAviso("ACCESO CONCEDIDO");
+            syncMaster(); setInterval(syncMaster, 15000);
+        } else { eliteAviso("PIN INVÁLIDO"); }
+    }
 
-            if(res.ok) {
-                eliteAviso("SUCURSAL ACTUALIZADA ✦");
-                toggleMenu();
-            } else { eliteAviso("ERROR AL ACTUALIZAR"); }
-        }
-
-        async function syncMaster() {
-            const ahora = new Date();
-            const hoy = ahora.getFullYear() + '-' + String(ahora.getMonth() + 1).padStart(2, '0') + '-' + String(ahora.getDate()).padStart(2, '0');
-            const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
-            const citas = await res.json();
-            let mxn = 0, usd = 0;
+    async function syncMaster() {
+        const hoy = new Date().toISOString().split('T')[0];
+        const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
+        const citas = await res.json();
+        let mxn = 0, usd = 0;
+        
+        document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
+            if(c.pagado) {
+                if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
+                else mxn += parseFloat(c.monto || 0);
+            }
+            let semaforo = "u-verde";
+            if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) semaforo = "u-rojo";
+            else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforo = "u-amarillo";
             
-            document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
-                if(c.pagado) {
-                    if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
-                    else mxn += parseFloat(c.monto || 0);
-                }
-                let semaforo = "u-verde";
-                if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) semaforo = "u-rojo";
-                else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforo = "u-amarillo";
-                
-                return `
-                    <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
-                        <div class="flex items-center gap-14 text-left">
-                            <span class="text-4xl font-black italic w-24 tracking-tighter" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
-                            <div>
-                                <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">${c.nombre_paciente}</h3>
-                                <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'VERIFICADO'}</p>
-                            </div>
+            return `
+                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
+                    <div class="flex items-center gap-14 text-left">
+                        <span class="text-4xl font-black italic w-24 tracking-tighter" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
+                        <div>
+                            <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">${c.nombre_paciente}</h3>
+                            <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'VERIFICADO'}</p>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
-                            <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition shadow-sm">📹</button>
-                        </div>
-                    </div>`;
-            }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
-            
-            document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-            document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
-            document.getElementById('total-hoy').innerText = citas.length;
-        }
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
+                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition shadow-sm">📹</button>
+                    </div>
+                </div>`;
+        }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
+        
+        document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
+        document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
+        document.getElementById('total-hoy').innerText = citas.length;
+    }
 
-        async function enfocarpaciente(id, nombre) {
-            currentPatientId = id;
-            document.getElementById('dra-patient-name').innerText = nombre;
-            const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
-            const historial = await res.json();
-            document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
-                <div class="timeline-item mb-4 pb-2 border-b border-slate-50">
-                    <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
-                    <p class="leading-tight text-slate-700 font-bold uppercase">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
-                </div>`).join('');
-        }
+    async function enfocarpaciente(id, nombre) {
+        currentPatientId = id;
+        document.getElementById('dra-patient-name').innerText = nombre;
+        const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
+        const historial = await res.json();
+        document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
+            <div class="timeline-item mb-4 pb-2 border-b border-slate-50">
+                <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
+                <p class="leading-tight text-xs font-bold uppercase">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
+            </div>`).join('');
+    }
 
-        async function enviarRespuestaDra() {
-            const resp = document.getElementById('dra-response-input').value;
-            if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
-            const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-            await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
-            eliteAviso("ENVIADO ✅");
-            document.getElementById('dra-response-input').value = "";
-            syncMaster();
-        }
+    async function enviarRespuestaDra() {
+        const resp = document.getElementById('dra-response-input').value;
+        if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
+        const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+        await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
+        eliteAviso("ENVIADO ✅");
+        document.getElementById('dra-response-input').value = "";
+        syncMaster();
+    }
 
-        async function abrirReporteGastos() {
-            try {
-                const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-                const logs = await res.json();
-                if (logs.length === 0) return alert("💸 NO HAY GASTOS REGISTRADOS");
-                const lista = logs.map(l => `• ${l.concepto}: $${l.monto}`).join('\n');
-                alert("💸 AUDITORÍA GASTOS K.B:\n\n" + lista);
-            } catch (e) { eliteAviso("FALLO EN NODO LOGÍSTICO"); }
-        }
+    async function abrirReporteGastos() {
+        try {
+            const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const logs = await res.json();
+            if (logs.length === 0) return alert("💸 NO HAY GASTOS REGISTRADOS");
+            const lista = logs.map(l => `• ${l.concepto}: $${l.monto}`).join('\n');
+            alert("💸 AUDITORÍA GASTOS K.B:\n\n" + lista);
+        } catch (e) { eliteAviso("FALLO EN NODO LOGÍSTICO"); }
+    }
 
-        async function abrirReporteLogistica() {
-            try {
-                const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-                const logs = await res.json();
-                if (logs.length === 0) return alert("📦 ALMACÉN EN ORDEN");
-                const lista = logs.map(l => `• ${l.concepto}`).join('\n');
-                alert("📦 REPORTE DE FALTANTES:\n\n" + lista);
-            } catch (e) { eliteAviso("FALLO EN NODO ALMACÉN"); }
-        }
+    async function abrirReporteLogistica() {
+        try {
+            const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            const logs = await res.json();
+            if (logs.length === 0) return alert("📦 ALMACÉN EN ORDEN");
+            const lista = logs.map(l => `• ${l.concepto}`).join('\n');
+            alert("📦 REPORTE DE FALTANTES:\n\n" + lista);
+        } catch (e) { eliteAviso("FALLO EN NODO ALMACÉN"); }
+    }
 
-        async function cambiarPin() {
-            const n = document.getElementById('nuevo-pin-input').value;
-            if(n && n.length === 4) {
-                const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-                await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
-                eliteAviso("PIN ACTUALIZADO ✅");
-                document.getElementById('nuevo-pin-input').value = "";
-                toggleMenu();
-            } else { eliteAviso("PIN DEBE SER DE 4 DÍGITOS"); }
-        }
-
-        function generarReceta() {
-            if(!currentPatientId || !globalDocData) return eliteAviso("DATOS DE MÉDICO O PACIENTE NO CARGADOS");
-            const doc = new jsPDF();
-            const nombrePaciente = document.getElementById('dra-patient-name').innerText;
-            const notas = document.getElementById('dra-response-input').value;
-            const fecha = new Date().toLocaleDateString('es-MX');
-            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(30, 41, 59); 
-            doc.text("K.B", 105, 20, { align: "center" });
-            doc.setFontSize(10); doc.text("TECH SOLUTIONS ✦", 105, 27, { align: "center" });
-            doc.line(20, 35, 190, 35);
-            doc.setFontSize(16); doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 50);
-            doc.setFontSize(10); doc.text(`${globalDocData.especialidad.toUpperCase()}`, 20, 56);
-            doc.text(`CÉDULA: ${globalDocData.cedula || 'VERIFICADA'}`, 20, 61);
-            doc.rect(20, 70, 170, 15); doc.text(`PACIENTE: ${nombrePaciente.toUpperCase()}`, 25, 79);
-            const splitNotas = doc.splitTextToSize(notas.toUpperCase(), 160);
-            doc.text(splitNotas, 20, 115);
-            doc.save(`Receta_${nombrePaciente.replace(/\s+/g, '_')}_KB.pdf`);
-            eliteAviso("RECETA GENERADA ✦");
-        }
-
-        // --- CORRECCIÓN DE LINK PARA PACIENTES (REPARA EL 404) ---
-        function copiarLinkCitas() { 
-            const currentPath = window.location.pathname;
-            const directory = currentPath.substring(0, currentPath.lastIndexOf('/'));
-            const fullLink = window.location.origin + directory + "/agendar.html?id=" + docId;
-            navigator.clipboard.writeText(fullLink); 
+    function copiarLinkCitas() { 
+        const currentPath = window.location.pathname;
+        const directory = currentPath.substring(0, currentPath.lastIndexOf('/'));
+        const fullLink = window.location.origin + directory + "/agendar.html?id=" + docId;
+        navigator.clipboard.writeText(fullLink).then(() => {
             eliteAviso("LINK COPIADO ✅"); 
-        }
+        });
+    }
 
-        function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
-        function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+    function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
+    function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
+    function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
 
-        function activarDictado() {
-            const btn = document.getElementById('btn-dictado');
-            const input = document.getElementById('dra-response-input');
-            const micText = document.getElementById('mic-text');
-            const micIcon = document.getElementById('mic-icon');
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return eliteAviso("NAVEGADOR NO COMPATIBLE");
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'es-MX'; recognition.interimResults = false;
-            recognition.onstart = () => {
-                btn.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
-                if(micText) micText.innerText = "ESCUCHANDO...";
-                if(micIcon) micIcon.innerText = "🛑";
-                eliteAviso("MICRÓFONO ACTIVO");
-            };
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                input.value += (input.value ? ". " : "") + transcript.toUpperCase();
-                eliteAviso("VOZ PROCESADA ✅");
-            };
-            recognition.onend = () => {
-                btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
-                if(micText) micText.innerText = "DICTAR POR VOZ";
-                if(micIcon) micIcon.innerText = "🎤";
-            };
-            recognition.start();
-        }
+    async function actualizarConfiguracionWeb() {
+        const dir = document.getElementById('edit-direccion').value, bio = document.getElementById('edit-bio').value, insta = document.getElementById('edit-insta').value;
+        const payload = { direccion_consultorio: dir, biografia: bio, redes_sociales: JSON.stringify({ instagram: insta, facebook: "" }) };
+        const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if(res.ok) { eliteAviso("SUCURSAL ACTUALIZADA ✦"); toggleMenu(); } else { eliteAviso("ERROR AL ACTUALIZAR"); }
+    }
+
+    async function cambiarPin() {
+        const n = document.getElementById('nuevo-pin-input').value;
+        if(n && n.length === 4) {
+            const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+            await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
+            eliteAviso("PIN ACTUALIZADO ✅");
+            document.getElementById('nuevo-pin-input').value = "";
+            toggleMenu();
+        } else { eliteAviso("PIN DEBE SER DE 4 DÍGITOS"); }
+    }
+
+    function activarDictado() {
+        const btn = document.getElementById('btn-dictado'), input = document.getElementById('dra-response-input'), micText = document.getElementById('mic-text'), micIcon = document.getElementById('mic-icon');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return eliteAviso("NAVEGADOR NO COMPATIBLE");
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-MX';
+        recognition.onstart = () => {
+            btn.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
+            if(micText) micText.innerText = "ESCUCHANDO...";
+            if(micIcon) micIcon.innerText = "🛑";
+            eliteAviso("MICRÓFONO ACTIVO");
+        };
+        recognition.onresult = (event) => { input.value += (input.value ? ". " : "") + event.results[0][0].transcript.toUpperCase(); eliteAviso("VOZ PROCESADA ✅"); };
+        recognition.onend = () => {
+            btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
+            if(micText) micText.innerText = "DICTAR POR VOZ";
+            if(micIcon) micIcon.innerText = "🎤";
+        };
+        recognition.start();
+    }
+
+    function generarReceta() {
+        if(!currentPatientId || !globalDocData) return eliteAviso("DATOS NO CARGADOS");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const np = document.getElementById('dra-patient-name').innerText;
+        const nt = document.getElementById('dra-response-input').value;
+        const fecha = new Date().toLocaleDateString('es-MX');
+        doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(30, 41, 59);
+        doc.text("K.B", 105, 20, { align: "center" });
+        doc.setFontSize(10); doc.text("TECH SOLUTIONS ✦", 105, 27, { align: "center" });
+        doc.setDrawColor(99, 102, 241); doc.line(20, 35, 190, 35);
+        doc.setFontSize(16); doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 50);
+        doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.text(`${globalDocData.especialidad.toUpperCase()}`, 20, 56);
+        doc.text(`CÉDULA: ${globalDocData.cedula || 'VERIFICADA'}`, 20, 61);
+        doc.rect(20, 70, 170, 15); doc.setFont("helvetica", "bold"); doc.text(`PACIENTE: ${np.toUpperCase()}`, 25, 79); doc.text(`FECHA: ${fecha}`, 150, 79);
+        const sn = doc.splitTextToSize(nt.toUpperCase(), 160); doc.text(sn, 20, 105);
+        doc.setDrawColor(200); doc.line(70, 250, 140, 250); doc.setFontSize(8); doc.text("FIRMA DEL MÉDICO RESPONSABLE", 105, 255, { align: "center" });
+        doc.save(`Receta_${np.replace(/\s+/g, '_')}_KB.pdf`);
+        eliteAviso("RECETA GENERADA ✦");
+    }
     </script>
 </body>
 </html>
