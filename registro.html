@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -112,6 +111,7 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
+        // --- CIRUGÍA 1: DETECTAR PLAN ELEGIDO ---
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         const infoPlanes = [
             { nombre: "Aspirante", precio: "$999" },
@@ -136,7 +136,13 @@
         function cambiarCatalogo() {
             const esp = document.getElementById('especialidad').value;
             const contenedor = document.getElementById('contenedor-colores');
-            const temas = CATALOGO[esp] || CATALOGO["General"];
+            let temas = CATALOGO[esp] || CATALOGO["General"];
+
+            // --- CIRUGÍA 2: EFECTO CAMALEÓN LIMITADO (Solo 2 temas si es Plan 0) ---
+            if (planElegido === 0) {
+                temas = temas.slice(0, 2); 
+            }
+
             contenedor.innerHTML = "";
             temas.forEach((t) => {
                 const dot = document.createElement('div');
@@ -177,7 +183,7 @@
                     email: emailTecnico,
                     especialidad: esp,
                     plan: planFinal, 
-                    template_id: parseInt(currentSelection.template_id), // Enviado como número para evitar errores
+                    template_id: parseInt(currentSelection.template_id),
                     creado_en: new Date().toISOString()
                 };
 
@@ -200,25 +206,29 @@
                     document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
                 } else {
-                    const errorMsg = await res.text();
-                    console.error("Fallo de esquema:", errorMsg);
-                    alert("Error de Sincronización. Verifique que todos los campos sean correctos.");
+                    alert("Error de Sincronización.");
                     btn.disabled = false;
                     btn.innerText = "Reintentar";
                 }
             } catch (e) { 
-                console.error("Error crítico:", e);
-                alert("Fallo de enlace con el servidor de Tijuana."); 
+                alert("Fallo de enlace."); 
                 btn.disabled = false; 
             }
         });
 
+        // --- CIRUGÍA 3: EL DESVIADOR DE NODO (Solo o Pro) ---
         function irANodo() {
             if(ultimoIdGenerado) {
                 const btn = event.target;
                 btn.innerText = "GEMINI ✦: INICIANDO COCCIÓN...";
                 setTimeout(() => {
-                    window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
+                    if (planElegido === 0) {
+                        // SI ES PLAN SOLO, VA AL SISTEMA COMPACTO
+                        window.location.href = `appsolo.html?id=${ultimoIdGenerado}`;
+                    } else {
+                        // SI ES PRO, VA A LA CONFIGURACIÓN MAESTRA
+                        window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
+                    }
                 }, 1500);
             }
         }
