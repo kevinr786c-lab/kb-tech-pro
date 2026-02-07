@@ -148,8 +148,7 @@
             </div>
         </main>
     </div>
-
-    <script>
+<script>
     const URL = "https://dgatsbnqgplalxwewpvs.supabase.co", KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
     const docId = new URLSearchParams(window.location.search).get('id')?.trim();
     let currentPatientId = null, globalDocData = null;
@@ -214,7 +213,6 @@
 
             syncMaster(); 
             setInterval(syncMaster, 15000);
-
         } else { 
             eliteAviso("PIN INVÁLIDO"); 
         }
@@ -246,118 +244,46 @@
             }
             
             return `
-                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
+                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer \${semaforo}" onclick="enfocarpaciente('\${c.id}', '\${c.nombre_paciente}')">
                     <div class="flex items-center gap-14 text-left">
-                        <span class="text-4xl font-black italic w-24 tracking-tighter" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
+                        <span class="text-4xl font-black italic w-24 tracking-tighter" style="color: var(--main-color)">\${c.hora.slice(0,5)}</span>
                         <div>
-                            <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">${c.nombre_paciente}</h3>
-                            <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">${c.telefono || 'VERIFICADO'}</p>
+                            <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">\${c.nombre_paciente}</h3>
+                            <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">\${c.telefono || 'VERIFICADO'}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
-                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition shadow-sm">📹</button>
+                        <span class="status-badge \${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">\${c.pagado ? 'Pagado' : 'Pendiente'}</span>
+                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-\${docId}-\${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition shadow-sm">📹</button>
                     </div>
                 </div>`;
         }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
         
-        document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-        document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
+        document.getElementById('ganancia-mxn').innerText = `$\${mxn.toLocaleString()}.00`;
+        document.getElementById('ganancia-usd').innerText = `$\${usd.toLocaleString()}.00`;
         document.getElementById('total-hoy').innerText = citas.length;
     }
 
     async function enfocarpaciente(id, nombre) {
         currentPatientId = id;
         document.getElementById('dra-patient-name').innerText = nombre;
-        const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
+        const res = await fetch(`\${URL}/rest/v1/Citas?nombre_paciente=eq.\${nombre}&doctor_id=eq.\${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
         const historial = await res.json();
         document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
             <div class="timeline-item mb-4 pb-2 border-b border-slate-50">
-                <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
-                <p class="leading-tight text-xs font-bold uppercase">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
+                <p class="text-[8px] text-slate-400 font-black mb-1">\${h.fecha}</p>
+                <p class="leading-tight text-xs font-bold uppercase">\${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
             </div>`).join('');
     }
 
     async function enviarRespuestaDra() {
         const resp = document.getElementById('dra-response-input').value;
         if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
-        const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-        await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
+        const headers = { 'apikey': KEY, 'Authorization': `Bearer \${KEY}`, 'Content-Type': 'application/json' };
+        await fetch(`\${URL}/rest/v1/Citas?id=eq.\${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
         eliteAviso("ENVIADO ✅");
         document.getElementById('dra-response-input').value = "";
         syncMaster();
-    }
-
-    async function abrirReporteGastos() {
-        try {
-            const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const logs = await res.json();
-            if (logs.length === 0) return alert("💸 NO HAY GASTOS REGISTRADOS");
-            const lista = logs.map(l => `• ${l.concepto}: $${l.monto}`).join('\n');
-            alert("💸 AUDITORÍA GASTOS K.B:\n\n" + lista);
-        } catch (e) { eliteAviso("FALLO EN NODO LOGÍSTICO"); }
-    }
-
-    async function abrirReporteLogistica() {
-        try {
-            const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
-            const logs = await res.json();
-            if (logs.length === 0) return alert("📦 ALMACÉN EN ORDEN");
-            const lista = logs.map(l => `• ${l.concepto}`).join('\n');
-            alert("📦 REPORTE DE FALTANTES:\n\n" + lista);
-        } catch (e) { eliteAviso("FALLO EN NODO ALMACÉN"); }
-    }
-
-    function copiarLinkCitas() { 
-        const currentPath = window.location.pathname;
-        const directory = currentPath.substring(0, currentPath.lastIndexOf('/'));
-        const fullLink = window.location.origin + directory + "/agendar.html?id=" + docId;
-        navigator.clipboard.writeText(fullLink).then(() => {
-            eliteAviso("LINK COPIADO ✅"); 
-        });
-    }
-
-    function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
-    function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
-    function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-
-    async function actualizarConfiguracionWeb() {
-        const dir = document.getElementById('edit-direccion').value, bio = document.getElementById('edit-bio').value, insta = document.getElementById('edit-insta').value;
-        const payload = { direccion_consultorio: dir, biografia: bio, redes_sociales: JSON.stringify({ instagram: insta, facebook: "" }) };
-        const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        if(res.ok) { eliteAviso("SUCURSAL ACTUALIZADA ✦"); toggleMenu(); } else { eliteAviso("ERROR AL ACTUALIZAR"); }
-    }
-
-    async function cambiarPin() {
-        const n = document.getElementById('nuevo-pin-input').value;
-        if(n && n.length === 4) {
-            const headers = { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' };
-            await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ pin_acceso: n }) });
-            eliteAviso("PIN ACTUALIZADO ✅");
-            document.getElementById('nuevo-pin-input').value = "";
-            toggleMenu();
-        } else { eliteAviso("PIN DEBE SER DE 4 DÍGITOS"); }
-    }
-
-    function activarDictado() {
-        const btn = document.getElementById('btn-dictado'), input = document.getElementById('dra-response-input'), micText = document.getElementById('mic-text'), micIcon = document.getElementById('mic-icon');
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return eliteAviso("NAVEGADOR NO COMPATIBLE");
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'es-MX';
-        recognition.onstart = () => {
-            btn.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
-            if(micText) micText.innerText = "ESCUCHANDO...";
-            if(micIcon) micIcon.innerText = "🛑";
-            eliteAviso("MICRÓFONO ACTIVO");
-        };
-        recognition.onresult = (event) => { input.value += (input.value ? ". " : "") + event.results[0][0].transcript.toUpperCase(); eliteAviso("VOZ PROCESADA ✅"); };
-        recognition.onend = () => {
-            btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
-            if(micText) micText.innerText = "DICTAR POR VOZ";
-            if(micIcon) micIcon.innerText = "🎤";
-        };
-        recognition.start();
     }
 
     function generarReceta() {
@@ -390,29 +316,26 @@
             <body>
                 <div class="header">
                     <div class="doc-info">
-                        <h1>Dr. ${doc.nombre_doctor}</h1>
-                        <p>${doc.especialidad || 'MÉDICO ESPECIALISTA'}</p>
-                        <p>${doc.direccion_consultorio || 'TIJUANA, B.C.'}</p>
+                        <h1>Dr. \${doc.nombre_doctor}</h1>
+                        <p>\${doc.especialidad || 'MÉDICO ESPECIALISTA'}</p>
+                        <p>\${doc.direccion_consultorio || 'CONSULTORIO MÉDICO'}</p>
                     </div>
                     <div class="recipe-meta">
-                        <p>FECHA: <b>${fecha}</b></p>
+                        <p>FECHA: <b>\${fecha}</b></p>
                     </div>
                 </div>
-
                 <div class="paciente-box">
                     <h2>PACIENTE</h2>
-                    <p>${pac}</p>
+                    <p>\${pac}</p>
                 </div>
-
                 <div class="rx-symbol">Rx</div>
-                <div class="prescripcion">${nota}</div>
-
+                <div class="prescripcion">\${nota}</div>
                 <div class="footer">
                     <div class="firma-linea"></div>
                     <p><b>FIRMA DEL MÉDICO</b></p>
-                    <p class="cedula">Cédula Profesional: ${doc.cedula || 'VERIFICAR ORIGINAL'}</p>
+                    <p class="cedula">Cédula Profesional: \${doc.cedula || 'VERIFICAR ORIGINAL'}</p>
                 </div>
-                <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }</script>
+                <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }<\/script>
             </body>
             </html>
         `);
@@ -426,6 +349,7 @@
             }).catch(err => console.log('Fallo en Blindaje', err));
         });
     }
-    </script>
+</script>
 </body>
 </html>
+    
