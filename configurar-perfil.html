@@ -16,13 +16,14 @@
         .btn-ia { background: var(--main-color); opacity: 0.9; }
         .btn-ia:hover { opacity: 1; transform: scale(1.05); }
 
-        /* Estilos para los Seguros (Pills) */
-        .seguro-pill { 
+        .seguro-pill, .feature-pill { 
             padding: 0.75rem 1.25rem; border-radius: 1rem; background: rgba(255,255,255,0.05); 
             border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; font-weight: 800; 
             cursor: pointer; transition: 0.3s; color: #94a3b8; text-transform: uppercase;
         }
-        .seguro-pill.active { background: var(--main-color); color: white; border-color: white; box-shadow: 0 10px 20px -5px var(--main-color); }
+        .seguro-pill.active, .feature-pill.active { background: var(--main-color); color: white; border-color: white; box-shadow: 0 10px 20px -5px var(--main-color); }
+
+        .service-row { background: rgba(255,255,255,0.03); border-radius: 1.5rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
 
         .gemini-star { color: var(--main-color); animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
@@ -68,6 +69,23 @@
                     <option value="45">45 MINUTOS</option>
                     <option value="60">1 HORA</option>
                 </select>
+                <div class="flex gap-2">
+                    <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-english">🇺🇸 English</div>
+                    <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-park">🅿️ Parking</div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-black text-[10px] uppercase text-amber-400 tracking-[0.3em] italic">💰 Menú de Servicios y Costos</h3>
+                    <button type="button" onclick="agregarServicio()" class="bg-amber-500 text-[9px] font-black text-white px-4 py-2 rounded-full">+ SERVICIO</button>
+                </div>
+                <div id="contenedor-servicios" class="space-y-3">
+                    <div class="service-row flex gap-3 items-center">
+                        <input type="text" placeholder="Ej: Consulta Inicial" class="bg-transparent flex-1 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-nombre">
+                        <input type="number" placeholder="MXN" class="bg-transparent w-24 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-precio">
+                    </div>
+                </div>
             </div>
 
             <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
@@ -87,44 +105,36 @@
             <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-[10px] uppercase text-emerald-400 tracking-[0.3em] italic">📍 Ubicación del Consultorio</h3>
-                    <button type="button" onclick="capturarUbicacion()" class="bg-emerald-500 text-[10px] font-black text-white px-6 py-2 rounded-full hover:scale-105 transition">📡 CAPTURAR GPS REAL</button>
+                    <button type="button" onclick="capturarUbicacion()" class="bg-emerald-500 text-[10px] font-black text-white px-6 py-2 rounded-full hover:scale-105 transition">📡 CAPTURAR GPS</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="direccion" placeholder="Ej: Av. Paseo de los Héroes #123, Zona Río" class="input-kb">
-                    <div id="gps-status" class="flex items-center justify-center p-4 bg-slate-800/50 rounded-2xl text-[10px] font-black text-slate-500 italic uppercase">
-                        Esperando señal de satélite...
-                    </div>
+                    <div id="gps-status" class="flex items-center justify-center p-4 bg-slate-800/50 rounded-2xl text-[10px] font-black text-slate-500 italic uppercase">Esperando señal...</div>
                 </div>
-                <input type="hidden" id="latitud">
-                <input type="hidden" id="longitud">
+                <input type="hidden" id="latitud"> <input type="hidden" id="longitud">
             </div>
 
             <div class="space-y-6">
                 <h3 class="font-black text-[10px] uppercase text-amber-400 tracking-[0.3em] italic">📸 Estética Digital</h3>
-                <input type="text" id="foto_consultorio" placeholder="URL Foto Consultorio (Fachada/Interior)" class="input-kb">
-                <input type="text" id="foto_equipo" placeholder="URL Foto Equipo Médico" class="input-kb">
+                <input type="text" id="foto_consultorio" placeholder="URL Foto Consultorio" class="input-kb">
+                <input type="text" id="foto_equipo" placeholder="URL Foto Equipo" class="input-kb">
             </div>
 
             <div class="space-y-6">
                 <h3 class="font-black text-[10px] uppercase text-sky-400 tracking-[0.3em] italic">📱 Redes de Contacto</h3>
-                <input type="text" id="instagram" placeholder="Usuario de Instagram (ej: @dr.lopez)" class="input-kb">
-                <input type="text" id="facebook" placeholder="Link de Facebook" class="input-kb">
+                <input type="text" id="instagram" placeholder="Instagram" class="input-kb">
+                <input type="text" id="facebook" placeholder="Facebook" class="input-kb">
             </div>
 
-            <div class="md:col-span-2 space-y-4 pt-4 border-t border-white/10">
-                <div class="flex justify-between items-center px-2">
-                    <h3 class="font-black text-[10px] uppercase text-slate-500 tracking-[0.3em]">📝 Biografía Curada</h3>
-                    <button type="button" onclick="sugerirConIA()" class="btn-ia text-[9px] font-black text-white px-4 py-2 rounded-full transition shadow-lg">✨ GENERAR CON GEMINI ✦</button>
-                </div>
-                <textarea id="bio" rows="4" placeholder="Gemini Engine ✦: Describe tu visión médica..." class="input-kb resize-none"></textarea>
+            <div class="md:col-span-2 space-y-4 pt-4 border-t border-white/10 text-center">
+                <button type="button" onclick="sugerirConIA()" class="btn-ia text-[9px] font-black text-white px-6 py-2 rounded-full mb-2 transition shadow-lg">✨ GENERAR BIO CON IA ✦</button>
+                <textarea id="bio" rows="4" placeholder="Describe tu visión médica..." class="input-kb resize-none"></textarea>
             </div>
 
             <div class="md:col-span-2 pt-6">
-                <button type="submit" id="btn-save" class="w-full py-6 bg-white text-slate-900 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] hover:bg-indigo-500 hover:text-white transition-all shadow-2xl">Inaugurar Sucursal Digital</button>
+                <button type="submit" id="btn-save" class="w-full py-6 bg-white text-slate-900 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] hover:bg-indigo-500 hover:text-white transition-all shadow-2xl">🚀 Inaugurar Sucursal Digital</button>
             </div>
         </form>
-
-        <p class="mt-10 text-center text-[9px] font-black text-slate-600 uppercase tracking-[0.5em]">K.B Tech Solutions • Beyond Technology</p>
     </div>
 
     <script>
@@ -133,115 +143,90 @@
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentDocData = null;
 
-        const CATALOGO_TEMAS = {
-            "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1"
-        };
+        const CATALOGO_TEMAS = { "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1" };
 
         async function init() {
-            if (!docId) return alert("Error: ID de Nodo no detectado.");
+            if (!docId) return alert("Error de Nodo.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
             const data = await res.json();
             currentDocData = data[0];
-
             if (currentDocData) {
                 document.getElementById('welcome-doc').innerText = `Dr. ${currentDocData.nombre_doctor}`;
-                const color = CATALOGO_TEMAS[currentDocData.especialidad] || "#6366f1";
-                document.documentElement.style.setProperty('--main-color', color);
+                document.documentElement.style.setProperty('--main-color', CATALOGO_TEMAS[currentDocData.especialidad] || "#6366f1");
             }
+        }
+
+        function agregarServicio() {
+            const container = document.getElementById('contenedor-servicios');
+            const div = document.createElement('div');
+            div.className = "service-row flex gap-3 items-center";
+            div.innerHTML = `<input type="text" placeholder="Servicio" class="bg-transparent flex-1 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-nombre">
+                             <input type="number" placeholder="Precio" class="bg-transparent w-24 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-precio">
+                             <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
+            container.appendChild(div);
         }
 
         function capturarUbicacion() {
             const status = document.getElementById('gps-status');
-            if (!navigator.geolocation) return status.innerText = "Error: GPS no soportado.";
-            status.innerText = "Sincronizando Satélites...";
-            status.classList.add('animate-pulse');
-
             navigator.geolocation.getCurrentPosition((pos) => {
                 document.getElementById('latitud').value = pos.coords.latitude;
                 document.getElementById('longitud').value = pos.coords.longitude;
-                status.innerText = "✅ Ubicación Vinculada con Precisión";
-                status.classList.remove('animate-pulse', 'text-slate-500');
-                status.classList.add('gps-active', 'text-emerald-400');
-            }, () => {
-                status.innerText = "⚠️ Activa el GPS para mayor precisión.";
+                status.innerText = "✅ GPS Sincronizado"; status.classList.add('gps-active');
             });
         }
 
         async function sugerirConIA() {
             const bio = document.getElementById('bio');
-            bio.value = "Gemini Engine ✦: Generando biografía profesional...";
-            const prompts = {
-                "Pediatría": "Especialista dedicado al crecimiento saludable y bienestar integral de los más pequeños, combinando calidez humana con medicina de precisión de vanguardia.",
-                "Ginecología": "Atención integral y empoderamiento de la salud femenina en todas sus etapas, con protocolos de vanguardia y máxima confidencialidad.",
-                "Odontología": "Transformando sonrisas mediante tecnología dental avanzada y un enfoque centrado en la estética y la salud funcional.",
-                "Cardiología": "Comprometido con la salud del corazón, integrando diagnóstico preventivo de alta tecnología para una vida plena y saludable.",
-                "General": "Comprometido con la detección oportuna y el cuidado preventivo, integrando tecnología avanzada para transformar la salud de mis pacientes."
-            };
-            setTimeout(() => { bio.value = prompts[currentDocData.especialidad] || prompts["General"]; }, 800);
+            const prompts = { "Pediatría": "Especialista en crecimiento infantil...", "General": "Comprometido con la salud preventiva..." };
+            bio.value = prompts[currentDocData.especialidad] || prompts["General"];
         }
 
         document.getElementById('form-config').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-save');
-            btn.innerText = "GEMINI ✦: CONFIGURANDO RED...";
-            btn.disabled = true;
+            btn.innerText = "Sincronizando..."; btn.disabled = true;
 
-            // Recolección de Seguros Activos
-            const segurosSeleccionados = Array.from(document.querySelectorAll('.seguro-pill.active')).map(el => el.innerText);
+            const nombres = document.getElementsByName('srv-nombre');
+            const precios = document.getElementsByName('srv-precio');
+            const serviciosArray = [];
+            for(let i=0; i<nombres.length; i++) {
+                if(nombres[i].value) serviciosArray.push({ nombre: nombres[i].value, precio: precios[i].value });
+            }
 
             const payload = {
                 cedula: document.getElementById('cedula').value,
-                aviso_cofepris: document.getElementById('cofepris').value || null,
-                url_logo: document.getElementById('url_logo').value || null,
                 hora_inicio: document.getElementById('h_inicio').value + ":00",
                 hora_fin: document.getElementById('h_fin').value + ":00",
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
-                url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
-                url_foto_equipo: document.getElementById('foto_equipo').value || null,
-                // Inyectamos la dirección y GPS que faltaban en el payload
+                url_foto_consultorio: document.getElementById('foto_consultorio').value,
+                url_foto_equipo: document.getElementById('foto_equipo').value,
                 direccion_consultorio: document.getElementById('direccion').value,
-                latitud: document.getElementById('latitud').value || null,
-                longitud: document.getElementById('longitud').value || null,
+                latitud: document.getElementById('latitud').value,
+                longitud: document.getElementById('longitud').value,
                 redes_sociales: JSON.stringify({
-                    instagram: document.getElementById('instagram').value || "",
-                    facebook: document.getElementById('facebook').value || "",
-                    url_foto_perfil: document.getElementById('url_foto_perfil').value || "",
-                    seguros_aceptados: segurosSeleccionados
+                    instagram: document.getElementById('instagram').value,
+                    facebook: document.getElementById('facebook').value,
+                    url_foto_perfil: document.getElementById('url_foto_perfil').value,
+                    seguros: Array.from(document.querySelectorAll('.seguro-pill.active')).map(el => el.innerText),
+                    english: document.getElementById('feat-english').classList.contains('active'),
+                    parking: document.getElementById('feat-park').classList.contains('active'),
+                    servicios: serviciosArray
                 })
             };
 
-            try {
-                const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                    method: 'PATCH',
-                    headers: { 
-                        'apikey': KEY_DB, 
-                        'Authorization': `Bearer ${KEY_DB}`, 
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal' 
-                    },
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-                if (response.ok) {
-                    alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                    const planCheck = sessionStorage.getItem('kb_plan_elegido');
-                    if (planCheck == "0") {
-                        window.location.href = `appsolo.html?id=${docId}`;
-                    } else {
-                        window.location.href = `app.html?id=${docId}`;
-                    }
-                } else {
-                    alert("Fallo en la sincronización.");
-                    btn.disabled = false;
-                    btn.innerText = "Inaugurar Sucursal Digital";
-                }
-            } catch (err) {
-                alert("Interferencia crítica.");
-                btn.disabled = false;
+            if (response.ok) {
+                alert("Nodo Sincronizado.");
+                const planCheck = sessionStorage.getItem('kb_plan_elegido');
+                window.location.href = (planCheck == "0") ? `appsolo.html?id=${docId}` : `app.html?id=${docId}`;
             }
         });
-
         init();
     </script>
 </body>
