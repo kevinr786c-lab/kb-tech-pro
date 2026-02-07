@@ -35,7 +35,6 @@
         .locked-feature.is-locked .locked-overlay { display: flex; }
         .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
         
-        /* BARRA DE DOPAMINA */
         #progress-bar-container { height: 4px; width: 100%; background: #e2e8f0; position: fixed; top: 0; left: 0; z-index: 200000; }
         #progress-bar-fill { height: 100%; width: 0%; background: var(--main-color); transition: 1s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 15px var(--main-color); }
     </style>
@@ -74,21 +73,17 @@
             <button onclick="window.location.href='asistente.html?id=' + docId" class="flex items-center gap-4 w-full p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl hover:bg-emerald-600 transition text-left text-emerald-500 hover:text-white">
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Ir a Recepción</span>
             </button>
-
             <hr class="border-slate-800 my-6">
-
             <div class="space-y-4">
                 <p class="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em] italic">Configuración de Sucursal</p>
                 <div class="space-y-3">
                     <input type="text" id="edit-direccion" placeholder="DIRECCIÓN CONSULTORIO" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase">
                     <textarea id="edit-bio" placeholder="BIOGRAFÍA PROFESIONAL" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase h-20 resize-none"></textarea>
                     <input type="text" id="edit-insta" placeholder="USUARIO INSTAGRAM" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500">
-                    <button id="btn-update-web" onclick="actualizarConfiguracionWeb()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-indigo-500 transition shadow-lg">Actualizar Sucursal Digital ✦</button>
+                    <button onclick="actualizarConfiguracionWeb()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-indigo-500 transition shadow-lg">Actualizar Sucursal Digital ✦</button>
                 </div>
             </div>
-
             <hr class="border-slate-800 my-6">
-            
             <div class="p-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl space-y-3">
                 <p class="text-[8px] font-black uppercase text-rose-500 tracking-widest italic">Seguridad del Nodo</p>
                 <input type="password" id="nuevo-pin-input" placeholder="NUEVO PIN (4)" maxlength="4" class="w-full bg-slate-800 border-none rounded-xl p-3 text-center text-xl tracking-[0.5em] font-black outline-none focus:ring-1 focus:ring-rose-500">
@@ -100,9 +95,9 @@
     <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000 max-w-7xl mx-auto p-6 md:p-10 text-left">
         <nav class="flex justify-between items-center mb-16">
             <div class="text-left">
-                <h1 class="text-5xl font-black italic tracking-tighter uppercase">K.B <span id="logo-tech" class="text-indigo-600">Doctor</span></h1>
-                <p id="doc-esp-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic"></p>
-                <p id="nav-doc-name" class="text-[10px] font-black text-slate-800 mt-1 uppercase"></p>
+                <h1 class="text-5xl font-black italic tracking-tighter uppercase">K.B <span id="logo-tech" class="text-indigo-600 transition-colors duration-500">Doctor</span> <span id="master-star" class="transition-colors duration-500">✦</span></h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic">Nodo Maestro: <span id="nav-doc-name" class="text-slate-800 transition-colors duration-500"></span></p>
+                <p id="doc-esp-label" class="text-[9px] font-black text-slate-400/50 mt-1 uppercase tracking-widest italic"></p>
             </div>
             <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
                 <div class="space-y-1.5"><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-indigo-500"></div></div>
@@ -189,8 +184,15 @@
         if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
             const opciones = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
             const temaElegido = opciones.find(t => t.id == globalDocData.template_id) || opciones[0];
+            
+            // PULIDO DE IDENTIDAD VISUAL
             document.documentElement.style.setProperty('--main-color', temaElegido.color);
-            document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
+            document.getElementById('logo-tech').style.color = temaElegido.color;
+            document.getElementById('master-star').style.color = temaElegido.color;
+            document.getElementById('nav-doc-name').innerText = globalDocData.nombre_doctor.toUpperCase();
+            document.getElementById('nav-doc-name').style.color = temaElegido.color;
+            document.getElementById('doc-esp-label').innerText = globalDocData.especialidad.toUpperCase();
+
             document.getElementById('pantalla-bloqueo').classList.add('hidden');
             document.getElementById('contenido-panel').classList.remove('hidden');
             setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
@@ -217,12 +219,9 @@
         const hoyObj = new Date();
         const offset = hoyObj.getTimezoneOffset();
         const hoy = new Date(hoyObj.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
-
         const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
         const citas = await res.json();
         let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
-        
-        // PREDICCIÓN DE LEALTAD
         const counts = {};
         citas.forEach(c => { counts[c.nombre_paciente] = (counts[c.nombre_paciente] || 0) + 1; });
 
@@ -230,22 +229,14 @@
             if(c.pagado) {
                 c.telefono?.includes("USD") ? usd += parseFloat(c.monto || 0) : mxn += parseFloat(c.monto || 0);
                 pagadasCount++;
-            } else {
-                faltante += 1200; // Costo promedio estimado por consulta
-            }
+            } else { faltante += 1200; }
             
             let sem = "u-verde";
             const triage = (c.telefono || "").toUpperCase();
             if(triage.includes("URGENTE") || triage.includes("DOLOR")) {
                 sem = "u-rojo";
-                if (Notification.permission === "granted") {
-                    new Notification("🚨 ALERTA: " + c.nombre_paciente, { body: "Prioridad inmediata detectada." });
-                }
-            } else if(triage.includes("PRIORIDAD")) {
-                sem = "u-amarillo";
-            }
-
-            // INSIGNIA DE LEALTAD (Basado en historial hoy, pero idealmente sería historial total)
+                if (Notification.permission === "granted") new Notification("🚨 ALERTA: " + c.nombre_paciente, { body: "Prioridad inmediata." });
+            } else if(triage.includes("PRIORIDAD")) sem = "u-amarillo";
             const isVip = counts[c.nombre_paciente] > 1 ? '<span class="ml-2 text-[10px] text-indigo-500 animate-pulse">⭐ VIP</span>' : '';
             
             return `
@@ -268,8 +259,6 @@
         document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
         document.getElementById('proyeccion-faltante').innerText = `$${faltante.toLocaleString()}.00 MXN`;
         document.getElementById('total-hoy').innerText = citas.length;
-
-        // ACTUALIZAR BARRA DE DOPAMINA
         const progress = citas.length > 0 ? (pagadasCount / citas.length) * 100 : 0;
         document.getElementById('progress-bar-fill').style.width = progress + "%";
     }
@@ -319,10 +308,7 @@
         const bal = document.getElementById('balance-display');
         bal.classList.toggle('hidden');
         if(!bal.classList.contains('hidden')) {
-            bal.animate([
-                { opacity: 0, transform: 'translateY(10px)' },
-                { opacity: 1, transform: 'translateY(0)' }
-            ], { duration: 400, easing: 'ease-out' });
+            bal.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 400, easing: 'ease-out' });
         }
     }
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
@@ -359,7 +345,6 @@
         const pac = document.getElementById('dra-patient-name').innerText;
         const nota = document.getElementById('dra-response-input').value;
         const fecha = new Date().toLocaleDateString();
-
         const ventana = window.open('', '', 'width=800,height=900');
         ventana.document.write(`
             <html>
