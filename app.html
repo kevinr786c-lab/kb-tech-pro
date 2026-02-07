@@ -169,7 +169,8 @@
         toast.classList.add('active');
         setTimeout(() => toast.classList.remove('active'), 4000);
     }
-async function verificarAcceso() {
+
+    async function verificarAcceso() {
         const pin = document.getElementById('pin-acceso').value;
         const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
         const data = await res.json();
@@ -194,17 +195,13 @@ async function verificarAcceso() {
             
             document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
             document.getElementById('edit-bio').value = globalDocData.biografia || "";
-            
             if(globalDocData.redes_sociales) {
                 try {
                     const redes = JSON.parse(globalDocData.redes_sociales);
                     document.getElementById('edit-insta').value = redes.instagram || "";
-                } catch(e) { 
-                    document.getElementById('edit-insta').value = ""; 
-                }
+                } catch(e) { document.getElementById('edit-insta').value = ""; }
             }
 
-            // --- INYECCIÓN DE ÉXITO Y RADAR ---
             eliteAviso("ACCESO CONCEDIDO ✦");
 
             if (Notification.permission !== 'granted') {
@@ -234,7 +231,7 @@ async function verificarAcceso() {
                 if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
                 else mxn += parseFloat(c.monto || 0);
             }
-            
+
             let semaforo = "u-verde";
             if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) {
                 semaforo = "u-rojo";
@@ -413,7 +410,7 @@ async function verificarAcceso() {
                 <div class="footer">
                     <div class="firma-linea"></div>
                     <p><b>FIRMA DEL MÉDICO</b></p>
-                    <p class="cedula">Cédula Profesional: ${doc.cedula || 'CONSULTAR ORIGINAL'}</p>
+                    <p class="cedula">Cédula Profesional: ${doc.cedula || 'VERIFICAR ORIGINAL'}</p>
                 </div>
                 <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }</script>
             </body>
@@ -432,4 +429,3 @@ async function verificarAcceso() {
     </script>
 </body>
 </html>
-   
