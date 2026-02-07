@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K.B DOCTOR | NODO MAESTRO ✦</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -185,7 +188,6 @@
             document.getElementById('contenido-panel').classList.remove('hidden');
             setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
             
-            // PEDIR PERMISO RADAR
             if (Notification.permission !== 'granted') Notification.requestPermission();
             
             if(globalDocData.plan_nivel === 0) document.getElementById('panel-intercom').classList.add('is-locked');
@@ -206,7 +208,6 @@
     }
 
     async function syncMaster() {
-        // CORRECCIÓN FECHA LOCAL
         const hoyObj = new Date();
         const offset = hoyObj.getTimezoneOffset();
         const hoy = new Date(hoyObj.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
@@ -218,7 +219,6 @@
         document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
             if(c.pagado) c.telefono?.includes("USD") ? usd += parseFloat(c.monto || 0) : mxn += parseFloat(c.monto || 0);
             
-            // SISTEMA DE TRIAGE Y RADAR
             let sem = "u-verde";
             const triage = (c.telefono || "").toUpperCase();
             if(triage.includes("URGENTE") || triage.includes("DOLOR")) {
@@ -322,7 +322,6 @@
         recognition.start();
     }
 
-    // --- FUNCIÓN DE RECETA ÉLITE 2.0 ---
     function generarReceta() {
         const doc = globalDocData;
         const pac = document.getElementById('dra-patient-name').innerText;
@@ -374,7 +373,6 @@
         ventana.document.close();
     }
 
-    // BLINDAJE PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Offline', err));
