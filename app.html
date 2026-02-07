@@ -148,7 +148,8 @@
             </div>
         </main>
     </div>
-<script>
+
+    <script>
     const URL = "https://dgatsbnqgplalxwewpvs.supabase.co", KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
     const docId = new URLSearchParams(window.location.search).get('id')?.trim();
     let currentPatientId = null, globalDocData = null;
@@ -178,19 +179,16 @@
         if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
             const opciones = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
             const temaElegido = opciones.find(t => t.id == globalDocData.template_id) || opciones[0];
-
             document.documentElement.style.setProperty('--main-color', temaElegido.color);
-            document.documentElement.style.setProperty('--main-glow', temaElegido.color + "33");
-            document.getElementById('logo-tech').style.color = temaElegido.color;
-            document.getElementById('lock-icon').innerText = temaElegido.icon;
-            document.getElementById('doc-esp-label').innerText = `${globalDocData.especialidad} | ${temaElegido.tag}`;
             document.getElementById('nav-doc-name').innerText = "Dr. " + globalDocData.nombre_doctor;
-            
-            if(document.getElementById('btn-update-web')) document.getElementById('btn-update-web').style.backgroundColor = temaElegido.color;
-
             document.getElementById('pantalla-bloqueo').classList.add('hidden');
             document.getElementById('contenido-panel').classList.remove('hidden');
             setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
+            
+            // PEDIR PERMISO RADAR
+            if (Notification.permission !== 'granted') Notification.requestPermission();
+            
+            if(globalDocData.plan_nivel === 0) document.getElementById('panel-intercom').classList.add('is-locked');
             
             document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
             document.getElementById('edit-bio').value = globalDocData.biografia || "";
@@ -202,90 +200,129 @@
             }
 
             eliteAviso("ACCESO CONCEDIDO ✦");
-
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission();
-            }
-
-            if(globalDocData.plan_nivel === 0) {
-                document.getElementById('panel-intercom').classList.add('is-locked');
-            }
-
             syncMaster(); 
             setInterval(syncMaster, 15000);
-        } else { 
-            eliteAviso("PIN INVÁLIDO"); 
-        }
+        } else { eliteAviso("PIN INVÁLIDO"); }
     }
 
     async function syncMaster() {
-        const hoy = new Date().toISOString().split('T')[0];
+        // CORRECCIÓN FECHA LOCAL
+        const hoyObj = new Date();
+        const offset = hoyObj.getTimezoneOffset();
+        const hoy = new Date(hoyObj.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
+
         const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
         const citas = await res.json();
         let mxn = 0, usd = 0;
         
         document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
-            if(c.pagado) {
-                if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
-                else mxn += parseFloat(c.monto || 0);
-            }
-
-            let semaforo = "u-verde";
-            if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) {
-                semaforo = "u-rojo";
+            if(c.pagado) c.telefono?.includes("USD") ? usd += parseFloat(c.monto || 0) : mxn += parseFloat(c.monto || 0);
+            
+            // SISTEMA DE TRIAGE Y RADAR
+            let sem = "u-verde";
+            const triage = (c.telefono || "").toUpperCase();
+            if(triage.includes("URGENTE") || triage.includes("DOLOR")) {
+                sem = "u-rojo";
                 if (Notification.permission === "granted") {
-                    new Notification("🚨 ALERTA DE URGENCIA", {
-                        body: `Paciente: ${c.nombre_paciente} requiere prioridad inmediata.`,
-                        icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
-                    });
+                    new Notification("🚨 ALERTA: " + c.nombre_paciente, { body: "Prioridad inmediata detectada." });
                 }
-            } else if(c.telefono && c.telefono.includes("PRIORIDAD")) {
-                semaforo = "u-amarillo";
+            } else if(triage.includes("PRIORIDAD")) {
+                sem = "u-amarillo";
             }
             
             return `
-                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer \${semaforo}" onclick="enfocarpaciente('\${c.id}', '\${c.nombre_paciente}')">
-                    <div class="flex items-center gap-14 text-left">
-                        <span class="text-4xl font-black italic w-24 tracking-tighter" style="color: var(--main-color)">\${c.hora.slice(0,5)}</span>
+                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${sem}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
+                    <div class="flex items-center gap-14">
+                        <span class="text-4xl font-black italic w-24" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
                         <div>
-                            <h3 class="font-black text-slate-800 uppercase text-lg leading-none mb-1">\${c.nombre_paciente}</h3>
-                            <p class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">\${c.telefono || 'VERIFICADO'}</p>
+                            <h3 class="font-black text-slate-800 text-lg">${c.nombre_paciente}</h3>
+                            <p class="text-[10px] font-black uppercase text-slate-400 italic">${c.telefono || 'VERIFICADO'}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <span class="status-badge \${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">\${c.pagado ? 'Pagado' : 'Pendiente'}</span>
-                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-\${docId}-\${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition shadow-sm">📹</button>
+                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
+                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl">📹</button>
                     </div>
                 </div>`;
         }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
         
-        document.getElementById('ganancia-mxn').innerText = `$\${mxn.toLocaleString()}.00`;
-        document.getElementById('ganancia-usd').innerText = `$\${usd.toLocaleString()}.00`;
+        document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
+        document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
         document.getElementById('total-hoy').innerText = citas.length;
     }
 
     async function enfocarpaciente(id, nombre) {
         currentPatientId = id;
         document.getElementById('dra-patient-name').innerText = nombre;
-        const res = await fetch(`\${URL}/rest/v1/Citas?nombre_paciente=eq.\${nombre}&doctor_id=eq.\${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
+        const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
         const historial = await res.json();
         document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
             <div class="timeline-item mb-4 pb-2 border-b border-slate-50">
-                <p class="text-[8px] text-slate-400 font-black mb-1">\${h.fecha}</p>
-                <p class="leading-tight text-xs font-bold uppercase">\${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
+                <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
+                <p class="leading-tight text-xs font-bold uppercase">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋') : 'Consulta base'}</p>
             </div>`).join('');
     }
 
     async function enviarRespuestaDra() {
         const resp = document.getElementById('dra-response-input').value;
         if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
-        const headers = { 'apikey': KEY, 'Authorization': `Bearer \${KEY}`, 'Content-Type': 'application/json' };
-        await fetch(`\${URL}/rest/v1/Citas?id=eq.\${currentPatientId}`, { method: 'PATCH', headers: headers, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
+        await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
         eliteAviso("ENVIADO ✅");
         document.getElementById('dra-response-input').value = "";
         syncMaster();
     }
 
+    async function abrirReporteGastos() {
+        const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+        const logs = await res.json();
+        if (logs.length === 0) return alert("💸 NO HAY GASTOS");
+        alert("💸 AUDITORÍA GASTOS:\n\n" + logs.map(l => `• ${l.concepto}: $${l.monto}`).join('\n'));
+    }
+
+    async function abrirReporteLogistica() {
+        const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
+        const logs = await res.json();
+        if (logs.length === 0) return alert("📦 ALMACÉN EN ORDEN");
+        alert("📦 REPORTE FALTANTES:\n\n" + logs.map(l => `• ${l.concepto}`).join('\n'));
+    }
+
+    function copiarLinkCitas() { 
+        const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
+        navigator.clipboard.writeText(link).then(() => eliteAviso("LINK COPIADO ✅"));
+    }
+
+    function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
+    function mostrarBalance() { document.getElementById('balance-display').classList.toggle('hidden'); }
+    function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+
+    async function actualizarConfiguracionWeb() {
+        const dir = document.getElementById('edit-direccion').value, bio = document.getElementById('edit-bio').value, insta = document.getElementById('edit-insta').value;
+        const payload = { direccion_consultorio: dir, biografia: bio, redes_sociales: JSON.stringify({ instagram: insta, facebook: "" }) };
+        const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if(res.ok) { eliteAviso("SUCURSAL ACTUALIZADA ✦"); toggleMenu(); }
+    }
+
+    async function cambiarPin() {
+        const n = document.getElementById('nuevo-pin-input').value;
+        if(n && n.length === 4) {
+            await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pin_acceso: n }) });
+            eliteAviso("PIN ACTUALIZADO ✅");
+            document.getElementById('nuevo-pin-input').value = "";
+            toggleMenu();
+        }
+    }
+
+    function activarDictado() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return eliteAviso("NO COMPATIBLE");
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'es-MX';
+        recognition.onstart = () => eliteAviso("ESCUCHANDO...");
+        recognition.onresult = (event) => { document.getElementById('dra-response-input').value += " " + event.results[0][0].transcript.toUpperCase(); };
+        recognition.start();
+    }
+
+    // --- FUNCIÓN DE RECETA ÉLITE 2.0 ---
     function generarReceta() {
         const doc = globalDocData;
         const pac = document.getElementById('dra-patient-name').innerText;
@@ -298,7 +335,7 @@
             <head>
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-                    body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; background: white; }
+                    body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; background: white; line-height: 1.5; }
                     .header { border-bottom: 3px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
                     .doc-info h1 { margin: 0; font-size: 28px; font-weight: 900; text-transform: uppercase; color: #1e293b; }
                     .doc-info p { margin: 2px 0; color: #64748b; font-weight: 600; font-size: 14px; }
@@ -307,8 +344,8 @@
                     .paciente-box h2 { margin: 0; font-size: 10px; text-transform: uppercase; color: #6366f1; letter-spacing: 1px; font-weight: 900; }
                     .paciente-box p { margin: 5px 0 0 0; font-size: 18px; font-weight: 700; }
                     .rx-symbol { font-size: 40px; font-weight: 900; color: #6366f1; margin-bottom: 10px; opacity: 0.3; }
-                    .prescripcion { min-height: 400px; line-height: 1.6; font-size: 16px; white-space: pre-wrap; color: #334155; }
-                    .footer { margin-top: 50px; padding-top: 20px; text-align: center; }
+                    .prescripcion { min-height: 400px; font-size: 16px; white-space: pre-wrap; color: #334155; }
+                    .footer { margin-top: 50px; padding-top: 20px; text-align: center; border-top: 1px solid #e2e8f0; }
                     .firma-linea { width: 250px; border-top: 2px solid #1e293b; margin: 0 auto 10px auto; }
                     .cedula { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
                 </style>
@@ -316,24 +353,19 @@
             <body>
                 <div class="header">
                     <div class="doc-info">
-                        <h1>Dr. \${doc.nombre_doctor}</h1>
-                        <p>\${doc.especialidad || 'MÉDICO ESPECIALISTA'}</p>
-                        <p>\${doc.direccion_consultorio || 'CONSULTORIO MÉDICO'}</p>
+                        <h1>Dr. ${doc.nombre_doctor}</h1>
+                        <p>${doc.especialidad || 'MÉDICO ESPECIALISTA'}</p>
+                        <p>${doc.direccion_consultorio || 'TIJUANA, B.C.'}</p>
                     </div>
-                    <div class="recipe-meta">
-                        <p>FECHA: <b>\${fecha}</b></p>
-                    </div>
+                    <div class="recipe-meta"><p>FECHA: <b>${fecha}</b></p></div>
                 </div>
-                <div class="paciente-box">
-                    <h2>PACIENTE</h2>
-                    <p>\${pac}</p>
-                </div>
+                <div class="paciente-box"><h2>PACIENTE</h2><p>${pac}</p></div>
                 <div class="rx-symbol">Rx</div>
-                <div class="prescripcion">\${nota}</div>
+                <div class="prescripcion">${nota}</div>
                 <div class="footer">
                     <div class="firma-linea"></div>
                     <p><b>FIRMA DEL MÉDICO</b></p>
-                    <p class="cedula">Cédula Profesional: \${doc.cedula || 'VERIFICAR ORIGINAL'}</p>
+                    <p class="cedula">Cédula Profesional: ${doc.cedula || 'VERIFICAR ORIGINAL'}</p>
                 </div>
                 <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }<\/script>
             </body>
@@ -342,14 +374,12 @@
         ventana.document.close();
     }
 
+    // BLINDAJE PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                console.log('Búnker Blindado: Service Worker Activo');
-            }).catch(err => console.log('Fallo en Blindaje', err));
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Offline', err));
         });
     }
-</script>
+    </script>
 </body>
 </html>
-    
