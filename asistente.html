@@ -63,9 +63,9 @@
     </div>
 
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-white z-[50000] flex items-center justify-center">
-        <div class="text-center p-12 glass-panel max-w-sm w-full border-t-8 border-indigo-600">
+        <div class="text-center p-12 glass-panel max-w-sm w-full border-t-8 border-indigo-600" id="lock-panel-border">
             <div class="text-7xl mb-6">👩‍💼</div>
-            <h2 class="text-3xl font-black mb-10 uppercase italic tracking-tighter">Recepción <span class="text-indigo-600">K.B</span></h2>
+            <h2 class="text-3xl font-black mb-10 uppercase italic tracking-tighter">Recepción <span id="lock-brand">K.B</span></h2>
             <input type="password" id="pin-acceso" class="input-kb text-center text-4xl tracking-[0.6em] mb-8" placeholder="****" maxlength="4">
             <button onclick="verificarAcceso()" class="w-full py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl">Entrar al Nodo</button>
         </div>
@@ -73,9 +73,9 @@
 
     <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-10 text-white text-left">
         <button onclick="toggleMenu()" class="absolute top-8 right-8 text-2xl">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-12 italic">Herramientas Pro</h3>
+        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-12 italic" id="menu-title-tech">Herramientas Pro</h3>
         <nav class="space-y-4">
-            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Calendario 12 Meses</span></button>
+            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl" id="btn-cal-pro"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Calendario 12 Meses</span></button>
             <button onclick="toggleMenu(); buscarPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">🔍</div><span class="text-[11px] font-black uppercase tracking-widest">Buscador Pro</span></button>
             <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span></button>
             <button onclick="toggleMenu(); abrirGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">💸</div><span class="text-[11px] font-black uppercase tracking-widest">Registrar Gasto</span></button>
@@ -133,7 +133,6 @@
     </div>
 
     <script>
-        // MANTENGO TUS CONSTANTES ORIGINALES
         const { jsPDF } = window.jspdf;
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
@@ -141,15 +140,16 @@
         let currentPatient = null, globalDocData = null, divisa = 'MXN', tc = 17.50;
         let fechaVisualizacion = new Date(), calFecha = new Date();
 
-       const CATALOGO_TEMAS = {
-    "Ginecología": ["#f43f5e", "#8b5cf6", "#fb7185", "#059669", "#1e293b"],
-    "Odontología": ["#0ea5e9", "#10b981", "#22d3ee", "#1e3a8a", "#6366f1"],
-    "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#f472b6", "#818cf8"],
-    "Cardiología": ["#e11d48", "#1e293b", "#0284c7", "#9f1239", "#4f46e5"],
-    "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
-    "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
-};
-        // --- FUNCIONES NUEVAS (INYECTADAS) ---
+        // 1. CATÁLOGO UNIFICADO (ESPEJO DEL DOCTOR)
+        const CATALOGO_TEMAS = {
+            "Ginecología": ["#f43f5e", "#8b5cf6", "#fb7185", "#059669", "#1e293b"],
+            "Odontología": ["#0ea5e9", "#10b981", "#22d3ee", "#1e3a8a", "#6366f1"],
+            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#f472b6", "#818cf8"],
+            "Cardiología": ["#e11d48", "#1e293b", "#0284c7", "#9f1239", "#4f46e5"],
+            "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
+            "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
+        };
+
         function togglePrivacy() {
             document.body.classList.toggle('privacy-mode');
             eliteAviso(document.body.classList.contains('privacy-mode') ? "MODO PRIVACIDAD ACTIVADO" : "MODO PRIVACIDAD DESACTIVADO");
@@ -169,7 +169,6 @@
             }
         }
 
-        // --- TUS FUNCIONES ORIGINALES (SIN TOCAR) ---
         function eliteAviso(msg) {
             const toast = document.getElementById('elite-toast');
             document.getElementById('toast-msg').innerText = msg;
@@ -190,12 +189,22 @@
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB } });
             const data = await res.json();
             globalDocData = data[0];
+
             if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
+                
+                // --- LÓGICA DE SINCRONIZACIÓN DE COLOR ---
                 const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const color = palette[(globalDocData.template_id || 1) % 5];
+                const colorIndex = (parseInt(globalDocData.template_id) - 1) || 0;
+                const color = palette[colorIndex % 5]; 
+
                 document.documentElement.style.setProperty('--main', color);
                 document.getElementById('brand-text').style.color = color;
                 document.getElementById('card-paciente').style.borderColor = color;
+                document.getElementById('lock-panel-border').style.borderColor = color;
+                document.getElementById('lock-brand').style.color = color;
+                document.getElementById('btn-cal-pro').style.backgroundColor = color;
+                document.getElementById('menu-title-tech').style.color = color;
+                
                 document.getElementById('pantalla-bloqueo').style.display = 'none';
                 document.getElementById('contenido-panel').classList.remove('hidden');
                 setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
@@ -221,7 +230,7 @@
                 const tarjeta = document.createElement('div');
                 tarjeta.className = `flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[1.5rem] hover:border-indigo-500 transition-all duration-300 cursor-pointer w-full shadow-md mb-2 ${semaforoClase}`;
                 tarjeta.onclick = () => seleccionarPaciente(c);
-                tarjeta.innerHTML = `<div class="flex items-center gap-6 text-left flex-1"><div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-300'} shadow-sm"></div><div><p class="text-[11px] font-black uppercase tracking-wider text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p><p class="font-black text-xl text-slate-800 uppercase leading-none mb-1">${c.nombre_paciente}</p><p class="text-[10px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">${c.pagado ? '✓ Liquidado' : '⏳ Cobro Pendiente'}</p></div></div><div class="flex gap-3"><button id="btn-edit-${c.id}" class="w-14 h-14 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button><button id="btn-pay-${c.id}" class="w-14 h-14 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-600 opacity-50' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg">💰</button></div>`;
+                tarjeta.innerHTML = `<div class="flex items-center gap-6 text-left flex-1"><div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-300'} shadow-sm"></div><div><p class="text-[11px] font-black uppercase tracking-wider text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p><p class="font-black text-xl text-slate-800 uppercase leading-none mb-1 blur-sensitive">${c.nombre_paciente}</p><p class="text-[10px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">${c.pagado ? '✓ Liquidado' : '⏳ Cobro Pendiente'}</p></div></div><div class="flex gap-3"><button id="btn-edit-${c.id}" class="w-14 h-14 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button><button id="btn-pay-${c.id}" class="w-14 h-14 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-600 opacity-50' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg">💰</button></div>`;
                 contenedor.appendChild(tarjeta);
                 document.getElementById(`btn-edit-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirModificarCita(c); };
                 document.getElementById(`btn-pay-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirCobroPremium(c); };
@@ -300,7 +309,6 @@
             abrirModal();
         }
 
-        // --- TU TERMINAL BINACIONAL REFORZADA CON CALCULADORA ---
         function abrirCobroPremium(cita) {
             const p = cita || currentPatient;
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
@@ -477,9 +485,12 @@
         }
 
         setInterval(() => {
-            document.getElementById('live-clock').innerText = new Date().toLocaleString('es-MX', {
-                hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: 'short'
-            });
+            const clock = document.getElementById('live-clock');
+            if(clock) {
+                clock.innerText = new Date().toLocaleString('es-MX', {
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: 'short'
+                });
+            }
         }, 1000);
     </script>
 </body>
