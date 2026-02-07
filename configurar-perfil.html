@@ -164,7 +164,6 @@
             btn.innerText = "GEMINI ✦: CONFIGURANDO RED...";
             btn.disabled = true;
 
-            // --- PAYLOAD SINCRONIZADO CON TU SQL ---
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value || null,
@@ -174,7 +173,6 @@
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
                 url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
-                // Redes enviadas como objeto puro para evitar Error 400
                 redes_sociales: {
                     instagram: document.getElementById('instagram').value || "",
                     facebook: document.getElementById('facebook').value || ""
@@ -195,16 +193,25 @@
 
                 if (response.ok) {
                     alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                    window.location.href = `app.html?id=${docId}`;
+                    
+                    // --- CABLE REFORZADO POR PLAN ---
+                    const planCheck = sessionStorage.getItem('kb_plan_elegido');
+                    
+                    if (planCheck == "0") {
+                        // SI ES PLAN SOLO (ASPIRANTE)
+                        window.location.href = `appsolo.html?id=${docId}`;
+                    } else {
+                        // SI ES PLAN PRO (DOMINIO) O CORPORATIVO
+                        window.location.href = `app.html?id=${docId}`;
+                    }
                 } else {
                     const errorMsg = await response.json();
-                    console.error("DETALLE ERROR:", errorMsg);
-                    alert("Fallo en la sincronización: " + (errorMsg.message || "Error de formato"));
+                    alert("Fallo en la sincronización.");
                     btn.disabled = false;
                     btn.innerText = "Inaugurar Sucursal Digital";
                 }
             } catch (err) {
-                alert("Interferencia crítica en la conexión.");
+                alert("Interferencia crítica.");
                 btn.disabled = false;
             }
         });
