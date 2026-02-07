@@ -7,30 +7,66 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; scroll-behavior: smooth; }
         :root { --main: #6366f1; } 
 
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid white; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.05); }
-        .btn-lujo { background: var(--main); color: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px -10px var(--main); }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid white; 
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.05); 
+            transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        /* Animación de entrada */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .btn-lujo { 
+            background: var(--main); 
+            color: white; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 20px 40px -10px var(--main); 
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-lujo::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            transition: 0.8s;
+        }
+        .btn-lujo:hover::after { left: 100%; }
         .btn-lujo:hover { transform: scale(1.02) translateY(-5px); filter: brightness(1.1); }
         
-        .gallery-img { aspect-ratio: 16/9; background: #e2e8f0; border-radius: 2rem; overflow: hidden; border: 1px solid #f1f5f9; background-size: cover; background-position: center; transition: 0.5s; }
-        .gallery-img:hover { transform: scale(1.02); }
+        .gallery-img { 
+            aspect-ratio: 16/9; 
+            background: #e2e8f0; 
+            border-radius: 2.5rem; 
+            overflow: hidden; 
+            border: 1px solid #f1f5f9; 
+            background-size: cover; 
+            background-position: center; 
+            transition: 0.5s; 
+        }
 
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.1); } }
         
-        /* Divisa Switch */
         .currency-switch { background: #f1f5f9; border-radius: 1rem; padding: 4px; display: inline-flex; gap: 4px; border: 1px solid #e2e8f0; }
-        .currency-btn { padding: 6px 12px; border-radius: 0.75rem; font-size: 9px; font-weight: 800; transition: 0.3s; color: #94a3b8; }
+        .currency-btn { padding: 6px 12px; border-radius: 0.75rem; font-size: 9px; font-weight: 800; transition: 0.3s; color: #94a3b8; cursor: pointer; }
         .currency-btn.active { background: white; color: var(--main); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        #badge-verificado span { background: var(--main); }
     </style>
 </head>
 <body class="py-10 md:py-20 px-4">
 
     <div class="max-w-4xl mx-auto space-y-12">
         
-        <header class="glass-card p-12 md:p-16 rounded-[4rem] text-center relative overflow-hidden">
+        <header class="glass-card p-12 md:p-16 rounded-[4rem] text-center relative overflow-hidden reveal">
             <div class="absolute top-8 right-8 flex items-center gap-2">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
                 <span class="text-[8px] font-black uppercase tracking-widest text-emerald-600">Nodo Activo</span>
@@ -38,7 +74,7 @@
 
             <div id="doc-icon" class="text-7xl mb-6">🩺</div>
             <div id="badge-verificado" class="mb-6">
-                <span class="bg-indigo-600 text-white text-[8px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full shadow-lg">Especialista Verificado K.B Tech</span>
+                <span class="text-white text-[8px] font-black uppercase tracking-[0.3em] px-5 py-2.5 rounded-full shadow-lg transition-colors duration-500">Especialista Verificado K.B Tech</span>
             </div>
             <h1 id="doc-name" class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Cargando...</h1>
             <p id="doc-esp" class="text-xs font-bold text-slate-400 uppercase tracking-[0.5em] italic mt-4">Sincronizando Nodo...</p>
@@ -49,13 +85,12 @@
                 </p>
             </div>
 
-            <div class="mt-10 flex justify-center gap-6" id="social-container">
-                </div>
+            <div class="mt-10 flex justify-center gap-6" id="social-container"></div>
         </header>
 
-        <section class="glass-card p-10 rounded-[3rem] flex flex-col md:flex-row justify-between items-center gap-6">
+        <section class="glass-card p-10 rounded-[3rem] flex flex-col md:flex-row justify-between items-center gap-6 reveal">
             <div class="text-left">
-                <h3 class="text-[9px] font-black uppercase text-indigo-500 tracking-[0.3em] italic">Inversión en Salud</h3>
+                <h3 class="text-[9px] font-black uppercase text-indigo-500 tracking-[0.3em] italic" id="label-inversion">Inversión en Salud</h3>
                 <p class="text-xl font-black italic tracking-tighter uppercase mt-1">Consulta Especializada</p>
             </div>
             <div class="flex items-center gap-6">
@@ -70,9 +105,9 @@
             </div>
         </section>
 
-        <section class="glass-card p-12 rounded-[4rem] space-y-10">
+        <section class="glass-card p-12 rounded-[4rem] space-y-10 reveal">
             <div class="text-center">
-                <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic">Infraestructura Médica</h3>
+                <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic" id="label-infra">Infraestructura Médica</h3>
                 <h2 class="text-3xl font-black italic tracking-tighter uppercase mt-2">Tecnología y Confort</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="galeria-contenedor">
@@ -81,18 +116,18 @@
             </div>
         </section>
 
-        <section class="glass-card p-12 rounded-[4rem] grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
+        <section class="glass-card p-12 rounded-[4rem] grid grid-cols-1 md:grid-cols-2 gap-12 items-center reveal">
+            <div class="text-left">
                 <span class="text-4xl">📍</span>
-                <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación del Consultorio</h3>
+                <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación</h3>
                 <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado estratégicamente en el Hub médico de Tijuana para su fácil acceso.</p>
                 <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                    <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
+                    <p class="text-[9px] font-black uppercase text-indigo-500 mb-1" id="label-dir">Dirección Registrada</p>
                     <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">Buscando coordenadas...</p>
                 </div>
                 <div class="flex gap-4 mt-6">
-                    <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Google Maps</a>
-                    <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Waze</a>
+                    <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Google Maps</a>
+                    <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Waze</a>
                 </div>
             </div>
             <div id="mapa-wrapper" class="h-80 bg-slate-200 rounded-[3rem] overflow-hidden border-2 border-dashed border-slate-300">
@@ -100,8 +135,8 @@
             </div>
         </section>
 
-        <footer class="text-center space-y-10">
-            <button onclick="window.location.href='agendar.html?id='+docId" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em]">
+        <footer class="text-center space-y-10 reveal">
+            <button onclick="window.location.href='agendar.html?id='+docId" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em] active:scale-95">
                 📅 Agendar Consulta Ahora
             </button>
             
@@ -119,44 +154,52 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let precioMXN = 1200;
-        const TC = 17.50;
+        const TC = 18.00; // Ajustado a 18 para rapidez mental del paciente
 
         const CATALOGO_TEMAS = {
-            "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1"
+            "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1", "Bienestar (Nutri/Psico)": "#059669"
         };
 
         async function init() {
             if(!docId) return;
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`} });
+            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
             const data = await res.json();
             
             if(data[0]) {
                 const doc = data[0];
                 const color = CATALOGO_TEMAS[doc.especialidad] || "#6366f1";
                 document.documentElement.style.setProperty('--main', color);
+                
+                // Aplicar color a etiquetas secundarias
+                ['label-inversion', 'label-infra', 'label-dir'].forEach(id => {
+                    document.getElementById(id).style.color = color;
+                });
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad + " | Certificado";
-                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica y el bienestar integral.";
+                document.getElementById('doc-esp').innerText = doc.especialidad + " | Especialista Certificado";
+                document.getElementById('doc-bio').innerText = doc.biografia || "Comprometido con la excelencia médica y el bienestar integral de cada paciente.";
                 document.getElementById('doc-direccion').innerText = doc.direccion_consultorio || "Tijuana, Baja California";
                 
-                // Redes Sociales
                 if(doc.redes_sociales) {
-                    const redes = JSON.parse(doc.redes_sociales);
-                    const container = document.getElementById('social-container');
-                    if(redes.instagram) container.innerHTML += `<a href="https://instagram.com/${redes.instagram.replace('@','')}" target="_blank" class="text-[9px] font-black uppercase text-slate-400 hover:text-indigo-500 transition">Instagram</a>`;
-                    if(redes.facebook) container.innerHTML += `<a href="${redes.facebook}" target="_blank" class="text-[9px] font-black uppercase text-slate-400 hover:text-indigo-500 transition">Facebook</a>`;
+                    try {
+                        const redes = JSON.parse(doc.redes_sociales);
+                        const container = document.getElementById('social-container');
+                        if(redes.instagram) container.innerHTML += `<a href="https://instagram.com/${redes.instagram.replace('@','')}" target="_blank" class="text-[9px] font-black uppercase text-slate-400 hover:text-indigo-500 transition">Instagram</a>`;
+                        if(redes.facebook) container.innerHTML += `<a href="${redes.facebook}" target="_blank" class="text-[9px] font-black uppercase text-slate-400 hover:text-indigo-500 transition">Facebook</a>`;
+                    } catch(e) { console.log("Redes no configuradas"); }
                 }
 
-                // Sincronización de Mapa
                 if(doc.latitud && doc.longitud) {
-                    document.getElementById('google-map-iframe').src = `https://www.google.com/maps/embed/v1/view?key=YOUR_API_KEY&center=${doc.latitud},${doc.longitud}&zoom=16`;
+                    document.getElementById('google-map-iframe').src = `https://maps.google.com/maps?q=${doc.latitud},${doc.longitud}&hl=es&z=16&output=embed`;
                     document.getElementById('link-maps').href = `https://www.google.com/maps?q=${doc.latitud},${doc.longitud}`;
                     document.getElementById('link-waze').href = `https://waze.com/ul?ll=${doc.latitud},${doc.longitud}&navigate=yes`;
                 }
 
                 if(doc.url_foto_consultorio) document.getElementById('img-1').style.backgroundImage = `url('${doc.url_foto_consultorio}')`;
                 if(doc.url_foto_equipo) document.getElementById('img-2').style.backgroundImage = `url('${doc.url_foto_equipo}')`;
+                
+                // Activar animaciones de revelado
+                reveal();
             }
         }
 
@@ -177,6 +220,19 @@
             }
         }
 
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
         init();
     </script>
 </body>
