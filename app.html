@@ -200,14 +200,31 @@
                     const redes = JSON.parse(globalDocData.redes_sociales);
                     document.getElementById('edit-insta').value = redes.instagram || "";
                 } catch(e) { document.getElementById('edit-insta').value = ""; }
-            }
-
-            if(globalDocData.plan_nivel === 0) document.getElementById('panel-intercom').classList.add('is-locked');
-            eliteAviso("ACCESO CONCEDIDO");
-            syncMaster(); setInterval(syncMaster, 15000);
-        } else { eliteAviso("PIN INVÁLIDO"); }
+            // --- AQUÍ TERMINA EL BLOQUE DE REDES SOCIALES ---
+        } catch(e) { document.getElementById('edit-insta').value = ""; }
     }
 
+    // --- INYECCIÓN DE ÉXITO Y RADAR (Añadir a partir de aquí) ---
+    eliteAviso("ACCESO CONCEDIDO ✦");
+
+    // Despertar el radar de notificaciones de Chrome
+    if (Notification.permission !== 'granted') {
+        Notification.requestPermission();
+    }
+
+    // Bloqueo de funciones para planes básicos
+    if(globalDocData.plan_nivel === 0) {
+        document.getElementById('panel-intercom').classList.add('is-locked');
+    }
+
+    syncMaster(); 
+    setInterval(syncMaster, 15000);
+
+} else { 
+    eliteAviso("PIN INVÁLIDO"); 
+}
+// --- ESTA ES LA LLAVE QUE CIERRA TODA LA FUNCIÓN verificarAcceso ---
+}
     async function syncMaster() {
         const hoy = new Date().toISOString().split('T')[0];
         const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
@@ -219,9 +236,20 @@
                 if(c.telefono && c.telefono.includes("USD")) usd += parseFloat(c.monto || 0);
                 else mxn += parseFloat(c.monto || 0);
             }
-            let semaforo = "u-verde";
-            if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) semaforo = "u-rojo";
-            else if(c.telefono && c.telefono.includes("PRIORIDAD")) semaforo = "u-amarillo";
+          let semaforo = "u-verde";
+        if(c.telefono && (c.telefono.includes("URGENTE") || c.telefono.includes("DOLOR"))) {
+            semaforo = "u-rojo";
+            
+            // --- DISPARAR RADAR DE ESCRITORIO ---
+            if (Notification.permission === "granted") {
+                new Notification("🚨 ALERTA DE URGENCIA", {
+                    body: `Paciente: ${c.nombre_paciente} requiere prioridad inmediata.`,
+                    icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+                });
+            }
+        } else if(c.telefono && c.telefono.includes("PRIORIDAD")) {
+            semaforo = "u-amarillo";
+        }
             
             return `
                 <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semaforo}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
@@ -338,26 +366,74 @@
         recognition.start();
     }
 
-    function generarReceta() {
-        if(!currentPatientId || !globalDocData) return eliteAviso("DATOS NO CARGADOS");
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const np = document.getElementById('dra-patient-name').innerText;
-        const nt = document.getElementById('dra-response-input').value;
-        const fecha = new Date().toLocaleDateString('es-MX');
-        doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(30, 41, 59);
-        doc.text("K.B", 105, 20, { align: "center" });
-        doc.setFontSize(10); doc.text("TECH SOLUTIONS ✦", 105, 27, { align: "center" });
-        doc.setDrawColor(99, 102, 241); doc.line(20, 35, 190, 35);
-        doc.setFontSize(16); doc.text(`DR(A). ${globalDocData.nombre_doctor.toUpperCase()}`, 20, 50);
-        doc.setFontSize(10); doc.setFont("helvetica", "italic"); doc.text(`${globalDocData.especialidad.toUpperCase()}`, 20, 56);
-        doc.text(`CÉDULA: ${globalDocData.cedula || 'VERIFICADA'}`, 20, 61);
-        doc.rect(20, 70, 170, 15); doc.setFont("helvetica", "bold"); doc.text(`PACIENTE: ${np.toUpperCase()}`, 25, 79); doc.text(`FECHA: ${fecha}`, 150, 79);
-        const sn = doc.splitTextToSize(nt.toUpperCase(), 160); doc.text(sn, 20, 105);
-        doc.setDrawColor(200); doc.line(70, 250, 140, 250); doc.setFontSize(8); doc.text("FIRMA DEL MÉDICO RESPONSABLE", 105, 255, { align: "center" });
-        doc.save(`Receta_${np.replace(/\s+/g, '_')}_KB.pdf`);
-        eliteAviso("RECETA GENERADA ✦");
-    }
-    </script>
+   // --- FUNCIÓN DE RECETA ÉLITE 2.0 ---
+function generarReceta() {
+    const doc = globalDocData;
+    const pac = document.getElementById('historial-nombre').innerText;
+    const nota = document.getElementById('nota-medica').value;
+    const fecha = new Date().toLocaleDateString();
+
+    const ventana = window.open('', '', 'width=800,height=900');
+    ventana.document.write(`
+        <html>
+        <head>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+                body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; background: white; }
+                .header { border-bottom: 3px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+                .doc-info h1 { margin: 0; font-size: 28px; font-weight: 900; text-transform: uppercase; color: #1e293b; }
+                .doc-info p { margin: 2px 0; color: #64748b; font-weight: 600; font-size: 14px; }
+                .recipe-meta { text-align: right; font-size: 12px; color: #94a3b8; }
+                .paciente-box { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #6366f1; }
+                .paciente-box h2 { margin: 0; font-size: 10px; text-transform: uppercase; color: #6366f1; letter-spacing: 1px; font-weight: 900; }
+                .paciente-box p { margin: 5px 0 0 0; font-size: 18px; font-weight: 700; }
+                .rx-symbol { font-size: 40px; font-weight: 900; color: #6366f1; margin-bottom: 10px; opacity: 0.3; }
+                .prescripcion { min-height: 400px; line-height: 1.6; font-size: 16px; white-space: pre-wrap; color: #334155; }
+                .footer { margin-top: 50px; padding-top: 20px; text-align: center; }
+                .firma-linea { width: 250px; border-top: 2px solid #1e293b; margin: 0 auto 10px auto; }
+                .cedula { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="doc-info">
+                    <h1>Dr. ${doc.nombre}</h1>
+                    <p>${doc.especialidad || 'MÉDICO ESPECIALISTA'}</p>
+                    <p>${doc.ubicacion || 'TIJUANA, B.C.'}</p>
+                </div>
+                <div class="recipe-meta">
+                    <p>FECHA: <b>${fecha}</b></p>
+                </div>
+            </div>
+
+            <div class="paciente-box">
+                <h2>PACIENTE</h2>
+                <p>${pac}</p>
+            </div>
+
+            <div class="rx-symbol">Rx</div>
+            <div class="prescripcion">${nota}</div>
+
+            <div class="footer">
+                <div class="firma-linea"></div>
+                <p><b>FIRMA DEL MÉDICO</b></p>
+                <p class="cedula">Cédula Profesional: ${doc.cedula || 'CONSULTAR ORIGINAL'}</p>
+            </div>
+            <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }</script>
+        </body>
+        </html>
+    `);
+    ventana.document.close();
+}
+
+// --- REGISTRO DE ARMADURA PWA ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('Búnker Blindado: Service Worker Activo');
+        }).catch(err => console.log('Fallo en Blindaje', err));
+    });
+}
+</script>
 </body>
 </html>
