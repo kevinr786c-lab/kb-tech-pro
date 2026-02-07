@@ -47,6 +47,7 @@
             <div class="space-y-6">
                 <h3 class="font-black text-[10px] uppercase text-indigo-400 tracking-[0.3em] italic">🛡️ Identidad Legal y Marca</h3>
                 <input type="text" id="cedula" placeholder="Cédula Profesional" class="input-kb" required>
+                <input type="text" id="cofepris" placeholder="Registro COFEPRIS" class="input-kb">
                 <input type="text" id="url_foto_perfil" placeholder="URL Foto de Perfil (Dr/Dra)" class="input-kb">
                 <input type="text" id="url_logo" placeholder="URL de tu Logo (Cuadrado)" class="input-kb">
             </div>
@@ -195,6 +196,7 @@
 
             const payload = {
                 cedula: document.getElementById('cedula').value,
+                aviso_cofepris: document.getElementById('cofepris').value || null, // <-- RECONECTADO
                 hora_inicio: document.getElementById('h_inicio').value + ":00",
                 hora_fin: document.getElementById('h_fin').value + ":00",
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
@@ -222,7 +224,7 @@
             });
 
             if (response.ok) {
-                alert("Nodo Sincronizado.");
+                alert("🚀 Nodo Maestro Sincronizado.");
                 const planCheck = sessionStorage.getItem('kb_plan_elegido');
                 window.location.href = (planCheck == "0") ? `appsolo.html?id=${docId}` : `app.html?id=${docId}`;
             }
