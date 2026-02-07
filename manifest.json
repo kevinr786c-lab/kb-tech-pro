@@ -1,0 +1,18 @@
+{
+  "short_name": "KB-Maestro",
+  "name": "K.B DOCTOR | NODO MAESTRO",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3774/3774299.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/app.html",
+  "background_color": "#0f172a",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#6366f1",
+  "description": "Sistema de Gestión Médica Élite - K.B Tech Pro"
+}
