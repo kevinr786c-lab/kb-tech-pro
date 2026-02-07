@@ -16,6 +16,14 @@
         .btn-ia { background: var(--main-color); opacity: 0.9; }
         .btn-ia:hover { opacity: 1; transform: scale(1.05); }
 
+        /* Estilos para los Seguros (Pills) */
+        .seguro-pill { 
+            padding: 0.75rem 1.25rem; border-radius: 1rem; background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; font-weight: 800; 
+            cursor: pointer; transition: 0.3s; color: #94a3b8; text-transform: uppercase;
+        }
+        .seguro-pill.active { background: var(--main-color); color: white; border-color: white; box-shadow: 0 10px 20px -5px var(--main-color); }
+
         .gemini-star { color: var(--main-color); animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
         
@@ -38,7 +46,7 @@
             <div class="space-y-6">
                 <h3 class="font-black text-[10px] uppercase text-indigo-400 tracking-[0.3em] italic">🛡️ Identidad Legal y Marca</h3>
                 <input type="text" id="cedula" placeholder="Cédula Profesional" class="input-kb" required>
-                <input type="text" id="cofepris" placeholder="Registro COFEPRIS (Opcional)" class="input-kb">
+                <input type="text" id="url_foto_perfil" placeholder="URL Foto de Perfil (Dr/Dra)" class="input-kb">
                 <input type="text" id="url_logo" placeholder="URL de tu Logo (Cuadrado)" class="input-kb">
             </div>
 
@@ -54,12 +62,26 @@
                         <input type="time" id="h_fin" value="18:00" class="input-kb">
                     </div>
                 </div>
-                <select id="duracion" class="input-kb appearance-none">
+                <select id="duracion" class="input-kb appearance-none cursor-pointer">
                     <option value="20">20 MINUTOS</option>
                     <option value="30" selected>30 MINUTOS</option>
                     <option value="45">45 MINUTOS</option>
                     <option value="60">1 HORA</option>
                 </select>
+            </div>
+
+            <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
+                <h3 class="font-black text-[10px] uppercase text-sky-400 tracking-[0.3em] italic">🏥 Seguros Aceptados (USA & MX)</h3>
+                <div id="contenedor-seguros" class="flex flex-wrap gap-3">
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Blue Shield</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Aetna</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Cigna</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">MetLife</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">AXA</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">GNP Seguros</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Allianz</div>
+                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Medi-Cal</div>
+                </div>
             </div>
 
             <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
@@ -164,6 +186,9 @@
             btn.innerText = "GEMINI ✦: CONFIGURANDO RED...";
             btn.disabled = true;
 
+            // Recolección de Seguros Activos
+            const segurosSeleccionados = Array.from(document.querySelectorAll('.seguro-pill.active')).map(el => el.innerText);
+
             const payload = {
                 cedula: document.getElementById('cedula').value,
                 aviso_cofepris: document.getElementById('cofepris').value || null,
@@ -173,10 +198,17 @@
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
                 biografia: document.getElementById('bio').value,
                 url_foto_consultorio: document.getElementById('foto_consultorio').value || null,
-                redes_sociales: {
+                url_foto_equipo: document.getElementById('foto_equipo').value || null,
+                // Inyectamos la dirección y GPS que faltaban en el payload
+                direccion_consultorio: document.getElementById('direccion').value,
+                latitud: document.getElementById('latitud').value || null,
+                longitud: document.getElementById('longitud').value || null,
+                redes_sociales: JSON.stringify({
                     instagram: document.getElementById('instagram').value || "",
-                    facebook: document.getElementById('facebook').value || ""
-                }
+                    facebook: document.getElementById('facebook').value || "",
+                    url_foto_perfil: document.getElementById('url_foto_perfil').value || "",
+                    seguros_aceptados: segurosSeleccionados
+                })
             };
 
             try {
@@ -193,19 +225,13 @@
 
                 if (response.ok) {
                     alert("🚀 Gemini Engine ✦: Nodo Sincronizado con Éxito.");
-                    
-                    // --- CABLE REFORZADO POR PLAN ---
                     const planCheck = sessionStorage.getItem('kb_plan_elegido');
-                    
                     if (planCheck == "0") {
-                        // SI ES PLAN SOLO (ASPIRANTE)
                         window.location.href = `appsolo.html?id=${docId}`;
                     } else {
-                        // SI ES PLAN PRO (DOMINIO) O CORPORATIVO
                         window.location.href = `app.html?id=${docId}`;
                     }
                 } else {
-                    const errorMsg = await response.json();
                     alert("Fallo en la sincronización.");
                     btn.disabled = false;
                     btn.innerText = "Inaugurar Sucursal Digital";
