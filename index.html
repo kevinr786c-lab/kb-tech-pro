@@ -140,6 +140,7 @@
         }
 
         async function seleccionarPlan(nivel) {
+            // REGISTRO DE LOGS (TU CÓDIGO ORIGINAL)
             try {
                 fetch(`${URL_DB}/rest/v1/logs_sistema`, {
                     method: 'POST',
@@ -147,7 +148,11 @@
                     body: JSON.stringify({ pagina_origen: "planes.html", codigo_error: "INTERÉS_PLAN", mensaje_error: `Intento nivel: ${nivel} via Gemini Engine` })
                 });
             } catch(e) {}
+
+            // CIRUGÍA: MARCAMOS EL PLAN ELEGIDO PARA EL REGISTRO
             sessionStorage.setItem('kb_plan_elegido', nivel);
+            
+            // REDIRECCIÓN AL REGISTRO
             window.location.href = 'registro.html';
         }
 
