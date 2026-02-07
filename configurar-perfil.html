@@ -185,7 +185,8 @@
         document.getElementById('form-config').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-save');
-            btn.innerText = "Sincronizando..."; btn.disabled = true;
+            btn.innerText = "SINCRONIZANDO..."; 
+            btn.disabled = true;
 
             const nombres = document.getElementsByName('srv-nombre');
             const precios = document.getElementsByName('srv-precio');
@@ -194,39 +195,61 @@
                 if(nombres[i].value) serviciosArray.push({ nombre: nombres[i].value, precio: precios[i].value });
             }
 
+            // REDES_SOCIALES se usará como contenedor flexible para columnas inexistentes en SQL
+            const metadatosJSON = JSON.stringify({
+                instagram: document.getElementById('instagram').value,
+                facebook: document.getElementById('facebook').value,
+                url_foto_perfil: document.getElementById('url_foto_perfil').value,
+                url_foto_equipo: document.getElementById('foto_equipo').value,
+                direccion: document.getElementById('direccion').value,
+                lat: document.getElementById('latitud').value,
+                lng: document.getElementById('longitud').value,
+                seguros: Array.from(document.querySelectorAll('.seguro-pill.active')).map(el => el.innerText),
+                english: document.getElementById('feat-english').classList.contains('active'),
+                parking: document.getElementById('feat-park').classList.contains('active'),
+                servicios: serviciosArray
+            });
+
+            // Payload ajustado estrictamente a las columnas del SQL proporcionado
             const payload = {
                 cedula: document.getElementById('cedula').value,
-                aviso_cofepris: document.getElementById('cofepris').value || null, // <-- RECONECTADO
+                aviso_cofepris: document.getElementById('cofepris').value || null,
+                biografia: document.getElementById('bio').value,
+                url_logo: document.getElementById('url_logo').value,
+                url_foto_consultorio: document.getElementById('foto_consultorio').value,
                 hora_inicio: document.getElementById('h_inicio').value + ":00",
                 hora_fin: document.getElementById('h_fin').value + ":00",
                 duracion_cita_min: parseInt(document.getElementById('duracion').value),
-                biografia: document.getElementById('bio').value,
-                url_foto_consultorio: document.getElementById('foto_consultorio').value,
-                url_foto_equipo: document.getElementById('foto_equipo').value,
-                direccion_consultorio: document.getElementById('direccion').value,
-                latitud: document.getElementById('latitud').value,
-                longitud: document.getElementById('longitud').value,
-                redes_sociales: JSON.stringify({
-                    instagram: document.getElementById('instagram').value,
-                    facebook: document.getElementById('facebook').value,
-                    url_foto_perfil: document.getElementById('url_foto_perfil').value,
-                    seguros: Array.from(document.querySelectorAll('.seguro-pill.active')).map(el => el.innerText),
-                    english: document.getElementById('feat-english').classList.contains('active'),
-                    parking: document.getElementById('feat-park').classList.contains('active'),
-                    servicios: serviciosArray
-                })
+                redes_sociales: metadatosJSON
             };
 
-            const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'apikey': KEY_DB, 
+                        'Authorization': `Bearer ${KEY_DB}`, 
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal' 
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-            if (response.ok) {
-                alert("🚀 Nodo Maestro Sincronizado.");
-                const planCheck = sessionStorage.getItem('kb_plan_elegido');
-                window.location.href = (planCheck == "0") ? `appsolo.html?id=${docId}` : `app.html?id=${docId}`;
+                if (response.ok) {
+                    alert("🚀 Nodo Maestro Sincronizado.");
+                    const planCheck = sessionStorage.getItem('kb_plan_elegido');
+                    window.location.href = (planCheck == "0") ? `appsolo.html?id=${docId}` : `app.html?id=${docId}`;
+                } else {
+                    const error = await response.json();
+                    console.error("Error Supabase:", error);
+                    alert("Error 400: Revisa que los nombres de las columnas coincidan con el SQL.");
+                    btn.disabled = false;
+                    btn.innerText = "Inaugurar Sucursal Digital";
+                }
+            } catch (err) {
+                console.error("Fallo crítico:", err);
+                alert("Fallo de red.");
+                btn.disabled = false;
             }
         });
         init();
