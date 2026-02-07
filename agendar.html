@@ -66,7 +66,7 @@
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-2">
                     <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest italic">Seleccione Día</p>
-                    <span id="current-month" class="text-[9px] font-black text-main uppercase"></span>
+                    <span id="current-month" class="text-[9px] font-black uppercase" style="color: var(--main)"></span>
                 </div>
                 <div id="date-slider" class="date-slider text-left"></div>
                 <input type="hidden" id="fecha-sel" required>
@@ -114,13 +114,14 @@
         let planNivel = 0;
         let configHoras = { inicio: "09:00", fin: "17:00" };
 
-        const CATALOGO = {
-            "Ginecología": ["#f43f5e", "#ec4899", "#8b5cf6", "#d946ef", "#fb7185"],
-            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#facc15", "#818cf8"],
-            "Odontología": ["#0ea5e9", "#2dd4bf", "#22d3ee", "#10b981", "#6366f1"],
-            "Cardiología": ["#e11d48", "#9f1239", "#4b5563", "#0284c7", "#ef4444"],
+        // 1. CATÁLOGO UNIFICADO (ADN VISUAL)
+        const CATALOGO_TEMAS = {
+            "Ginecología": ["#f43f5e", "#8b5cf6", "#fb7185", "#059669", "#1e293b"],
+            "Odontología": ["#0ea5e9", "#10b981", "#22d3ee", "#1e3a8a", "#6366f1"],
+            "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#f472b6", "#818cf8"],
+            "Cardiología": ["#e11d48", "#1e293b", "#0284c7", "#9f1239", "#4f46e5"],
             "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
-            "General": ["#6366f1", "#4f46e5", "#1e293b", "#3b82f6", "#06b6d4"]
+            "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
         };
 
         function eliteAviso(msg) {
@@ -138,9 +139,13 @@
                 planNivel = doc.plan === 'Dominio' || doc.plan === 'Corporativo' ? 1 : 0;
                 configHoras.inicio = doc.hora_inicio || "09:00";
                 configHoras.fin = doc.hora_fin || "17:00";
-                const palette = CATALOGO[doc.especialidad] || CATALOGO["General"];
-                const color = palette[(doc.template_id || 1) % 5];
+
+                // --- LÓGICA DE SINCRONIZACIÓN DE COLOR (ESPEJO) ---
+                const palette = CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"];
+                const colorIndex = (parseInt(doc.template_id) - 1) || 0;
+                const color = palette[colorIndex % 5]; 
                 document.documentElement.style.setProperty('--main', color);
+
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Verificado" : "");
                 if(doc.biografia) {
@@ -207,7 +212,6 @@
             const motivo = document.getElementById('motivo-consulta').value.toUpperCase();
             if(!h || !f) return eliteAviso("POR FAVOR SELECCIONE FECHA Y HORA");
 
-            // --- MOTOR DE TRIAGE IA (SEMÁFORO) ---
             let clasificacionIA = "";
             const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "RESPIRAR", "ACCIDENTE", "URGENTE", "FRACTURA"];
             const prioridadKills = ["FIEBRE", "VOMITO", "FUERTE", "DIARREA", "MAREO", "DESMAYO"];
@@ -227,7 +231,6 @@
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                    // Inyectamos la clasificación en el campo de teléfono (que usa el Doctor para ver notas)
                     telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + clasificacionIA,
                     fecha: f, hora: h, pagado: false, monto: 0
                 })
