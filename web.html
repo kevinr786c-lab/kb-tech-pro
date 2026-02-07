@@ -33,7 +33,6 @@
         .service-item { border-bottom: 1px solid #f1f5f9; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
         
         .badge-feature { background: #f1f5f9; color: #64748b; padding: 6px 12px; border-radius: 99px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .badge-feature.active { background: #ecfdf5; color: #10b981; border: 1px solid #10b981; }
 
         .seguro-badge { background: white; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 1rem; font-size: 11px; font-weight: 800; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 
@@ -50,18 +49,24 @@
     <div class="max-w-4xl mx-auto space-y-12">
         
         <header class="glass-card p-12 md:p-16 rounded-[4rem] text-center relative overflow-hidden reveal mt-20">
-            <img id="doc-pic" src="" class="doc-profile-img hidden" alt="Doctor">
+            <img id="doc-pic" src="" class="doc-profile-img hidden mx-auto" alt="Doctor">
+            
             <div class="absolute top-8 right-8 flex items-center gap-2">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
                 <span class="text-[8px] font-black uppercase tracking-widest text-emerald-600">Nodo Activo</span>
             </div>
 
-            <div id="badge-verificado" class="mb-6">
+            <div id="badge-verificado" class="mb-4">
                 <span class="bg-indigo-600 text-white text-[8px] font-black uppercase tracking-[0.3em] px-5 py-2.5 rounded-full shadow-lg">Especialista Verificado K.B Tech</span>
             </div>
+
             <h1 id="doc-name" class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Cargando...</h1>
             <p id="doc-esp" class="text-xs font-bold text-slate-400 uppercase tracking-[0.5em] italic mt-4">Sincronizando Nodo...</p>
             
+            <div id="doc-legal-header" class="mt-4 space-y-1">
+                <p id="doc-cedula" class="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden">Cédula: ---</p>
+            </div>
+
             <div class="mt-8 flex justify-center gap-3" id="logistica-badges">
                 <div id="badge-english" class="badge-feature hidden">🇺🇸 English Spoken</div>
                 <div id="badge-parking" class="badge-feature hidden">🅿️ Parking Available</div>
@@ -77,7 +82,7 @@
         <section class="glass-card p-12 rounded-[4rem] reveal">
             <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
                 <div class="text-left">
-                    <h3 class="text-[9px] font-black uppercase text-indigo-500 tracking-[0.3em] italic" id="label-inversion">Menú de Especialidad</h3>
+                    <h3 class="text-[9px] font-black uppercase text-indigo-500 tracking-[0.3em] italic">Inversión en Salud</h3>
                     <h2 class="text-3xl font-black italic tracking-tighter uppercase mt-1">Servicios y Costos</h2>
                 </div>
                 <div class="currency-switch">
@@ -85,25 +90,23 @@
                     <button id="btn-usd" onclick="cambiarDivisa('USD')" class="currency-btn">USD</button>
                 </div>
             </div>
-            <div id="lista-servicios" class="space-y-2">
-                </div>
+            <div id="lista-servicios" class="space-y-2"></div>
             <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-6 text-center italic">Sujeto a valoración médica en consultorio</p>
         </section>
 
-        <section class="glass-card p-12 rounded-[4rem] reveal text-center">
+        <section id="sec-seguros" class="glass-card p-12 rounded-[4rem] reveal text-center hidden">
             <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic mb-8">Aseguradoras Aceptadas</h3>
-            <div id="seguros-grid" class="flex flex-wrap justify-center gap-4">
-                </div>
+            <div id="seguros-grid" class="flex flex-wrap justify-center gap-4"></div>
         </section>
 
         <section class="glass-card p-12 rounded-[4rem] space-y-10 reveal">
             <div class="text-center">
-                <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic" id="label-infra">Infraestructura Médica</h3>
+                <h3 class="text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] italic">Infraestructura Médica</h3>
                 <h2 class="text-3xl font-black italic tracking-tighter uppercase mt-2">Tecnología y Confort</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="galeria-contenedor">
-                <div id="img-1" class="gallery-img shadow-xl"></div>
-                <div id="img-2" class="gallery-img shadow-xl"></div>
+                <div id="img-1" class="gallery-img shadow-xl bg-slate-200 aspect-video rounded-[2.5rem] bg-cover bg-center"></div>
+                <div id="img-2" class="gallery-img shadow-xl bg-slate-200 aspect-video rounded-[2.5rem] bg-cover bg-center"></div>
             </div>
         </section>
 
@@ -111,14 +114,14 @@
             <div class="text-left">
                 <span class="text-4xl">📍</span>
                 <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación</h3>
-                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado en el Hub médico de Tijuana.</p>
+                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado estratégicamente para su fácil acceso.</p>
                 <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                    <p class="text-[9px] font-black uppercase text-indigo-500 mb-1" id="label-dir">Dirección</p>
+                    <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
                     <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">Buscando...</p>
                 </div>
                 <div class="flex gap-4 mt-6">
-                    <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Maps</a>
-                    <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition">Waze</a>
+                    <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Google Maps</a>
+                    <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Waze</a>
                 </div>
             </div>
             <div id="mapa-wrapper" class="h-80 bg-slate-200 rounded-[3rem] overflow-hidden border-2 border-dashed border-slate-300">
@@ -127,9 +130,14 @@
         </section>
 
         <footer class="text-center space-y-10 reveal">
-            <button onclick="window.location.href='agendar.html?id='+docId" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em]">
+            <button id="btn-agendar" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em] active:scale-95">
                 📅 Agendar Consulta Ahora
             </button>
+            
+            <div id="legal-cofepris" class="hidden">
+                <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em]">Registro COFEPRIS: <span id="val-cofepris" class="text-slate-500">---</span></p>
+            </div>
+
             <div class="pt-10 border-t border-slate-200">
                 <p class="text-[8px] font-black text-slate-300 uppercase tracking-[0.8em] italic">
                     <span class="gemini-star">✦</span> Powered by K.B Tech Solutions <span class="gemini-star">✦</span>
@@ -162,38 +170,53 @@
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                 document.getElementById('doc-esp').innerText = doc.especialidad + " | Especialista Certificado";
                 document.getElementById('doc-bio').innerText = doc.biografia;
-                document.getElementById('doc-direccion').innerText = doc.direccion_consultorio;
+                document.getElementById('btn-agendar').onclick = () => window.location.href = `agendar.html?id=${docId}`;
 
-                const redes = JSON.parse(doc.redes_sociales || "{}");
+                // --- 1. DATOS LEGALES (Columnas SQL directas) ---
+                if(doc.cedula) {
+                    const cEl = document.getElementById('doc-cedula');
+                    cEl.innerText = `Cédula Profesional: ${doc.cedula}`;
+                    cEl.classList.remove('hidden');
+                }
+                if(doc.aviso_cofepris) {
+                    document.getElementById('val-cofepris').innerText = doc.aviso_cofepris;
+                    document.getElementById('legal-cofepris').classList.remove('hidden');
+                }
+
+                // --- 2. DATOS FLEXIBLES (Caja redes_sociales) ---
+                const meta = JSON.parse(doc.redes_sociales || "{}");
                 
-                // 1. Inyectar Foto de Perfil
-                if(redes.url_foto_perfil) {
+                if(meta.url_foto_perfil) {
                     const pic = document.getElementById('doc-pic');
-                    pic.src = redes.url_foto_perfil;
+                    pic.src = meta.url_foto_perfil;
                     pic.classList.remove('hidden');
                 }
 
-                // 2. Inyectar Badges de Logística
-                if(redes.english) document.getElementById('badge-english').classList.remove('hidden');
-                if(redes.parking) document.getElementById('badge-parking').classList.remove('hidden');
+                if(meta.english) document.getElementById('badge-english').classList.remove('hidden');
+                if(meta.parking) document.getElementById('badge-parking').classList.remove('hidden');
 
-                // 3. Inyectar Matriz de Servicios
-                serviciosCache = redes.servicios || [];
+                serviciosCache = meta.servicios || [];
                 renderServicios();
 
-                // 4. Inyectar Seguros
-                const seguros = redes.seguros || [];
-                const sGrid = document.getElementById('seguros-grid');
-                seguros.forEach(s => {
-                    sGrid.innerHTML += `<div class="seguro-badge">${s}</div>`;
-                });
+                if(meta.seguros && meta.seguros.length > 0) {
+                    const sGrid = document.getElementById('seguros-grid');
+                    document.getElementById('sec-seguros').classList.remove('hidden');
+                    meta.seguros.forEach(s => {
+                        sGrid.innerHTML += `<div class="seguro-badge">${s}</div>`;
+                    });
+                }
 
-                if(doc.latitud && doc.longitud) {
-                    document.getElementById('google-map-iframe').src = `https://maps.google.com/maps?q=${doc.latitud},${doc.longitud}&hl=es&z=16&output=embed`;
+                // --- 3. UBICACIÓN Y FOTOS ---
+                document.getElementById('doc-direccion').innerText = meta.direccion || "Tijuana, B.C.";
+                
+                if(meta.lat && meta.lng) {
+                    document.getElementById('google-map-iframe').src = `https://maps.google.com/maps?q=${meta.lat},${meta.lng}&hl=es&z=16&output=embed`;
+                    document.getElementById('link-maps').href = `https://www.google.com/maps?q=${meta.lat},${meta.lng}`;
+                    document.getElementById('link-waze').href = `https://waze.com/ul?ll=${meta.lat},${meta.lng}&navigate=yes`;
                 }
 
                 if(doc.url_foto_consultorio) document.getElementById('img-1').style.backgroundImage = `url('${doc.url_foto_consultorio}')`;
-                if(doc.url_foto_equipo) document.getElementById('img-2').style.backgroundImage = `url('${doc.url_foto_equipo}')`;
+                if(meta.url_foto_equipo) document.getElementById('img-2').style.backgroundImage = `url('${meta.url_foto_equipo}')`;
                 
                 reveal();
             }
