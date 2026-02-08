@@ -29,11 +29,8 @@
         .btn-lujo:hover { transform: scale(1.02) translateY(-5px); filter: brightness(1.1); }
         
         .doc-profile-img { width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.1); object-fit: cover; margin: -75px auto 20px; position: relative; z-index: 10; }
-        
         .service-item { border-bottom: 1px solid #f1f5f9; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
-        
         .badge-feature { background: #f1f5f9; color: #64748b; padding: 6px 12px; border-radius: 99px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-
         .seguro-badge { background: white; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 1rem; font-size: 11px; font-weight: 800; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
@@ -43,8 +40,11 @@
         .currency-btn { padding: 6px 12px; border-radius: 0.75rem; font-size: 9px; font-weight: 800; cursor: pointer; }
         .currency-btn.active { background: white; color: var(--main); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* MEJORA: SELLO DE VERIFICACIÓN */
         .verification-shield { border: 2px solid var(--main); background: white; padding: 15px; border-radius: 2rem; display: inline-flex; align-items: center; gap: 12px; margin-top: 20px; }
+
+        /* ESTILO BOTONES GOOGLE RESERVE */
+        .slot-pill { padding: 8px 16px; border-radius: 12px; background: white; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 800; color: var(--main); transition: 0.3s; cursor: pointer; }
+        .slot-pill:hover { background: var(--main); color: white; transform: translateY(-2px); box-shadow: 0 10px 20px -5px var(--main); }
     </style>
 </head>
 <body class="py-10 md:py-20 px-4">
@@ -72,6 +72,12 @@
                     <p id="doc-cedula-pro" class="text-[10px] font-black text-slate-800 uppercase leading-none">Validando Cédula...</p>
                     <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-1">Registro Médico Certificado</p>
                 </div>
+            </div>
+
+            <div id="quick-slots-container" class="mt-8 opacity-0 transition-all duration-1000">
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4">Próximos Espacios Libres ✦</p>
+                <div id="slots-grid" class="flex flex-wrap justify-center gap-3">
+                    </div>
             </div>
 
             <div class="mt-8 flex justify-center gap-3" id="logistica-badges">
@@ -122,12 +128,10 @@
                 <span class="text-4xl">📍</span>
                 <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación Estratégica</h3>
                 <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado estratégicamente para su fácil acceso desde California y Tijuana.</p>
-                
                 <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                     <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
                     <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">Buscando...</p>
                 </div>
-
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <div class="p-3 bg-indigo-50 rounded-2xl border border-indigo-100">
                         <p class="text-[7px] font-black text-indigo-400 uppercase">San Ysidro RL</p>
@@ -138,7 +142,6 @@
                         <p class="text-xs font-black text-emerald-600">~ 20 MIN</p>
                     </div>
                 </div>
-
                 <div class="flex gap-4 mt-6">
                     <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Google Maps</a>
                     <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Waze</a>
@@ -153,11 +156,9 @@
             <button id="btn-agendar" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em] active:scale-95 animate-bounce">
                 📅 Reservar Mi Espacio Ahora ✦
             </button>
-            
             <div id="legal-cofepris" class="hidden">
                 <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em]">Registro COFEPRIS: <span id="val-cofepris" class="text-slate-500">---</span></p>
             </div>
-
             <div class="pt-10 border-t border-slate-200">
                 <p class="text-[8px] font-black text-slate-300 uppercase tracking-[0.8em] italic">
                     <span class="gemini-star">✦</span> Powered by K.B Tech Solutions <span class="gemini-star">✦</span>
@@ -192,23 +193,17 @@
                 document.getElementById('doc-bio').innerText = doc.biografia;
                 document.getElementById('btn-agendar').onclick = () => window.location.href = `agendar.html?id=${docId}`;
 
-                // --- DATOS LEGALES MEJORADOS ---
-                if(doc.cedula) {
-                    document.getElementById('doc-cedula-pro').innerText = `CED. PROF: ${doc.cedula}`;
-                }
+                if(doc.cedula) document.getElementById('doc-cedula-pro').innerText = `CED. PROF: ${doc.cedula}`;
                 if(doc.aviso_cofepris) {
                     document.getElementById('val-cofepris').innerText = doc.aviso_cofepris;
                     document.getElementById('legal-cofepris').classList.remove('hidden');
                 }
 
                 const meta = JSON.parse(doc.redes_sociales || "{}");
-                
                 if(meta.url_foto_perfil) {
                     const pic = document.getElementById('doc-pic');
-                    pic.src = meta.url_foto_perfil;
-                    pic.classList.remove('hidden');
+                    pic.src = meta.url_foto_perfil; pic.classList.remove('hidden');
                 }
-
                 if(meta.english) document.getElementById('badge-english').classList.remove('hidden');
                 if(meta.parking) document.getElementById('badge-parking').classList.remove('hidden');
 
@@ -218,16 +213,12 @@
                 if(meta.seguros && meta.seguros.length > 0) {
                     const sGrid = document.getElementById('seguros-grid');
                     document.getElementById('sec-seguros').classList.remove('hidden');
-                    meta.seguros.forEach(s => {
-                        sGrid.innerHTML += `<div class="seguro-badge">${s}</div>`;
-                    });
+                    meta.seguros.forEach(s => sGrid.innerHTML += `<div class="seguro-badge">${s}</div>`);
                 }
 
                 document.getElementById('doc-direccion').innerText = meta.direccion || "Tijuana, B.C.";
                 
                 if(meta.lat && meta.lng) {
-                    document.getElementById('google-map-iframe').src = `https://www.google.com/maps/embed/v1/place?key=REPLACE_WITH_YOUR_KEY&q=${meta.lat},${meta.lng}`;
-                    // Simplificado para que funcione sin API KEY en el iframe directo:
                     document.getElementById('google-map-iframe').src = `https://maps.google.com/maps?q=${meta.lat},${meta.lng}&hl=es&z=16&output=embed`;
                     document.getElementById('link-maps').href = `https://www.google.com/maps?q=${meta.lat},${meta.lng}`;
                     document.getElementById('link-waze').href = `https://waze.com/ul?ll=${meta.lat},${meta.lng}&navigate=yes`;
@@ -236,8 +227,45 @@
                 if(doc.url_foto_consultorio) document.getElementById('img-1').style.backgroundImage = `url('${doc.url_foto_consultorio}')`;
                 if(meta.url_foto_equipo) document.getElementById('img-2').style.backgroundImage = `url('${meta.url_foto_equipo}')`;
                 
+                // INICIAR SCANNER DE DISPONIBILIDAD
+                scanDisponibilidad(doc.hora_inicio || "09:00", doc.hora_fin || "17:00");
                 reveal();
             }
+        }
+
+        // --- MOTOR SCANNER DE TIEMPO REAL ---
+        async function scanDisponibilidad(inicio, fin) {
+            const container = document.getElementById('slots-grid');
+            const wrapper = document.getElementById('quick-slots-container');
+            const hoyISO = new Date().toISOString().split('T')[0];
+            
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyISO}`, { headers: {'apikey': KEY_DB} });
+                const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
+                
+                let count = 0;
+                const startHour = parseInt(inicio.split(':')[0]);
+                const endHour = parseInt(fin.split(':')[0]);
+                const currentHour = new Date().getHours();
+
+                for(let h = startHour; h < endHour && count < 3; h++) {
+                    if(h <= currentHour) continue; // No mostrar horas pasadas
+                    const timeStr = h < 10 ? `0${h}:00` : `${h}:00`;
+                    
+                    if(!ocupadas.includes(timeStr)) {
+                        const pill = document.createElement('div');
+                        pill.className = "slot-pill";
+                        pill.innerText = `HOY ${h > 12 ? h-12 : h}:00 ${h >= 12 ? 'PM' : 'AM'}`;
+                        pill.onclick = () => window.location.href = `agendar.html?id=${docId}`;
+                        container.appendChild(pill);
+                        count++;
+                    }
+                }
+
+                if(count > 0) {
+                    wrapper.style.opacity = "1";
+                }
+            } catch (e) { console.error("Scanner offline"); }
         }
 
         function renderServicios() {
@@ -245,11 +273,7 @@
             container.innerHTML = "";
             serviciosCache.forEach(s => {
                 let precioFinal = divisaActual === "MXN" ? `$${s.precio} MXN` : `$${(s.precio/TC).toFixed(0)} USD`;
-                container.innerHTML += `
-                    <div class="service-item">
-                        <p class="text-sm font-bold text-slate-700 uppercase italic">${s.nombre}</p>
-                        <p class="text-lg font-black text-slate-900 tracking-tighter">${precioFinal}</p>
-                    </div>`;
+                container.innerHTML += `<div class="service-item"><p class="text-sm font-bold text-slate-700 uppercase italic">${s.nombre}</p><p class="text-lg font-black text-slate-900 tracking-tighter">${precioFinal}</p></div>`;
             });
         }
 
