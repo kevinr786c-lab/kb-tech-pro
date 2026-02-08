@@ -50,6 +50,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-card p-6 rounded-[2.5rem] border border-white/5">
+                        <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Foto de Perfil (Avatar)</label>
+                        <input type="file" id="foto_perfil" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-indigo-500 file:text-white hover:file:bg-indigo-400 cursor-pointer">
+                    </div>
+                    <div class="glass-card p-6 rounded-[2.5rem] border border-white/5">
+                        <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Cédula o Local (Validación)</label>
+                        <input type="file" id="foto_cedula" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
+                    </div>
+                </div>
+
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
                         <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Catálogo Camaleón</p>
@@ -111,7 +122,6 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
-        // --- CIRUGÍA 1: DETECTAR PLAN ELEGIDO ---
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         const infoPlanes = [
             { nombre: "Aspirante", precio: "$999" },
@@ -138,10 +148,7 @@
             const contenedor = document.getElementById('contenedor-colores');
             let temas = CATALOGO[esp] || CATALOGO["General"];
 
-            // --- CIRUGÍA 2: EFECTO CAMALEÓN LIMITADO (Solo 2 temas si es Plan 0) ---
-            if (planElegido === 0) {
-                temas = temas.slice(0, 2); 
-            }
+            if (planElegido === 0) { temas = temas.slice(0, 2); }
 
             contenedor.innerHTML = "";
             temas.forEach((t) => {
@@ -165,25 +172,43 @@
             contenedor.firstChild.click();
         }
 
+        // FUNCIÓN DE CARGA BLINDADA (STORAGE)
+        async function subirFoto(inputElement, folder) {
+            const file = inputElement.files[0];
+            if (!file) return null;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}.${fileExt}`;
+            const filePath = `${folder}/${fileName}`;
+
+            const res = await fetch(`${URL_DB}/storage/v1/object/medicos_assets/${filePath}`, {
+                method: 'POST',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': file.type },
+                body: file
+            });
+            if (!res.ok) throw new Error("Error subiendo imagen");
+            return `${URL_DB}/storage/v1/object/public/medicos_assets/${filePath}`;
+        }
+
         document.getElementById('form-registro').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nombre = document.getElementById('nombre').value.trim();
-            const esp = document.getElementById('especialidad').value;
             const btn = document.getElementById('btn-activar');
-            
-            btn.innerText = "GEMINI ✦: FORJANDO NODO..."; 
+            btn.innerText = "GEMINI ✦: SUBIENDO ARCHIVOS...";
             btn.disabled = true;
 
-            const planFinal = infoPlanes[planElegido].nombre;
-            const emailTecnico = `${nombre.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`;
-
             try {
+                // 1. Subir archivos primero
+                const urlPerfil = await subirFoto(document.getElementById('foto_perfil'), 'perfiles');
+                const urlCedula = await subirFoto(document.getElementById('foto_cedula'), 'cedulas');
+
+                // 2. Enviar JSON con URLs de texto
                 const payload = {
-                    nombre_doctor: nombre,
-                    email: emailTecnico,
-                    especialidad: esp,
-                    plan: planFinal, 
+                    nombre_doctor: document.getElementById('nombre').value.trim(),
+                    email: `${document.getElementById('nombre').value.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`,
+                    especialidad: document.getElementById('especialidad').value,
+                    plan: infoPlanes[planElegido].nombre,
                     template_id: parseInt(currentSelection.template_id),
+                    foto_perfil_url: urlPerfil,
+                    foto_cedula_url: urlCedula,
                     creado_en: new Date().toISOString()
                 };
 
@@ -202,33 +227,27 @@
 
                 if (res.ok && data.length > 0) {
                     ultimoIdGenerado = data[0].id;
-                    const shortName = nombre.split(' ')[0].toUpperCase();
+                    const shortName = payload.nombre_doctor.split(' ')[0].toUpperCase();
                     document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
                 } else {
-                    alert("Error de Sincronización.");
-                    btn.disabled = false;
-                    btn.innerText = "Reintentar";
+                    throw new Error("Fallo en base de datos");
                 }
-            } catch (e) { 
-                alert("Fallo de enlace."); 
-                btn.disabled = false; 
+            } catch (error) {
+                alert("Error de enlace. Verifique conexión y tamaño de fotos.");
+                btn.disabled = false;
+                btn.innerText = "Reintentar";
             }
         });
 
-        // --- CIRUGÍA 3: EL DESVIADOR DE NODO (Solo o Pro) ---
         function irANodo() {
             if(ultimoIdGenerado) {
                 const btn = event.target;
                 btn.innerText = "GEMINI ✦: INICIANDO COCCIÓN...";
                 setTimeout(() => {
-                    if (planElegido === 0) {
-                        // SI ES PLAN SOLO, VA AL SISTEMA COMPACTO
-                        window.location.href = `appsolo.html?id=${ultimoIdGenerado}`;
-                    } else {
-                        // SI ES PRO, VA A LA CONFIGURACIÓN MAESTRA
-                        window.location.href = `configurar-perfil.html?id=${ultimoIdGenerado}`;
-                    }
+                    window.location.href = (planElegido === 0) 
+                        ? `appsolo.html?id=${ultimoIdGenerado}` 
+                        : `configurar-perfil.html?id=${ultimoIdGenerado}`;
                 }, 1500);
             }
         }
