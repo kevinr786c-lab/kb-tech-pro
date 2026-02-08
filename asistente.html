@@ -192,7 +192,6 @@
             "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
         };
 
-        // --- FUNCIONES DE BÚNKER (CONTROL DE DOTS) ---
         function updateDots() {
             const val = document.getElementById('pin-acceso').value;
             for(let i=1; i<=4; i++) {
@@ -246,7 +245,6 @@
                 document.getElementById('btn-cal-pro').style.backgroundColor = color;
                 document.getElementById('menu-title-tech').style.color = color;
                 
-                // Animación de éxito
                 document.getElementById('lock-icon').style.transform = "rotate(360deg) scale(1.2)";
                 document.getElementById('lock-icon').innerText = "✅";
 
@@ -329,7 +327,7 @@
             const m = calFecha.getMonth(), y = calFecha.getFullYear();
             const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             
-            document.getElementById('modal-icon').innerText = "🗓️";
+            document.getElementById('modal-icon').innerText = "📅";
             document.getElementById('modal-title').innerText = "Radar de Ocupación";
             document.querySelector('.modal-content').style.maxWidth = "850px"; 
 
@@ -343,7 +341,7 @@
                     <div class="md:col-span-7">
                         <div class="flex justify-between items-center mb-6">
                             <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="p-2 font-black">‹</button>
-                            <h4 class="font-black uppercase text-xl italic">${mesNombres[m]} ${y}</h4>
+                            <h4 class="font-black uppercase text-xl italic text-slate-800">${mesNombres[m]} ${y}</h4>
                             <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="p-2 font-black">›</button>
                         </div>
                         <div class="cal-grid" id="days-container">
@@ -565,30 +563,100 @@
             abrirModal();
         }
 
+        // --- MOTOR DE PDF EVOLUCIONADO (ÉLITE) ---
         function generarFacturaSAT_Premium() {
             const p = currentPatient;
+            const docData = globalDocData;
             const rfc = document.getElementById('billing-data').value || "XAXX010101000";
             const amt = document.getElementById('pay-amount').value || 0;
+            const fecha = new Date().toLocaleDateString('es-MX');
+            
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
             const doc = new jsPDF();
-            doc.text("K.B TECH MEDICAL HUB - FACTURA", 20, 20);
-            doc.text(`PACIENTE: ${p.nombre_paciente.toUpperCase()}`, 20, 40);
-            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 50);
-            doc.text(`MONTO: $${amt} MXN`, 20, 70);
+            
+            // Estética de Marca
+            doc.setFillColor(15, 23, 42); 
+            doc.rect(0, 0, 210, 45, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont("helvetica", "bold");
+            doc.text("K.B TECH MEDICAL HUB", 20, 25);
+            doc.setFontSize(10);
+            doc.text("COMPROBANTE DE SERVICIOS MÉDICOS", 20, 35);
+            
+            // Datos del Emisor (Doctor)
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(12);
+            doc.text(`DR. ${docData.nombre_doctor.toUpperCase()}`, 20, 60);
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${docData.especialidad.toUpperCase()}`, 20, 65);
+            doc.text(`CED. PROF: ${docData.cedula || '---'}`, 20, 70);
+            doc.text(`${docData.direccion_consultorio || 'TIJUANA, B.C.'}`, 20, 75);
+            
+            doc.setDrawColor(226, 232, 240);
+            doc.line(20, 85, 190, 85);
+            
+            // Datos del Receptor (Paciente)
+            doc.setFont("helvetica", "bold");
+            doc.text("DATOS DEL PACIENTE", 20, 95);
+            doc.setFont("helvetica", "normal");
+            doc.text(`NOMBRE: ${p.nombre_paciente}`, 20, 105);
+            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 110);
+            doc.text(`FECHA DE SERVICIO: ${fecha}`, 20, 115);
+            
+            doc.autoTable({
+                startY: 125,
+                head: [['DESCRIPCIÓN', 'UNIDAD', 'MONTO']],
+                body: [['CONSULTA MÉDICA ESPECIALIZADA', 'E48', `$${amt}.00 MXN`]],
+                headStyles: { fillColor: [99, 102, 241] },
+                theme: 'striped'
+            });
+            
             doc.save(`FACTURA_${p.nombre_paciente}.pdf`);
             eliteAviso("FACTURA GENERADA ✦");
         }
 
         function generarSuperbillUSA_Premium() {
             const p = currentPatient;
+            const docData = globalDocData;
             const insuranceId = document.getElementById('billing-data').value || "PENDING";
             const amt = document.getElementById('pay-amount').value || 0;
+            const fecha = new Date().toLocaleDateString('en-US');
+            
             if(!p) return eliteAviso("SELECT PATIENT");
             const doc = new jsPDF();
-            doc.text("USA HEALTH INSURANCE CLAIM", 20, 20);
-            doc.text(`PATIENT: ${p.nombre_paciente.toUpperCase()}`, 20, 40);
-            doc.text(`INSURANCE ID: ${insuranceId.toUpperCase()}`, 20, 50);
-            doc.text(`TOTAL PAID: $${(amt/tc).toFixed(2)} USD`, 20, 70);
+            
+            doc.setDrawColor(99, 102, 241);
+            doc.setLineWidth(1.5);
+            doc.line(20, 20, 190, 20);
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(18);
+            doc.setFont("helvetica", "bold");
+            doc.text("HEALTH INSURANCE CLAIM FORM", 20, 35);
+            
+            doc.setFontSize(10);
+            doc.text("PROVIDER INFORMATION", 120, 55);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text(`Provider: DR. ${docData.nombre_doctor}`, 120, 62);
+            doc.text(`Facility: ${docData.direccion_consultorio}`, 120, 67);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("PATIENT INFORMATION", 20, 55);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text(`Full Name: ${p.nombre_paciente}`, 20, 62);
+            doc.text(`Insurance ID: ${insuranceId.toUpperCase()}`, 20, 67);
+            
+            doc.autoTable({
+                startY: 85,
+                head: [['CPT CODE', 'DESCRIPTION', 'CHARGES']],
+                body: [['99213', 'OUTPATIENT OFFICE VISIT', `$${(amt/tc).toFixed(2)} USD`]],
+                headStyles: { fillColor: [30, 41, 59] }
+            });
+            
             doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
             eliteAviso("SUPERBILL GENERATED ✦");
         }
