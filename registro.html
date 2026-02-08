@@ -28,7 +28,7 @@
                     <h1 class="text-5xl font-black italic tracking-tighter mb-2 uppercase">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
                     <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Gemini Engine ✦ Sincronizando Nodo</p>
                 </div>
-                <div id="plan-display-badge" class="badge-plan">Sincronizando...</div>
+                <div id="plan-display-badge" class="badge-plan italic">Sincronizando...</div>
             </header>
 
             <form id="form-registro" class="space-y-6">
@@ -56,7 +56,7 @@
                         <input type="file" id="foto_perfil" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-indigo-500 file:text-white hover:file:bg-indigo-400 cursor-pointer">
                     </div>
                     <div class="glass-card p-6 rounded-[2.5rem] border border-white/5">
-                        <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Cédula o Local (Validación)</label>
+                        <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Cédula o ID (Validación)</label>
                         <input type="file" id="foto_cedula" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
                     </div>
                 </div>
@@ -71,8 +71,8 @@
 
                 <div class="flex items-center gap-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
-                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Costo de Activación</p>
-                        <p class="text-4xl font-black text-white" id="precio-display">$0 <span class="text-xs text-slate-500 italic font-normal tracking-normal uppercase">MXN/mes</span></p>
+                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Inversión del Nodo</p>
+                        <p class="text-4xl font-black text-white" id="precio-display">$0 <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span></p>
                     </div>
                     <button type="submit" id="btn-activar" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all active:scale-95">Activar Nodo</button>
                 </div>
@@ -122,15 +122,19 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
+        // --- DETECCIÓN DE PLAN ---
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         const infoPlanes = [
-            { nombre: "Aspirante", precio: "$999" },
-            { nombre: "Dominio", precio: "$1,599" },
-            { nombre: "Corporativo", precio: "Consultoría" }
+            { nombre: "Aspirante", precio: "$999", color: "#64748b" },
+            { nombre: "Dominio", precio: "$1,599", color: "#6366f1" },
+            { nombre: "Corporativo", precio: "Consultoría", color: "#f59e0b" }
         ];
 
-        document.getElementById('plan-display-badge').innerText = `PLAN: ${infoPlanes[planElegido].nombre}`;
-        document.getElementById('precio-display').innerHTML = `${infoPlanes[planElegido].precio} <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span>`;
+        const planActual = infoPlanes[planElegido];
+        const badge = document.getElementById('plan-display-badge');
+        badge.innerText = `NODO: ${planActual.nombre.toUpperCase()}`;
+        badge.style.background = planActual.color;
+        document.getElementById('precio-display').innerHTML = `${planActual.precio} <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span>`;
 
         const CATALOGO = {
             "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral", desc: "Rose Quartz" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique", desc: "Lavender Silk" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal", desc: "Pink Velvet" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico", desc: "Nature Essence" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite", desc: "Premium Care" }],
@@ -169,11 +173,11 @@
                 };
                 contenedor.appendChild(dot);
             });
-            contenedor.firstChild.click();
+            if(contenedor.firstChild) contenedor.firstChild.click();
         }
 
-        // FUNCIÓN DE CARGA BLINDADA (STORAGE)
-        async function subirFoto(inputElement, folder) {
+        // --- FUNCIÓN DE CARGA DE FOTOS (SIN ERRORES 400) ---
+        async function subirAStorage(inputElement, folder) {
             const file = inputElement.files[0];
             if (!file) return null;
             const fileExt = file.name.split('.').pop();
@@ -185,27 +189,29 @@
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': file.type },
                 body: file
             });
-            if (!res.ok) throw new Error("Error subiendo imagen");
+            if (!res.ok) throw new Error("Error en subida");
             return `${URL_DB}/storage/v1/object/public/medicos_assets/${filePath}`;
         }
 
         document.getElementById('form-registro').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-activar');
-            btn.innerText = "GEMINI ✦: SUBIENDO ARCHIVOS...";
+            btn.innerText = "GEMINI ✦: SUBIENDO ARCHIVOS..."; 
             btn.disabled = true;
 
             try {
-                // 1. Subir archivos primero
-                const urlPerfil = await subirFoto(document.getElementById('foto_perfil'), 'perfiles');
-                const urlCedula = await subirFoto(document.getElementById('foto_cedula'), 'cedulas');
+                // 1. Subir fotos
+                const urlPerfil = await subirAStorage(document.getElementById('foto_perfil'), 'perfiles');
+                const urlCedula = await subirAStorage(document.getElementById('foto_cedula'), 'cedulas');
 
-                // 2. Enviar JSON con URLs de texto
+                // 2. Registro en DB
+                const nombre = document.getElementById('nombre').value.trim();
                 const payload = {
-                    nombre_doctor: document.getElementById('nombre').value.trim(),
-                    email: `${document.getElementById('nombre').value.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`,
+                    nombre_doctor: nombre,
+                    email: `${nombre.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`,
                     especialidad: document.getElementById('especialidad').value,
-                    plan: infoPlanes[planElegido].nombre,
+                    plan: planActual.nombre,
+                    plan_nivel: planElegido,
                     template_id: parseInt(currentSelection.template_id),
                     foto_perfil_url: urlPerfil,
                     foto_cedula_url: urlCedula,
@@ -214,44 +220,31 @@
 
                 const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
                     method: 'POST',
-                    headers: { 
-                        'apikey': KEY_DB, 
-                        'Authorization': `Bearer ${KEY_DB}`, 
-                        'Content-Type': 'application/json', 
-                        'Prefer': 'return=representation' 
-                    },
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
                     body: JSON.stringify(payload)
                 });
 
                 const data = await res.json();
-
                 if (res.ok && data.length > 0) {
                     ultimoIdGenerado = data[0].id;
-                    const shortName = payload.nombre_doctor.split(' ')[0].toUpperCase();
-                    document.getElementById('pago-concepto').innerText = `KB-TJ-${shortName}-${ultimoIdGenerado.substring(0,4)}`;
+                    document.getElementById('pago-concepto').innerText = `KB-TJ-${nombre.split(' ')[0].toUpperCase()}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
-                } else {
-                    throw new Error("Fallo en base de datos");
                 }
-            } catch (error) {
-                alert("Error de enlace. Verifique conexión y tamaño de fotos.");
-                btn.disabled = false;
-                btn.innerText = "Reintentar";
+            } catch (e) { 
+                alert("Error de enlace. Verifique conexión."); 
+                btn.disabled = false; btn.innerText = "Reintentar";
             }
         });
 
         function irANodo() {
             if(ultimoIdGenerado) {
                 const btn = event.target;
-                btn.innerText = "GEMINI ✦: INICIANDO COCCIÓN...";
+                btn.innerText = "GEMINI ✦: VALIDANDO...";
                 setTimeout(() => {
-                    window.location.href = (planElegido === 0) 
-                        ? `appsolo.html?id=${ultimoIdGenerado}` 
-                        : `configurar-perfil.html?id=${ultimoIdGenerado}`;
+                    window.location.href = (planElegido === 0) ? `appsolo.html?id=${ultimoIdGenerado}` : `configurar-perfil.html?id=${ultimoIdGenerado}`;
                 }, 1500);
             }
         }
-
         cambiarCatalogo();
     </script>
 </body>
