@@ -262,16 +262,21 @@
         box.innerHTML += `<div id="${loadingId}" class="msg-ia italic animate-pulse">PROCESANDO CONSULTA...</div>`;
 
         try {
-            // BUSQUE ESTA LÍNEA EN EL SCRIPT DE IA DE SU app.html
-const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
+            const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
             const res = await fetch(URL_IA, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: orden })
             });
             const data = await res.json();
+            
+            // LA REPARACIÓN: Extraer el campo 'respuesta' del objeto JSON
             document.getElementById(loadingId).remove();
-            box.innerHTML += `<div class="msg-ia">${data.respuesta}</div>`;
+            if (data && data.respuesta) {
+                box.innerHTML += `<div class="msg-ia">${data.respuesta}</div>`;
+            } else {
+                box.innerHTML += `<div class="msg-ia text-rose-500 font-bold">ERROR: EL CEREBRO NO DEVOLVIÓ DATOS LEGIBLES.</div>`;
+            }
         } catch (err) {
             document.getElementById(loadingId).innerText = "ERROR: CEREBRO OFFLINE. VERIFIQUE SERVER.";
         }
@@ -471,7 +476,7 @@ const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
     }
 
     function activarDictado() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitRecognition;
         if (!SpeechRecognition) return eliteAviso("NO COMPATIBLE");
         const recognition = new SpeechRecognition();
         recognition.lang = 'es-MX';
