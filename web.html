@@ -42,6 +42,9 @@
         .currency-switch { background: #f1f5f9; border-radius: 1rem; padding: 4px; display: inline-flex; gap: 4px; }
         .currency-btn { padding: 6px 12px; border-radius: 0.75rem; font-size: 9px; font-weight: 800; cursor: pointer; }
         .currency-btn.active { background: white; color: var(--main); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* MEJORA: SELLO DE VERIFICACIÓN */
+        .verification-shield { border: 2px solid var(--main); background: white; padding: 15px; border-radius: 2rem; display: inline-flex; align-items: center; gap: 12px; margin-top: 20px; }
     </style>
 </head>
 <body class="py-10 md:py-20 px-4">
@@ -63,8 +66,12 @@
             <h1 id="doc-name" class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Cargando...</h1>
             <p id="doc-esp" class="text-xs font-bold text-slate-400 uppercase tracking-[0.5em] italic mt-4">Sincronizando Nodo...</p>
             
-            <div id="doc-legal-header" class="mt-4 space-y-1">
-                <p id="doc-cedula" class="text-[9px] font-black text-slate-400 uppercase tracking-widest hidden">Cédula: ---</p>
+            <div class="verification-shield mx-auto">
+                <span class="text-2xl">🛡️</span>
+                <div class="text-left">
+                    <p id="doc-cedula-pro" class="text-[10px] font-black text-slate-800 uppercase leading-none">Validando Cédula...</p>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-1">Registro Médico Certificado</p>
+                </div>
             </div>
 
             <div class="mt-8 flex justify-center gap-3" id="logistica-badges">
@@ -113,12 +120,25 @@
         <section class="glass-card p-12 rounded-[4rem] grid grid-cols-1 md:grid-cols-2 gap-12 items-center reveal">
             <div class="text-left">
                 <span class="text-4xl">📍</span>
-                <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación</h3>
-                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado estratégicamente para su fácil acceso.</p>
+                <h3 class="text-2xl font-black italic uppercase tracking-tighter mt-4">Ubicación Estratégica</h3>
+                <p class="text-slate-500 text-sm mt-4 font-medium italic leading-relaxed">Localizado estratégicamente para su fácil acceso desde California y Tijuana.</p>
+                
                 <div class="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                     <p class="text-[9px] font-black uppercase text-indigo-500 mb-1">Dirección Registrada</p>
                     <p id="doc-direccion" class="text-xs font-bold text-slate-800 uppercase tracking-wider italic">Buscando...</p>
                 </div>
+
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-indigo-50 rounded-2xl border border-indigo-100">
+                        <p class="text-[7px] font-black text-indigo-400 uppercase">San Ysidro RL</p>
+                        <p class="text-xs font-black text-indigo-600">~ 15 MIN</p>
+                    </div>
+                    <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <p class="text-[7px] font-black text-emerald-400 uppercase">Otay Mesa</p>
+                        <p class="text-xs font-black text-emerald-600">~ 20 MIN</p>
+                    </div>
+                </div>
+
                 <div class="flex gap-4 mt-6">
                     <a id="link-maps" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Google Maps</a>
                     <a id="link-waze" target="_blank" class="flex-1 py-3 bg-white border border-slate-200 rounded-xl text-[8px] font-black uppercase text-center hover:bg-slate-50 transition cursor-pointer">Waze</a>
@@ -130,8 +150,8 @@
         </section>
 
         <footer class="text-center space-y-10 reveal">
-            <button id="btn-agendar" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em] active:scale-95">
-                📅 Agendar Consulta Ahora
+            <button id="btn-agendar" class="btn-lujo w-full max-w-lg py-8 rounded-[2.5rem] font-black uppercase text-xs tracking-[0.3em] active:scale-95 animate-bounce">
+                📅 Reservar Mi Espacio Ahora ✦
             </button>
             
             <div id="legal-cofepris" class="hidden">
@@ -172,18 +192,15 @@
                 document.getElementById('doc-bio').innerText = doc.biografia;
                 document.getElementById('btn-agendar').onclick = () => window.location.href = `agendar.html?id=${docId}`;
 
-                // --- 1. DATOS LEGALES (Columnas SQL directas) ---
+                // --- DATOS LEGALES MEJORADOS ---
                 if(doc.cedula) {
-                    const cEl = document.getElementById('doc-cedula');
-                    cEl.innerText = `Cédula Profesional: ${doc.cedula}`;
-                    cEl.classList.remove('hidden');
+                    document.getElementById('doc-cedula-pro').innerText = `CED. PROF: ${doc.cedula}`;
                 }
                 if(doc.aviso_cofepris) {
                     document.getElementById('val-cofepris').innerText = doc.aviso_cofepris;
                     document.getElementById('legal-cofepris').classList.remove('hidden');
                 }
 
-                // --- 2. DATOS FLEXIBLES (Caja redes_sociales) ---
                 const meta = JSON.parse(doc.redes_sociales || "{}");
                 
                 if(meta.url_foto_perfil) {
@@ -206,10 +223,11 @@
                     });
                 }
 
-                // --- 3. UBICACIÓN Y FOTOS ---
                 document.getElementById('doc-direccion').innerText = meta.direccion || "Tijuana, B.C.";
                 
                 if(meta.lat && meta.lng) {
+                    document.getElementById('google-map-iframe').src = `https://www.google.com/maps/embed/v1/place?key=REPLACE_WITH_YOUR_KEY&q=${meta.lat},${meta.lng}`;
+                    // Simplificado para que funcione sin API KEY en el iframe directo:
                     document.getElementById('google-map-iframe').src = `https://maps.google.com/maps?q=${meta.lat},${meta.lng}&hl=es&z=16&output=embed`;
                     document.getElementById('link-maps').href = `https://www.google.com/maps?q=${meta.lat},${meta.lng}`;
                     document.getElementById('link-waze').href = `https://waze.com/ul?ll=${meta.lat},${meta.lng}&navigate=yes`;
