@@ -108,15 +108,18 @@
             } catch (e) { console.warn("Sentinela Offline"); }
         }
 
+        // --- ⚙️ FUNCIÓN DE SELECCIÓN BLINDADA ---
         async function seleccionarPlan(nivel) {
-            // Guardamos el nivel en la memoria del navegador
-            sessionStorage.setItem('kb_plan_elegido', nivel);
+            // Guardamos el nivel forzado como string para evitar errores de tipo
+            sessionStorage.setItem('kb_plan_elegido', nivel.toString());
             
-            // Log de seguimiento
+            // Log de seguimiento (opcional pero recomendado)
             await sentinelaPlan(nivel);
             
-            // Lanzamiento al registro (Asegúrate de que el archivo se llame registro.html)
-            window.location.href = 'registro.html';
+            // Delay táctico para asegurar que el navegador escriba en memoria
+            setTimeout(() => {
+                window.location.href = 'registro.html';
+            }, 100);
         }
 
         async function contactarCEO() {
