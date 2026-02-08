@@ -14,11 +14,13 @@
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
         .modal-pago { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); }
         .badge-plan { background: #6366f1; color: white; padding: 4px 12px; border-radius: 99px; font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        
         .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
 </head>
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
+
     <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 space-y-8 text-left">
             <header class="flex justify-between items-start">
@@ -28,6 +30,7 @@
                 </div>
                 <div id="plan-display-badge" class="badge-plan italic">Sincronizando...</div>
             </header>
+
             <form id="form-registro" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
@@ -46,6 +49,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="glass-card p-6 rounded-[2.5rem] border border-white/5">
                         <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Foto de Perfil (Avatar)</label>
@@ -56,6 +60,7 @@
                         <input type="file" id="foto_cedula" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
                     </div>
                 </div>
+
                 <div class="glass-card p-8 rounded-[3rem] space-y-6">
                     <div class="flex justify-between items-center">
                         <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Catálogo Camaleón</p>
@@ -63,6 +68,7 @@
                     </div>
                     <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
                 </div>
+
                 <div class="flex items-center gap-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
                     <div class="flex-grow">
                         <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Inversión del Nodo</p>
@@ -72,6 +78,7 @@
                 </div>
             </form>
         </div>
+
         <div class="lg:col-span-5 flex flex-col items-center">
             <div id="preview-box" class="preview-phone">
                 <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-5 text-slate-900 pointer-events-none italic">🏥</div>
@@ -84,6 +91,7 @@
             </div>
         </div>
     </div>
+
     <div id="modal-pago" class="hidden fixed inset-0 modal-pago z-50 flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-[3rem] p-8 text-slate-800 shadow-2xl border-t-[12px] border-indigo-500">
             <div class="text-center mb-6">
@@ -105,16 +113,18 @@
             <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">He realizado la transferencia</button>
         </div>
     </div>
+
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
-        // --- 🛠️ DETECCIÓN DEL PLAN ---
+        // --- DETECCIÓN DE PLAN REFORZADA ---
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         const infoPlanes = [
             { nombre: "Aspirante", precio: "$999", color: "#64748b" },
-            { nombre: "Dominio", precio: "$1,599", color: "#6366f1" }
+            { nombre: "Dominio", precio: "$1,599", color: "#6366f1" },
+            { nombre: "Corporativo", precio: "Consultoría", color: "#f59e0b" }
         ];
 
         const planActual = infoPlanes[planElegido];
@@ -138,7 +148,10 @@
             const esp = document.getElementById('especialidad').value;
             const contenedor = document.getElementById('contenedor-colores');
             let temas = CATALOGO[esp] || CATALOGO["General"];
-            // 🔓 MODO CAMALEÓN LIBERADO PARA TODOS
+
+            // --- LIBERACIÓN DEL MODO CAMALEÓN ---
+            // Hemos eliminado el recorte (slice) para que todos vean los 5 temas
+            
             contenedor.innerHTML = "";
             temas.forEach((t) => {
                 const dot = document.createElement('div');
@@ -146,7 +159,8 @@
                 dot.style.backgroundColor = t.color;
                 dot.onclick = () => {
                     document.querySelectorAll('.color-dot').forEach(d => { d.classList.remove('active'); d.style.borderColor = "transparent"; });
-                    dot.classList.add('active'); dot.style.borderColor = "white";
+                    dot.classList.add('active');
+                    dot.style.borderColor = "white";
                     currentSelection = { template_id: t.id, color: t.color };
                     document.getElementById('prev-button').style.backgroundColor = t.color;
                     document.getElementById('prev-icon').innerText = t.icon;
@@ -163,53 +177,68 @@
         async function subirAStorage(inputElement, folder) {
             const file = inputElement.files[0];
             if (!file) return null;
-            const fileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}.${file.name.split('.').pop()}`;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}.${fileExt}`;
             const filePath = `${folder}/${fileName}`;
+
             const res = await fetch(`${URL_DB}/storage/v1/object/medicos_assets/${filePath}`, {
                 method: 'POST',
                 headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': file.type },
                 body: file
             });
-            return res.ok ? `${URL_DB}/storage/v1/object/public/medicos_assets/${filePath}` : null;
+            if (!res.ok) throw new Error("Error en subida");
+            return `${URL_DB}/storage/v1/object/public/medicos_assets/${filePath}`;
         }
 
         document.getElementById('form-registro').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-activar');
-            btn.innerText = "GEMINI ✦: SUBIENDO..."; btn.disabled = true;
+            btn.innerText = "GEMINI ✦: SUBIENDO ARCHIVOS..."; 
+            btn.disabled = true;
+
             try {
                 const urlPerfil = await subirAStorage(document.getElementById('foto_perfil'), 'perfiles');
                 const urlCedula = await subirAStorage(document.getElementById('foto_cedula'), 'cedulas');
+
                 const nombre = document.getElementById('nombre').value.trim();
                 const payload = {
                     nombre_doctor: nombre,
                     email: `${nombre.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`,
                     especialidad: document.getElementById('especialidad').value,
-                    plan: planActual.nombre, plan_nivel: planElegido,
+                    plan: planActual.nombre,
+                    plan_nivel: planElegido,
                     template_id: parseInt(currentSelection.template_id),
-                    foto_perfil_url: urlPerfil, foto_cedula_url: urlCedula,
+                    foto_perfil_url: urlPerfil,
+                    foto_cedula_url: urlCedula,
                     creado_en: new Date().toISOString()
                 };
+
                 const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
                     method: 'POST',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
                     body: JSON.stringify(payload)
                 });
+
                 const data = await res.json();
                 if (res.ok && data.length > 0) {
                     ultimoIdGenerado = data[0].id;
                     document.getElementById('pago-concepto').innerText = `KB-TJ-${nombre.split(' ')[0].toUpperCase()}-${ultimoIdGenerado.substring(0,4)}`;
                     document.getElementById('modal-pago').classList.remove('hidden');
                 }
-            } catch (e) { alert("Error de enlace."); btn.disabled = false; }
+            } catch (e) { 
+                alert("Error de enlace. Verifique conexión."); 
+                btn.disabled = false; btn.innerText = "Reintentar";
+            }
         });
 
         function irANodo() {
             if(ultimoIdGenerado) {
-                // 🔌 SOLDADURA FINAL DEL CABLE
-                // Si es Aspirante (0) -> Directo a appsolo.html
-                // Si es Dominio (1) -> Va a configurar-perfil.html
-                window.location.href = (planElegido === 0) ? `appsolo.html?id=${ultimoIdGenerado}` : `configurar-perfil.html?id=${ultimoIdGenerado}`;
+                const btn = event.target;
+                btn.innerText = "GEMINI ✦: VALIDANDO...";
+                setTimeout(() => {
+                    // CABLEADO FINAL: 0 = Aspirante (appsolo), 1 = Dominio (configurar)
+                    window.location.href = (planElegido === 0) ? `appsolo.html?id=${ultimoIdGenerado}` : `configurar-perfil.html?id=${ultimoIdGenerado}`;
+                }, 1500);
             }
         }
         cambiarCatalogo();
