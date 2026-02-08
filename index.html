@@ -12,14 +12,16 @@
         :root { --accent: #6366f1; }
 
         .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 3.5rem; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        .glass-card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 40px 80px -20px rgba(0,0,0,0.5); }
+        .glass-card:hover { transform: translateY(-10px); border-color: var(--accent); }
         
+        /* NOTAS DE IMPACTO */
         .reflection-card { 
             background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
             border-left: 3px solid var(--accent);
             transition: 0.4s;
         }
 
+        /* SIMULADOR CAMALEÓN */
         .preview-phone { width: 220px; height: 440px; border: 8px solid #1e293b; border-radius: 2.5rem; position: relative; overflow: hidden; background: #f8fafc; transition: 0.5s; }
         .phone-header { height: 60px; background: var(--accent); width: 100%; transition: 0.5s; }
         .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
@@ -28,9 +30,8 @@
         .gemini-star { color: var(--accent); animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
         
-        /* Estilo de Opiniones */
-        .opinion-pill { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 2rem; transition: 0.4s; }
-        .opinion-pill:hover { background: rgba(255,255,255,0.06); transform: scale(1.05); }
+        .text-accent { color: var(--accent); transition: 0.5s; }
+        .bg-accent { background: var(--accent); transition: 0.5s; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center py-10 px-6">
@@ -65,86 +66,65 @@
             </div>
 
             <div class="reflection-card p-6 rounded-2xl">
-                <p class="text-[9px] font-black text-accent uppercase tracking-widest mb-2">Soporte Táctico Presencial</p>
-                <p class="text-xs italic text-slate-300">"No somos una voz en un chat. Vamos físicamente a su consultorio en Tijuana para configurar su Nodo y asegurar su éxito."</p>
+                <p class="text-[9px] font-black text-accent uppercase tracking-widest mb-2">Nota de Mercado</p>
+                <p class="text-xs italic text-slate-300">"El 70% de los pacientes menores de 30 años juzgan la capacidad de un doctor por la calidad visual de su plataforma digital."</p>
             </div>
         </div>
 
         <div class="flex justify-center relative">
             <div class="absolute -inset-10 bg-accent/20 blur-3xl rounded-full"></div>
             <div class="preview-phone shadow-2xl">
-                <div id="phone-nav" class="phone-header flex items-center justify-center text-white text-2xl">🩺</div>
-                <div class="p-6 space-y-4 text-center">
-                    <div class="h-4 w-3/4 bg-slate-200 rounded mx-auto"></div>
+                <div id="phone-nav" class="phone-header flex items-center justify-center text-white text-2xl" id="phone-icon">🩺</div>
+                <div class="p-6 space-y-4">
+                    <div class="h-4 w-3/4 bg-slate-200 rounded"></div>
                     <div class="h-2 w-full bg-slate-100 rounded"></div>
-                    <div class="h-10 bg-slate-100 rounded-xl mt-6"></div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="h-8 bg-slate-100 rounded-lg"></div>
-                        <div class="h-8 bg-slate-100 rounded-lg"></div>
-                        <div class="h-8 bg-slate-100 rounded-lg"></div>
+                    <div class="h-2 w-full bg-slate-100 rounded"></div>
+                    <div class="mt-10 grid grid-cols-3 gap-2">
+                        <div class="h-10 bg-slate-100 rounded-xl"></div>
+                        <div class="h-10 bg-slate-100 rounded-xl"></div>
+                        <div class="h-10 bg-slate-100 rounded-xl"></div>
                     </div>
+                    <div class="h-12 w-full bg-slate-900 rounded-2xl mt-8"></div>
                 </div>
                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-slate-300 uppercase tracking-widest">Sucursal Digital VIP</div>
             </div>
         </div>
     </section>
 
-    <section class="max-w-7xl w-full mb-40">
-        <h2 class="text-center text-[10px] font-black tracking-[1em] text-slate-600 uppercase mb-16">Voces de los Primeros Nodos</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="opinion-pill">
-                <p class="text-xs italic text-slate-400 mb-6">"Los pacientes de San Diego agendan sin preguntar. El sistema se paga solo en una semana."</p>
-                <p class="text-[9px] font-black text-accent uppercase">Dr. Andres L. — Ginecología</p>
-            </div>
-            <div class="opinion-pill">
-                <p class="text-xs italic text-slate-400 mb-6">"El soporte en Tijuana fue clave. Vinieron a mi oficina en Zona Río y configuraron todo."</p>
-                <p class="text-[9px] font-black text-accent uppercase">Dr. Victor T. — Pediatría</p>
-            </div>
-            <div class="opinion-pill">
-                <p class="text-xs italic text-slate-400 mb-6">"Sentinel IA detectó un caso urgente a las 11 PM. La notificación nos permitió reaccionar a tiempo."</p>
-                <p class="text-[9px] font-black text-accent uppercase">Dra. Elena R. — Odontología</p>
-            </div>
-            <div class="opinion-pill">
-                <p class="text-xs italic text-slate-400 mb-6">"Mi consultorio ahora se siente de otro nivel. El Modo Camaleón me dio la identidad que buscaba."</p>
-                <p class="text-[9px] font-black text-accent uppercase">Dr. Memo — Pediatría</p>
-            </div>
-        </div>
-    </section>
-
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl w-full mb-32">
         <div class="glass-card p-12 flex flex-col h-full opacity-60">
-            <h2 class="text-2xl font-black italic uppercase mb-10 text-center">Aspirante</h2>
+            <h2 class="text-2xl font-black italic uppercase mb-10">Aspirante</h2>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-500">
                 <li>✓ Agenda Live Digital</li>
                 <li>✓ Sucursal Gemini ✦</li>
-                <li>✕ Soporte Presencial TJ</li>
+                <li>✕ Soporte Presencial</li>
                 <li>✕ Modo Camaleón Full</li>
             </ul>
-            <p class="text-3xl font-black mb-8 italic text-center">$999 <span class="text-xs font-normal">MXN</span></p>
-            <button onclick="location.href='registro.html'" class="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] uppercase transition hover:bg-white hover:text-black">Iniciar Nodo</button>
+            <p class="text-3xl font-black mb-8 italic">$999 <span class="text-xs font-normal">MXN</span></p>
+            <button onclick="location.href='registro.html'" class="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] uppercase">Iniciar Nodo</button>
         </div>
 
-        <div class="glass-card p-12 border-accent bg-accent/[0.05] scale-105 relative">
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest italic shadow-lg">Programa Fundadores</div>
-            <h2 class="text-3xl font-black italic uppercase mb-10 text-accent text-center">Dominio</h2>
-            <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-indigo-100">
+        <div class="glass-card p-12 border-accent/50 bg-accent/[0.05] scale-105 relative">
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest italic">Programa Fundadores</div>
+            <h2 class="text-3xl font-black italic uppercase mb-10 text-accent">Dominio</h2>
+            <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold">
                 <li>✓ Soporte Táctico Presencial TJ</li>
                 <li>✓ Sentinel IA Symptoms</li>
                 <li>✓ Modo Camaleón: 30 Temas</li>
                 <li>✓ Tarifa Congelada 2026</li>
             </ul>
-            <p class="text-3xl font-black mb-8 italic text-accent text-center">$1,599 <span class="text-xs font-normal text-white/50">MXN</span></p>
+            <p class="text-3xl font-black mb-8 italic text-accent">$1,599 <span class="text-xs font-normal text-white/50">MXN</span></p>
             <button onclick="location.href='registro.html'" class="w-full py-6 bg-accent rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-indigo-500/20 active:scale-95 transition">Activar Poder Total</button>
         </div>
 
-        <div class="glass-card p-12 flex flex-col h-full border-amber-500/10">
-            <h2 class="text-2xl font-black italic uppercase mb-10 text-amber-500 text-center">Corporativo</h2>
+        <div class="glass-card p-12">
+            <h2 class="text-2xl font-black italic uppercase mb-10 text-amber-500">Corporativo</h2>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-400">
                 <li>✓ Central Intelligence CEO</li>
-                <li>✓ Control Multi-Nodo Global</li>
+                <li>✓ Control Multi-Nodo</li>
                 <li>✓ Consultoría Técnica Élite</li>
             </ul>
-            <p class="text-2xl font-black mb-8 italic text-amber-500 text-center">A Medida</p>
+            <p class="text-2xl font-black mb-8 italic text-amber-500">A Medida</p>
             <button onclick="window.open('https://wa.me/5216641234567')" class="w-full py-5 bg-amber-500 text-black rounded-2xl font-black text-[10px] uppercase transition hover:bg-amber-400">Consultoría Élite</button>
         </div>
     </main>
@@ -154,15 +134,19 @@
     </footer>
 
     <script>
+        // LÓGICA CAMALEÓN
         function mutar(color, especialidad, icono) {
             document.documentElement.style.setProperty('--accent', color);
             document.getElementById('phone-nav').style.background = color;
             document.getElementById('phone-nav').innerText = icono;
+            
+            // Efecto de vibración sutil para indicar cambio
             const phone = document.querySelector('.preview-phone');
             phone.style.transform = "scale(1.05)";
             setTimeout(() => phone.style.transform = "scale(1)", 200);
         }
 
+        // LÓGICA SECRETA
         let pulseCount = 0;
         function activarProtocoloRestringido() {
             pulseCount++;
