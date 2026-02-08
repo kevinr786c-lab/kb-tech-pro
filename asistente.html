@@ -145,23 +145,12 @@
                     <h3 class="text-[11px] font-black uppercase text-slate-400 mb-8 tracking-widest italic">Seleccionado:</h3>
                     <p class="text-4xl font-extrabold text-slate-900 leading-none mb-3 blur-sensitive" id="patient-display">---</p>
                     <p id="patient-time-display" class="text-xs font-bold text-slate-500 uppercase italic">Standby</p>
-                    
                     <div id="nota-del-doctor-panel" class="mt-6 p-4 bg-amber-50 rounded-2xl border-l-4 border-amber-400 hidden">
                         <p class="text-[9px] font-black text-amber-600 uppercase mb-1 italic">Instrucción del Dr:</p>
                         <p id="txt-nota-doctor" class="text-xs font-bold text-amber-900 uppercase italic blur-sensitive">...</p>
                     </div>
-
-                    <div class="mt-8 space-y-3">
-                        <button onclick="contactarWhatsApp('confirmar')" class="w-full py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-200 flex items-center justify-center gap-3">
-                            <span>📱</span> CONFIRMAR CITA ✦
-                        </button>
-                        <button onclick="generarPasaporteDigital()" class="w-full py-4 bg-indigo-50 text-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-indigo-100 flex items-center justify-center gap-3">
-                            <span>📄</span> PASAPORTE MÉDICO
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mt-6">
-                        <button onclick="contactarWhatsApp('libre')" class="py-5 bg-slate-50 text-slate-600 rounded-2xl font-black text-[11px] uppercase tracking-widest">Chat Libre</button>
+                    <div class="grid grid-cols-2 gap-4 mt-10">
+                        <button onclick="contactarWhatsApp()" class="py-5 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[11px] uppercase tracking-widest">WhatsApp</button>
                         <button onclick="abrirCobroPremium()" class="py-5 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-2xl">Cobrar</button>
                     </div>
                 </div>
@@ -203,6 +192,7 @@
             "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
         };
 
+        // --- FUNCIONES DE BÚNKER (CONTROL DE DOTS) ---
         function updateDots() {
             const val = document.getElementById('pin-acceso').value;
             for(let i=1; i<=4; i++) {
@@ -226,6 +216,18 @@
             setTimeout(() => toast.classList.remove('active'), 3500);
         }
 
+        function filtrarAgendaLocal() {
+            const term = document.getElementById('quick-filter').value.toLowerCase();
+            const rows = document.querySelectorAll('#tabla-citas-body > div');
+            let encontrados = 0;
+            rows.forEach(t => {
+                const match = t.innerText.toLowerCase().includes(term);
+                t.style.display = match ? "flex" : "none";
+                if(match) encontrados++;
+            });
+            document.getElementById('agenda-title').innerText = term ? `RESULTADOS: ${encontrados}` : "AGENDA ACTIVA";
+        }
+      
         async function verificarAcceso() {
             const pin = document.getElementById('pin-acceso').value;
             if(!docId) return eliteAviso("ID NO ENCONTRADO");
@@ -237,11 +239,17 @@
                 const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
                 const colorIndex = (parseInt(globalDocData.template_id) - 1) || 0;
                 const color = palette[colorIndex % 5];
+
                 document.documentElement.style.setProperty('--main', color);
                 document.getElementById('brand-text').style.color = color;
                 document.getElementById('card-paciente').style.borderColor = color;
+                document.getElementById('btn-cal-pro').style.backgroundColor = color;
+                document.getElementById('menu-title-tech').style.color = color;
+                
+                // Animación de éxito
                 document.getElementById('lock-icon').style.transform = "rotate(360deg) scale(1.2)";
                 document.getElementById('lock-icon').innerText = "✅";
+
                 setTimeout(() => {
                     document.getElementById('pantalla-bloqueo').style.display = 'none';
                     document.getElementById('contenido-panel').classList.remove('hidden');
@@ -250,149 +258,357 @@
                     cargarCitas(); setInterval(cargarCitas, 30000);
                     eliteAviso("ACCESO CONCEDIDO ✦");
                 }, 600);
-            } else { eliteAviso("PIN INCORRECTO"); document.getElementById('pin-acceso').value = ""; updateDots(); }
+            } else { 
+                eliteAviso("PIN INCORRECTO");
+                document.getElementById('pin-acceso').value = "";
+                updateDots();
+            }
         }
 
         async function cargarCitas() {
             const hoyStr = `${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}`;
             document.getElementById('fecha-actual-display').innerText = `📅 AGENDA: ${hoyStr}`;
+            
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
             const citas = await res.json();
+            
             let recaudado = 0, proyectado = 0;
-            citas.forEach(c => { if(c.pagado) recaudado += (c.monto || 0); else proyectado += (c.monto || 0); });
+            citas.forEach(c => {
+                if(c.pagado) recaudado += (c.monto || 0);
+                else proyectado += (c.monto || 0);
+            });
             document.getElementById('stat-citas').innerText = citas.length;
             document.getElementById('stat-cobrado').innerText = `$${recaudado.toLocaleString()}`;
             document.getElementById('stat-faltante').innerText = `$${proyectado.toLocaleString()}`;
+
             const contenedor = document.getElementById('tabla-citas-body');
-            contenedor.innerHTML = citas.length ? "" : '<div class="text-center py-20 opacity-20"><p class="text-5xl mb-4">📭</p><p class="font-black italic uppercase text-xs">Sin actividad para este día</p></div>';
+            contenedor.innerHTML = ""; 
+            if (citas.length === 0) { 
+                contenedor.innerHTML = '<div class="text-center py-20 opacity-20"><p class="text-5xl mb-4">📭</p><p class="font-black italic uppercase text-xs">Sin actividad para este día</p></div>'; 
+                return; 
+            }
+
             citas.forEach(c => {
-                let sem = (c.telefono || "").toLowerCase().match(/dolor|sangre|fuerte|urgente|grave|emergencia/) ? "u-rojo" : ((c.telefono || "").includes("prioridad") ? "u-amarillo" : "u-verde");
+                let semaforoClase = "u-verde"; 
+                const notaPaciente = (c.telefono || "").toLowerCase();
+                if (notaPaciente.match(/dolor|sangre|fuerte|urgente|grave|emergencia/)) semaforoClase = "u-rojo";
+                else if (notaPaciente.includes("prioridad")) semaforoClase = "u-amarillo";
+
+                let servicioLabel = "CONSULTA";
+                if(c.monto > 0 && c.monto < 1000) servicioLabel = "SEGUIMIENTO";
+                if(c.monto >= 2000) servicioLabel = "PROCEDIMIENTO";
+
                 const tarjeta = document.createElement('div');
-                tarjeta.className = `flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-500 transition-all duration-300 cursor-pointer w-full shadow-md mb-2 ${sem}`;
+                tarjeta.className = `flex items-center justify-between p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-500 transition-all duration-300 cursor-pointer w-full shadow-md mb-2 ${semaforoClase}`;
                 tarjeta.onclick = () => seleccionarPaciente(c);
-                tarjeta.innerHTML = `<div class="flex items-center gap-6 text-left flex-1"><div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-200'}"></div><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter">${c.hora.slice(0,5)} HS</span></div><p class="font-black text-xl text-slate-800 uppercase leading-none mb-1 blur-sensitive">${c.nombre_paciente}</p><p class="text-[9px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">${c.pagado ? '✓ Pago Confirmado' : `⏳ Pendiente: $${c.monto || 0}`}</p></div></div><div class="flex gap-3"><button id="btn-edit-${c.id}" class="w-12 h-12 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button><button id="btn-pay-${c.id}" class="w-12 h-12 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-400 opacity-40' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg text-lg">💰</button></div>`;
+                tarjeta.innerHTML = `
+                    <div class="flex items-center gap-6 text-left flex-1">
+                        <div class="w-4 h-4 rounded-full ${c.pagado ? 'bg-emerald-400' : 'bg-slate-200'} shadow-sm"></div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-3 py-0.5 bg-slate-100 text-slate-500 rounded-full text-[7px] font-black uppercase tracking-widest">${servicioLabel}</span>
+                                <span class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter">${c.hora.slice(0,5)} HS</span>
+                            </div>
+                            <p class="font-black text-xl text-slate-800 uppercase leading-none mb-1 blur-sensitive">${c.nombre_paciente}</p>
+                            <p class="text-[9px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">
+                                ${c.pagado ? '✓ Pago Confirmado' : `⏳ Pendiente: $${c.monto || 0}`}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="btn-edit-${c.id}" class="w-12 h-12 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">✏️</button>
+                        <button id="btn-pay-${c.id}" class="w-12 h-12 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-400 opacity-40' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition-all shadow-lg text-lg">💰</button>
+                    </div>`;
                 contenedor.appendChild(tarjeta);
                 document.getElementById(`btn-edit-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirModificarCita(c); };
                 document.getElementById(`btn-pay-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirCobroPremium(c); };
             });
-        }
+        } 
 
-        // --- MOTOR CONCIERGE WHATSAPP ---
-        function contactarWhatsApp(modo) {
-            if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
-            const tel = currentPatient.telefono ? currentPatient.telefono.split(' ')[0] : "";
-            let msg = `Hola ${currentPatient.nombre_paciente}, te escribimos de la clínica del Dr. ${globalDocData.nombre_doctor}. `;
-            if(modo === 'confirmar') {
-                const MapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(globalDocData.direccion_consultorio || "Tijuana")}`;
-                msg += `Confirmamos tu cita hoy a las *${currentPatient.hora.slice(0,5)} HS*. \n\n📍 Ubicación: ${MapsLink}`;
+        async function abrirCalendarioMaestro() { 
+            const m = calFecha.getMonth(), y = calFecha.getFullYear();
+            const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            
+            document.getElementById('modal-icon').innerText = "🗓️";
+            document.getElementById('modal-title').innerText = "Radar de Ocupación";
+            document.querySelector('.modal-content').style.maxWidth = "850px"; 
+
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${y}-${String(m+1).padStart(2,'0')}-01&fecha=lte.${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`, { headers: {'apikey': KEY_DB} });
+            const citasMes = await res.json();
+            const mapa = {};
+            citasMes.forEach(c => { mapa[c.fecha] = (mapa[c.fecha] || 0) + 1; });
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <div class="md:col-span-7">
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="p-2 font-black">‹</button>
+                            <h4 class="font-black uppercase text-xl italic">${mesNombres[m]} ${y}</h4>
+                            <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="p-2 font-black">›</button>
+                        </div>
+                        <div class="cal-grid" id="days-container">
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Dom</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Lun</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Mar</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Mie</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Jue</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Vie</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Sab</div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-5 bg-slate-50 rounded-[2.5rem] p-6 min-h-[300px]" id="day-details-sidebar">
+                        <div class="flex flex-col items-center justify-center h-full text-slate-300 italic text-[10px] uppercase font-black text-center">
+                            <p>Toca un día para<br>escanear pacientes</p>
+                        </div>
+                    </div>
+                </div>`;
+
+            const container = document.getElementById('days-container');
+            for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
+            for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
+                const f = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const count = mapa[f] || 0;
+                let color = "bg-emerald-50 text-emerald-600 border-emerald-100";
+                if(count >= 4) color = "bg-amber-50 text-amber-600 border-amber-200";
+                if(count >= 8) color = "bg-rose-50 text-rose-600 border-rose-200 animate-pulse";
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `cal-day border-2 ${color}`;
+                dayEl.innerHTML = `${d}<span class="text-[6px] absolute bottom-1 right-1 opacity-40">${count || ''}</span>`;
+                dayEl.onclick = () => mostrarDetallesDia(f, citasMes, d, mesNombres[m]);
+                container.appendChild(dayEl);
             }
-            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
+            abrirModal();
         }
 
-        // --- MOTOR PASAPORTE MÉDICO DIGITAL ---
-        function generarPasaporteDigital() {
-            if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
-            const doc = new jsPDF();
-            const p = currentPatient;
-            const d = globalDocData;
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("K.B MEDICAL PASSPORT", 20, 25);
-            doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.text(`DR. ${d.nombre_doctor.toUpperCase()}`, 20, 55);
-            doc.text(`${d.especialidad.toUpperCase()}`, 20, 60);
-            doc.setFontSize(14); doc.text(`PATIENT: ${p.nombre_paciente}`, 20, 80);
-            doc.text(`DATE: ${p.fecha} | TIME: ${p.hora.slice(0,5)}`, 20, 90);
-            doc.setFontSize(10); doc.text("VALID FOR BORDER CROSSING / MEDICAL CLAIM", 20, 110);
-            doc.save(`PASSPORT_${p.nombre_paciente}.pdf`);
-            eliteAviso("PASAPORTE GENERADO ✦");
+        function mostrarDetallesDia(fecha, citas, dia, mes) {
+            const sidebar = document.getElementById('day-details-sidebar');
+            const filtradas = citas.filter(c => c.fecha === fecha).sort((a,b) => a.hora.localeCompare(b.hora));
+            sidebar.innerHTML = `
+                <div class="mb-6">
+                    <h5 class="text-[10px] font-black uppercase text-indigo-600 italic tracking-widest">${dia} ${mes}</h5>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">${filtradas.length} PACIENTES REGISTRADOS</p>
+                </div>
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                    ${filtradas.map(c => `
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                            <p class="text-[8px] font-black text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p>
+                            <p class="text-[11px] font-black text-slate-800 uppercase leading-none mb-2">${c.nombre_paciente}</p>
+                            <div class="flex gap-2">
+                                <button onclick="window.open('https://wa.me/${c.telefono.split(' ')[0]}')" class="text-[8px] font-black text-emerald-500 uppercase">WhatsApp</button>
+                                <button onclick="enfocarDia('${fecha}')" class="text-[8px] font-black text-slate-400 uppercase">Ver Día</button>
+                            </div>
+                        </div>
+                    `).join('') || '<p class="text-center text-[9px] font-black text-slate-300 py-10">DÍA LIBRE</p>'}
+                </div>
+                ${filtradas.length > 0 ? `<button onclick="enfocarDia('${fecha}')" class="w-full mt-6 py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase italic">Enfocar Agenda</button>` : ''}
+            `;
         }
 
+        function enfocarDia(fecha) {
+            fechaVisualizacion = new Date(fecha + "T12:00:00");
+            cargarCitas(); cerrarModal();
+        }
+      
         function seleccionarPaciente(cita) {
             currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
             document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} HS`;
-            const p = document.getElementById('nota-del-doctor-panel');
+            const panelNota = document.getElementById('nota-del-doctor-panel');
             if(cita.telefono && cita.telefono.includes("DOCTOR DICE:")) {
-                p.classList.remove('hidden'); document.getElementById('txt-nota-doctor').innerText = cita.telefono.replace("DOCTOR DICE:", "").trim();
-            } else p.classList.add('hidden');
+                panelNota.classList.remove('hidden');
+                document.getElementById('txt-nota-doctor').innerText = cita.telefono.replace("DOCTOR DICE:", "").trim();
+            } else { panelNota.classList.add('hidden'); }
         }
 
-        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; document.querySelector('.modal-content').style.maxWidth = "550px"; }
-        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        
-        async function abrirModificarCita(c) {
-            document.getElementById('modal-icon').innerText = "⚙️"; document.getElementById('modal-title').innerText = "Modificar Cita";
-            document.getElementById('modal-body').innerHTML = `<input type="time" id="m-hora" class="input-kb mb-3" value="${c.hora.slice(0,5)}"><input type="date" id="m-fecha" class="input-kb" value="${c.fecha}">`;
+        function abrirModificarCita(cita) {
+            document.getElementById('modal-icon').innerText = "⚙️";
+            document.getElementById('modal-title').innerText = "Modificar Cita";
+            document.getElementById('modal-body').innerHTML = `<div class="space-y-4 text-left"><p class="text-[10px] font-black uppercase text-slate-400 italic">Paciente: ${cita.nombre_paciente}</p><label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Hora:</label><input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}"><label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Fecha:</label><input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}"></div>`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${c.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ hora: document.getElementById('m-hora').value + ":00", fecha: document.getElementById('m-fecha').value }) });
-                eliteAviso("ACTUALIZADA ✅"); cerrarModal(); cargarCitas();
-            }; abrirModal();
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ hora: document.getElementById('m-hora').value + ":00", fecha: document.getElementById('m-fecha').value }) });
+                eliteAviso("CITA ACTUALIZADA ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
         }
 
         async function enviarNotaAlDr() {
-            const n = document.getElementById('internal-note-input').value;
-            if(!currentPatient || !n.trim()) return eliteAviso("SELECCIONE PACIENTE");
-            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + n.toUpperCase().trim() }) });
-            eliteAviso("ENVIADO ✅"); document.getElementById('internal-note-input').value = ""; cargarCitas();
+            const nota = document.getElementById('internal-note-input').value;
+            if(!currentPatient || !nota.trim()) return eliteAviso("SELECCIONE PACIENTE");
+            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + nota.toUpperCase().trim() }) });
+            eliteAviso("NOTA ENVIADA ✅"); document.getElementById('internal-note-input').value = ""; cargarCitas();
         }
 
-        function abrirCobroPremium() {
-            if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
-            document.getElementById('modal-icon').innerText = "🏢"; document.getElementById('modal-title').innerText = "Terminal Binacional";
-            document.getElementById('modal-body').innerHTML = `<div class="space-y-4"><input type="number" id="pay-amount" placeholder="MONTO MXN" class="input-kb text-center text-2xl font-black py-6"></div>`;
+        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
+        function cerrarModal() { 
+            document.getElementById('modal-container').style.display = 'none'; 
+            document.querySelector('.modal-content').style.maxWidth = "550px";
+        }
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+        function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
+        
+        async function abrirNuevoPaciente() {
+            document.getElementById('modal-icon').innerText = "👤";
+            document.getElementById('modal-title').innerText = "Nueva Cita";
+            document.getElementById('modal-body').innerHTML = `<input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase"><input type="time" id="n-hora" class="input-kb mb-3" value="12:00"><input type="date" id="n-fecha" class="input-kb" value="${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}">`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                const a = document.getElementById('pay-amount').value;
-                if(!a) return eliteAviso("INGRESE MONTO");
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: Math.round(a) }) });
-                eliteAviso("PAGADO ✅"); cerrarModal(); cargarCitas();
-            }; abrirModal();
+                await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
+                eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
         }
 
-        function filtrarAgendaLocal() {
-            const t = document.getElementById('quick-filter').value.toLowerCase();
-            document.querySelectorAll('#tabla-citas-body > div').forEach(el => el.style.display = el.innerText.toLowerCase().includes(t) ? "flex" : "none");
+        function abrirCobroPremium(cita) {
+            const p = cita || currentPatient;
+            if(!p) return eliteAviso("SELECCIONE PACIENTE");
+            divisa = 'MXN';
+            document.getElementById('modal-icon').innerText = "🏢";
+            document.getElementById('modal-title').innerText = "Terminal Binacional";
+            document.querySelector('.modal-content').style.maxWidth = "650px";
+            document.getElementById('modal-body').innerHTML = `
+                <div class="space-y-6">
+                    <div class="p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl border-b-4 border-indigo-500 relative">
+                        <p class="text-[10px] font-black uppercase opacity-60 tracking-widest text-center">Tipo de Cambio</p>
+                        <div class="flex items-center justify-center gap-2 mt-1">
+                            <span class="text-3xl font-black">1 USD = </span>
+                            <input type="number" id="tc-input" value="${tc}" step="0.1" class="bg-transparent text-emerald-400 text-3xl font-black w-24 outline-none border-b-2 border-emerald-400/30 text-center">
+                            <span class="text-3xl font-black">MXN</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 p-2 bg-slate-100 rounded-[2.2rem]">
+                        <button id="btn-mxn" onclick="seleccionarDivisa('MXN')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900">🇲🇽 PESOS MXN</button>
+                        <button id="btn-usd" onclick="seleccionarDivisa('USD')" class="flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50">🇺🇸 DÓLARES USD</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1 text-center">
+                             <p class="text-[9px] font-black uppercase text-slate-400 italic">Monto a Cobrar</p>
+                             <input type="number" id="pay-amount" placeholder="0.00" oninput="calcularCambio()" class="input-kb text-center text-3xl font-black py-8 bg-slate-50 border-none rounded-[2rem] focus:ring-0">
+                        </div>
+                        <div class="space-y-1 text-center">
+                             <p class="text-[9px] font-black uppercase text-indigo-600 italic">Efectivo Recibido</p>
+                             <input type="number" id="cash-received" placeholder="0.00" oninput="calcularCambio()" class="input-kb text-center text-3xl font-black py-8 bg-indigo-50 border-none rounded-[2rem] focus:ring-0">
+                        </div>
+                    </div>
+                    <div id="change-display" class="text-center text-slate-400 font-bold italic py-2">ESPERANDO EFECTIVO...</div>
+                    <div class="space-y-4 p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                        <p class="text-[9px] font-black uppercase text-indigo-600 tracking-widest mb-2 italic">Facturación / Insurance</p>
+                        <input type="text" id="billing-data" placeholder="RFC (MX) / INSURANCE ID (USA)" class="input-kb !bg-white text-center uppercase">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="generarFacturaSAT_Premium()" class="py-4 bg-emerald-500 text-white rounded-2xl font-black text-[9px] uppercase hover:scale-105 transition shadow-lg shadow-emerald-200">🇲🇽 Factura SAT</button>
+                            <button onclick="generarSuperbillUSA_Premium()" class="py-4 bg-blue-600 text-white rounded-2xl font-black text-[9px] uppercase hover:scale-105 transition shadow-lg shadow-blue-200">🇺🇸 Claim</button>
+                        </div>
+                    </div>
+                    <select id="metodo-pago" class="input-kb font-bold text-center appearance-none cursor-pointer">
+                        <option value="Efectivo">💵 EFECTIVO</option>
+                        <option value="Tarjeta">💳 TARJETA (+3.5% COMISIÓN)</option>
+                        <option value="Transferencia">🏦 ZELLE / TRANSFERENCIA</option>
+                    </select>
+                </div>`;
+
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                tc = parseFloat(document.getElementById('tc-input').value) || tc;
+                let amt = parseFloat(document.getElementById('pay-amount').value);
+                const metodo = document.getElementById('metodo-pago').value;
+                if(!amt) return eliteAviso("INGRESE MONTO");
+                if(metodo.includes("Tarjeta")) amt = amt * 1.035;
+                const montoFinal = (divisa === 'USD') ? (amt * tc) : amt;
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: Math.round(montoFinal), telefono: `PAGO: ${divisa} | ${metodo.toUpperCase()} (TC: ${tc})` }) });
+                eliteAviso("COBRO REGISTRADO ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
         }
 
+        function seleccionarDivisa(tipo) {
+            divisa = tipo;
+            const btnMXN = document.getElementById('btn-mxn'), btnUSD = document.getElementById('btn-usd');
+            if(tipo === 'MXN') {
+                btnMXN.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-white shadow-lg border-indigo-500 border-2 transition-all scale-105 text-slate-900";
+                btnUSD.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50 border-2 border-transparent";
+            } else {
+                btnUSD.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] bg-slate-900 shadow-lg border-indigo-500 border-2 transition-all scale-105 text-white";
+                btnMXN.className = "flex-1 py-4 rounded-[1.8rem] font-black text-[11px] text-slate-400 transition-all opacity-50 border-2 border-transparent";
+            }
+        }
+      
         async function iniciarCierreCaja() {
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
+            eliteAviso("GENERANDO REPORTE...");
+            const d = fechaVisualizacion, hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
             const data = await res.json();
-            const doc = new jsPDF(); doc.text("REPORTE DE CAJA K.B", 15, 20);
-            doc.autoTable({ head: [['HORA', 'PACIENTE', 'MONTO']], body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}`]), startY: 30 });
-            doc.save("CIERRE.pdf"); eliteAviso("DESCARGADO ✅");
+            const doc = new jsPDF();
+            doc.text("K.B ASSISTANT - REPORTE DE CAJA", 15, 20);
+            doc.autoTable({ head: [['HORA', 'PACIENTE', 'MONTO']], body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}.00`]), startY: 30 });
+            doc.save(`CIERRE_${hoy}.pdf`); eliteAviso("REPORTE DESCARGADO ✅");
         }
 
         function abrirGasto() {
-            document.getElementById('modal-icon').innerText = "💸"; document.getElementById('modal-body').innerHTML = `<input type="text" id="g-c" placeholder="CONCEPTO" class="input-kb mb-3 uppercase"><input type="number" id="g-m" placeholder="MONTO $" class="input-kb">`;
+            document.getElementById('modal-icon').innerText = "💸"; document.getElementById('modal-title').innerText = "Gasto Administrativo";
+            document.getElementById('modal-body').innerHTML = `<input type="text" id="g-concepto" placeholder="CONCEPTO" class="input-kb mb-3 uppercase"><input type="number" id="g-monto" placeholder="MONTO $" class="input-kb">`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "GASTO", concepto: document.getElementById('g-c').value.toUpperCase(), monto: document.getElementById('g-m').value }) });
+                const concepto = document.getElementById('g-concepto').value.toUpperCase(), monto = document.getElementById('g-monto').value;
+                if(!concepto || !monto) return eliteAviso("FALTAN DATOS");
+                await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "GASTO", concepto: concepto, monto: monto }) });
                 eliteAviso("REGISTRADO ✅"); cerrarModal();
-            }; abrirModal();
+            };
+            abrirModal();
         }
 
         function abrirInsumo() {
-            document.getElementById('modal-icon').innerText = "📦"; document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32 uppercase" placeholder="Ej: Faltan hojas..."></textarea>`;
+            document.getElementById('modal-icon').innerText = "📦"; document.getElementById('modal-title').innerText = "Reportar Faltante";
+            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-kb h-32 uppercase" placeholder="Ej: Faltan hojas..."></textarea>`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "INSUMO", concepto: document.getElementById('ins-txt').value.toUpperCase(), monto: 0 }) });
+                const msg = document.getElementById('ins-txt').value.toUpperCase();
+                if(!msg) return eliteAviso("ESCRIBA EL FALTANTE");
+                await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "INSUMO", concepto: msg, monto: 0 }) });
                 eliteAviso("NOTIFICADO ✅"); cerrarModal();
-            }; abrirModal();
+            };
+            abrirModal();
         }
 
-        async function abrirCalendarioMaestro() { 
-            const y = calFecha.getFullYear(), m = calFecha.getMonth();
-            document.getElementById('modal-title').innerText = "Radar de Ocupación";
-            document.getElementById('modal-body').innerHTML = `<div class="cal-grid" id="days-container"></div>`;
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
-            const data = await res.json();
-            const mapa = {}; data.forEach(c => mapa[c.fecha] = (mapa[c.fecha] || 0) + 1);
-            const container = document.getElementById('days-container');
-            for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
-                const f = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const el = document.createElement('div'); el.className = `cal-day border-2 bg-slate-50`; el.innerText = d;
-                if(mapa[f]) el.classList.add('bg-indigo-100', 'text-indigo-600');
-                el.onclick = () => { fechaVisualizacion = new Date(f + "T12:00:00"); cargarCitas(); cerrarModal(); };
-                container.appendChild(el);
-            } abrirModal();
+        function generarFacturaSAT_Premium() {
+            const p = currentPatient;
+            const rfc = document.getElementById('billing-data').value || "XAXX010101000";
+            const amt = document.getElementById('pay-amount').value || 0;
+            if(!p) return eliteAviso("SELECCIONE PACIENTE");
+            const doc = new jsPDF();
+            doc.text("K.B TECH MEDICAL HUB - FACTURA", 20, 20);
+            doc.text(`PACIENTE: ${p.nombre_paciente.toUpperCase()}`, 20, 40);
+            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 50);
+            doc.text(`MONTO: $${amt} MXN`, 20, 70);
+            doc.save(`FACTURA_${p.nombre_paciente}.pdf`);
+            eliteAviso("FACTURA GENERADA ✦");
         }
+
+        function generarSuperbillUSA_Premium() {
+            const p = currentPatient;
+            const insuranceId = document.getElementById('billing-data').value || "PENDING";
+            const amt = document.getElementById('pay-amount').value || 0;
+            if(!p) return eliteAviso("SELECT PATIENT");
+            const doc = new jsPDF();
+            doc.text("USA HEALTH INSURANCE CLAIM", 20, 20);
+            doc.text(`PATIENT: ${p.nombre_paciente.toUpperCase()}`, 20, 40);
+            doc.text(`INSURANCE ID: ${insuranceId.toUpperCase()}`, 20, 50);
+            doc.text(`TOTAL PAID: $${(amt/tc).toFixed(2)} USD`, 20, 70);
+            doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
+            eliteAviso("SUPERBILL GENERATED ✦");
+        }
+
+        function calcularCambio() {
+            const m = parseFloat(document.getElementById('pay-amount').value) || 0;
+            const r = parseFloat(document.getElementById('cash-received').value) || 0;
+            const c = r - m;
+            const d = document.getElementById('change-display');
+            if(c >= 0) {
+                d.innerText = `CAMBIO: $${c.toFixed(2)} ${divisa}`;
+                d.className = "text-center text-emerald-500 font-black italic tracking-widest text-lg py-2";
+            } else {
+                d.innerText = "ESPERANDO EFECTIVO...";
+                d.className = "text-center text-slate-400 font-bold italic py-2";
+            }
+        }
+
+        async function init() { }
+        init();
     </script>
 </body>
 </html>
