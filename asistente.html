@@ -12,7 +12,6 @@
         :root { --main: #6366f1; --bg: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; text-align: left; }
         
-        /* MODO PRIVACIDAD INYECTADO */
         body.privacy-mode .blur-sensitive { filter: blur(12px); pointer-events: none; transition: 0.4s; }
 
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
@@ -23,7 +22,7 @@
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; }
+        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; transition: 0.3s; }
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
         
         .u-rojo { border-left: 12px solid #ef4444 !important; background: #fff1f2; animation: pulse-red 2s infinite; }
@@ -32,9 +31,8 @@
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.1); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-        .cal-day:hover { background: var(--main); color: white; }
-        .cal-day.today { background: #0f172a; color: white; } 
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 2px solid transparent; position: relative; }
+        .cal-day:hover { transform: scale(1.1); z-index: 10; }
 
         #contenido-panel { max-width: none !important; width: 98% !important; margin: 0 auto; display: flex; flex-direction: column; }
         main.grid { display: flex !important; gap: 2.5rem; align-items: flex-start; }
@@ -75,8 +73,7 @@
         <button onclick="toggleMenu()" class="absolute top-8 right-8 text-2xl">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-12 italic" id="menu-title-tech">Herramientas Pro</h3>
         <nav class="space-y-4">
-            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl" id="btn-cal-pro"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Calendario 12 Meses</span></button>
-            <button onclick="toggleMenu(); buscarPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">🔍</div><span class="text-[11px] font-black uppercase tracking-widest">Buscador Pro</span></button>
+            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl" id="btn-cal-pro"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Radar de Citas</span></button>
             <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span></button>
             <button onclick="toggleMenu(); abrirGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">💸</div><span class="text-[11px] font-black uppercase tracking-widest">Registrar Gasto</span></button>
             <button onclick="toggleMenu(); abrirInsumo()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">📦</div><span class="text-[11px] font-black uppercase tracking-widest">Almacén</span></button>
@@ -123,7 +120,7 @@
             </div>
             <div id="panel-principal-agenda" class="glass-panel !p-8 !max-w-none w-full shadow-2xl">
                 <div class="relative mb-10">
-                    <input type="text" id="quick-filter" oninput="filtrarAgendaLocal()" placeholder="FILTRAR POR NOMBRE O ESTADO..." class="input-kb !bg-white border-2 border-slate-100 focus:border-indigo-600 text-[10px] tracking-widest pl-12 uppercase italic transition-all">
+                    <input type="text" id="quick-filter" oninput="filtrarAgendaLocal()" placeholder="BUSCAR PACIENTE, HORA O ESTADO..." class="input-kb !bg-white border-2 border-slate-100 focus:border-indigo-600 text-[10px] tracking-widest pl-12 uppercase italic transition-all">
                     <div class="absolute left-5 top-1/2 -translate-y-1/2 opacity-30 text-xl">🔍</div>
                 </div>
                 <h3 id="agenda-title" class="text-lg font-black uppercase text-slate-800 italic tracking-widest pb-3 border-b-4 border-slate-900 mb-12">Agenda</h3>
@@ -140,7 +137,6 @@
         let currentPatient = null, globalDocData = null, divisa = 'MXN', tc = 17.50;
         let fechaVisualizacion = new Date(), calFecha = new Date();
 
-        // 1. CATÁLOGO UNIFICADO (ESPEJO DEL DOCTOR)
         const CATALOGO_TEMAS = {
             "Ginecología": ["#f43f5e", "#8b5cf6", "#fb7185", "#059669", "#1e293b"],
             "Odontología": ["#0ea5e9", "#10b981", "#22d3ee", "#1e3a8a", "#6366f1"],
@@ -178,9 +174,14 @@
 
         function filtrarAgendaLocal() {
             const term = document.getElementById('quick-filter').value.toLowerCase();
-            document.querySelectorAll('#tabla-citas-body > div').forEach(t => {
-                t.style.display = t.innerText.toLowerCase().includes(term) ? "flex" : "none";
+            const rows = document.querySelectorAll('#tabla-citas-body > div');
+            let encontrados = 0;
+            rows.forEach(t => {
+                const match = t.innerText.toLowerCase().includes(term);
+                t.style.display = match ? "flex" : "none";
+                if(match) encontrados++;
             });
+            document.getElementById('agenda-title').innerText = term ? `RESULTADOS: ${encontrados}` : "AGENDA";
         }
       
         async function verificarAcceso() {
@@ -191,11 +192,9 @@
             globalDocData = data[0];
 
             if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-                
-                // --- LÓGICA DE SINCRONIZACIÓN DE COLOR ---
                 const palette = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
                 const colorIndex = (parseInt(globalDocData.template_id) - 1) || 0;
-                const color = palette[colorIndex % 5]; 
+                const color = palette[colorIndex % 5];
 
                 document.documentElement.style.setProperty('--main', color);
                 document.getElementById('brand-text').style.color = color;
@@ -236,6 +235,97 @@
                 document.getElementById(`btn-pay-${c.id}`).onclick = (e) => { e.stopPropagation(); abrirCobroPremium(c); };
             });
         } 
+
+        // --- RADAR DE OCUPACIÓN FORMA B ---
+        async function abrirCalendarioMaestro() { 
+            const m = calFecha.getMonth(), y = calFecha.getFullYear();
+            const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            
+            document.getElementById('modal-icon').innerText = "🗓️";
+            document.getElementById('modal-title').innerText = "Radar de Ocupación";
+            document.querySelector('.modal-content').style.maxWidth = "850px"; 
+
+            const primerDia = `${y}-${String(m+1).padStart(2,'0')}-01`;
+            const ultimoDia = `${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`;
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${primerDia}&fecha=lte.${ultimoDia}`, { headers: {'apikey': KEY_DB} });
+            const citasMes = await res.json();
+
+            const mapaOcupacion = {};
+            citasMes.forEach(c => { mapaOcupacion[c.fecha] = (mapaOcupacion[c.fecha] || 0) + 1; });
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <div class="md:col-span-7">
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="font-bold p-2">‹</button>
+                            <h4 class="font-black uppercase text-xl italic">${mesNombres[m]} ${y}</h4>
+                            <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="font-bold p-2">›</button>
+                        </div>
+                        <div class="cal-grid" id="days-container">
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Dom</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Lun</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Mar</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Mie</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Jue</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Vie</div>
+                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Sab</div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-5 bg-slate-50 rounded-3xl p-6 min-h-[300px]" id="day-details-sidebar">
+                        <div class="flex flex-col items-center justify-center h-full text-slate-300 italic text-[10px] uppercase font-black text-center">
+                            <p>Toca un día para<br>ver pacientes</p>
+                        </div>
+                    </div>
+                </div>`;
+
+            const container = document.getElementById('days-container');
+            for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
+            
+            for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
+                const f = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const count = mapaOcupacion[f] || 0;
+                let color = "bg-emerald-50 text-emerald-600 border-emerald-100";
+                if(count >= 4) color = "bg-amber-50 text-amber-600 border-amber-200";
+                if(count >= 8) color = "bg-rose-50 text-rose-600 border-rose-200 animate-pulse";
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `cal-day border-2 ${color}`;
+                dayEl.innerHTML = `${d}<span class="text-[6px] absolute bottom-1 right-1 opacity-40">${count || ''}</span>`;
+                dayEl.onclick = () => mostrarDetallesDia(f, citasMes, d, mesNombres[m]);
+                container.appendChild(dayEl);
+            }
+            abrirModal();
+        }
+
+        function mostrarDetallesDia(fecha, citas, dia, mes) {
+            const sidebar = document.getElementById('day-details-sidebar');
+            const filtradas = citas.filter(c => c.fecha === fecha).sort((a,b) => a.hora.localeCompare(b.hora));
+            sidebar.innerHTML = `
+                <div class="mb-6">
+                    <h5 class="text-[10px] font-black uppercase text-indigo-600 italic tracking-widest">${dia} ${mes}</h5>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">${filtradas.length} PACIENTES</p>
+                </div>
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                    ${filtradas.map(c => `
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                            <p class="text-[8px] font-black text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p>
+                            <p class="text-[11px] font-black text-slate-800 uppercase leading-none mb-2">${c.nombre_paciente}</p>
+                            <div class="flex gap-2">
+                                <button onclick="window.open('https://wa.me/${c.telefono.split(' ')[0]}')" class="text-[8px] font-black text-emerald-500 uppercase">WhatsApp</button>
+                                <button onclick="enfocarDia('${fecha}')" class="text-[8px] font-black text-slate-400 uppercase">Enfocar</button>
+                            </div>
+                        </div>
+                    `).join('') || '<p class="text-center text-[9px] font-black text-slate-300 py-10">SIN CITAS</p>'}
+                </div>
+                ${filtradas.length > 0 ? `<button onclick="enfocarDia('${fecha}')" class="w-full mt-6 py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase italic">Ir a esta fecha</button>` : ''}
+            `;
+        }
+
+        function enfocarDia(fecha) {
+            fechaVisualizacion = new Date(fecha + "T12:00:00");
+            cargarCitas();
+            cerrarModal();
+        }
       
         function seleccionarPaciente(cita) {
             currentPatient = cita;
@@ -266,23 +356,13 @@
             eliteAviso("NOTA ENVIADA ✅"); document.getElementById('internal-note-input').value = ""; cargarCitas();
         }
 
-        async function buscarPaciente() {
-            document.getElementById('modal-icon').innerText = "🔍";
-            document.getElementById('modal-title').innerText = "Buscador Pro";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="s-input" placeholder="Nombre..." class="input-kb"><div id="s-results" class="mt-6 space-y-3"></div>`;
-            document.getElementById('s-input').oninput = async (e) => {
-                if(e.target.value.length < 3) return;
-                const res = await fetch(`${URL_DB}/rest/v1/Citas?nombre_paciente=ilike.*${e.target.value}*&doctor_id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
-                const data = await res.json();
-                document.getElementById('s-results').innerHTML = data.map(r => `<div class="p-4 bg-slate-50 rounded-2xl font-black uppercase text-[10px] cursor-pointer" onclick='seleccionarPaciente(${JSON.stringify(r)}); cerrarModal();'>${r.nombre_paciente} (${r.fecha})</div>`).join('');
-            };
-            abrirModal();
-        }
-
         function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
-        function cerrarModal() { document.getElementById('modal-container').style.display = 'none'; }
+        function cerrarModal() { 
+            document.getElementById('modal-container').style.display = 'none'; 
+            document.querySelector('.modal-content').style.maxWidth = "550px";
+        }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-        function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/5216641234567?text=Hola ${currentPatient.nombre_paciente}`); }
+        function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
         
         async function abrirNuevoPaciente() {
             document.getElementById('modal-icon').innerText = "👤";
@@ -292,20 +372,6 @@
                 await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
                 eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas();
             };
-            abrirModal();
-        }
-
-        function abrirCalendarioMaestro() { 
-            const m = calFecha.getMonth(), y = calFecha.getFullYear();
-            const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            document.getElementById('modal-icon').innerText = "🗓️";
-            document.getElementById('modal-title').innerText = "Control de Fecha";
-            document.getElementById('modal-body').innerHTML = `<div class="flex justify-between items-center mb-6 px-2"><button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="font-bold">‹</button><h4 class="font-black uppercase text-xl">${mesNombres[m]} ${y}</h4><button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="font-bold">›</button></div><div class="cal-grid" id="days-container"></div>`;
-            const container = document.getElementById('days-container');
-            for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
-                container.innerHTML += `<div class="cal-day" onclick="fechaVisualizacion = new Date(${y}, ${m}, ${d}); cargarCitas(); cerrarModal();">${d}</div>`;
-            }
             abrirModal();
         }
 
@@ -492,6 +558,8 @@
                 });
             }
         }, 1000);
+        
+        init();
     </script>
 </body>
 </html>
