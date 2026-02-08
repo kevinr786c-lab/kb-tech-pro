@@ -14,29 +14,43 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: 0.5s ease; text-align: left; }
         :root { --main-color: #6366f1; --main-glow: rgba(99, 102, 241, 0.2); }
         
+        /* MODERNIZACIÓN DE PINES Y TOAST */
         #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
+        /* PINES MODERNOS (SEMÁFORO NEÓN) */
+        .pin-master { width: 12px; height: 12px; border-radius: 50%; position: relative; display: inline-block; margin-right: 10px; }
+        .pin-glow { position: absolute; inset: -4px; border-radius: 50%; opacity: 0.4; animation: pulse-pin 2s infinite; }
+        
+        @keyframes pulse-pin {
+            0% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(2.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
-        .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; }
+        .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; position: relative; overflow: hidden; }
         .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color) !important; box-shadow: 0 20px 40px var(--main-glow); }
         
-        .u-rojo { border-left: 15px solid #ef4444 !important; background: #fef2f2; animation: pulse-red 2s infinite; }
-        .u-amarillo { border-left: 15px solid #f59e0b !important; background: #fffbeb; }
-        .u-verde { border-left: 15px solid #10b981 !important; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        /* MODERNIZACIÓN DE BORDES (PINES LATERALES) */
+        .u-rojo { border-left: 6px solid #ef4444 !important; background: linear-gradient(90deg, #fef2f2 0%, white 100%); }
+        .u-amarillo { border-left: 6px solid #f59e0b !important; background: linear-gradient(90deg, #fffbeb 0%, white 100%); }
+        .u-verde { border-left: 6px solid #10b981 !important; }
         
         .input-premium { background: #f1f5f9; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; width: 100%; outline: none; transition: 0.3s; font-weight: 700; }
         .input-premium:focus { border-color: var(--main-color); background: #fff; box-shadow: 0 0 20px var(--main-glow); }
         
         #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; overflow-y: auto; }
         .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 8px; font-weight: 900; text-transform: uppercase; }
-        #btn-ingresos { position: fixed; bottom: 2rem; right: 2rem; width: 4rem; height: 4rem; background: linear-gradient(135deg, #fbbf24, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); transition: 0.3s; }
-        .locked-feature.is-locked .locked-overlay { display: flex; }
-        .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 50; border-radius: inherit; }
         
+        #btn-ingresos { position: fixed; bottom: 2rem; right: 2rem; width: 4rem; height: 4rem; background: linear-gradient(135deg, #fbbf24, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); transition: 0.3s; }
+        
+        /* BARRA DE PROGRESO ELITE */
         #progress-bar-container { height: 4px; width: 100%; background: #e2e8f0; position: fixed; top: 0; left: 0; z-index: 200000; }
         #progress-bar-fill { height: 100%; width: 0%; background: var(--main-color); transition: 1s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 15px var(--main-color); }
+
+        /* WIDGET GARITAS */
+        .garita-card { background: #f8fafc; border-radius: 1.5rem; padding: 1rem; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -106,8 +120,23 @@
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-4 space-y-6">
+                
+                <div class="glass-panel p-8 shadow-sm border border-slate-100 mb-6">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 italic text-indigo-600">📡 Radar Garitas (California-TJ)</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="garita-card">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase">San Ysidro RL</p>
+                            <p class="text-xl font-black text-indigo-600">45 MIN</p>
+                        </div>
+                        <div class="garita-card">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase">Otay Mesa</p>
+                            <p class="text-xl font-black text-emerald-600">20 MIN</p>
+                        </div>
+                    </div>
+                    <p class="text-[7px] mt-4 text-slate-400 font-bold uppercase italic tracking-widest">Sincronizado cada 5 min con CBP ✦</p>
+                </div>
+
                 <div id="panel-intercom" class="glass-panel p-8 shadow-sm border border-slate-100 locked-feature relative overflow-hidden">
-                    <div class="locked-overlay flex-col text-center"><span class="text-3xl mb-3">🔒</span><p class="text-[9px] font-black uppercase italic tracking-widest">Expediente IA</p></div>
                     <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-indigo-600">Expediente Maestro</h3>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-indigo-200 mb-6 text-center">
                         <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase tracking-tighter">---</p>
@@ -129,10 +158,17 @@
                 </div>
 
                 <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden hidden" id="balance-display">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Hoy</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Hoy (Binacional)</p>
                     <div class="space-y-6">
-                        <div><p class="text-[8px] font-bold text-slate-500 uppercase">MXN Hoy</p><p class="text-4xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p></div>
-                        <div><p class="text-[8px] font-bold text-slate-500 uppercase">USD Hoy</p><p class="text-3xl font-black italic text-emerald-400 tracking-tighter" id="ganancia-usd">$0.00</p></div>
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase">Pesos Hoy</p>
+                            <p class="text-4xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                            <p class="text-[8px] font-bold text-emerald-400 uppercase">Dólares Hoy</p>
+                            <p class="text-3xl font-black italic text-emerald-400 tracking-tighter" id="ganancia-usd">$0.00</p>
+                            <p class="text-[7px] text-emerald-400/50 mt-1 uppercase font-bold">TC: 18.50 ✦</p>
+                        </div>
                         <div class="pt-4 border-t border-white/5">
                             <p class="text-[8px] font-bold text-indigo-400 uppercase">Proyección Faltante</p>
                             <p class="text-xl font-black italic tracking-tighter text-slate-400" id="proyeccion-faltante">$0.00 MXN</p>
@@ -157,6 +193,7 @@
     <script>
     const URL = "https://dgatsbnqgplalxwewpvs.supabase.co", KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
     const docId = new URLSearchParams(window.location.search).get('id')?.trim();
+    const TC = 18.50; // Tipo de cambio fijo para terminal binacional
     let currentPatientId = null, globalDocData = null;
 
     const CATALOGO_TEMAS = {
@@ -185,7 +222,6 @@
             const opciones = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
             const temaElegido = opciones.find(t => t.id == globalDocData.template_id) || opciones[0];
             
-            // PULIDO DE IDENTIDAD VISUAL
             document.documentElement.style.setProperty('--main-color', temaElegido.color);
             document.getElementById('logo-tech').style.color = temaElegido.color;
             document.getElementById('master-star').style.color = temaElegido.color;
@@ -198,7 +234,6 @@
             setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
             
             if (Notification.permission !== 'granted') Notification.requestPermission();
-            if(globalDocData.plan_nivel === 0) document.getElementById('panel-intercom').classList.add('is-locked');
             
             document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
             document.getElementById('edit-bio').value = globalDocData.biografia || "";
@@ -221,6 +256,7 @@
         const hoy = new Date(hoyObj.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
         const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
         const citas = await res.json();
+        
         let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
         const counts = {};
         citas.forEach(c => { counts[c.nombre_paciente] = (counts[c.nombre_paciente] || 0) + 1; });
@@ -231,20 +267,31 @@
                 pagadasCount++;
             } else { faltante += 1200; }
             
-            let sem = "u-verde";
-            const triage = (c.telefono || "").toUpperCase();
-            if(triage.includes("URGENTE") || triage.includes("DOLOR")) {
-                sem = "u-rojo";
+            // LÓGICA DE PINES MODERNOS
+            let pinColor = "#10b981"; // Verde por defecto
+            let triageMsg = (c.telefono || "").toUpperCase();
+            
+            if(triageMsg.includes("URGENTE") || triageMsg.includes("DOLOR")) {
+                pinColor = "#ef4444";
                 if (Notification.permission === "granted") new Notification("🚨 ALERTA: " + c.nombre_paciente, { body: "Prioridad inmediata." });
-            } else if(triage.includes("PRIORIDAD")) sem = "u-amarillo";
+            } else if(triageMsg.includes("PRIORIDAD")) {
+                pinColor = "#f59e0b";
+            }
+            
+            let semClase = pinColor === "#ef4444" ? "u-rojo" : (pinColor === "#f59e0b" ? "u-amarillo" : "u-verde");
             const isVip = counts[c.nombre_paciente] > 1 ? '<span class="ml-2 text-[10px] text-indigo-500 animate-pulse">⭐ VIP</span>' : '';
             
             return `
-                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${sem}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
+                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semClase}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
                     <div class="flex items-center gap-14">
                         <span class="text-4xl font-black italic w-24" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
                         <div>
-                            <h3 class="font-black text-slate-800 text-lg uppercase flex items-center">${c.nombre_paciente} ${isVip}</h3>
+                            <h3 class="font-black text-slate-800 text-lg uppercase flex items-center">
+                                <div class="pin-master" style="background: ${pinColor}">
+                                    <div class="pin-glow" style="background: ${pinColor}"></div>
+                                </div>
+                                ${c.nombre_paciente} ${isVip}
+                            </h3>
                             <p class="text-[10px] font-black uppercase text-slate-400 italic">${c.telefono || 'VERIFICADO'}</p>
                         </div>
                     </div>
