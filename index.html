@@ -12,16 +12,15 @@
         :root { --accent: #6366f1; }
 
         .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 3.5rem; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        .glass-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        /* Cirugía: El borde ahora responde dinámicamente al acento */
+        .glass-card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 20px 40px -10px var(--accent); }
         
-        /* NOTAS DE IMPACTO */
         .reflection-card { 
             background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
             border-left: 3px solid var(--accent);
             transition: 0.4s;
         }
 
-        /* SIMULADOR CAMALEÓN */
         .preview-phone { width: 220px; height: 440px; border: 8px solid #1e293b; border-radius: 2.5rem; position: relative; overflow: hidden; background: #f8fafc; transition: 0.5s; }
         .phone-header { height: 60px; background: var(--accent); width: 100%; transition: 0.5s; }
         .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
@@ -30,8 +29,10 @@
         .gemini-star { color: var(--accent); animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
         
+        /* Clases de utilidad para la cirugía */
         .text-accent { color: var(--accent); transition: 0.5s; }
         .bg-accent { background: var(--accent); transition: 0.5s; }
+        .border-accent { border-color: var(--accent); transition: 0.5s; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center py-10 px-6">
@@ -42,7 +43,7 @@
     </div>
 
     <header class="text-center mb-20 max-w-4xl">
-        <h1 onclick="activarProtocoloRestringido()" class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-none mb-6">
+        <h1 id="main-title" onclick="activarProtocoloRestringido()" class="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-none mb-6">
             EL FUTURO <span class="text-accent italic">ES HOY</span>
         </h1>
         <p class="text-slate-400 text-sm font-medium italic opacity-80 max-w-xl mx-auto">
@@ -72,9 +73,9 @@
         </div>
 
         <div class="flex justify-center relative">
-            <div class="absolute -inset-10 bg-accent/20 blur-3xl rounded-full"></div>
+            <div id="glow-bg" class="absolute -inset-10 bg-accent/20 blur-3xl rounded-full transition-all duration-1000"></div>
             <div class="preview-phone shadow-2xl">
-                <div id="phone-nav" class="phone-header flex items-center justify-center text-white text-2xl" id="phone-icon">🩺</div>
+                <div id="phone-nav" class="phone-header flex items-center justify-center text-white text-2xl">🩺</div>
                 <div class="p-6 space-y-4">
                     <div class="h-4 w-3/4 bg-slate-200 rounded"></div>
                     <div class="h-2 w-full bg-slate-100 rounded"></div>
@@ -91,33 +92,33 @@
         </div>
     </section>
 
-    <main class="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl w-full mb-32">
-        <div class="glass-card p-12 flex flex-col h-full opacity-60">
-            <h2 class="text-2xl font-black italic uppercase mb-10">Aspirante</h2>
-            <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-500">
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl w-full mb-32 px-4">
+        <div class="glass-card p-12 flex flex-col h-full border-white/10 group">
+            <h2 class="text-2xl font-black italic uppercase mb-10 group-hover:text-accent transition">Aspirante</h2>
+            <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-400">
                 <li>✓ Agenda Live Digital</li>
                 <li>✓ Sucursal Gemini ✦</li>
                 <li>✕ Soporte Presencial</li>
                 <li>✕ Modo Camaleón Full</li>
             </ul>
             <p class="text-3xl font-black mb-8 italic">$999 <span class="text-xs font-normal">MXN</span></p>
-            <button onclick="location.href='registro.html'" class="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] uppercase">Iniciar Nodo</button>
+            <button onclick="location.href='registro.html'" class="w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-[10px] uppercase hover:bg-white hover:text-black transition duration-500">Iniciar Nodo</button>
         </div>
 
-        <div class="glass-card p-12 border-accent/50 bg-accent/[0.05] scale-105 relative">
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest italic">Programa Fundadores</div>
+        <div class="glass-card p-12 border-accent bg-accent/[0.05] scale-105 relative">
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest italic shadow-lg shadow-indigo-500/20">Programa Fundadores</div>
             <h2 class="text-3xl font-black italic uppercase mb-10 text-accent">Dominio</h2>
-            <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold">
+            <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-indigo-100">
                 <li>✓ Soporte Táctico Presencial TJ</li>
                 <li>✓ Sentinel IA Symptoms</li>
                 <li>✓ Modo Camaleón: 30 Temas</li>
                 <li>✓ Tarifa Congelada 2026</li>
             </ul>
             <p class="text-3xl font-black mb-8 italic text-accent">$1,599 <span class="text-xs font-normal text-white/50">MXN</span></p>
-            <button onclick="location.href='registro.html'" class="w-full py-6 bg-accent rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-indigo-500/20 active:scale-95 transition">Activar Poder Total</button>
+            <button onclick="location.href='registro.html'" class="w-full py-6 bg-accent rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-indigo-500/30 active:scale-95 transition duration-500">Activar Poder Total</button>
         </div>
 
-        <div class="glass-card p-12">
+        <div class="glass-card p-12 flex flex-col h-full border-amber-500/10">
             <h2 class="text-2xl font-black italic uppercase mb-10 text-amber-500">Corporativo</h2>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-400">
                 <li>✓ Central Intelligence CEO</li>
@@ -134,19 +135,24 @@
     </footer>
 
     <script>
-        // LÓGICA CAMALEÓN
         function mutar(color, especialidad, icono) {
+            // Cambio de variable raíz para que TODO el sitio responda
             document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('phone-nav').style.background = color;
-            document.getElementById('phone-nav').innerText = icono;
             
-            // Efecto de vibración sutil para indicar cambio
+            // Cambio en el simulador de teléfono
+            const nav = document.getElementById('phone-nav');
+            nav.style.background = color;
+            nav.innerText = icono;
+            
+            // Cambio en el resplandor de fondo
+            document.getElementById('glow-bg').style.backgroundColor = color + "33"; // 33 es opacidad en hex
+
+            // Feedback visual de mutación
             const phone = document.querySelector('.preview-phone');
             phone.style.transform = "scale(1.05)";
             setTimeout(() => phone.style.transform = "scale(1)", 200);
         }
 
-        // LÓGICA SECRETA
         let pulseCount = 0;
         function activarProtocoloRestringido() {
             pulseCount++;
