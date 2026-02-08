@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH | SELECCIÓN DE NODO</title>
+    <title>K.B TECH | INFRAESTRUCTURA MÉDICA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
@@ -12,6 +12,14 @@
         .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 3.5rem; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         .glass-card:hover { transform: translateY(-20px) scale(1.02); border-color: rgba(99, 102, 241, 0.5); background: rgba(255, 255, 255, 0.05); }
         
+        /* NOTAS DE REFLEXIÓN */
+        .reflection-card { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+            border-left: 2px solid #6366f1;
+            transition: 0.4s;
+        }
+        .reflection-card:hover { background: rgba(99, 102, 241, 0.05); transform: translateX(10px); }
+
         .faq-box { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1.5rem 0; cursor: pointer; transition: 0.3s; }
         .faq-box:hover { padding-left: 1rem; border-color: #6366f1; }
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; color: #94a3b8; font-size: 0.8rem; }
@@ -20,7 +28,6 @@
         .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
         
-        /* Interruptor de Moneda */
         .currency-switch { background: rgba(255,255,255,0.05); padding: 4px; border-radius: 1rem; display: inline-flex; gap: 4px; border: 1px solid rgba(255,255,255,0.1); }
         .currency-btn { padding: 6px 16px; border-radius: 0.8rem; font-size: 9px; font-weight: 800; transition: 0.3s; }
         .currency-btn.active { background: #6366f1; color: white; }
@@ -28,27 +35,42 @@
         .auth-trigger { cursor: default; user-select: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center py-20 px-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
+<body class="min-h-screen flex flex-col items-center py-10 px-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
 
     <div class="mb-10 flex items-center gap-3 bg-white/5 px-6 py-2 rounded-full border border-white/10">
         <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
-        <span class="text-[8px] font-black uppercase tracking-[0.3em] text-emerald-400">4 Nodos activados hoy en Tijuana Hub</span>
+        <span class="text-[8px] font-black uppercase tracking-[0.3em] text-emerald-400">4 Nodos fundadores activos en Tijuana Hub</span>
     </div>
 
-    <header class="text-center mb-16 space-y-6">
-        <h1 onclick="activarProtocoloRestringido()" class="auth-trigger text-6xl font-black italic tracking-tighter uppercase leading-none">
-            El futuro <span class="text-indigo-500">es hoy</span>
+    <header class="text-center mb-24 space-y-8 max-w-4xl">
+        <h1 onclick="activarProtocoloRestringido()" class="auth-trigger text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none">
+            EL PRESTIGIO <span class="text-indigo-500">NO ES SUFICIENTE</span>
         </h1>
         
-        <div class="currency-switch mb-4">
+        <div class="currency-switch">
             <button id="btn-mxn" onclick="cambiarMoneda('MXN')" class="currency-btn active">MXN</button>
             <button id="btn-usd" onclick="cambiarMoneda('USD')" class="currency-btn">USD</button>
         </div>
 
         <p class="text-slate-400 text-sm font-medium italic opacity-80 max-w-xl mx-auto">
-            <span class="gemini-star">✦</span> "La tecnología no es solo una herramienta, es la determinación de no quedarse atrás. Gemini Engine ✦ ha despertado."
+            <span class="gemini-star">✦</span> "La tecnología avanza más rápido que su agenda. El futuro de su consultorio depende de su capacidad de evolución digital hoy."
         </p>
     </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl w-full mb-32">
+        <div class="reflection-card p-8 rounded-2xl">
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Nota de Realidad 01</p>
+            <p class="text-sm italic font-medium text-slate-300">"Los jóvenes ya no usan WhatsApp para esperar. Si no pueden agendar en 3 clics, su próximo cliente ya eligió a la competencia."</p>
+        </div>
+        <div class="reflection-card p-8 rounded-2xl">
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Nota de Realidad 02</p>
+            <p class="text-sm italic font-medium text-slate-300">"Usted salva vidas. Gemini Engine ✦ salva su tiempo y su relevancia en un mundo que ya no se detiene a esperar."</p>
+        </div>
+        <div class="reflection-card p-8 rounded-2xl">
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Nota de Realidad 03</p>
+            <p class="text-sm italic font-medium text-slate-300">"Si su consultorio no es digital en 2026, para la nueva generación de pacientes simplemente no existe."</p>
+        </div>
+    </section>
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl w-full mb-32">
         <div class="glass-card p-12 flex flex-col h-full">
@@ -63,13 +85,13 @@
         </div>
 
         <div class="glass-card p-12 border-indigo-500/30 bg-indigo-500/[0.03] scale-105 relative">
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest italic shadow-lg shadow-indigo-500/40">Poder Máximo</div>
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest italic shadow-lg shadow-indigo-500/40">Programa Fundadores</div>
             <h2 class="text-3xl font-black italic uppercase mb-10 text-indigo-400">Dominio</h2>
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-indigo-100/80">
                 <li><span class="text-indigo-400">✓</span> Soporte Táctico Presencial TJ</li>
-                <li><span class="text-indigo-400">✓</span> Modo Camaleón: 30 Temas</li>
-                <li><span class="text-indigo-400">✓</span> Infraestructura Gemini Engine ✦</li>
-                <li><span class="text-indigo-400">✓</span> Migración de Datos Full</li>
+                <li><span class="text-indigo-400">✓</span> Sentinel IA: Clasificación</li>
+                <li><span class="text-indigo-400">✓</span> Infraestructura Gemini 2026</li>
+                <li><span class="text-indigo-400">✓</span> Tarifa Congelada (Pionero)</li>
             </ul>
             <p id="price-1" class="text-3xl font-black mb-8 italic text-indigo-400">$1,599 <span class="text-xs font-normal text-white opacity-50">MXN</span></p>
             <button onclick="seleccionarPlan(1)" class="w-full py-6 bg-indigo-600 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-indigo-500/20 active:scale-95 transition">Activar Poder Total</button>
@@ -80,7 +102,7 @@
             <ul class="text-[10px] space-y-5 mb-12 flex-grow uppercase font-bold text-slate-400">
                 <li><span class="text-amber-500">✓</span> Central Intelligence CEO</li>
                 <li><span class="text-amber-500">✓</span> Control Multi-Nodo</li>
-                <li><span class="text-amber-500">✓</span> Línea Directa con el Comando</li>
+                <li><span class="text-amber-500">✓</span> Consultoría Técnica Local</li>
             </ul>
             <p class="text-2xl font-black mb-8 italic text-amber-500">A Medida</p>
             <button onclick="contactarCEO()" class="w-full py-5 bg-amber-500 text-black rounded-2xl font-black text-[10px] uppercase transition hover:bg-amber-400">Consultoría Élite</button>
@@ -90,23 +112,22 @@
     <section class="max-w-3xl w-full mb-40">
         <h3 class="text-3xl font-black italic uppercase mb-12 text-center text-indigo-500">Protocolos de Confianza</h3>
         <div class="faq-box">
-            <h4 class="text-xs font-black uppercase italic tracking-widest">¿Cómo funciona el soporte en Tijuana?</h4>
-            <div class="faq-answer">No somos una voz en un teléfono. Vamos físicamente a tu consultorio para configurar tu Nodo Gemini Engine ✦ y asegurar que tu transición sea perfecta.</div>
+            <h4 class="text-xs font-black uppercase italic tracking-widest">¿Qué es el Programa de Fundadores?</h4>
+            <div class="faq-answer">Es un acceso exclusivo para los primeros 10 doctores en Tijuana. Incluye soporte técnico presencial en su consultorio y el compromiso de K.B TECH de mantener su tarifa sin aumentos de por vida.</div>
         </div>
         <div class="faq-box">
-            <h4 class="text-xs font-black uppercase italic tracking-widest">¿Qué es el Modo Camaleón?</h4>
-            <div class="faq-answer">Es la capacidad de tu sistema para cambiar de identidad visual según tu especialidad, dándote un prestigio que ninguna agenda común puede ofrecer.</div>
+            <h4 class="text-xs font-black uppercase italic tracking-widest">¿Por qué Gemini Engine ✦?</h4>
+            <div class="faq-answer">A diferencia de agendas tradicionales, nuestro motor utiliza IA para clasificar síntomas y sincronizar precios y servicios en milisegundos. Es tecnología de 2026 aplicada hoy.</div>
         </div>
     </section>
 
-    <footer class="text-center opacity-30">
+    <footer class="text-center opacity-30 pb-10">
         <p class="text-[9px] font-black text-slate-600 uppercase tracking-[0.8em]">K.B Tech Solutions ✦ Gemini Engine ✦ 2026</p>
     </footer>
 
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
-        const tc = 17.50; // Tipo de cambio fijo para la UI
 
         function cambiarMoneda(tipo) {
             const p0 = document.getElementById('price-0');
@@ -117,13 +138,11 @@
             if(tipo === 'USD') {
                 p0.innerHTML = `$58 <span class="text-xs font-normal text-slate-500">USD</span>`;
                 p1.innerHTML = `$92 <span class="text-xs font-normal text-white opacity-50">USD</span>`;
-                btnUSD.classList.add('active');
-                btnMXN.classList.remove('active');
+                btnUSD.classList.add('active'); btnMXN.classList.remove('active');
             } else {
                 p0.innerHTML = `$999 <span class="text-xs font-normal text-slate-500">MXN</span>`;
                 p1.innerHTML = `$1,599 <span class="text-xs font-normal text-white opacity-50">MXN</span>`;
-                btnMXN.classList.add('active');
-                btnUSD.classList.remove('active');
+                btnMXN.classList.add('active'); btnUSD.classList.remove('active');
             }
         }
 
@@ -132,27 +151,21 @@
             pulseCount++;
             if (pulseCount === 3) {
                 const access = prompt("ADMIN_COMMAND: INGRESE CÓDIGO DE AUTORIDAD");
-                if (access === "2026") { 
-                    window.location.href = 'secreto.html'; 
-                } else { pulseCount = 0; }
+                if (access === "2026") { window.location.href = 'secreto.html'; } 
+                else { pulseCount = 0; }
             }
             setTimeout(() => { pulseCount = 0; }, 2000);
         }
 
         async function seleccionarPlan(nivel) {
-            // REGISTRO DE LOGS (TU CÓDIGO ORIGINAL)
             try {
                 fetch(`${URL_DB}/rest/v1/logs_sistema`, {
                     method: 'POST',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pagina_origen: "planes.html", codigo_error: "INTERÉS_PLAN", mensaje_error: `Intento nivel: ${nivel} via Gemini Engine` })
+                    body: JSON.stringify({ pagina_origen: "index.html", codigo_error: "INTERÉS_PLAN", mensaje_error: `Intento nivel: ${nivel}` })
                 });
             } catch(e) {}
-
-            // CIRUGÍA: MARCAMOS EL PLAN ELEGIDO PARA EL REGISTRO
             sessionStorage.setItem('kb_plan_elegido', nivel);
-            
-            // REDIRECCIÓN AL REGISTRO
             window.location.href = 'registro.html';
         }
 
