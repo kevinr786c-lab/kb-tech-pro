@@ -118,8 +118,8 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
-        // --- 🛠️ CIRUGÍA: DETECCIÓN REFORZADA DE PLAN ---
-        // Forzamos a que lea el plan correctamente de la memoria
+        // --- 🛠️ CIRUGÍA: DETECCIÓN BINARIA ---
+        // Se lee el plan de la memoria. Si no hay nada, por defecto es 0 (Aspirante).
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
         
         const infoPlanes = [
@@ -128,9 +128,10 @@
             { nombre: "Corporativo", precio: "Consultoría", color: "#f59e0b" }
         ];
 
+        // Sincronización del badge y precio según el ecosistema
         const planActual = infoPlanes[planElegido];
         const badge = document.getElementById('plan-display-badge');
-        badge.innerText = `NODO: ${planActual.nombre.toUpperCase()}`;
+        badge.innerText = `ECOSISTEMA: ${planActual.nombre.toUpperCase()}`;
         badge.style.background = planActual.color;
         document.getElementById('precio-display').innerHTML = `${planActual.precio} <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span>`;
 
@@ -150,11 +151,8 @@
             const contenedor = document.getElementById('contenedor-colores');
             let temas = CATALOGO[esp] || CATALOGO["General"];
 
-            // --- 🧪 LÓGICA DE DESBLOQUEO ---
-            // Solo restringimos si el plan es estrictamente 0
-            if (planElegido === 0) { 
-                temas = temas.slice(0, 2); 
-            }
+            // --- 🧪 LIBERACIÓN TOTAL ---
+            // Hemos eliminado el recorte de temas (slice). Ahora los 5 están disponibles.
 
             contenedor.innerHTML = "";
             temas.forEach((t) => {
@@ -240,6 +238,7 @@
                 const btn = event.target;
                 btn.innerText = "GEMINI ✦: VALIDANDO...";
                 setTimeout(() => {
+                    // Enrutamiento dinámico según el ecosistema
                     window.location.href = (planElegido === 0) ? `appsolo.html?id=${ultimoIdGenerado}` : `configurar-perfil.html?id=${ultimoIdGenerado}`;
                 }, 1500);
             }
