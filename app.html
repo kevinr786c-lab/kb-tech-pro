@@ -262,8 +262,8 @@
         box.innerHTML += `<div id="${loadingId}" class="msg-ia italic animate-pulse">PROCESANDO CONSULTA...</div>`;
 
         try {
-            // Reemplazar con URL de Render al desplegar Componente 1
-            const URL_IA = "https://tu-proyecto-gratis.onrender.com/preguntar"; 
+            // BUSQUE ESTA LÍNEA EN EL SCRIPT DE IA DE SU app.html
+const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
             const res = await fetch(URL_IA, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
