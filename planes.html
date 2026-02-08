@@ -93,38 +93,35 @@
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
 
-        async function sentinelaPlan(nivel) {
+        // Función Sentinela en segundo plano (no detiene el flujo)
+        function sentinelaPlan(nivel) {
             const nombres = ["ASPIRANTE", "DOMINIO", "CORPORATIVO"];
-            try {
-                await fetch(`${URL_DB}/rest/v1/logs_sistema`, {
-                    method: 'POST',
-                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        pagina_origen: "planes.html", 
-                        codigo_error: "INTERÉS_NODO", 
-                        mensaje_error: `Gemini Engine ✦: Prospecto interesado en nivel: ${nombres[nivel]}` 
-                    })
-                });
-            } catch (e) { console.warn("Sentinela Offline"); }
+            fetch(`${URL_DB}/rest/v1/logs_sistema`, {
+                method: 'POST',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    pagina_origen: "planes.html", 
+                    codigo_error: "INTERÉS_NODO", 
+                    mensaje_error: `Gemini Engine ✦: Prospecto interesado en: ${nombres[nivel]}` 
+                })
+            }).catch(e => console.warn("Sentinela Offline"));
         }
 
-        // --- ⚙️ FUNCIÓN DE SELECCIÓN BLINDADA ---
-        async function seleccionarPlan(nivel) {
-            // Guardamos el nivel forzado como string para evitar errores de tipo
+        // --- ⚙️ FUNCIÓN DE SELECCIÓN REPARADA ---
+        function seleccionarPlan(nivel) {
+            // 1. Guardar de inmediato
             sessionStorage.setItem('kb_plan_elegido', nivel.toString());
             
-            // Log de seguimiento (opcional pero recomendado)
-            await sentinelaPlan(nivel);
+            // 2. Registrar interés (sin esperar respuesta)
+            sentinelaPlan(nivel);
             
-            // Delay táctico para asegurar que el navegador escriba en memoria
-            setTimeout(() => {
-                window.location.href = 'registro.html';
-            }, 100);
+            // 3. Salto directo y garantizado
+            window.location.href = 'registro.html';
         }
 
-        async function contactarCEO() {
-            await sentinelaPlan(2);
-            const msg = encodeURIComponent("Comandante Kevin, solicito integración de Nodo Corporativo Gemini Engine ✦ para mi infraestructura médica.");
+        function contactarCEO() {
+            sentinelaPlan(2);
+            const msg = encodeURIComponent("Comandante Kevin, solicito integración de Nodo Corporativo Gemini Engine ✦.");
             window.open(`https://wa.me/5216641234567?text=${msg}`);
         }
     </script>
