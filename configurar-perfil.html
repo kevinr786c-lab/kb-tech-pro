@@ -51,7 +51,7 @@
                 
                 <div class="space-y-2">
                     <div class="flex gap-2">
-                        <input type="text" id="url_foto_perfil" placeholder="URL Foto Perfil..." class="input-kb flex-1" readonly>
+                        <input type="text" id="url_foto_perfil" placeholder="URL Foto Perfil..." class="input-kb flex-1">
                         <button type="button" onclick="document.getElementById('upload-perfil').click()" class="bg-indigo-600 px-4 rounded-2xl text-[10px] font-black hover:bg-white hover:text-indigo-600 transition">SUBIR</button>
                     </div>
                     <input type="file" id="upload-perfil" class="hidden" accept="image/*" onchange="subirImagen(this, 'url_foto_perfil')">
@@ -59,7 +59,7 @@
 
                 <div class="space-y-2">
                     <div class="flex gap-2">
-                        <input type="text" id="url_logo" placeholder="URL de tu Logo..." class="input-kb flex-1" readonly>
+                        <input type="text" id="url_logo" placeholder="URL de tu Logo..." class="input-kb flex-1">
                         <button type="button" onclick="document.getElementById('upload-logo').click()" class="bg-indigo-600 px-4 rounded-2xl text-[10px] font-black hover:bg-white hover:text-indigo-600 transition">SUBIR</button>
                     </div>
                     <input type="file" id="upload-logo" class="hidden" accept="image/*" onchange="subirImagen(this, 'url_logo')">
@@ -134,7 +134,7 @@
                 
                 <div class="space-y-2">
                     <div class="flex gap-2">
-                        <input type="text" id="foto_consultorio" placeholder="Foto Consultorio..." class="input-kb flex-1" readonly>
+                        <input type="text" id="foto_consultorio" placeholder="Foto Consultorio..." class="input-kb flex-1">
                         <button type="button" onclick="document.getElementById('upload-cons').click()" class="bg-amber-500 px-4 rounded-2xl text-[10px] font-black hover:bg-white hover:text-amber-500 transition">SUBIR</button>
                     </div>
                     <input type="file" id="upload-cons" class="hidden" accept="image/*" onchange="subirImagen(this, 'foto_consultorio')">
@@ -142,7 +142,7 @@
 
                 <div class="space-y-2">
                     <div class="flex gap-2">
-                        <input type="text" id="foto_equipo" placeholder="Foto Equipo..." class="input-kb flex-1" readonly>
+                        <input type="text" id="foto_equipo" placeholder="Foto Equipo..." class="input-kb flex-1">
                         <button type="button" onclick="document.getElementById('upload-equipo').click()" class="bg-amber-500 px-4 rounded-2xl text-[10px] font-black hover:bg-white hover:text-amber-500 transition">SUBIR</button>
                     </div>
                     <input type="file" id="upload-equipo" class="hidden" accept="image/*" onchange="subirImagen(this, 'foto_equipo')">
@@ -185,7 +185,6 @@
             }
         }
 
-        // --- MOTOR DE CARGA DE IMÁGENES K.B TECH ---
         async function subirImagen(input, targetId) {
             const file = input.files[0];
             if (!file) return;
@@ -199,7 +198,6 @@
             formData.append("image", file);
 
             try {
-                // Usamos ImgBB para procesar la imagen (Servicio gratuito Pro)
                 const res = await fetch("https://api.imgbb.com/1/upload?key=67f677f3747372291583e74853039648", {
                     method: "POST",
                     body: formData
