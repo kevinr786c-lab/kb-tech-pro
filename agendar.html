@@ -23,12 +23,18 @@
         .date-card.selected { background: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 30px -10px var(--main); }
         
         .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
-        .time-pill.selected { background: var(--main); color: white; }
-        .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; background: #f8fafc; }
+        .time-pill.selected { background: var(--main); color: white; box-shadow: 0 10px 20px -5px var(--main); }
+        .time-pill.disabled { opacity: 0.15; cursor: not-allowed; background: #f1f5f9; border-style: dashed; }
 
-        .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
+        .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); position: relative; overflow: hidden; }
+        .btn-lujo:not(:disabled):hover { transform: translateY(-3px); background: var(--main); }
+        
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Efecto de carga Élite */
+        .loading-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -60,7 +66,7 @@
                 <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-premium uppercase" required>
                 <div class="flex gap-3">
                     <select id="lada" class="w-24 input-premium text-xs"><option value="52">🇲🇽 +52</option><option value="1">🇺🇸 +1</option></select>
-                    <input type="tel" id="telefono" placeholder="WHATSAPP" class="flex-1 input-premium" required>
+                    <input type="tel" id="telefono" placeholder="WHATSAPP" class="flex-1 input-premium" required title="Ingrese solo números">
                 </div>
                 <textarea id="motivo-consulta" placeholder="MOTIVO DE CONSULTA..." class="input-premium text-xs h-20 resize-none uppercase" required></textarea>
             </div>
@@ -68,24 +74,24 @@
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-2 text-[9px] font-black uppercase text-slate-400">
                     <p>3. Seleccione Día</p>
-                    <span id="current-month" style="color: var(--main)"></span>
+                    <span id="current-month" class="font-black italic uppercase" style="color: var(--main)"></span>
                 </div>
                 <div id="date-slider" class="date-slider text-left"></div>
                 <input type="hidden" id="fecha-sel" required>
             </div>
 
             <div class="space-y-3">
-                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">4. Horarios</p>
+                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">4. Horarios Disponibles</p>
                 <div id="time-grid" class="grid grid-cols-3 gap-3"></div>
                 <input type="hidden" id="hora-sel" required>
             </div>
 
-            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación</button>
+            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Finalizar Reservación ✦</button>
         </form>
 
         <footer class="mt-8 text-center">
             <span class="gemini-star text-xs">✦</span>
-            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Gemini Engine ✦ K.B Solutions</p>
+            <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Powered by Gemini Engine ✦ K.B Tech Solutions</p>
         </footer>
     </div>
 
@@ -109,29 +115,30 @@
         }
 
         async function init() {
-            if(!docId) return eliteAviso("NODO NO IDENTIFICADO");
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
-            const data = await res.json();
-            const doc = data[0];
-            if(doc) {
-                planNivel = doc.plan === 'Dominio' || doc.plan === 'Corporativo' ? 1 : 0;
-                configHoras.inicio = doc.hora_inicio || "09:00";
-                configHoras.fin = doc.hora_fin || "17:00";
+            if(!docId) return eliteAviso("ERROR: NODO NO IDENTIFICADO");
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
+                const data = await res.json();
+                const doc = data[0];
+                if(doc) {
+                    planNivel = doc.plan === 'Dominio' || doc.plan === 'Corporativo' ? 1 : 0;
+                    configHoras.inicio = doc.hora_inicio || "09:00";
+                    configHoras.fin = doc.hora_fin || "17:00";
 
-                const color = (CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"])[0];
-                document.documentElement.style.setProperty('--main', color);
+                    const color = (CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"])[0];
+                    document.documentElement.style.setProperty('--main', color);
 
-                document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad;
-                if(doc.biografia) {
-                    const bioEl = document.querySelector('#doc-bio');
-                    bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
+                    document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
+                    document.getElementById('doc-esp').innerText = doc.especialidad;
+                    if(doc.biografia) {
+                        const bioEl = document.querySelector('#doc-bio');
+                        bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
+                    }
+
+                    syncServiciosHibrido(doc.redes_sociales);
+                    renderDateSlider();
                 }
-
-                // --- MOTOR DE SINCRONIZACIÓN HÍBRIDO ---
-                syncServiciosHibrido(doc.redes_sociales);
-                renderDateSlider();
-            }
+            } catch (err) { eliteAviso("ERROR DE SINCRONIZACIÓN"); }
         }
 
         function syncServiciosHibrido(raw) {
@@ -140,13 +147,11 @@
             let menu = [];
 
             try {
-                // 1. Intentar como JSON (Formato de web.html)
                 const meta = JSON.parse(raw || "{}");
                 if (meta.servicios && meta.servicios.length > 0) {
                     menu = meta.servicios.map(s => ({ nombre: s.nombre, precio: s.precio }));
                 }
             } catch (e) {
-                // 2. Intentar como Texto Plano (Formato Agendador)
                 if (raw && raw.includes("|") && raw.includes(":")) {
                     menu = raw.split("|").map(s => {
                         const [n, p] = s.split(":");
@@ -155,7 +160,6 @@
                 }
             }
 
-            // 3. Catálogo de Emergencia si todo falla
             if (menu.length === 0) {
                 menu = [{ nombre: "CONSULTA GENERAL", precio: 800 }, { nombre: "VALORACIÓN", precio: 400 }];
             }
@@ -172,7 +176,7 @@
             const opt = el.options[el.selectedIndex];
             document.getElementById('monto-sel').value = el.value;
             document.getElementById('servicio-nombre').value = opt.dataset.nombre;
-            eliteAviso(`SERVICIO: ${opt.dataset.nombre}`);
+            eliteAviso(`SELECCIONADO: ${opt.dataset.nombre}`);
         }
 
         function renderDateSlider() {
@@ -198,27 +202,31 @@
 
         async function getHoras(fecha) {
             const grid = document.getElementById('time-grid');
-            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Sincronizando...</p>";
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY_DB} });
-            const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
-            grid.innerHTML = "";
-            let start = parseInt(configHoras.inicio.split(':')[0]);
-            let end = parseInt(configHoras.fin.split(':')[0]);
-            for(let h = start; h < end; h++) {
-                const slots = [h < 10 ? `0${h}:00` : `${h}:00`];
-                if(planNivel > 0) slots.push(h < 10 ? `0${h}:30` : `${h}:30`);
-                slots.forEach(t => {
-                    const pill = document.createElement('div');
-                    pill.className = `time-pill ${ocupadas.includes(t) ? 'disabled' : ''}`;
-                    pill.innerText = t;
-                    if(!ocupadas.includes(t)) pill.onclick = () => {
-                        document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                        pill.classList.add('selected');
-                        document.getElementById('hora-sel').value = t + ":00";
-                    };
-                    grid.appendChild(pill);
-                });
-            }
+            grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase loading-shimmer py-4'>Escaneando disponibilidad...</p>";
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY_DB} });
+                const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
+                grid.innerHTML = "";
+                let start = parseInt(configHoras.inicio.split(':')[0]);
+                let end = parseInt(configHoras.fin.split(':')[0]);
+                for(let h = start; h < end; h++) {
+                    const slots = [h < 10 ? `0${h}:00` : `${h}:00`];
+                    if(planNivel > 0) slots.push(h < 10 ? `0${h}:30` : `${h}:30`);
+                    slots.forEach(t => {
+                        const pill = document.createElement('div');
+                        pill.className = `time-pill ${ocupadas.includes(t) ? 'disabled' : ''}`;
+                        pill.innerText = t;
+                        if(!ocupadas.includes(t)) {
+                            pill.onclick = () => {
+                                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                                pill.classList.add('selected');
+                                document.getElementById('hora-sel').value = t + ":00";
+                            };
+                        }
+                        grid.appendChild(pill);
+                    });
+                }
+            } catch (err) { eliteAviso("ERROR AL CARGAR HORARIOS"); }
         }
 
         document.getElementById('form-cita').onsubmit = async (e) => {
@@ -229,32 +237,36 @@
             const sMon = document.getElementById('monto-sel').value;
             const motivo = document.getElementById('motivo-consulta').value.toUpperCase();
             
-            if(!h || !f || !sNom) return eliteAviso("FALTA SELECCIONAR SERVICIO O HORA");
+            if(!h || !f || !sNom) return eliteAviso("ERROR: SELECCIONE SERVICIO Y HORARIO");
 
             let clasificacionIA = "";
             const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "URGENTE"];
             if (urgenciaKills.some(palabra => motivo.includes(palabra))) clasificacionIA = " | URGENTE 🔴";
 
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "ENLAZANDO..."; btn.disabled = true;
+            btn.innerText = "ESTABLECIENDO CONEXIÓN..."; btn.disabled = true;
 
-            const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
-                method: 'POST',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    doctor_id: docId,
-                    nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                    telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + " | " + sNom + clasificacionIA,
-                    fecha: f, hora: h, pagado: false, monto: parseInt(sMon)
-                })
-            });
+            try {
+                const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        doctor_id: docId,
+                        nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
+                        telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + " | " + sNom + clasificacionIA,
+                        fecha: f, hora: h, pagado: false, monto: parseInt(sMon)
+                    })
+                });
 
-            if(res.ok) {
-                eliteAviso("RESERVACIÓN CONFIRMADA ✅");
-                setTimeout(() => location.reload(), 3000);
-            } else {
-                eliteAviso("ERROR AL AGENDAR");
-                btn.disabled = false; btn.innerText = "Confirmar Reservación";
+                if(res.ok) {
+                    eliteAviso("CONFIRMADO: CITA REGISTRADA CON ÉXITO ✅");
+                    setTimeout(() => location.reload(), 3000);
+                } else {
+                    throw new Error();
+                }
+            } catch (err) {
+                eliteAviso("ERROR CRÍTICO AL AGENDAR");
+                btn.disabled = false; btn.innerText = "Confirmar Reservación ✦";
             }
         };
 
