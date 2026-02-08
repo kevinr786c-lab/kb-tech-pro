@@ -27,8 +27,6 @@
         .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; background: #f8fafc; }
 
         .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
-        .modal-blur { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
@@ -44,7 +42,7 @@
             <div id="doc-icon" class="text-5xl mb-4 grayscale hover:grayscale-0 transition duration-500">🩺</div>
             <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic leading-none text-center">---</h1>
             <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Gemini Engine ✦ Sincronizando...</p>
-            <p id="doc-bio" class="text-[10px] text-slate-500 font-medium mt-6 px-4 leading-relaxed italic opacity-0 transition-opacity duration-1000" id="doc-bio"></p>
+            <p id="doc-bio" class="text-[10px] text-slate-500 font-medium mt-6 px-4 leading-relaxed italic opacity-0 transition-opacity duration-1000"></p>
         </header>
 
         <form id="form-cita" class="space-y-6">
@@ -68,9 +66,9 @@
             </div>
 
             <div class="space-y-3">
-                <div class="flex justify-between items-center px-2">
-                    <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest italic">3. Seleccione Día</p>
-                    <span id="current-month" class="text-[9px] font-black uppercase" style="color: var(--main)"></span>
+                <div class="flex justify-between items-center px-2 text-[9px] font-black uppercase text-slate-400">
+                    <p>3. Seleccione Día</p>
+                    <span id="current-month" style="color: var(--main)"></span>
                 </div>
                 <div id="date-slider" class="date-slider text-left"></div>
                 <input type="hidden" id="fecha-sel" required>
@@ -82,11 +80,6 @@
                 <input type="hidden" id="hora-sel" required>
             </div>
 
-            <div class="flex items-center gap-3 px-2 pt-2">
-                <input type="checkbox" id="check-privacidad" class="w-5 h-5 accent-slate-900" required>
-                <label class="text-[8px] text-slate-400 font-bold uppercase leading-tight text-left">Acepto el <button type="button" onclick="abrirPrivacidad()" class="text-slate-900 underline">Aviso de Privacidad</button></label>
-            </div>
-
             <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación</button>
         </form>
 
@@ -94,17 +87,6 @@
             <span class="gemini-star text-xs">✦</span>
             <p class="text-[7px] font-black text-slate-300 uppercase tracking-widest mt-2">Gemini Engine ✦ K.B Solutions</p>
         </footer>
-    </div>
-
-    <div id="modal-privacidad" class="modal-blur">
-        <div class="bg-white p-10 rounded-[3rem] max-w-sm w-full">
-            <h2 class="font-black uppercase italic text-xl mb-4 tracking-tighter text-center">Protección K.B</h2>
-            <div class="text-[10px] text-slate-400 space-y-4 font-bold uppercase leading-relaxed text-left">
-                <p>1. Datos bajo encriptación de Gemini Engine ✦.</p>
-                <p>2. Comunicación exclusiva vía WhatsApp Business.</p>
-            </div>
-            <button type="button" onclick="cerrarPrivacidad()" class="w-full mt-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase">Aceptar</button>
-        </div>
     </div>
 
     <script>
@@ -143,14 +125,14 @@
                 document.documentElement.style.setProperty('--main', color);
 
                 document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
-                document.getElementById('doc-esp').innerText = doc.especialidad;
+                document.getElementById('doc-esp').innerText = doc.especialidad + (planNivel > 0 ? " | Verificado" : "");
+                
                 if(doc.biografia) {
                     const bioEl = document.getElementById('doc-bio');
                     bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
                 }
-                
-                // SINCRONIZACIÓN REAL DE SERVICIOS
-                syncServiciosReal(doc);
+
+                syncServiciosReal(doc); // PASAMOS EL OBJETO COMPLETO
                 renderDateSlider();
             }
         }
@@ -158,7 +140,7 @@
         function syncServiciosReal(doc) {
             const selector = document.getElementById('select-servicios');
             selector.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>';
-            let raw = doc.redes_sociales || "";
+            let raw = doc.redes_sociales || ""; // LEEMOS COLUMNA REAL
             let menu = [];
 
             if(raw.includes("|") && raw.includes(":")) {
@@ -182,10 +164,9 @@
             const opt = el.options[el.selectedIndex];
             document.getElementById('monto-sel').value = el.value;
             document.getElementById('servicio-nombre').value = opt.dataset.nombre;
-            eliteAviso(`SELECCIONADO: ${opt.dataset.nombre}`);
+            eliteAviso(`SERVICIO: ${opt.dataset.nombre}`);
         }
 
-        // --- LAS SIGUIENTES FUNCIONES SON TUYAS (SIN CAMBIOS) ---
         function renderDateSlider() {
             const slider = document.getElementById('date-slider');
             const now = new Date();
@@ -193,10 +174,11 @@
             const limite = planNivel > 0 ? 14 : 7;
             for(let i=0; i < limite; i++) {
                 const d = new Date(); d.setDate(now.getDate() + i);
+                const dayName = d.toLocaleString('es-mx', {weekday:'short'});
                 const localISO = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                 const card = document.createElement('div');
                 card.className = "date-card";
-                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40">${d.toLocaleString('es-mx', {weekday:'short'})}</span><span class="text-xl font-black">${d.getDate()}</span>`;
+                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40">${dayName}</span><span class="text-xl font-black">${d.getDate()}</span>`;
                 card.onclick = () => {
                     document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
@@ -242,7 +224,6 @@
             
             if(!h || !f || !sNom) return eliteAviso("COMPLETE TODOS LOS PASOS");
 
-            // --- IA DE SÍNTOMAS RECUPERADA ---
             let clasificacionIA = "";
             const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "RESPIRAR", "URGENTE"];
             if (urgenciaKills.some(palabra => motivo.includes(palabra))) clasificacionIA = " | URGENTE 🔴";
@@ -270,8 +251,6 @@
             }
         };
 
-        function abrirPrivacidad() { document.getElementById('modal-privacidad').style.display = 'flex'; }
-        function cerrarPrivacidad() { document.getElementById('modal-privacidad').style.display = 'none'; }
         init();
     </script>
 </body>
