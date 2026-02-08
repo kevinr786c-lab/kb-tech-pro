@@ -14,7 +14,6 @@
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
         .modal-pago { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); }
         .badge-plan { background: #6366f1; color: white; padding: 4px 12px; border-radius: 99px; font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
-        
         .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
@@ -99,7 +98,6 @@
                 <h2 class="text-2xl font-black uppercase italic tracking-tighter">Pasarela BBVA</h2>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic tracking-[0.3em]">Kevin Brayan Reyes Cruz</p>
             </div>
-            
             <div class="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
                 <div>
                     <p class="text-[9px] font-black text-indigo-500 uppercase italic">Clabe Interbancaria</p>
@@ -110,9 +108,7 @@
                     <p class="font-bold italic text-indigo-600" id="pago-concepto">CARGANDO...</p>
                 </div>
             </div>
-
             <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, Gemini Engine ✦ validará la transacción y activará tu Nodo Maestro automáticamente.</p>
-            
             <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">He realizado la transferencia</button>
         </div>
     </div>
@@ -122,8 +118,10 @@
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
         let ultimoIdGenerado = null;
 
-        // --- DETECCIÓN DE PLAN ---
+        // --- 🛠️ CIRUGÍA: DETECCIÓN REFORZADA DE PLAN ---
+        // Forzamos a que lea el plan correctamente de la memoria
         const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
+        
         const infoPlanes = [
             { nombre: "Aspirante", precio: "$999", color: "#64748b" },
             { nombre: "Dominio", precio: "$1,599", color: "#6366f1" },
@@ -152,7 +150,11 @@
             const contenedor = document.getElementById('contenedor-colores');
             let temas = CATALOGO[esp] || CATALOGO["General"];
 
-            if (planElegido === 0) { temas = temas.slice(0, 2); }
+            // --- 🧪 LÓGICA DE DESBLOQUEO ---
+            // Solo restringimos si el plan es estrictamente 0
+            if (planElegido === 0) { 
+                temas = temas.slice(0, 2); 
+            }
 
             contenedor.innerHTML = "";
             temas.forEach((t) => {
@@ -176,7 +178,6 @@
             if(contenedor.firstChild) contenedor.firstChild.click();
         }
 
-        // --- FUNCIÓN DE CARGA DE FOTOS (SIN ERRORES 400) ---
         async function subirAStorage(inputElement, folder) {
             const file = inputElement.files[0];
             if (!file) return null;
@@ -200,11 +201,9 @@
             btn.disabled = true;
 
             try {
-                // 1. Subir fotos
                 const urlPerfil = await subirAStorage(document.getElementById('foto_perfil'), 'perfiles');
                 const urlCedula = await subirAStorage(document.getElementById('foto_cedula'), 'cedulas');
 
-                // 2. Registro en DB
                 const nombre = document.getElementById('nombre').value.trim();
                 const payload = {
                     nombre_doctor: nombre,
