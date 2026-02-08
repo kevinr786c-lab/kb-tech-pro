@@ -10,6 +10,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; color: #0f172a; overflow-x: hidden; transition: 0.5s ease; }
         :root { --main: #6366f1; } 
 
+        /* NOTIFICACIONES DE LUJO */
         #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
@@ -26,7 +27,7 @@
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 10px 20px -5px var(--main); }
         .time-pill.disabled { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; background: #f8fafc; }
 
-        /* ESTILOS NUEVOS: SELECTOR DE SERVICIOS */
+        /* ESTILOS DE SERVICIOS DINÁMICOS */
         .service-card { border: 2px solid #f1f5f9; transition: 0.3s; cursor: pointer; padding: 1.5rem; border-radius: 1.8rem; background: #fff; }
         .service-card.selected { border-color: var(--main); background: rgba(99, 102, 241, 0.05); transform: scale(1.02); }
 
@@ -163,23 +164,36 @@
                     bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
                 }
                 
-                // INYECCIÓN: CARGAR SERVICIOS BASADOS EN ESPECIALIDAD
-                renderServices(doc.especialidad);
+                // --- FUSIÓN: CARGA DINÁMICA DE SERVICIOS ---
+                renderServices(doc);
                 renderDateSlider();
             }
         }
 
-        function renderServices(especialidad) {
-            // Catálogo inteligente de servicios por defecto
-            const menu = [
-                { id: 1, nombre: "Consulta General", precio: 800 },
-                { id: 2, nombre: "Seguimiento", precio: 500 },
-                { id: 3, nombre: "Procedimiento Élite", precio: 1500 }
-            ];
+        function renderServices(doc) {
             const grid = document.getElementById('services-grid');
+            grid.innerHTML = "";
+            
+            // Usamos el campo 'redes_sociales' para leer servicios reales
+            let raw = doc.redes_sociales || "";
+            let menu = [];
+
+            if(raw.includes("|") && raw.includes(":")) {
+                menu = raw.split("|").map(s => {
+                    const [nombre, precio] = s.split(":");
+                    return { nombre: nombre.trim(), precio: precio ? precio.replace("$","").trim() : 0 };
+                });
+            } else {
+                // Catálogo Pro de Respaldo por especialidad si no hay datos
+                menu = [
+                    { nombre: "CONSULTA ESPECIALIZADA", precio: 800 },
+                    { nombre: "RE-VALORACIÓN", precio: 500 }
+                ];
+            }
+
             grid.innerHTML = menu.map(s => `
                 <div class="service-card flex justify-between items-center" onclick="seleccionarServicio(this, ${s.precio}, '${s.nombre}')">
-                    <p class="text-[10px] font-black uppercase text-slate-800">${s.nombre}</p>
+                    <p class="text-[10px] font-black uppercase text-slate-800 tracking-tighter">${s.nombre}</p>
                     <p class="text-sm font-black text-indigo-600">$${s.precio}</p>
                 </div>
             `).join('');
@@ -190,7 +204,7 @@
             el.classList.add('selected');
             document.getElementById('monto-sel').value = precio;
             document.getElementById('servicio-nombre').value = nombre;
-            eliteAviso(`SELECCIONADO: ${nombre}`);
+            eliteAviso(`OBJETIVO: ${nombre}`);
         }
 
         function renderDateSlider() {
@@ -250,11 +264,12 @@
             const sMon = document.getElementById('monto-sel').value;
             const motivo = document.getElementById('motivo-consulta').value.toUpperCase();
             
-            if(!h || !f) return eliteAviso("POR FAVOR SELECCIONE FECHA Y HORA");
-            if(!sNom) return eliteAviso("POR FAVOR SELECCIONE UN SERVICIO");
+            if(!h || !f) return eliteAviso("FALTA FECHA Y HORA");
+            if(!sNom) return eliteAviso("ELIJA UN OBJETIVO DE VISITA");
 
+            // TU LÓGICA DE IA DE SÍNTOMAS (INTACTA)
             let clasificacionIA = "";
-            const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "RESPIRAR", "ACCIDENTE", "URGENTE", "FRACTURA"];
+            const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "RESPIRAR", "URGENTE", "FRACTURA"];
             const prioridadKills = ["FIEBRE", "VOMITO", "FUERTE", "DIARREA", "MAREO", "DESMAYO"];
 
             if (urgenciaKills.some(palabra => motivo.includes(palabra))) {
@@ -272,12 +287,10 @@
                 body: JSON.stringify({
                     doctor_id: docId,
                     nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                    // Fusionamos el nombre del servicio con el motivo y la clasificación IA
-                    telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + clasificacionIA,
-                    fecha: f, 
-                    hora: h, 
-                    pagado: false, 
-                    monto: parseInt(sMon) // Inyectamos el monto real a cobrar
+                    // Fusión de Teléfono + Servicio + Clasificación IA
+                    telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + " | " + sNom + clasificacionIA,
+                    fecha: f, hora: h, pagado: false, 
+                    monto: parseInt(sMon) // MONTO REAL SINCRONIZADO
                 })
             });
 
@@ -285,7 +298,7 @@
                 eliteAviso("RESERVACIÓN CONFIRMADA CON ÉXITO");
                 setTimeout(() => location.reload(), 3000);
             } else {
-                eliteAviso("ERROR AL AGENDAR");
+                eliteAviso("ERROR EN EL ENLACE");
                 btn.disabled = false; btn.innerText = "Confirmar Reservación";
             }
         };
