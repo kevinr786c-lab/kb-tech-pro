@@ -12,7 +12,8 @@
         :root { --main: #6366f1; --bg: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; text-align: left; }
         
-        body.privacy-mode .blur-sensitive { filter: blur(12px); pointer-events: none; transition: 0.4s; }
+        /* MODO PRIVACIDAD EXPANDIDO */
+        body.privacy-mode .blur-sensitive { filter: blur(15px); pointer-events: none; transition: 0.4s; }
 
         .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
         .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; font-size: 0.9rem; }
@@ -98,6 +99,9 @@
         <nav class="space-y-4">
             <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl" id="btn-cal-pro"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Radar de Citas</span></button>
             <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span></button>
+            <button onclick="window.location.href='app.html?id=' + docId" class="flex items-center gap-5 w-full p-5 bg-indigo-500/10 border border-indigo-500/30 rounded-3xl text-indigo-400 hover:bg-indigo-600 hover:text-white transition text-left">
+                <div class="text-2xl">🩺</div><span class="text-[11px] font-black uppercase tracking-widest">Ir a Nodo Maestro</span>
+            </button>
             <button onclick="toggleMenu(); abrirGasto()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">💸</div><span class="text-[11px] font-black uppercase tracking-widest">Registrar Gasto</span></button>
             <button onclick="toggleMenu(); abrirInsumo()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">📦</div><span class="text-[11px] font-black uppercase tracking-widest">Almacén</span></button>
             <hr class="border-slate-800 my-4">
@@ -123,7 +127,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div class="glass-panel p-8 border-b-4 border-indigo-500">
                 <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1">Citas de Hoy</p>
-                <p class="text-4xl font-black text-slate-800 italic" id="stat-citas">--</p>
+                <p class="text-4xl font-black text-slate-800 italic blur-sensitive" id="stat-citas">--</p>
             </div>
             <div class="glass-panel p-8 border-b-4 border-emerald-500">
                 <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1">Recaudación Real</p>
@@ -143,7 +147,7 @@
                     <p id="patient-time-display" class="text-xs font-bold text-slate-500 uppercase italic">Standby</p>
                     <div id="nota-del-doctor-panel" class="mt-6 p-4 bg-amber-50 rounded-2xl border-l-4 border-amber-400 hidden">
                         <p class="text-[9px] font-black text-amber-600 uppercase mb-1 italic">Instrucción del Dr:</p>
-                        <p id="txt-nota-doctor" class="text-xs font-bold text-amber-900 uppercase italic">...</p>
+                        <p id="txt-nota-doctor" class="text-xs font-bold text-amber-900 uppercase italic blur-sensitive">...</p>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-10">
                         <button onclick="contactarWhatsApp()" class="py-5 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[11px] uppercase tracking-widest">WhatsApp</button>
@@ -188,7 +192,6 @@
             "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
         };
 
-        // --- FUNCIONES DE BÚNKER (SINCRO CON DOCTOR) ---
         function updateDots() {
             const val = document.getElementById('pin-acceso').value;
             for(let i=1; i<=4; i++) {
@@ -242,7 +245,6 @@
                 document.getElementById('btn-cal-pro').style.backgroundColor = color;
                 document.getElementById('menu-title-tech').style.color = color;
                 
-                // Animación de éxito
                 document.getElementById('lock-icon').style.transform = "rotate(360deg) scale(1.2)";
                 document.getElementById('lock-icon').innerText = "✅";
 
@@ -389,7 +391,7 @@
                     ${filtradas.map(c => `
                         <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
                             <p class="text-[8px] font-black text-indigo-500 mb-1">${c.hora.slice(0,5)} HS</p>
-                            <p class="text-[11px] font-black text-slate-800 uppercase leading-none mb-2">${c.nombre_paciente}</p>
+                            <p class="text-[11px] font-black text-slate-800 uppercase leading-none mb-2 blur-sensitive">${c.nombre_paciente}</p>
                             <div class="flex gap-2">
                                 <button onclick="window.open('https://wa.me/${c.telefono.split(' ')[0]}')" class="text-[8px] font-black text-emerald-500 uppercase">WhatsApp</button>
                                 <button onclick="enfocarDia('${fecha}')" class="text-[8px] font-black text-slate-400 uppercase">Ver Día</button>
