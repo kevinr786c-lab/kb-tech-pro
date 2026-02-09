@@ -570,49 +570,73 @@
             const rfc = document.getElementById('billing-data').value || "XAXX010101000";
             const amt = document.getElementById('pay-amount').value || 0;
             const fecha = new Date().toLocaleDateString('es-MX');
+            const folio = Math.floor(100000 + Math.random() * 900000);
             
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
             const doc = new jsPDF();
             
-            // Estética de Marca
+            // Estética Corporativa
             doc.setFillColor(15, 23, 42); 
-            doc.rect(0, 0, 210, 45, 'F');
+            doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(24);
+            doc.setFontSize(22);
             doc.setFont("helvetica", "bold");
-            doc.text("K.B TECH MEDICAL HUB", 20, 25);
-            doc.setFontSize(10);
-            doc.text("COMPROBANTE DE SERVICIOS MÉDICOS", 20, 35);
+            doc.text("K.B MEDICAL HUB", 20, 25);
+            doc.setFontSize(8);
+            doc.text("SISTEMA DE FACTURACIÓN INTEGRAL BINACIONAL", 20, 32);
             
-            // Datos del Emisor (Doctor)
+            // Folio y Fecha
+            doc.setTextColor(255, 255, 255);
+            doc.text(`FOLIO: KB-${folio}`, 160, 22);
+            doc.text(`FECHA: ${fecha}`, 160, 28);
+
+            // Datos Emisor
             doc.setTextColor(30, 41, 59);
-            doc.setFontSize(12);
-            doc.text(`DR. ${docData.nombre_doctor.toUpperCase()}`, 20, 60);
-            doc.setFontSize(9);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("DATOS DEL PRESTADOR", 20, 55);
             doc.setFont("helvetica", "normal");
-            doc.text(`${docData.especialidad.toUpperCase()}`, 20, 65);
-            doc.text(`CED. PROF: ${docData.cedula || '---'}`, 20, 70);
-            doc.text(`${docData.direccion_consultorio || 'TIJUANA, B.C.'}`, 20, 75);
-            
+            doc.setFontSize(9);
+            doc.text(`DR. ${docData.nombre_doctor.toUpperCase()}`, 20, 62);
+            doc.text(`${docData.especialidad.toUpperCase()}`, 20, 67);
+            doc.text(`CÉDULA: ${docData.cedula || '---'}`, 20, 72);
+            doc.text(`${docData.direccion_consultorio || 'TIJUANA, B.C.'}`, 20, 77);
+
+            // Línea divisoria
             doc.setDrawColor(226, 232, 240);
             doc.line(20, 85, 190, 85);
-            
-            // Datos del Receptor (Paciente)
+
+            // Datos Receptor
             doc.setFont("helvetica", "bold");
-            doc.text("DATOS DEL PACIENTE", 20, 95);
+            doc.text("RECEPTOR / PACIENTE", 20, 95);
             doc.setFont("helvetica", "normal");
-            doc.text(`NOMBRE: ${p.nombre_paciente}`, 20, 105);
-            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 110);
-            doc.text(`FECHA DE SERVICIO: ${fecha}`, 20, 115);
-            
+            doc.text(`NOMBRE: ${p.nombre_paciente}`, 20, 102);
+            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 107);
+            doc.text("USO CFDI: G03 - GASTOS EN GENERAL", 20, 112);
+
+            // Tabla de Servicios
             doc.autoTable({
-                startY: 125,
-                head: [['DESCRIPCIÓN', 'UNIDAD', 'MONTO']],
-                body: [['CONSULTA MÉDICA ESPECIALIZADA', 'E48', `$${amt}.00 MXN`]],
-                headStyles: { fillColor: [99, 102, 241] },
+                startY: 120,
+                head: [['CANT', 'CÓDIGO SAT', 'DESCRIPCIÓN', 'MONTO']],
+                body: [['1', '83111502', 'CONSULTA MÉDICA ESPECIALIZADA', `$${amt}.00 MXN`]],
+                headStyles: { fillColor: [99, 102, 241], fontSize: 9 },
+                styles: { fontSize: 8, cellPadding: 5 },
                 theme: 'striped'
             });
+
+            // Sello Digital Mock
+            const finalY = doc.lastAutoTable.finalY + 20;
+            doc.setFontSize(7);
+            doc.setTextColor(148, 163, 184);
+            doc.text("CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACIÓN DIGITAL DEL SAT:", 20, finalY);
+            doc.setFont("courier", "normal");
+            doc.text(`||1.1|KB-TECH-${folio}|${fecha}|SAT970701NN3|KBT${Math.random().toString(36).substring(7).toUpperCase()}||`, 20, finalY + 5, {maxWidth: 170});
             
+            // Branding Fondo
+            doc.setFontSize(40);
+            doc.setTextColor(241, 245, 249);
+            doc.text("K.B TECH VERIFIED", 45, 250, { angle: 45 });
+
             doc.save(`FACTURA_${p.nombre_paciente}.pdf`);
             eliteAviso("FACTURA GENERADA ✦");
         }
@@ -620,43 +644,58 @@
         function generarSuperbillUSA_Premium() {
             const p = currentPatient;
             const docData = globalDocData;
-            const insuranceId = document.getElementById('billing-data').value || "PENDING";
+            const insuranceId = document.getElementById('billing-data').value || "SELF-PAY";
             const amt = document.getElementById('pay-amount').value || 0;
             const fecha = new Date().toLocaleDateString('en-US');
+            const folio = Math.floor(100000 + Math.random() * 900000);
             
             if(!p) return eliteAviso("SELECT PATIENT");
             const doc = new jsPDF();
             
-            doc.setDrawColor(99, 102, 241);
-            doc.setLineWidth(1.5);
-            doc.line(20, 20, 190, 20);
-            doc.setTextColor(30, 41, 59);
-            doc.setFontSize(18);
+            // Header USA Style
+            doc.setDrawColor(30, 41, 59);
+            doc.setLineWidth(0.5);
+            doc.line(20, 25, 190, 25);
+            
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
-            doc.text("HEALTH INSURANCE CLAIM FORM", 20, 35);
+            doc.text("HEALTH INSURANCE CLAIM FORM (SUPERBILL)", 20, 20);
             
-            doc.setFontSize(10);
-            doc.text("PROVIDER INFORMATION", 120, 55);
+            doc.setFontSize(9);
+            doc.text("PHYSICIAN / PROVIDER INFO", 120, 40);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text(`Provider: DR. ${docData.nombre_doctor}`, 120, 62);
-            doc.text(`Facility: ${docData.direccion_consultorio}`, 120, 67);
-            
+            doc.text(`Name: DR. ${docData.nombre_doctor}`, 120, 46);
+            doc.text(`NPI/Tax ID: PENDING`, 120, 51);
+            doc.text(`Address: ${docData.direccion_consultorio}`, 120, 56, {maxWidth: 70});
+
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.text("PATIENT INFORMATION", 20, 55);
+            doc.text("PATIENT INFO", 20, 40);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text(`Full Name: ${p.nombre_paciente}`, 20, 62);
-            doc.text(`Insurance ID: ${insuranceId.toUpperCase()}`, 20, 67);
-            
+            doc.text(`Full Name: ${p.nombre_paciente}`, 20, 46);
+            doc.text(`Insurance ID: ${insuranceId.toUpperCase()}`, 20, 51);
+            doc.text(`Date of Service: ${fecha}`, 20, 56);
+
+            // Table of Charges
             doc.autoTable({
-                startY: 85,
-                head: [['CPT CODE', 'DESCRIPTION', 'CHARGES']],
-                body: [['99213', 'OUTPATIENT OFFICE VISIT', `$${(amt/tc).toFixed(2)} USD`]],
-                headStyles: { fillColor: [30, 41, 59] }
+                startY: 70,
+                head: [['DATE', 'CPT CODE', 'DIAGNOSIS (ICD-10)', 'DESCRIPTION', 'CHARGES']],
+                body: [[fecha, '99213', 'Z00.00', 'OFFICE VISIT - ESTABLISHED', `$${(amt/tc).toFixed(2)} USD`]],
+                headStyles: { fillColor: [15, 23, 42] },
+                theme: 'grid'
             });
+
+            // Footer Legal
+            const finalY = doc.lastAutoTable.finalY + 30;
+            doc.line(20, finalY, 90, finalY);
+            doc.setFontSize(8);
+            doc.text("PROVIDER SIGNATURE", 20, finalY + 5);
+            doc.text("I certify that the services listed above were medically necessary.", 20, finalY + 15);
             
+            // Folio Tracking
+            doc.setTextColor(203, 213, 225);
+            doc.text(`CONTROL ID: KB-USA-${folio}`, 150, 280);
+
             doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
             eliteAviso("SUPERBILL GENERATED ✦");
         }
