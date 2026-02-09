@@ -248,7 +248,6 @@
         document.getElementById('ia-panel').classList.toggle('open');
     }
 
-    // --- CIRUGÍA DE PRECISIÓN: FUNCIÓN REPARADA ---
     async function enviarComandoIA() {
         const input = document.getElementById('ia-input');
         const box = document.getElementById('ia-chat-box');
@@ -264,9 +263,9 @@
 
         try {
             const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
-            
             const res = await fetch(URL_IA, {
                 method: 'POST',
+                mode: 'cors',
                 headers: { 
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
@@ -274,29 +273,23 @@
                 body: JSON.stringify({ prompt: orden })
             });
 
-            // VALIDACIÓN DE STATUS
-            if (!res.ok) throw new Error("SERVIDOR EN REPOSO O ERROR 500");
+            if (!res.ok) throw new Error(`ERROR ${res.status}: SERVIDOR EN REPOSO`);
 
             const data = await res.json();
             
-            const loader = document.getElementById(loadingId);
-            if(loader) loader.remove();
-
+            document.getElementById(loadingId).remove();
+            
             if (data && data.respuesta) {
                 box.innerHTML += `<div class="msg-ia">${data.respuesta}</div>`;
-            } else if (data && typeof data === 'string') {
+            } else if (typeof data === 'string') {
                 box.innerHTML += `<div class="msg-ia">${data}</div>`;
             } else {
-                box.innerHTML += `<div class="msg-ia text-amber-500 font-bold">> ADVERTENCIA: RESPUESTA NO ESTRUCTURADA.</div>`;
+                box.innerHTML += `<div class="msg-ia text-amber-500 font-bold">ERROR: EL CEREBRO NO DEVOLVIÓ DATOS LEGIBLES.</div>`;
             }
         } catch (err) {
-            const loader = document.getElementById(loadingId);
-            if(loader) {
-                loader.classList.remove('animate-pulse');
-                loader.classList.add('text-rose-500', 'font-black');
-                loader.innerText = "ERROR: " + err.message + ". REINTENTANDO VÍNCULO...";
-            }
-            console.error("Falla en Nodo:", err);
+            document.getElementById(loadingId).classList.remove('animate-pulse');
+            document.getElementById(loadingId).classList.add('text-rose-500', 'font-black');
+            document.getElementById(loadingId).innerText = "ERROR CRÍTICO: " + err.message + ". REINTENTANDO VÍNCULO...";
         }
         box.scrollTop = box.scrollHeight;
     }
