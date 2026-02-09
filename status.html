@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.B TECH | ESTADO DEL NODO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; }
+        .glow-text { text-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+        .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 2rem; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="p-6 md:p-20">
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-20 text-center">
+            <h1 class="text-6xl font-black italic tracking-tighter uppercase mb-4 glow-text">K.B <span class="text-indigo-500">Vision</span> ✦</h1>
+            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.5em] italic">Reporte para Fundadores | Nodo Maestro 2026</p>
+        </header>
+
+        <main class="space-y-10">
+            <section class="glass-card p-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="status-dot"></div>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-emerald-400">Estado del Desarrollo: FASE BETA ALPHA</h2>
+                </div>
+                <p class="text-slate-400 leading-relaxed text-sm mb-6">
+                    Actualmente, el **Cerebro K.B** ha sido sincronizado exitosamente con los servidores de Oregón, utilizando motores de Inteligencia Artificial de última generación (**Gemini 2.0 Flash**). Hemos superado la etapa de infraestructura y estamos en la fase de refinamiento de la "Conexión Neural".
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                        <p class="text-[8px] font-black text-indigo-400 uppercase italic">Servidor</p>
+                        <p class="font-bold text-xs uppercase">Render Cloud (Oregón)</p>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                        <p class="text-[8px] font-black text-indigo-400 uppercase italic">Motor IA</p>
+                        <p class="font-bold text-xs uppercase">Google Gemini 2.0</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-8 border-l-4 border-indigo-500">
+                    <h3 class="font-black text-sm uppercase mb-4 italic">⚡ Velocidad de Diagnóstico</h3>
+                    <p class="text-[11px] text-slate-400 leading-relaxed uppercase font-bold">Reducción del 70% en el tiempo de análisis de síntomas mediante procesamiento masivo de datos en tiempo real.</p>
+                </div>
+                <div class="glass-card p-8 border-l-4 border-emerald-500">
+                    <h3 class="font-black text-sm uppercase mb-4 italic">🩺 Automatización Élite</h3>
+                    <p class="text-[11px] text-slate-400 leading-relaxed uppercase font-bold">Generación de recetas y expedientes digitales sin intervención humana manual, minimizando errores clínicos.</p>
+                </div>
+            </section>
+
+            <section class="glass-card p-10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 text-5xl opacity-10">🚀</div>
+                <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 mb-8 italic">Hoja de Ruta (Next Steps)</h3>
+                <ul class="space-y-4 text-xs font-bold uppercase tracking-wide text-slate-300">
+                    <li class="flex items-center gap-3">
+                        <span class="text-indigo-500">01.</span> Integración de Visión por Computadora (Análisis de Rayos X).
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-indigo-500">02.</span> Nodo de Telemedicina Encriptada con Latencia Cero.
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-indigo-500">03.</span> Expansión de Base de Datos para Medicina Preventiva.
+                    </li>
+                </ul>
+            </section>
+        </main>
+
+        <footer class="mt-20 text-center pb-20">
+            <button onclick="window.history.back()" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 transition shadow-2xl">
+                Volver al Búnker
+            </button>
+        </footer>
+    </div>
+</body>
+</html>
