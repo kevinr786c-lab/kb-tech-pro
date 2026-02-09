@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B TECH | ESTRATEGIA GLOBAL</title>
+    <title>K.B TECH | MULTI-NODE STRATEGY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
@@ -12,125 +12,108 @@
         .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 2rem; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .vision-border { border-left: 2px solid rgba(99, 102, 241, 0.3); padding-left: 1.5rem; }
         .warning-gradient { background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%); border-left: 4px solid #ef4444; }
-        .level-card { border: 1px solid rgba(255,255,255,0.03); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .level-card:hover { border-color: rgba(99, 102, 241, 0.5); background: rgba(99, 102, 241, 0.08); transform: translateY(-5px); }
-        .specialty-tag { font-size: 8px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+        .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .level-tag { font-size: 7px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+        .vision-text { font-size: 9px; color: #94a3b8; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; font-style: italic; }
     </style>
 </head>
 <body class="p-6 md:p-20">
-    <div class="max-w-4xl mx-auto">
-        <header class="mb-20 text-center">
-            <h1 class="text-6xl font-black italic tracking-tighter uppercase mb-4 glow-text">K.B <span class="text-indigo-500">Global</span> ✦</h1>
-            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.5em] italic">De Tijuana para el Mundo | Master Node 2026</p>
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-16 text-center">
+            <h1 class="text-6xl font-black italic tracking-tighter uppercase mb-4 glow-text">K.B <span class="text-indigo-500">Multinodo</span> ✦</h1>
+            <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.5em] italic">Ecosistema Médico Integral | Global Vision 2026</p>
         </header>
 
-        <main class="space-y-12">
+        <main class="space-y-10">
             <section class="p-8 rounded-3xl warning-gradient">
-                <h3 class="text-[11px] font-black uppercase tracking-[0.4em] text-red-500 mb-4 italic">Alerta de Soberanía Tecnológica</h3>
-                <p class="text-sm font-bold text-slate-200 leading-relaxed italic">
-                    "Hoy muchos ven la Inteligencia Artificial como un juguete o una herramienta de ocio. Pero mientras el mundo se distrae en lo vulgar, el futuro se está privatizando."
-                </p>
-                <p class="text-[11px] text-slate-400 mt-4 leading-relaxed uppercase font-medium">
-                    K.B TECH es un escudo contra la dependencia. Si el sector médico no toma el control ahora, mañana será rehén de precios exorbitantes. Estamos asegurando que el doctor sea el dueño del algoritmo, y no al revés.
+                <h3 class="text-[11px] font-black uppercase tracking-[0.4em] text-red-500 mb-2 italic">Blindaje Legal y Ético</h3>
+                <p class="text-[10px] text-slate-400 uppercase font-bold leading-relaxed">
+                    Protocolos NOM-024-SSA3 y HIPAA integrados. El sistema funciona como **Soporte de Decisión Clínica**, asegurando que el especialista mantenga la soberanía total sobre el diagnóstico final.
                 </p>
             </section>
 
-            <section class="glass-card p-10">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="status-dot"></div>
-                    <h2 class="text-xs font-black uppercase tracking-widest text-emerald-400">Estado: NODO OREGÓN LIVE (NIVEL 1)</h2>
-                </div>
-                <p class="text-slate-400 leading-relaxed text-sm mb-6 uppercase font-bold">
-                    Implementación de **Gemini 2.0 Flash**. Hemos blindado el acceso a la red para protocolos médicos estrictos, eliminando la carga administrativa y garantizando la soberanía de los datos.
-                </p>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 text-center">
-                        <p class="text-[8px] font-black text-indigo-400 uppercase italic">Seguridad</p>
-                        <p class="font-bold text-[10px] uppercase">Encriptación de Grado Clínico</p>
+            <div class="spec-grid">
+                
+                <div class="glass-card p-6 border-t-2 border-red-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-black text-sm uppercase italic">Cardiología</h3>
+                        <span class="level-tag text-red-400">Escudo Vital</span>
                     </div>
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 text-center">
-                        <p class="text-[8px] font-black text-indigo-400 uppercase italic">Control</p>
-                        <p class="font-bold text-[10px] uppercase">Soberanía Digital Absoluta</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="space-y-6">
-                <h3 class="text-[12px] font-black uppercase tracking-[0.4em] text-indigo-400 mb-8 italic text-center text-white">Línea de Tiempo de Expansión</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
-                        <p class="text-[10px] font-black text-emerald-500 mb-2 uppercase">Nivel 01: Cimiento Neural</p>
-                        <p class="text-xs font-bold text-white mb-2 italic">Automatización y Sincronización</p>
-                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase font-bold">Estado: <span class="text-emerald-500">OPERATIVO</span></p>
-                    </div>
-                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
-                        <p class="text-[10px] font-black text-indigo-500 mb-2 uppercase">Nivel 02: Visión Diagnóstica</p>
-                        <p class="text-xs font-bold text-white mb-2 italic">IA en Odontología y Ginecología</p>
-                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Análisis visual de radiografías y patrones preventivos en embarazos de alto riesgo. <span class="text-amber-500">BETA</span></p>
-                    </div>
-                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
-                        <p class="text-[10px] font-black text-indigo-500 mb-2 uppercase">Nivel 03: Medicina Predictiva</p>
-                        <p class="text-xs font-bold text-white mb-2 italic">Pronóstico vs Diagnóstico</p>
-                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Predecir enfermedades basadas en datos transfronterizos y hábitos regionales.</p>
-                    </div>
-                    <div class="level-card p-6 rounded-2xl bg-white/[0.02] border-indigo-500/30">
-                        <p class="text-[10px] font-black text-indigo-400 mb-2 uppercase">Nivel 04: Presencia Absoluta</p>
-                        <p class="text-xs font-bold text-white mb-2 italic">Sincronización Biométrica (Wearables)</p>
-                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">El Apple Watch del paciente se convierte en una extensión del búnker médico.</p>
-                    </div>
-                </div>
-                <div class="level-card p-6 rounded-2xl bg-indigo-500/10 border-indigo-500/30 text-center">
-                    <p class="text-[10px] font-black text-indigo-400 mb-2 uppercase tracking-[0.5em]">Nivel 05: Dominio Transnacional</p>
-                    <p class="text-xs font-bold text-white mb-2 italic uppercase">Escalabilidad de Tijuana para el Mundo</p>
-                    <p class="text-[10px] text-slate-400 leading-relaxed uppercase">Exportación del Sistema Operativo Médico K.B a centros de salud globales.</p>
-                </div>
-            </section>
-
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-card p-8 border-l-4 border-indigo-500">
-                    <div class="flex justify-between mb-4">
-                        <h3 class="font-black text-sm uppercase italic">Odontología</h3>
-                        <span class="specialty-tag">Visión IA</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed uppercase font-bold">
-                        Detección automatizada en radiografías y simulaciones quirúrgicas preventivas basadas en gemelos digitales.
+                    <p class="text-[10px] text-slate-400 uppercase font-bold leading-tight">
+                        Análisis de ECG mediante IA y monitoreo de arritmias vía Wearables. Predicción de crisis hipertensivas en tiempo real.
                     </p>
+                    <p class="vision-text">VISIÓN: Pasar de reaccionar ante el infarto a prevenirlo 5 horas antes mediante telemetría constante.</p>
                 </div>
-                <div class="glass-card p-8 border-l-4 border-emerald-500">
-                    <div class="flex justify-between mb-4">
+
+                <div class="glass-card p-6 border-t-2 border-sky-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-black text-sm uppercase italic">Pediatría</h3>
+                        <span class="level-tag text-sky-400">Centinela Infantil</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold leading-tight">
+                        Automatización de curvas de desarrollo y alertas de vacunación. IA de triaje para reducir saturación en emergencias.
+                    </p>
+                    <p class="vision-text">VISIÓN: Un guardián digital 24/7 que conecte la calma de los padres con la precisión del pediatra.</p>
+                </div>
+
+                <div class="glass-card p-6 border-t-2 border-emerald-500/50">
+                    <div class="flex justify-between items-start mb-4">
                         <h3 class="font-black text-sm uppercase italic">Ginecología</h3>
-                        <span class="specialty-tag">Monitoreo Vital</span>
+                        <span class="level-tag text-emerald-400">Protocolo Vida</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed uppercase font-bold">
-                        Alertas tempranas de preeclampsia y control biométrico 24/7 en embarazos críticos.
+                    <p class="text-[10px] text-slate-400 uppercase font-bold leading-tight">
+                        Seguimiento de embarazos de alto riesgo con telemetría fetal. Prevención de preeclampsia mediante Big Data.
                     </p>
+                    <p class="vision-text">VISIÓN: Cero muertes materno-fetales por falta de monitoreo. Presencia absoluta sin invasión.</p>
                 </div>
-            </section>
 
-            <section class="p-10 border border-white/5 rounded-[3rem] bg-gradient-to-br from-indigo-500/10 to-transparent">
-                <div class="space-y-8">
-                    <div class="vision-border">
-                        <p class="text-lg font-bold italic text-white mb-2 text-indigo-400">Instinto Local vs Inteligencia Genérica</p>
-                        <p class="text-[11px] text-slate-400 uppercase leading-relaxed font-medium">
-                            La IA de Silicon Valley no entiende a nuestra gente. Nosotros sí. Estamos entrenando la red neural para descifrar la dinámica de nuestra frontera. La inteligencia sin contexto es solo ruido costoso.
-                        </p>
+                <div class="glass-card p-6 border-t-2 border-indigo-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-black text-sm uppercase italic">Odontología</h3>
+                        <span class="level-tag text-indigo-400">Precisión Óptica</span>
                     </div>
-                    <div class="vision-border">
-                        <p class="text-lg font-bold italic text-white mb-2 text-indigo-400">Metamorfosis y Resistencia</p>
-                        <p class="text-[11px] text-slate-400 uppercase leading-relaxed font-medium italic">
-                            "Todo hombre herido se ve forzado a la metamorfosis. El deseo constante de resistir es solo el amor al futuro."
-                        </p>
-                    </div>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold leading-tight">
+                        Detección de caries profundas y anomalías en radiografías. Simulación de resultados estéticos predictivos.
+                    </p>
+                    <p class="vision-text">VISIÓN: Diagnósticos indiscutibles que aumenten la confianza del paciente y la rentabilidad del nodo.</p>
                 </div>
+
+                <div class="glass-card p-6 border-t-2 border-amber-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-black text-sm uppercase italic">Medicina Interna</h3>
+                        <span class="level-tag text-amber-400">Cerebro Analítico</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold leading-tight">
+                        Gestión de pacientes crónicos (diabetes/hipertensión). Ajuste de dosis basado en respuesta metabólica real.
+                    </p>
+                    <p class="vision-text">VISIÓN: Convertir enfermedades crónicas en condiciones controladas matemáticamente por el algoritmo.</p>
+                </div>
+
+                <div class="glass-card p-6 border-t-2 border-purple-500/50">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="font-black text-sm uppercase italic">Salud Mental</h3>
+                        <span class="level-tag text-purple-400">Patrón Tonal</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold leading-tight">
+                        Análisis de voz y sueño para detectar picos de ansiedad o depresión de manera objetiva y no subjetiva.
+                    </p>
+                    <p class="vision-text">VISIÓN: Alertas preventivas ante crisis emocionales, permitiendo intervención humana antes del colapso.</p>
+                </div>
+
+            </div>
+
+            <section class="glass-card p-10 text-center">
+                <p class="text-[11px] text-indigo-400 uppercase font-black tracking-[0.3em] mb-4 italic">El Poder de la Red Neural</p>
+                <p class="text-xs text-slate-400 leading-relaxed uppercase font-bold mx-auto max-w-3xl">
+                    "K.B TECH no es una herramienta aislada. Es una colmena. Si un cardiólogo en Tijuana detecta un patrón nuevo, el sistema aprende y protege al pediatra en la zona norte al instante."
+                </p>
             </section>
         </main>
 
-        <footer class="mt-20 text-center pb-20">
-            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 mb-10 italic italic">"En un mundo de caos digital, K.B TECH es el arquitecto del orden."</p>
-            <button onclick="window.history.back()" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 transition shadow-2xl">
-                Volver al Búnker
+        <footer class="mt-16 text-center pb-10">
+            <button onclick="window.history.back()" class="px-8 py-3 bg-indigo-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 transition shadow-2xl">
+                Retornar al Centro de Mando
             </button>
         </footer>
     </div>
