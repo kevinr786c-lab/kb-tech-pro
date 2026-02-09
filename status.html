@@ -12,6 +12,7 @@
         .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 2rem; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .vision-border { border-left: 2px solid rgba(99, 102, 241, 0.3); padding-left: 1.5rem; }
     </style>
 </head>
 <body class="p-6 md:p-20">
@@ -42,6 +43,24 @@
                 </div>
             </section>
 
+            <section class="p-10 border border-white/5 rounded-[3rem] bg-gradient-to-br from-indigo-500/10 to-transparent">
+                <h3 class="text-[12px] font-black uppercase tracking-[0.4em] text-indigo-400 mb-8 italic">El Imperativo Tecnológico</h3>
+                <div class="space-y-6">
+                    <div class="vision-border">
+                        <p class="text-lg font-bold italic text-white mb-2">"La inteligencia sin contexto es solo ruido."</p>
+                        <p class="text-[11px] text-slate-400 uppercase leading-relaxed font-medium">
+                            Mientras las grandes corporaciones intentan vender sistemas genéricos, K.B TECH nace de la realidad de nuestra región. Entendemos el pulso de Tijuana y las necesidades que solo el instinto local puede descifrar.
+                        </p>
+                    </div>
+                    <div class="vision-border">
+                        <p class="text-lg font-bold italic text-white mb-2">La Brecha Generacional</p>
+                        <p class="text-[11px] text-slate-400 uppercase leading-relaxed font-medium">
+                            Estamos ante el cambio de guardia más grande de la historia médica. Las nuevas generaciones no buscan herramientas; buscan ecosistemas. El que no logre hablar el lenguaje de la <span class="text-indigo-500">Inteligencia Autónoma</span>, simplemente dejará de existir en el mapa de la salud privada.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="glass-card p-8 border-l-4 border-indigo-500">
                     <h3 class="font-black text-sm uppercase mb-4 italic">⚡ Velocidad de Diagnóstico</h3>
@@ -53,24 +72,32 @@
                 </div>
             </section>
 
-            <section class="glass-card p-10 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-8 text-5xl opacity-10">🚀</div>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 mb-8 italic">Hoja de Ruta (Next Steps)</h3>
-                <ul class="space-y-4 text-xs font-bold uppercase tracking-wide text-slate-300">
-                    <li class="flex items-center gap-3">
-                        <span class="text-indigo-500">01.</span> Integración de Visión por Computadora (Análisis de Rayos X).
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <span class="text-indigo-500">02.</span> Nodo de Telemedicina Encriptada con Latencia Cero.
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <span class="text-indigo-500">03.</span> Expansión de Base de Datos para Medicina Preventiva.
-                    </li>
+            <section class="glass-card p-10 border-t-2 border-amber-500/50 bg-gradient-to-b from-amber-500/5">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500 mb-8 italic text-center">Hoja de Ruta: El Futuro de K.B CORP</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-10">
+                    <div class="space-y-2">
+                        <p class="text-2xl font-black italic">2026</p>
+                        <p class="text-[8px] text-slate-500 uppercase font-black">Consolidación del Nodo Maestro</p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-2xl font-black italic text-indigo-500">2027</p>
+                        <p class="text-[8px] text-slate-500 uppercase font-black">Lanzamiento de IA Predictiva Regional</p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-2xl font-black italic text-emerald-500">2028</p>
+                        <p class="text-[8px] text-slate-500 uppercase font-black">Sincronización Total Autónoma</p>
+                    </div>
+                </div>
+                <ul class="space-y-4 text-[10px] font-bold uppercase tracking-wide text-slate-300 border-t border-white/5 pt-8">
+                    <li class="flex items-center gap-3"><span class="text-indigo-500">✦</span> Integración de Visión por Computadora (Rayos X).</li>
+                    <li class="flex items-center gap-3"><span class="text-indigo-500">✦</span> Nodo de Telemedicina Encriptada con Latencia Cero.</li>
+                    <li class="flex items-center gap-3"><span class="text-indigo-500">✦</span> Expansión de Big Data para Medicina Preventiva.</li>
                 </ul>
             </section>
         </main>
 
         <footer class="mt-20 text-center pb-20">
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 mb-10 italic">"No estamos creando una herramienta. Estamos creando la red neural del mañana."</p>
             <button onclick="window.history.back()" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 transition shadow-2xl">
                 Volver al Búnker
             </button>
