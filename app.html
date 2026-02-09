@@ -248,6 +248,7 @@
         document.getElementById('ia-panel').classList.toggle('open');
     }
 
+    // --- CIRUGÍA DE PRECISIÓN: FUNCIÓN REPARADA ---
     async function enviarComandoIA() {
         const input = document.getElementById('ia-input');
         const box = document.getElementById('ia-chat-box');
@@ -259,26 +260,43 @@
         box.scrollTop = box.scrollHeight;
 
         const loadingId = "loading-" + Date.now();
-        box.innerHTML += `<div id="${loadingId}" class="msg-ia italic animate-pulse">PROCESANDO CONSULTA...</div>`;
+        box.innerHTML += `<div id="${loadingId}" class="msg-ia italic animate-pulse">SINCRONIZANDO CON NODO OREGÓN...</div>`;
 
         try {
             const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
+            
             const res = await fetch(URL_IA, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ prompt: orden })
             });
+
+            // VALIDACIÓN DE STATUS
+            if (!res.ok) throw new Error("SERVIDOR EN REPOSO O ERROR 500");
+
             const data = await res.json();
             
-            // LA REPARACIÓN: Extraer el campo 'respuesta' del objeto JSON
-            document.getElementById(loadingId).remove();
+            const loader = document.getElementById(loadingId);
+            if(loader) loader.remove();
+
             if (data && data.respuesta) {
                 box.innerHTML += `<div class="msg-ia">${data.respuesta}</div>`;
+            } else if (data && typeof data === 'string') {
+                box.innerHTML += `<div class="msg-ia">${data}</div>`;
             } else {
-                box.innerHTML += `<div class="msg-ia text-rose-500 font-bold">ERROR: EL CEREBRO NO DEVOLVIÓ DATOS LEGIBLES.</div>`;
+                box.innerHTML += `<div class="msg-ia text-amber-500 font-bold">> ADVERTENCIA: RESPUESTA NO ESTRUCTURADA.</div>`;
             }
         } catch (err) {
-            document.getElementById(loadingId).innerText = "ERROR: CEREBRO OFFLINE. VERIFIQUE SERVER.";
+            const loader = document.getElementById(loadingId);
+            if(loader) {
+                loader.classList.remove('animate-pulse');
+                loader.classList.add('text-rose-500', 'font-black');
+                loader.innerText = "ERROR: " + err.message + ". REINTENTANDO VÍNCULO...";
+            }
+            console.error("Falla en Nodo:", err);
         }
         box.scrollTop = box.scrollHeight;
     }
