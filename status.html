@@ -14,6 +14,8 @@
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         .vision-border { border-left: 2px solid rgba(99, 102, 241, 0.3); padding-left: 1.5rem; }
         .warning-gradient { background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%); border-left: 4px solid #ef4444; }
+        .level-card { border: 1px solid rgba(255,255,255,0.03); transition: 0.3s; }
+        .level-card:hover { border-color: rgba(99, 102, 241, 0.5); background: rgba(99, 102, 241, 0.05); }
     </style>
 </head>
 <body class="p-6 md:p-20">
@@ -30,7 +32,7 @@
                     "Hoy muchos ven la Inteligencia Artificial como un juguete o una herramienta de ocio. Pero mientras el mundo se distrae, el futuro se está privatizando."
                 </p>
                 <p class="text-[11px] text-slate-400 mt-4 leading-relaxed uppercase font-medium">
-                    Si el sector médico no toma el control de esta tecnología ahora, mañana estará obligado a comprarla a precios exorbitantes. K.B TECH no es solo software; es un escudo contra la dependencia tecnológica externa. Estamos asegurando que el doctor sea el dueño del algoritmo, y no al revés.
+                    Si el sector médico no toma el control de esta tecnología ahora, mañana estará obligado a comprarla a precios exorbitantes. K.B TECH es un escudo contra la dependencia. Estamos asegurando que el doctor sea el dueño del algoritmo, y no al revés.
                 </p>
             </section>
 
@@ -40,16 +42,42 @@
                     <h2 class="text-xs font-black uppercase tracking-widest text-emerald-400">Infraestructura: NODO OREGÓN LIVE</h2>
                 </div>
                 <p class="text-slate-400 leading-relaxed text-sm mb-6">
-                    Implementación de **Gemini 2.0 Flash**. Hemos blindado el acceso a la red para garantizar que la IA trabaje bajo protocolos médicos estrictos, lejos del uso vulgar o descontrolado que impera en el mercado global.
+                    Implementación de **Gemini 2.0 Flash**. Hemos blindado el acceso a la red para garantizar que la IA trabaje bajo protocolos médicos estrictos, lejos del uso vulgar o descontrolado del mercado global.
                 </p>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 text-center">
                         <p class="text-[8px] font-black text-indigo-400 uppercase italic">Seguridad</p>
-                        <p class="font-bold text-xs uppercase">Encriptación de Grado Clínico</p>
+                        <p class="font-bold text-[10px] uppercase">Encriptación Grado Clínico</p>
                     </div>
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 text-center">
                         <p class="text-[8px] font-black text-indigo-400 uppercase italic">Control</p>
-                        <p class="font-bold text-xs uppercase">Soberanía de Datos</p>
+                        <p class="font-bold text-[10px] uppercase">Soberanía de Datos</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h3 class="text-[12px] font-black uppercase tracking-[0.4em] text-indigo-400 mb-8 italic text-center">Niveles de Evolución del Sistema</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
+                        <p class="text-[10px] font-black text-indigo-500 mb-2 uppercase">Nivel 01: Cimiento Neural</p>
+                        <p class="text-xs font-bold text-white mb-2 italic">Automatización y Sincronización</p>
+                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Eliminación de carga administrativa y gestión de agendas inteligente. Estado: <span class="text-emerald-500">OPERATIVO</span>.</p>
+                    </div>
+                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
+                        <p class="text-[10px] font-black text-indigo-500 mb-2 uppercase">Nivel 02: Visión Diagnóstica</p>
+                        <p class="text-xs font-bold text-white mb-2 italic">Análisis Visual por IA</p>
+                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Integración de análisis de Rayos X y tomografías con precisión quirúrgica. Estado: <span class="text-amber-500">EN DESARROLLO</span>.</p>
+                    </div>
+                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
+                        <p class="text-[10px] font-black text-indigo-500 mb-2 uppercase">Nivel 03: Medicina Predictiva</p>
+                        <p class="text-xs font-bold text-white mb-2 italic">Análisis de Big Data Local</p>
+                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Predicción de brotes y tendencias de salud en la región antes de que ocurran. Estado: <span class="text-slate-600">PROYECTADO</span>.</p>
+                    </div>
+                    <div class="level-card p-6 rounded-2xl bg-white/[0.02]">
+                        <p class="text-[10px] font-black text-indigo-500 mb-2 uppercase">Nivel 04: Soberanía Total</p>
+                        <p class="text-xs font-bold text-white mb-2 italic">Ecosistema Médico Autónomo</p>
+                        <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Un sistema que aprende de cada caso en Tijuana para volverse el doctor digital más sabio del mundo. Estado: <span class="text-slate-600">VISIÓN 2028</span>.</p>
                     </div>
                 </div>
             </section>
@@ -57,34 +85,23 @@
             <section class="p-10 border border-white/5 rounded-[3rem] bg-gradient-to-br from-indigo-500/10 to-transparent">
                 <div class="space-y-8">
                     <div class="vision-border">
-                        <p class="text-lg font-bold italic text-white mb-2">La Ventaja del Contexto Regional</p>
+                        <p class="text-lg font-bold italic text-white mb-2 text-indigo-400">Instinto Local vs Inteligencia Genérica</p>
                         <p class="text-[11px] text-slate-400 uppercase leading-relaxed font-medium">
-                            La IA genérica no sabe qué ocurre en Tijuana. Nosotros sí. Estamos entrenando la red neural para entender la dinámica específica de nuestra frontera. La inteligencia sin contexto local es solo ruido costoso.
+                            La IA de Silicon Valley no entiende a Tijuana. Nosotros sí. Estamos entrenando la red neural para descifrar la dinámica de nuestra frontera. La inteligencia sin contexto es solo ruido costoso.
                         </p>
                     </div>
                     <div class="vision-border">
-                        <p class="text-lg font-bold italic text-white mb-2">Legado y Tecnología</p>
+                        <p class="text-lg font-bold italic text-white mb-2 text-indigo-400">Legado y Tecnología</p>
                         <p class="text-[11px] text-slate-400 uppercase leading-relaxed font-medium">
                             Estamos construyendo el cimiento para las próximas generaciones de médicos. El que hoy ignore esta evolución, mañana será irrelevante en un mercado que no perdona la lentitud.
                         </p>
                     </div>
                 </div>
             </section>
-
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-card p-8 border-l-4 border-indigo-500">
-                    <h3 class="font-black text-sm uppercase mb-4 italic text-indigo-400">Automatización Ética</h3>
-                    <p class="text-[11px] text-slate-400 leading-relaxed uppercase font-bold">La IA asume la carga administrativa para que el médico recupere su tiempo y su humanidad.</p>
-                </div>
-                <div class="glass-card p-8 border-l-4 border-amber-500">
-                    <h3 class="font-black text-sm uppercase mb-4 italic text-amber-500">Patrimonio Digital</h3>
-                    <p class="text-[11px] text-slate-400 leading-relaxed uppercase font-bold">Cada dato procesado es un activo que aumenta el valor de la red K.B CORP para sus fundadores.</p>
-                </div>
-            </section>
         </main>
 
         <footer class="mt-20 text-center pb-20">
-            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 mb-10 italic italic">"En un mundo que usa la IA para el caos, nosotros la usamos para el orden y la salud."</p>
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 mb-10 italic">"En un mundo que usa la IA para el caos, nosotros la usamos para el orden y la salud."</p>
             <button onclick="window.history.back()" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 transition shadow-2xl">
                 Volver al Búnker
             </button>
