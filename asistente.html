@@ -349,60 +349,77 @@
         } 
 
         async function abrirCalendarioMaestro() { 
-            const m = calFecha.getMonth(), y = calFecha.getFullYear();
-            const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            
-            document.getElementById('modal-icon').innerText = "📅";
-            document.getElementById('modal-title').innerText = "Radar de Ocupación";
-            document.querySelector('.modal-content').style.maxWidth = "850px"; 
+    // 1. Limpieza de seguridad para evitar duplicados visuales
+    const m = calFecha.getMonth();
+    const y = calFecha.getFullYear();
+    const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    
+    document.getElementById('modal-icon').innerText = "📅";
+    document.getElementById('modal-title').innerText = "Radar de Ocupación";
+    document.querySelector('.modal-content').style.maxWidth = "850px"; 
 
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${y}-${String(m+1).padStart(2,'0')}-01&fecha=lte.${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`, { headers: {'apikey': KEY_DB} });
-            const citasMes = await res.json();
-            const mapa = {};
-            citasMes.forEach(c => { mapa[c.fecha] = (mapa[c.fecha] || 0) + 1; });
+    // 2. Rango de fechas dinámico para Supabase
+    const primerDiaMes = `${y}-${String(m+1).padStart(2,'0')}-01`;
+    const ultimoDiaMes = `${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`;
 
-            document.getElementById('modal-body').innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-                    <div class="md:col-span-7">
-                        <div class="flex justify-between items-center mb-6">
-                            <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="p-2 font-black">‹</button>
-                            <h4 class="font-black uppercase text-xl italic text-slate-800">${mesNombres[m]} ${y}</h4>
-                            <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="p-2 font-black">›</button>
-                        </div>
-                        <div class="cal-grid" id="days-container">
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Dom</div>
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Lun</div>
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Mar</div>
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Mie</div>
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Jue</div>
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Vie</div>
-                            <div class="text-[7px] font-black text-slate-300 text-center uppercase">Sab</div>
-                        </div>
-                    </div>
-                    <div class="md:col-span-5 bg-slate-50 rounded-[2.5rem] p-6 min-h-[300px]" id="day-details-sidebar">
-                        <div class="flex flex-col items-center justify-center h-full text-slate-300 italic text-[10px] uppercase font-black text-center">
-                            <p>Toca un día para<br>escanear pacientes</p>
-                        </div>
-                    </div>
-                </div>`;
+    const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${primerDiaMes}&fecha=lte.${ultimoDiaMes}`, { 
+        headers: {'apikey': KEY_DB} 
+    });
+    const citasMes = await res.json();
+    
+    // Mapeo de citas por día
+    const mapa = {};
+    citasMes.forEach(c => { mapa[c.fecha] = (mapa[c.fecha] || 0) + 1; });
 
-            const container = document.getElementById('days-container');
-            for(let i=0; i<new Date(y, m, 1).getDay(); i++) container.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(y, m+1, 0).getDate(); d++) {
-                const f = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const count = mapa[f] || 0;
-                let color = "bg-emerald-50 text-emerald-600 border-emerald-100";
-                if(count >= 4) color = "bg-amber-50 text-amber-600 border-amber-200";
-                if(count >= 8) color = "bg-rose-50 text-rose-600 border-rose-200 animate-pulse";
+    // 3. Inyección de Estructura (Botones de navegación reparados)
+    document.getElementById('modal-body').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div class="md:col-span-7">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="p-3 bg-slate-100 rounded-full font-black hover:bg-indigo-600 hover:text-white transition">‹</button>
+                    <h4 class="font-black uppercase text-xl italic text-slate-800">${mesNombres[m]} ${y}</h4>
+                    <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="p-3 bg-slate-100 rounded-full font-black hover:bg-indigo-600 hover:text-white transition">›</button>
+                </div>
+                <div class="cal-grid" id="days-container">
+                    ${['Dom','Lun','Mar','Mie','Jue','Vie','Sab'].map(d => `<div class="text-[8px] font-black text-slate-300 text-center uppercase">${d}</div>`).join('')}
+                </div>
+            </div>
+            <div class="md:col-span-5 bg-slate-50 rounded-[2.5rem] p-6 min-h-[300px]" id="day-details-sidebar">
+                <div class="flex flex-col items-center justify-center h-full text-slate-300 italic text-[10px] uppercase font-black text-center">
+                    <p>Toca un día para<br>escanear pacientes</p>
+                </div>
+            </div>
+        </div>`;
 
-                const dayEl = document.createElement('div');
-                dayEl.className = `cal-day border-2 ${color}`;
-                dayEl.innerHTML = `${d}<span class="text-[6px] absolute bottom-1 right-1 opacity-40">${count || ''}</span>`;
-                dayEl.onclick = () => mostrarDetallesDia(f, citasMes, d, mesNombres[m]);
-                container.appendChild(dayEl);
-            }
-            abrirModal();
-        }
+    const container = document.getElementById('days-container');
+    
+    // 4. Generación de espacios en blanco (Offset)
+    const offset = new Date(y, m, 1).getDay();
+    for(let i=0; i < offset; i++) {
+        container.innerHTML += `<div class="opacity-0"></div>`;
+    }
+
+    // 5. Generación de días reales con lógica de color (Semáforo)
+    const diasEnMes = new Date(y, m+1, 0).getDate();
+    for(let d=1; d <= diasEnMes; d++) {
+        const f = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const count = mapa[f] || 0;
+        
+        let colorClase = "bg-white text-slate-400 border-slate-100"; // Vacío
+        if(count > 0 && count < 5) colorClase = "bg-emerald-50 text-emerald-600 border-emerald-100"; // Bajo
+        if(count >= 5 && count < 9) colorClase = "bg-amber-50 text-amber-600 border-amber-200"; // Medio
+        if(count >= 9) colorClase = "bg-rose-50 text-rose-600 border-rose-200 animate-pulse"; // Saturado
+
+        const dayEl = document.createElement('div');
+        dayEl.className = `cal-day border-2 shadow-sm ${colorClase}`;
+        dayEl.innerHTML = `<span>${d}</span>${count > 0 ? `<span class="text-[7px] absolute bottom-1 right-2 font-black">${count}</span>` : ''}`;
+        
+        // Al hacer clic, cargamos los detalles en el sidebar derecho
+        dayEl.onclick = () => mostrarDetallesDia(f, citasMes, d, mesNombres[m]);
+        container.appendChild(dayEl);
+    }
+    abrirModal();
+}
 
         function mostrarDetallesDia(fecha, citas, dia, mes) {
             const sidebar = document.getElementById('day-details-sidebar');
