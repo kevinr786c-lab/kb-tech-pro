@@ -35,16 +35,15 @@
         .input-premium { background: #f1f5f9; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; width: 100%; outline: none; transition: 0.3s; font-weight: 700; }
         .input-premium:focus { border-color: var(--main-color); background: #fff; box-shadow: 0 0 20px var(--main-glow); }
 
-        #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; overflow-y: auto; }
         #progress-bar-container { height: 4px; width: 100%; background: #e2e8f0; position: fixed; top: 0; left: 0; z-index: 200000; }
         #progress-bar-fill { height: 100%; width: 0%; background: var(--main-color); transition: 1s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 15px var(--main-color); }
 
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.7rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; position: relative; }
-        .cal-day:hover { transform: scale(1.1); z-index: 10; border-color: var(--main-color); }
         
-        /* PRIVACIDAD */
         body.privacy-mode .blur-sensitive { filter: blur(15px); pointer-events: none; transition: 0.4s; }
+        .shimmer { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="min-h-screen">
@@ -54,9 +53,9 @@
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-[#020617] z-[50000] flex items-center justify-center p-6">
         <div class="max-w-md w-full glass-panel-dark p-12 text-center shadow-2xl">
             <div class="scanner-line"></div>
-            <div id="lock-icon" class="text-7xl mb-6 transition-all duration-700">👩‍💼</div>
+            <div id="lock-icon" class="text-7xl mb-6">👩‍💼</div>
             <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2 text-white">Recepción K.B</h2>
-            <p class="text-[9px] text-indigo-400 uppercase tracking-[0.4em] font-black mb-10 italic">Validación Operativa ✦ Terminal Recepción</p>
+            <p class="text-[9px] text-indigo-400 uppercase tracking-[0.4em] font-black mb-10 italic">Acceso Operativo ✦ Terminal Recepción</p>
             <div class="flex justify-center gap-4 mb-8">
                 <div class="pin-dot" id="dot-1"></div><div class="pin-dot" id="dot-2"></div>
                 <div class="pin-dot" id="dot-3"></div><div class="pin-dot" id="dot-4"></div>
@@ -66,7 +65,7 @@
         </div>
     </div>
 
-    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white text-left">
+    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white text-left" style="z-index: 100000;">
         <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-indigo-400">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-10 italic">Herramientas Pro</h3>
         <nav class="space-y-4">
@@ -83,7 +82,7 @@
                 <div class="text-xl">💸</div><span class="text-[10px] font-black uppercase">Registrar Gasto</span>
             </button>
             <button onclick="toggleMenu(); abrirInsumo()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl transition text-left">
-                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Reportar Insumo</span>
+                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Almacén</span>
             </button>
             <hr class="border-slate-800 my-6">
             <button onclick="toggleMenu(); iniciarCierreCaja()" class="flex items-center gap-4 w-full p-4 bg-rose-600/20 border border-rose-600/30 rounded-2xl text-rose-400 transition text-left">
@@ -135,15 +134,14 @@
                     <input type="text" id="quick-filter" oninput="filtrarAgendaLocal()" placeholder="BUSCAR PACIENTE O SERVICIO..." class="input-premium !bg-white border-2 border-slate-100 focus:border-indigo-600 text-[10px] tracking-widest pl-12 uppercase italic transition-all shadow-sm">
                     <div class="absolute left-5 top-1/2 -translate-y-1/2 opacity-30 text-xl">🔍</div>
                 </div>
-                <div class="flex justify-between items-end mb-8 px-2">
+                <div class="flex justify-between items-end mb-8 px-2 text-left">
                     <h2 id="agenda-title" class="text-3xl font-black italic uppercase tracking-tighter">Agenda <span class="text-indigo-600">Activa</span></h2>
                     <div class="bg-white shadow-sm px-4 py-1.5 rounded-full text-[8px] font-black text-slate-600 uppercase border border-slate-100">
                         Citas: <span id="stat-citas" class="text-indigo-600">0</span>
                     </div>
                 </div>
                 <div id="tabla-citas-body" class="grid gap-5 blur-sensitive">
-                    <div class="h-24 w-full bg-slate-100 rounded-3xl animate-pulse opacity-20"></div>
-                    <div class="h-24 w-full bg-slate-100 rounded-3xl animate-pulse opacity-20"></div>
+                    <div class="h-24 w-full shimmer rounded-3xl opacity-20"></div>
                 </div>
             </div>
         </main>
@@ -158,7 +156,7 @@
             <div id="modal-body" class="max-h-[50vh] overflow-y-auto space-y-4 px-2 text-left"></div>
             <div id="modal-footer" class="flex gap-4 mt-10">
                 <button onclick="cerrarModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-[9px] uppercase tracking-widest">Cerrar</button>
-                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-xl tracking-widest">Confirmar ✦</button>
+                <button id="modal-confirm-btn" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-xl tracking-widest">Confirmar ✦</button>
             </div>
         </div>
     </div>
@@ -197,14 +195,8 @@
 
         function filtrarAgendaLocal() {
             const term = document.getElementById('quick-filter').value.toLowerCase();
-            const rows = document.querySelectorAll('#tabla-citas-body > div');
-            let encontrados = 0;
-            rows.forEach(t => {
-                const match = t.innerText.toLowerCase().includes(term);
-                t.style.display = match ? "flex" : "none";
-                if(match) encontrados++;
-            });
-            document.getElementById('agenda-title').innerText = term ? `RESULTADOS: ${encontrados}` : "AGENDA ACTIVA";
+            const rows = document.querySelectorAll('#tabla-citas-body > .card-appointment');
+            rows.forEach(t => t.style.display = t.innerText.toLowerCase().includes(term) ? "flex" : "none");
         }
 
         async function verificarAcceso() {
@@ -217,7 +209,7 @@
             if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
                 const color = (CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"])[0];
                 document.documentElement.style.setProperty('--main-color', color);
-                document.getElementById('logo-tech').style.color = color;
+                document.getElementById('brand-text').style.color = color;
                 document.getElementById('card-paciente').style.borderColor = color;
                 document.getElementById('nav-doc-name').innerText = globalDocData.nombre_doctor.toUpperCase();
                 document.getElementById('lock-icon').innerText = "✅";
@@ -227,13 +219,14 @@
                     document.getElementById('contenido-panel').classList.remove('hidden');
                     setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
                     cargarCitas(); setInterval(cargarCitas, 20000);
-                    eliteAviso("SINCRO EXITOSA ✦");
+                    eliteAviso("ACCESO CONCEDIDO ✦");
                 }, 600);
             } else { eliteAviso("PIN INCORRECTO"); document.getElementById('pin-acceso').value = ""; updateDots(); }
         }
 
         async function cargarCitas() {
-            const hoyStr = fechaVisualizacion.toISOString().split('T')[0];
+            const y = fechaVisualizacion.getFullYear(), m = String(fechaVisualizacion.getMonth() + 1).padStart(2, '0'), d = String(fechaVisualizacion.getDate()).padStart(2, '0');
+            const hoyStr = `${y}-${m}-${d}`;
             document.getElementById('fecha-actual-display').innerText = `📅 ${hoyStr}`;
             
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
@@ -249,8 +242,8 @@
                 let semClase = triage.match(/dolor|urgente|sangre/) ? "u-rojo" : (triage.includes("prioridad") ? "u-amarillo" : "u-verde");
                 
                 return `
-                <div class="card-appointment glass-panel p-8 flex items-center justify-between cursor-pointer ${semClase}" onclick="seleccionarPaciente(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-                    <div class="flex items-center gap-8">
+                <div class="card-appointment glass-panel p-8 flex items-center justify-between cursor-pointer ${semClase}" onclick="seleccionarCita(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+                    <div class="flex items-center gap-8 pointer-events-none">
                         <span class="text-3xl font-black italic w-20" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
                         <div>
                             <h3 class="font-black text-slate-800 text-lg uppercase">${c.nombre_paciente}</h3>
@@ -260,15 +253,15 @@
                     <div class="flex items-center gap-4">
                         <span class="px-3 py-1 rounded-full text-[7px] font-black uppercase ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Cobro Pendiente'}</span>
                         <div class="flex gap-2">
-                             <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/"/g, '&quot;')})" class="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-indigo-600 hover:text-white transition shadow-sm">✏️</button>
-                             <button onclick="event.stopPropagation(); abrirCobroPremium(${JSON.stringify(c).replace(/"/g, '&quot;')})" class="w-10 h-10 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-400 opacity-30' : 'bg-slate-900 text-white'} rounded-xl shadow-lg transition">💰</button>
+                             <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/"/g, '&quot;')})" class="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl">✏️</button>
+                             <button onclick="event.stopPropagation(); abrirCobroPremium(${JSON.stringify(c).replace(/"/g, '&quot;')})" class="w-10 h-10 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-400 opacity-30' : 'bg-slate-900 text-white'} rounded-xl shadow-lg">💰</button>
                         </div>
                     </div>
                 </div>`;
-            }).join('') || '<div class="text-center py-20 opacity-20 italic font-black uppercase">Sin actividad para hoy</div>';
+            }).join('') || '<div class="text-center py-20 opacity-20 italic font-black uppercase">Sin actividad hoy</div>';
         }
 
-        function seleccionarPaciente(cita) {
+        function seleccionarCita(cita) {
             currentPatient = cita;
             document.getElementById('patient-display').innerText = cita.nombre_paciente;
             document.getElementById('patient-time-display').innerText = `HORARIO: ${cita.hora.slice(0,5)} HS`;
@@ -279,21 +272,21 @@
             } else panel.classList.add('hidden');
         }
 
-        // --- FUNCIONES DE COMANDO (ASISTENTE) ---
         async function abrirCalendarioMaestro() {
             const m = calFecha.getMonth(), y = calFecha.getFullYear();
             const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             document.getElementById('modal-icon').innerText = "📅";
             document.getElementById('modal-title').innerText = "Radar de Ocupación";
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${y}-${String(m+1).padStart(2,'0')}-01&fecha=lte.${y}-${String(m+1).padStart(2,'0')}-31`, { headers: {'apikey': KEY_DB} });
+            
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${y}-${String(m+1).padStart(2,'0')}-01&fecha=lte.${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`, { headers: {'apikey': KEY_DB} });
             const data = await res.json();
             const mapa = {}; data.forEach(c => mapa[c.fecha] = (mapa[c.fecha] || 0) + 1);
 
             document.getElementById('modal-body').innerHTML = `
                 <div class="flex justify-between items-center mb-6">
-                    <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="font-black p-2">‹</button>
+                    <button onclick="calFecha.setMonth(calFecha.getMonth()-1); abrirCalendarioMaestro()" class="font-black p-2 text-xl">‹</button>
                     <h4 class="font-black uppercase text-xl italic">${mesNombres[m]} ${y}</h4>
-                    <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="font-black p-2">›</button>
+                    <button onclick="calFecha.setMonth(calFecha.getMonth()+1); abrirCalendarioMaestro()" class="font-black p-2 text-xl">›</button>
                 </div>
                 <div class="cal-grid">
                     ${['Do','Lu','Ma','Mi','Ju','Vi','Sa'].map(d=>`<div class="text-[7px] font-black text-slate-300 text-center uppercase">${d}</div>`).join('')}
@@ -303,7 +296,7 @@
                         const count = mapa[f] || 0;
                         return `<div onclick="enfocarDia('${f}')" class="cal-day ${count > 0 ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'bg-slate-50 text-slate-300'}">
                             <span class="pointer-events-none">${i+1}</span>
-                            ${count > 0 ? `<span class="text-[6px] absolute bottom-1 right-1 font-black">${count}</span>` : ''}
+                            ${count > 0 ? `<span class="text-[6px] absolute bottom-1 right-1 font-black pointer-events-none">${count}</span>` : ''}
                         </div>`;
                     }).join('')}
                 </div>`;
@@ -313,7 +306,8 @@
         function enfocarDia(fecha) { fechaVisualizacion = new Date(fecha + "T12:00:00"); cargarCitas(); cerrarModal(); }
 
         async function abrirNuevoPaciente() {
-            const suggested = calFecha.toISOString().split('T')[0];
+            const y = calFecha.getFullYear(), m = String(calFecha.getMonth()+1).padStart(2,'0'), d = String(new Date().getDate()).padStart(2,'0');
+            const suggested = `${y}-${m}-${d}`;
             document.getElementById('modal-icon').innerText = "👤";
             document.getElementById('modal-title').innerText = "Nueva Cita Manual";
             document.getElementById('modal-body').innerHTML = `
@@ -333,76 +327,134 @@
             abrirModal();
         }
 
+        function abrirCobroPremium(cita) {
+            const p = cita || currentPatient; if(!p) return eliteAviso("SELECCIONE PACIENTE");
+            document.getElementById('modal-icon').innerText = "💵";
+            document.getElementById('modal-title').innerText = "Mando de Cobro";
+            document.getElementById('modal-body').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl text-center">
+                        <p class="text-[10px] font-black uppercase opacity-60 tracking-widest mb-1">Tipo de Cambio</p>
+                        <input type="number" id="tc-input" value="${tc}" step="0.1" class="bg-transparent text-emerald-400 text-3xl font-black w-24 outline-none border-b-2 border-emerald-400/30 text-center">
+                        <span class="text-2xl font-black">MXN</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="divisa='MXN'; eliteAviso('PESOS MXN')" class="py-4 bg-slate-100 rounded-2xl font-black text-[9px] uppercase">🇲🇽 Pesos</button>
+                        <button onclick="divisa='USD'; eliteAviso('DOLARES USD')" class="py-4 bg-slate-100 rounded-2xl font-black text-[9px] uppercase">🇺🇸 Dólares</button>
+                    </div>
+                    <input type="number" id="pay-amt" placeholder="MONTO" class="input-premium text-center text-3xl">
+                    <div class="p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                        <p class="text-[9px] font-black uppercase text-indigo-600 tracking-widest mb-2 italic">Facturación Binacional</p>
+                        <input type="text" id="billing-data" placeholder="RFC (MX) / INSURANCE ID (USA)" class="input-premium !bg-white text-center uppercase">
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                            <button onclick="generarFacturaSAT_Premium()" class="py-3 bg-emerald-500 text-white rounded-xl font-black text-[8px] uppercase">🇲🇽 SAT PDF</button>
+                            <button onclick="generarSuperbillUSA_Premium()" class="py-3 bg-blue-600 text-white rounded-xl font-black text-[8px] uppercase">🇺🇸 CLAIM PDF</button>
+                        </div>
+                    </div>
+                    <select id="metodo" class="input-premium font-bold uppercase"><option value="Efectivo">💵 Efectivo</option><option value="Tarjeta">💳 Tarjeta (+3.5%)</option><option value="Transferencia">🏦 Transferencia</option></select>
+                </div>`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                let amt = parseFloat(document.getElementById('pay-amt').value);
+                const met = document.getElementById('metodo').value;
+                const tcVal = parseFloat(document.getElementById('tc-input').value) || tc;
+                if(!amt) return eliteAviso("INGRESE MONTO");
+                if(met === 'Tarjeta') amt *= 1.035;
+                const finalAmt = divisa === 'USD' ? amt * tcVal : amt;
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: Math.round(finalAmt), telefono: `PAGO: ${divisa} | ${met.toUpperCase()} (TC: ${tcVal})` }) });
+                eliteAviso("COBRO REGISTRADO ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
+        }
+
+        // --- MOTORES DE FACTURACIÓN (BLINDADOS) ---
+        function generarFacturaSAT_Premium() {
+            const p = currentPatient; const docData = globalDocData;
+            const rfc = document.getElementById('billing-data').value || "XAXX010101000";
+            const amt = document.getElementById('pay-amt').value || 0;
+            const folio = Math.floor(100000 + Math.random() * 900000);
+            if(!p) return eliteAviso("SELECCIONE PACIENTE");
+            const doc = new jsPDF();
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("K.B MEDICAL HUB", 20, 25);
+            doc.setFontSize(8); doc.text("SISTEMA DE FACTURACIÓN INTEGRAL BINACIONAL", 20, 32);
+            doc.text(`FOLIO: KB-${folio}`, 160, 22);
+            doc.setTextColor(30, 41, 59); doc.setFontSize(10); doc.text("DATOS DEL PRESTADOR", 20, 55);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal");
+            doc.text(`DR. ${docData.nombre_doctor.toUpperCase()}`, 20, 62);
+            doc.text(`${docData.especialidad.toUpperCase()}`, 20, 67);
+            doc.line(20, 85, 190, 85);
+            doc.setFont("helvetica", "bold"); doc.text("RECEPTOR", 20, 95);
+            doc.setFont("helvetica", "normal"); doc.text(`PACIENTE: ${p.nombre_paciente}`, 20, 102); doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 107);
+            doc.autoTable({ startY: 120, head: [['CANT', 'CÓDIGO', 'DESCRIPCIÓN', 'MONTO']], body: [['1', '83111502', 'CONSULTA MÉDICA', `$${amt}.00 MXN`]], headStyles: { fillColor: [99, 102, 241] } });
+            doc.save(`FACTURA_${p.nombre_paciente}.pdf`);
+            eliteAviso("FACTURA GENERADA ✦");
+        }
+
+        function generarSuperbillUSA_Premium() {
+            const p = currentPatient; const docData = globalDocData;
+            const insId = document.getElementById('billing-data').value || "SELF-PAY";
+            const amt = document.getElementById('pay-amt').value || 0;
+            if(!p) return eliteAviso("SELECT PATIENT");
+            const doc = new jsPDF();
+            doc.setDrawColor(30, 41, 59); doc.line(20, 25, 190, 25);
+            doc.setTextColor(15, 23, 42); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("HEALTH INSURANCE CLAIM FORM", 20, 20);
+            doc.setFontSize(9); doc.text("PROVIDER INFO", 120, 40);
+            doc.setFont("helvetica", "normal"); doc.text(`DR. ${docData.nombre_doctor}`, 120, 46);
+            doc.setFont("helvetica", "bold"); doc.text("PATIENT INFO", 20, 40);
+            doc.setFont("helvetica", "normal"); doc.text(`Full Name: ${p.nombre_paciente}`, 20, 46); doc.text(`Insurance ID: ${insId}`, 20, 52);
+            doc.autoTable({ startY: 70, head: [['DATE', 'CPT', 'DIAGNOSIS', 'CHARGES']], body: [[new Date().toLocaleDateString(), '99213', 'Z00.00', `$${(amt/tc).toFixed(2)} USD`]], headStyles: { fillColor: [15, 23, 42] } });
+            doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
+            eliteAviso("SUPERBILL GENERATED ✦");
+        }
+
+        async function enviarNotaAlDr() {
+            const nota = document.getElementById('internal-note-input').value;
+            if(!currentPatient || !nota) return eliteAviso("FALTA NOTA");
+            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + nota.toUpperCase() }) });
+            eliteAviso("ENVIADO ✅"); document.getElementById('internal-note-input').value = "";
+        }
+
+        async function abrirModificarCita(cita) {
+            document.getElementById('modal-icon').innerText = "⚙️";
+            document.getElementById('modal-title').innerText = "Modificar Cita";
+            document.getElementById('modal-body').innerHTML = `<input type="time" id="m-hora" class="input-premium mb-3" value="${cita.hora.slice(0,5)}"><input type="date" id="m-fecha" class="input-premium" value="${cita.fecha}">`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ hora: document.getElementById('m-hora').value + ":00", fecha: document.getElementById('m-fecha').value }) });
+                cerrarModal(); cargarCitas();
+            };
+            abrirModal();
+        }
+
         async function abrirGasto() {
             document.getElementById('modal-icon').innerText = "💸";
-            document.getElementById('modal-title').innerText = "Registrar Gasto";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="g-con" placeholder="CONCEPTO" class="input-premium mb-3 uppercase"><input type="number" id="g-mon" placeholder="MONTO $" class="input-premium">`;
+            document.getElementById('modal-body').innerHTML = `<input type="text" id="g-con" placeholder="CONCEPTO" class="input-premium mb-3 uppercase"><input type="number" id="g-mon" placeholder="MONTO" class="input-premium">`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 const c = document.getElementById('g-con').value.toUpperCase(), m = document.getElementById('g-mon').value;
-                if(!c || !m) return eliteAviso("FALTAN DATOS");
                 await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "GASTO", concepto: c, monto: m }) });
-                eliteAviso("REGISTRADO ✅"); cerrarModal();
+                cerrarModal(); eliteAviso("REGISTRADO ✅");
             };
             abrirModal();
         }
 
         async function abrirInsumo() {
             document.getElementById('modal-icon').innerText = "📦";
-            document.getElementById('modal-title').innerText = "Reportar Insumo";
-            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-premium h-32 uppercase" placeholder="Ej: FALTAN HOJAS..."></textarea>`;
+            document.getElementById('modal-body').innerHTML = `<textarea id="ins-txt" class="input-premium h-32 uppercase" placeholder="FALTANTE..."></textarea>`;
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 const msg = document.getElementById('ins-txt').value.toUpperCase();
-                if(!msg) return eliteAviso("ESCRIBA EL MENSAJE");
                 await fetch(`${URL_DB}/rest/v1/Finanzas_Logistica`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, categoria: "INSUMO", concepto: msg, monto: 0 }) });
-                eliteAviso("NOTIFICADO ✅"); cerrarModal();
+                cerrarModal(); eliteAviso("NOTIFICADO ✅");
             };
             abrirModal();
         }
 
         async function iniciarCierreCaja() {
-            eliteAviso("GENERANDO REPORTE...");
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fechaVisualizacion.toISOString().split('T')[0]}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
+            const hoy = fechaVisualizacion.toISOString().split('T')[0];
+            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&pagado=eq.true`, { headers: {'apikey': KEY_DB} });
             const data = await res.json();
             const doc = new jsPDF();
-            doc.text("K.B ASSISTANT - CIERRE DE CAJA", 15, 20);
-            doc.autoTable({ head: [['HORA', 'PACIENTE', 'MONTO']], body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}.00`]), startY: 30 });
-            doc.save(`CIERRE_${fechaVisualizacion.toISOString().split('T')[0]}.pdf`); eliteAviso("DESCARGADO ✅");
-        }
-
-        function abrirCobroPremium(cita) {
-            const p = cita || currentPatient; if(!p) return eliteAviso("SELECCIONE PACIENTE");
-            document.getElementById('modal-icon').innerText = "💵";
-            document.getElementById('modal-title').innerText = "Terminal de Cobro";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="space-y-4">
-                    <div class="p-4 bg-slate-900 text-white rounded-3xl text-center">
-                        <p class="text-[8px] font-black uppercase opacity-50">Tipo de Cambio Actual</p>
-                        <p class="text-2xl font-black">1 USD = ${tc} MXN</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="divisa='MXN'; this.classList.add('bg-indigo-600','text-white')" class="py-4 bg-slate-100 rounded-2xl font-black text-[9px] uppercase">🇲🇽 Pesos</button>
-                        <button onclick="divisa='USD'; this.classList.add('bg-indigo-600','text-white')" class="py-4 bg-slate-100 rounded-2xl font-black text-[9px] uppercase">🇺🇸 Dólares</button>
-                    </div>
-                    <input type="number" id="pay-amt" placeholder="MONTO TOTAL" class="input-premium text-center text-2xl">
-                    <select id="metodo" class="input-premium font-bold uppercase"><option value="Efectivo">Efectivo</option><option value="Tarjeta">Tarjeta (+3.5%)</option><option value="Transferencia">Transferencia</option></select>
-                </div>`;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                let amt = parseFloat(document.getElementById('pay-amt').value);
-                const met = document.getElementById('metodo').value;
-                if(!amt) return eliteAviso("INGRESE MONTO");
-                if(met === 'Tarjeta') amt *= 1.035;
-                const finalAmt = divisa === 'USD' ? amt * tc : amt;
-                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: Math.round(finalAmt), telefono: `PAGO: ${divisa} | ${met.toUpperCase()} (TC: ${tc})` }) });
-                eliteAviso("COBRO REGISTRADO ✅"); cerrarModal(); cargarCitas();
-            };
-            abrirModal();
-        }
-
-        async function enviarNotaAlDr() {
-            const nota = document.getElementById('internal-note-input').value;
-            if(!currentPatient || !nota) return eliteAviso("DATOS INCOMPLETOS");
-            await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatient.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "RECEPCIÓN DICE: " + nota.toUpperCase() }) });
-            eliteAviso("NOTA ENVIADA ✅"); document.getElementById('internal-note-input').value = "";
+            doc.text(`CIERRE CAJA - ${hoy}`, 15, 20);
+            doc.autoTable({ head: [['HORA', 'PACIENTE', 'MONTO']], body: data.map(c => [c.hora.slice(0,5), c.nombre_paciente, `$${c.monto}`]), startY: 30 });
+            doc.save(`CIERRE_${hoy}.pdf`);
         }
 
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
