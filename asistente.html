@@ -444,7 +444,10 @@ function seleccionarPaciente(c) {
 
         function mostrarDetallesDia(fecha, citas, dia, mes) {
             const sidebar = document.getElementById('day-details-sidebar');
-            const filtradas = citas.filter(c => c.fecha === fecha).sort((a,b) => a.hora.localeCompare(b.hora));
+            const filtradas = citas
+  .filter(c => c.fecha === fecha)
+  .sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
+
             sidebar.innerHTML = `
                 <div class="mb-6">
                     <h5 class="text-[10px] font-black uppercase text-indigo-600 italic tracking-widest">${dia} ${mes}</h5>
