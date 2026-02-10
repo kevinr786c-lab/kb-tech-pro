@@ -17,10 +17,12 @@
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; appearance: none; }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        .date-slider { display: flex; overflow-x: auto; gap: 12px; padding: 10px 5px; scrollbar-width: none; -ms-overflow-style: none; }
-        .date-slider::-webkit-scrollbar { display: none; }
-        .date-card { min-width: 65px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.5rem; border: 1px solid #f1f5f9; transition: 0.4s; cursor: pointer; }
-        .date-card.selected { background: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 30px -10px var(--main); }
+        /* NUEVO GRID DE CALENDARIO */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+        .day-header { font-size: 7px; font-weight: 800; text-transform: uppercase; color: #94a3b8; text-align: center; padding-bottom: 5px; }
+        .date-card { aspect-ratio: 1/1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: 0.3s; cursor: pointer; }
+        .date-card.selected { background: var(--main); color: white; transform: scale(1.05); box-shadow: 0 10px 20px -5px var(--main); border-color: transparent; }
+        .date-card.disabled { opacity: 0.15; cursor: not-allowed; filter: grayscale(1); border: 1px dashed #cbd5e1; }
         
         .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
         .time-pill.selected { background: var(--main); color: white; box-shadow: 0 10px 20px -5px var(--main); }
@@ -31,7 +33,6 @@
         
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
         .loading-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
@@ -40,7 +41,7 @@
 
     <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p></div>
 
-    <div id="main-node-container" class="max-w-md w-full glass-card p-10 rounded-[3.5rem] relative overflow-hidden text-left">
+    <div id="main-node-container" class="max-w-md w-full glass-card p-8 md:p-10 rounded-[3.5rem] relative overflow-hidden text-left">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
         
         <header class="text-center mb-10">
@@ -65,18 +66,27 @@
                 <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-premium uppercase" required>
                 <div class="flex gap-3">
                     <select id="lada" class="w-24 input-premium text-xs"><option value="52">🇲🇽 +52</option><option value="1">🇺🇸 +1</option></select>
-                    <input type="tel" id="telefono" placeholder="WHATSAPP" class="flex-1 input-premium" required title="Ingrese solo números">
+                    <input type="tel" id="telefono" placeholder="WHATSAPP" class="flex-1 input-premium" required>
                 </div>
                 <textarea id="motivo-consulta" placeholder="MOTIVO DE CONSULTA..." class="input-premium text-xs h-20 resize-none uppercase" required></textarea>
             </div>
 
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-2 text-[9px] font-black uppercase text-slate-400">
-                    <p>3. Seleccione Día (Deslice para ver más)</p>
-                    <span id="current-month" class="font-black italic uppercase" style="color: var(--main)"></span>
+                    <p>3. Fecha de Cita</p>
+                    <div class="flex items-center gap-3 bg-slate-100 py-1 px-3 rounded-full">
+                        <button type="button" onclick="cambiarMes(-1)" class="text-xs font-black">‹</button>
+                        <span id="current-month" class="font-black italic uppercase text-indigo-600" style="min-width: 80px; text-align: center;"></span>
+                        <button type="button" onclick="cambiarMes(1)" class="text-xs font-black">›</button>
+                    </div>
                 </div>
-                <div id="date-slider" class="date-slider text-left"></div>
-                <input type="hidden" id="fecha-sel" required>
+                
+                <div class="calendar-grid">
+                    <div class="day-header">Dom</div><div class="day-header">Lun</div><div class="day-header">Mar</div>
+                    <div class="day-header">Mie</div><div class="day-header">Jue</div><div class="day-header">Vie</div>
+                    <div class="day-header">Sab</div>
+                </div>
+                <div id="date-slider" class="calendar-grid"></div> <input type="hidden" id="fecha-sel" required>
             </div>
 
             <div class="space-y-3">
@@ -101,6 +111,7 @@
         
         let planNivel = 0;
         let configHoras = { inicio: "09:00", fin: "17:00" };
+        let currentViewDate = new Date(); // Fecha para controlar la navegación del calendario
 
         const CATALOGO_TEMAS = {
             "Ginecología": ["#f43f5e"], "Odontología": ["#0ea5e9"], "Pediatría": ["#fb923c"], "General": ["#6366f1"]
@@ -123,19 +134,16 @@
                     planNivel = doc.plan === 'Dominio' || doc.plan === 'Corporativo' ? 1 : 0;
                     configHoras.inicio = doc.hora_inicio || "09:00";
                     configHoras.fin = doc.hora_fin || "17:00";
-
                     const color = (CATALOGO_TEMAS[doc.especialidad] || CATALOGO_TEMAS["General"])[0];
                     document.documentElement.style.setProperty('--main', color);
-
                     document.getElementById('doc-name').innerText = "Dr. " + doc.nombre_doctor;
                     document.getElementById('doc-esp').innerText = doc.especialidad;
                     if(doc.biografia) {
                         const bioEl = document.querySelector('#doc-bio');
                         bioEl.innerText = doc.biografia; bioEl.style.opacity = "1";
                     }
-
                     syncServiciosHibrido(doc.redes_sociales);
-                    renderDateSlider();
+                    renderCalendarGrid();
                 }
             } catch (err) { eliteAviso("ERROR DE SINCRONIZACIÓN"); }
         }
@@ -144,25 +152,18 @@
             const selector = document.getElementById('select-servicios');
             selector.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>';
             let menu = [];
-
             try {
                 const meta = JSON.parse(raw || "{}");
-                if (meta.servicios && meta.servicios.length > 0) {
-                    menu = meta.servicios.map(s => ({ nombre: s.nombre, precio: s.precio }));
-                }
+                if (meta.servicios && meta.servicios.length > 0) menu = meta.servicios.map(s => ({ nombre: s.nombre, precio: s.precio }));
             } catch (e) {
-                if (raw && raw.includes("|") && raw.includes(":")) {
+                if (raw && raw.includes("|")) {
                     menu = raw.split("|").map(s => {
                         const [n, p] = s.split(":");
                         return { nombre: n.trim(), precio: p ? p.replace("$","").trim() : 0 };
                     });
                 }
             }
-
-            if (menu.length === 0) {
-                menu = [{ nombre: "CONSULTA GENERAL", precio: 800 }, { nombre: "VALORACIÓN", precio: 400 }];
-            }
-
+            if (menu.length === 0) menu = [{ nombre: "CONSULTA GENERAL", precio: 800 }];
             menu.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.precio; opt.dataset.nombre = s.nombre;
@@ -175,37 +176,52 @@
             const opt = el.options[el.selectedIndex];
             document.getElementById('monto-sel').value = el.value;
             document.getElementById('servicio-nombre').value = opt.dataset.nombre;
-            eliteAviso(`SELECCIONE: ${opt.dataset.nombre}`);
+            eliteAviso(`SELECCIONADO: ${opt.dataset.nombre}`);
         }
 
-        // REPARADO: Slider de fechas con rango extendido de 30 días para navegación multimes
-        function renderDateSlider() {
-            const slider = document.getElementById('date-slider');
-            const now = new Date();
-            document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
-            
-            // REPARADO: Aumentamos el límite a 30 días para permitir ver el mes siguiente
-            const limite = 30; 
-            
-            for(let i=0; i < limite; i++) {
-                const d = new Date(); d.setDate(now.getDate() + i);
-                const localISO = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        function cambiarMes(dir) {
+            currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+            renderCalendarGrid();
+        }
+
+        // NUEVA FUNCIÓN: RENDERIZADO EN GRID (CALENDARIO COMPLETO)
+        function renderCalendarGrid() {
+            const container = document.getElementById('date-slider');
+            container.innerHTML = "";
+            const monthName = currentViewDate.toLocaleString('es-mx', {month:'long', year:'numeric'});
+            document.getElementById('current-month').innerText = monthName;
+
+            const year = currentViewDate.getFullYear();
+            const month = currentViewDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Espacios vacíos para el inicio del mes
+            for(let e=0; e < firstDay; e++) {
+                const empty = document.createElement('div');
+                container.appendChild(empty);
+            }
+
+            for(let d=1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const localISO = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 
                 const card = document.createElement('div');
-                card.className = "date-card";
-                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40 pointer-events-none">${d.toLocaleString('es-mx', {weekday:'short'})}</span><span class="text-xl font-black pointer-events-none">${d.getDate()}</span>`;
+                const isPast = dateObj < today;
+                card.className = `date-card ${isPast ? 'disabled' : ''}`;
+                card.innerHTML = `<span class="text-lg font-black">${d}</span>`;
                 
-                card.onclick = () => {
-                    document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    document.getElementById('fecha-sel').value = localISO;
-                    
-                    // REPARADO: El indicador de mes se actualiza según la tarjeta que toques
-                    document.getElementById('current-month').innerText = d.toLocaleString('es-mx', {month:'long'});
-                    
-                    getHoras(localISO);
-                };
-                slider.appendChild(card);
+                if(!isPast) {
+                    card.onclick = () => {
+                        document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        document.getElementById('fecha-sel').value = localISO;
+                        getHoras(localISO);
+                    };
+                }
+                container.appendChild(card);
             }
         }
 
@@ -246,11 +262,7 @@
             const sMon = document.getElementById('monto-sel').value;
             const motivo = document.getElementById('motivo-consulta').value.toUpperCase();
             
-            if(!h || !f || !sNom) return eliteAviso("ERROR: SELECCIONE SERVICIO Y HORARIO");
-
-            let clasificacionIA = "";
-            const urgenciaKills = ["DOLOR FUERTE", "PECHO", "SANGRE", "HEMORRAGIA", "URGENTE"];
-            if (urgenciaKills.some(palabra => motivo.includes(palabra))) clasificacionIA = " | URGENTE 🔴";
+            if(!h || !f || !sNom) return eliteAviso("ERROR: DATOS INCOMPLETOS");
 
             const btn = document.getElementById('btn-submit');
             btn.innerText = "ESTABLECIENDO CONEXIÓN..."; btn.disabled = true;
@@ -262,20 +274,18 @@
                     body: JSON.stringify({
                         doctor_id: docId,
                         nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
-                        telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + " | " + sNom + clasificacionIA,
+                        telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + " | " + sNom,
                         fecha: f, hora: h, pagado: false, monto: parseInt(sMon)
                     })
                 });
 
                 if(res.ok) {
-                    eliteAviso("CONFIRMADO: CITA REGISTRADA CON ÉXITO ✅");
+                    eliteAviso("CONFIRMADO: RESERVACIÓN ÉLITE EXITOSA ✅");
                     setTimeout(() => location.reload(), 3000);
-                } else {
-                    throw new Error();
                 }
             } catch (err) {
                 eliteAviso("ERROR CRÍTICO AL AGENDAR");
-                btn.disabled = false; btn.innerText = "Confirmar Reservación ✦";
+                btn.disabled = false; btn.innerText = "Finalizar Reservación ✦";
             }
         };
 
