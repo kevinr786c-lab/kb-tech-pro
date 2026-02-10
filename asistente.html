@@ -323,6 +323,7 @@
             });
         } 
 
+        // REPARADO: Lógica de navegación multimes y carga dinámica
         async function abrirCalendarioMaestro() { 
             const m = calFecha.getMonth(), y = calFecha.getFullYear();
             const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -331,6 +332,7 @@
             document.getElementById('modal-title').innerText = "Radar de Ocupación";
             document.querySelector('.modal-content').style.maxWidth = "850px"; 
 
+            // REPARADO: Fetch que se actualiza según la navegación
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${y}-${String(m+1).padStart(2,'0')}-01&fecha=lte.${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`, { headers: {'apikey': KEY_DB} });
             const citasMes = await res.json();
             const mapa = {};
@@ -445,10 +447,18 @@
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
         
+        // REPARADO: Agendado manual sincronizado con la navegación actual del radar
         async function abrirNuevoPaciente() {
+            // Sincronizamos la fecha del Radar con la fecha sugerida de nueva cita
+            const suggestedDate = `${calFecha.getFullYear()}-${String(calFecha.getMonth()+1).padStart(2,'0')}-${String(calFecha.getDate()).padStart(2,'0')}`;
+            
             document.getElementById('modal-icon').innerText = "👤";
             document.getElementById('modal-title').innerText = "Nueva Cita";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase"><input type="time" id="n-hora" class="input-kb mb-3" value="12:00"><input type="date" id="n-fecha" class="input-kb" value="${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}">`;
+            document.getElementById('modal-body').innerHTML = `
+                <input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase">
+                <input type="time" id="n-hora" class="input-kb mb-3" value="12:00">
+                <input type="date" id="n-fecha" class="input-kb" value="${suggestedDate}">`;
+            
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
                 eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas();
@@ -575,7 +585,6 @@
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
             const doc = new jsPDF();
             
-            // Estética Corporativa
             doc.setFillColor(15, 23, 42); 
             doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255, 255, 255);
@@ -585,12 +594,10 @@
             doc.setFontSize(8);
             doc.text("SISTEMA DE FACTURACIÓN INTEGRAL BINACIONAL", 20, 32);
             
-            // Folio y Fecha
             doc.setTextColor(255, 255, 255);
             doc.text(`FOLIO: KB-${folio}`, 160, 22);
             doc.text(`FECHA: ${fecha}`, 160, 28);
 
-            // Datos Emisor
             doc.setTextColor(30, 41, 59);
             doc.setFontSize(10);
             doc.setFont("helvetica", "bold");
@@ -602,11 +609,9 @@
             doc.text(`CÉDULA: ${docData.cedula || '---'}`, 20, 72);
             doc.text(`${docData.direccion_consultorio || 'TIJUANA, B.C.'}`, 20, 77);
 
-            // Línea divisoria
             doc.setDrawColor(226, 232, 240);
             doc.line(20, 85, 190, 85);
 
-            // Datos Receptor
             doc.setFont("helvetica", "bold");
             doc.text("RECEPTOR / PACIENTE", 20, 95);
             doc.setFont("helvetica", "normal");
@@ -614,7 +619,6 @@
             doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 107);
             doc.text("USO CFDI: G03 - GASTOS EN GENERAL", 20, 112);
 
-            // Tabla de Servicios
             doc.autoTable({
                 startY: 120,
                 head: [['CANT', 'CÓDIGO SAT', 'DESCRIPCIÓN', 'MONTO']],
@@ -624,7 +628,6 @@
                 theme: 'striped'
             });
 
-            // Sello Digital Mock
             const finalY = doc.lastAutoTable.finalY + 20;
             doc.setFontSize(7);
             doc.setTextColor(148, 163, 184);
@@ -632,7 +635,6 @@
             doc.setFont("courier", "normal");
             doc.text(`||1.1|KB-TECH-${folio}|${fecha}|SAT970701NN3|KBT${Math.random().toString(36).substring(7).toUpperCase()}||`, 20, finalY + 5, {maxWidth: 170});
             
-            // Branding Fondo
             doc.setFontSize(40);
             doc.setTextColor(241, 245, 249);
             doc.text("K.B TECH VERIFIED", 45, 250, { angle: 45 });
@@ -652,7 +654,6 @@
             if(!p) return eliteAviso("SELECT PATIENT");
             const doc = new jsPDF();
             
-            // Header USA Style
             doc.setDrawColor(30, 41, 59);
             doc.setLineWidth(0.5);
             doc.line(20, 25, 190, 25);
@@ -676,7 +677,6 @@
             doc.text(`Insurance ID: ${insuranceId.toUpperCase()}`, 20, 51);
             doc.text(`Date of Service: ${fecha}`, 20, 56);
 
-            // Table of Charges
             doc.autoTable({
                 startY: 70,
                 head: [['DATE', 'CPT CODE', 'DIAGNOSIS (ICD-10)', 'DESCRIPTION', 'CHARGES']],
@@ -685,14 +685,12 @@
                 theme: 'grid'
             });
 
-            // Footer Legal
             const finalY = doc.lastAutoTable.finalY + 30;
             doc.line(20, finalY, 90, finalY);
             doc.setFontSize(8);
             doc.text("PROVIDER SIGNATURE", 20, finalY + 5);
             doc.text("I certify that the services listed above were medically necessary.", 20, finalY + 15);
             
-            // Folio Tracking
             doc.setTextColor(203, 213, 225);
             doc.text(`CONTROL ID: KB-USA-${folio}`, 150, 280);
 
