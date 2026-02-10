@@ -538,26 +538,29 @@ function seleccionarPaciente(c) {
             eliteAviso("NOTA ENVIADA ✅"); document.getElementById('internal-note-input').value = ""; cargarCitas();
         }
 
-       function abrirModal() { 
-    document.getElementById('modal-container').style.display = 'flex'; 
-    document.body.style.overflow = 'hidden'; // Evita scroll atrás al estar abierto
+      function abrirModal() {
+    const modal = document.getElementById('modal-container');
+
+    modal.style.display = 'flex';
+    modal.style.pointerEvents = 'auto';
+
+    document.body.style.overflow = 'hidden';
 }
 
-function cerrarModal() { 
+
+
+function cerrarModal() {
     const modal = document.getElementById('modal-container');
 
     modal.style.display = 'none';
     modal.style.pointerEvents = 'none';
 
-    document.querySelector('.modal-content').style.maxWidth = "550px";
     document.body.style.overflow = 'auto';
-    document.body.style.pointerEvents = 'auto';
 
-    // Limpieza dura de eventos fantasma
-    setTimeout(() => {
-        modal.style.pointerEvents = 'auto';
-    }, 50);
+    // 🔥 limpieza dura por si quedó algo colgado
+    document.body.removeAttribute('style');
 }
+
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
