@@ -461,73 +461,16 @@
             } else { panelNota.classList.add('hidden'); }
         }
 
-        async function cargarCitas() {
-    // 1. Configuración de Fecha
-    const hoyStr = `${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}`;
-    document.getElementById('fecha-actual-display').innerText = `📅 AGENDA: ${hoyStr}`;
-    
-    // 2. Extracción de Datos de Supabase
-    const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { 
-        headers: { 'apikey': KEY_DB } 
-    });
-    const citas = await res.json();
-    
-    // 3. Motor de Estadísticas (Recaudación Real)
-    let recaudado = 0, proyectado = 0;
-    citas.forEach(c => {
-        if(c.pagado) recaudado += (c.monto || 0);
-        else proyectado += (c.monto || 0);
-    });
-    
-    document.getElementById('stat-citas').innerText = citas.length;
-    document.getElementById('stat-cobrado').innerText = `$${recaudado.toLocaleString()}`;
-    document.getElementById('stat-faltante').innerText = `$${proyectado.toLocaleString()}`;
-
-    const contenedor = document.getElementById('tabla-citas-body');
-    contenedor.innerHTML = ""; 
-
-    if (citas.length === 0) { 
-        contenedor.innerHTML = `
-            <div class="text-center py-20 opacity-20">
-                <p class="text-5xl mb-4">📭</p>
-                <p class="font-black italic uppercase text-xs">Sin actividad para este día</p>
-            </div>`; 
-        return; 
-    }
-
-    // 4. Generación de Tarjetas Élite
-    citas.forEach(c => {
-        // Triage automático por palabras clave
-        let semaforoClase = "u-verde"; 
-        const notaTriage = (c.telefono || "").toLowerCase();
-        if (notaTriage.match(/dolor|sangre|urgente|emergencia/)) semaforoClase = "u-rojo";
-        else if (notaTriage.includes("prioridad")) semaforoClase = "u-amarillo";
-
-        const tarjeta = document.createElement('div');
-        // Usamos la clase card-appointment del app.html
-        tarjeta.className = `card-appointment glass-panel p-8 flex items-center justify-between cursor-pointer shadow-md mb-2 ${semaforoClase}`;
-        tarjeta.onclick = () => seleccionarPaciente(c);
-        
-        tarjeta.innerHTML = `
-            <div class="flex items-center gap-8 text-left flex-1">
-                <div class="pointer-events-none">
-                    <p class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter">${c.hora.slice(0,5)} HS</p>
-                    <p class="font-black text-xl text-slate-800 uppercase leading-none mb-1 blur-sensitive">${c.nombre_paciente}</p>
-                    <p class="text-[9px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">
-                        ${c.pagado ? '✓ PAGO CONFIRMADO' : `⏳ PENDIENTE: $${c.monto || 0}`}
-                    </p>
-                </div>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="event.stopPropagation(); abrirModificarCita(${JSON.stringify(c).replace(/"/g, '&quot;')})" 
-                    class="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-indigo-600 hover:text-white transition shadow-sm">✏️</button>
-                <button onclick="event.stopPropagation(); abrirCobroPremium(${JSON.stringify(c).replace(/"/g, '&quot;')})" 
-                    class="w-12 h-12 flex items-center justify-center ${c.pagado ? 'bg-emerald-50 text-emerald-400 opacity-40' : 'bg-slate-900 text-white'} rounded-2xl hover:scale-105 transition shadow-lg text-lg">💰</button>
-            </div>`;
-        
-        contenedor.appendChild(tarjeta);
-    });
-}
+        function abrirModificarCita(cita) {
+            document.getElementById('modal-icon').innerText = "⚙️";
+            document.getElementById('modal-title').innerText = "Modificar Cita";
+            document.getElementById('modal-body').innerHTML = `<div class="space-y-4 text-left"><p class="text-[10px] font-black uppercase text-slate-400 italic">Paciente: ${cita.nombre_paciente}</p><label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Hora:</label><input type="time" id="m-hora" class="input-kb" value="${cita.hora.slice(0,5)}"><label class="text-[9px] font-black uppercase text-indigo-600 block">Nueva Fecha:</label><input type="date" id="m-fecha" class="input-kb" value="${cita.fecha}"></div>`;
+            document.getElementById('modal-confirm-btn').onclick = async () => {
+                await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${cita.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ hora: document.getElementById('m-hora').value + ":00", fecha: document.getElementById('m-fecha').value }) });
+                eliteAviso("CITA ACTUALIZADA ✅"); cerrarModal(); cargarCitas();
+            };
+            abrirModal();
+        }
 
         async function enviarNotaAlDr() {
             const nota = document.getElementById('internal-note-input').value;
