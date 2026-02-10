@@ -479,11 +479,25 @@
             eliteAviso("NOTA ENVIADA ✅"); document.getElementById('internal-note-input').value = ""; cargarCitas();
         }
 
-        function abrirModal() { document.getElementById('modal-container').style.display = 'flex'; }
-        function cerrarModal() { 
-            document.getElementById('modal-container').style.display = 'none'; 
-            document.querySelector('.modal-content').style.maxWidth = "550px";
-        }
+       function abrirModal() { 
+    document.getElementById('modal-container').style.display = 'flex'; 
+    document.body.style.overflow = 'hidden'; // Evita scroll atrás al estar abierto
+}
+
+function cerrarModal() { 
+    // 1. Ocultamos el contenedor
+    document.getElementById('modal-container').style.display = 'none'; 
+    
+    // 2. Reseteamos el ancho (ADN Maestro)
+    document.querySelector('.modal-content').style.maxWidth = "550px";
+    
+    // 3. LA CLAVE: Liberamos el mouse y el scroll
+    document.body.style.overflow = 'auto';
+    document.body.style.pointerEvents = 'auto'; 
+    
+    // 4. Limpieza de residuos de clics previos
+    window.scrollTo(window.scrollX, window.scrollY); 
+}
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
         
