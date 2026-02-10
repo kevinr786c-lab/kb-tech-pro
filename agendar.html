@@ -17,7 +17,7 @@
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; appearance: none; }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        .date-slider { display: flex; overflow-x: auto; gap: 12px; padding: 10px 5px; scrollbar-width: none; }
+        .date-slider { display: flex; overflow-x: auto; gap: 12px; padding: 10px 5px; scrollbar-width: none; -ms-overflow-style: none; }
         .date-slider::-webkit-scrollbar { display: none; }
         .date-card { min-width: 65px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.5rem; border: 1px solid #f1f5f9; transition: 0.4s; cursor: pointer; }
         .date-card.selected { background: var(--main); color: white; transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 30px -10px var(--main); }
@@ -32,7 +32,6 @@
         .gemini-star { color: var(--main); animation: pulse 3s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* Efecto de carga Élite */
         .loading-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
@@ -73,7 +72,7 @@
 
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-2 text-[9px] font-black uppercase text-slate-400">
-                    <p>3. Seleccione Día</p>
+                    <p>3. Seleccione Día (Deslice para ver más)</p>
                     <span id="current-month" class="font-black italic uppercase" style="color: var(--main)"></span>
                 </div>
                 <div id="date-slider" class="date-slider text-left"></div>
@@ -176,24 +175,34 @@
             const opt = el.options[el.selectedIndex];
             document.getElementById('monto-sel').value = el.value;
             document.getElementById('servicio-nombre').value = opt.dataset.nombre;
-            eliteAviso(`SELECCIONADO: ${opt.dataset.nombre}`);
+            eliteAviso(`SELECCIONE: ${opt.dataset.nombre}`);
         }
 
+        // REPARADO: Slider de fechas con rango extendido de 30 días para navegación multimes
         function renderDateSlider() {
             const slider = document.getElementById('date-slider');
             const now = new Date();
             document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long'});
-            const limite = planNivel > 0 ? 14 : 7;
+            
+            // REPARADO: Aumentamos el límite a 30 días para permitir ver el mes siguiente
+            const limite = 30; 
+            
             for(let i=0; i < limite; i++) {
                 const d = new Date(); d.setDate(now.getDate() + i);
                 const localISO = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                
                 const card = document.createElement('div');
                 card.className = "date-card";
-                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40">${d.toLocaleString('es-mx', {weekday:'short'})}</span><span class="text-xl font-black">${d.getDate()}</span>`;
+                card.innerHTML = `<span class="text-[8px] font-black uppercase opacity-40 pointer-events-none">${d.toLocaleString('es-mx', {weekday:'short'})}</span><span class="text-xl font-black pointer-events-none">${d.getDate()}</span>`;
+                
                 card.onclick = () => {
                     document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     document.getElementById('fecha-sel').value = localISO;
+                    
+                    // REPARADO: El indicador de mes se actualiza según la tarjeta que toques
+                    document.getElementById('current-month').innerText = d.toLocaleString('es-mx', {month:'long'});
+                    
                     getHoras(localISO);
                 };
                 slider.appendChild(card);
