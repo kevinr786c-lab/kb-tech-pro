@@ -442,19 +442,43 @@
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
         
+        // REPARADO: Sincronización de cita manual con la fecha actual o seleccionada
         async function abrirNuevoPaciente() {
-            const m = calFecha.getMonth(), y = calFecha.getFullYear(), d = new Date().getDate();
-            const syncRadarDate = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const now = new Date();
+            // Si el usuario está navegando en el Radar, calFecha tiene el mes correcto.
+            const y = calFecha.getFullYear();
+            const m = String(calFecha.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0'); // Usamos el día de hoy por defecto
+            const suggestedDate = `${y}-${m}-${d}`;
             
             document.getElementById('modal-icon').innerText = "👤";
             document.getElementById('modal-title').innerText = "Nueva Cita";
             document.getElementById('modal-body').innerHTML = `
-                <input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase">
-                <input type="time" id="n-hora" class="input-kb mb-3" value="12:00">
-                <input type="date" id="n-fecha" class="input-kb" value="${syncRadarDate}">`;
+                <div class="space-y-4">
+                    <input type="text" id="n-nombre" placeholder="NOMBRE DEL PACIENTE" class="input-kb uppercase">
+                    <div>
+                        <label class="text-[9px] font-black uppercase text-indigo-600 ml-2">Hora de Cita:</label>
+                        <input type="time" id="n-hora" class="input-kb" value="12:00">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black uppercase text-indigo-600 ml-2">Fecha de Cita:</label>
+                        <input type="date" id="n-fecha" class="input-kb" value="${suggestedDate}">
+                    </div>
+                </div>`;
             
             document.getElementById('modal-confirm-btn').onclick = async () => {
-                await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
+                const nombre = document.getElementById('n-nombre').value.toUpperCase();
+                const fecha = document.getElementById('n-fecha').value;
+                const hora = document.getElementById('n-hora').value + ":00";
+                
+                if(!nombre) return eliteAviso("INGRESE NOMBRE");
+                
+                await fetch(`${URL_DB}/rest/v1/Citas`, { 
+                    method: 'POST', 
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ doctor_id: docId, nombre_paciente: nombre, fecha: fecha, hora: hora, pagado: false, monto: 0 }) 
+                });
+                
                 eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas();
             };
             abrirModal();
@@ -567,7 +591,6 @@
             abrirModal();
         }
 
-        // --- MOTOR DE PDF EVOLUCIONADO (ÉLITE) ---
         function generarFacturaSAT_Premium() {
             const p = currentPatient;
             const docData = globalDocData;
@@ -578,7 +601,6 @@
             
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
             const doc = new jsPDF();
-            
             doc.setFillColor(15, 23, 42); 
             doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255, 255, 255);
@@ -587,11 +609,9 @@
             doc.text("K.B MEDICAL HUB", 20, 25);
             doc.setFontSize(8);
             doc.text("SISTEMA DE FACTURACIÓN INTEGRAL BINACIONAL", 20, 32);
-            
             doc.setTextColor(255, 255, 255);
             doc.text(`FOLIO: KB-${folio}`, 160, 22);
             doc.text(`FECHA: ${fecha}`, 160, 28);
-
             doc.setTextColor(30, 41, 59);
             doc.setFontSize(10);
             doc.setFont("helvetica", "bold");
@@ -602,17 +622,14 @@
             doc.text(`${docData.especialidad.toUpperCase()}`, 20, 67);
             doc.text(`CÉDULA: ${docData.cedula || '---'}`, 20, 72);
             doc.text(`${docData.direccion_consultorio || 'TIJUANA, B.C.'}`, 20, 77);
-
             doc.setDrawColor(226, 232, 240);
             doc.line(20, 85, 190, 85);
-
             doc.setFont("helvetica", "bold");
             doc.text("RECEPTOR / PACIENTE", 20, 95);
             doc.setFont("helvetica", "normal");
             doc.text(`NOMBRE: ${p.nombre_paciente}`, 20, 102);
             doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 107);
             doc.text("USO CFDI: G03 - GASTOS EN GENERAL", 20, 112);
-
             doc.autoTable({
                 startY: 120,
                 head: [['CANT', 'CÓDIGO SAT', 'DESCRIPCIÓN', 'MONTO']],
@@ -621,18 +638,15 @@
                 styles: { fontSize: 8, cellPadding: 5 },
                 theme: 'striped'
             });
-
             const finalY = doc.lastAutoTable.finalY + 20;
             doc.setFontSize(7);
             doc.setTextColor(148, 163, 184);
             doc.text("CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACIÓN DIGITAL DEL SAT:", 20, finalY);
             doc.setFont("courier", "normal");
             doc.text(`||1.1|KB-TECH-${folio}|${fecha}|SAT970701NN3|KBT${Math.random().toString(36).substring(7).toUpperCase()}||`, 20, finalY + 5, {maxWidth: 170});
-            
             doc.setFontSize(40);
             doc.setTextColor(241, 245, 249);
             doc.text("K.B TECH VERIFIED", 45, 250, { angle: 45 });
-
             doc.save(`FACTURA_${p.nombre_paciente}.pdf`);
             eliteAviso("FACTURA GENERADA ✦");
         }
@@ -644,33 +658,27 @@
             const amt = document.getElementById('pay-amount').value || 0;
             const fecha = new Date().toLocaleDateString('en-US');
             const folio = Math.floor(100000 + Math.random() * 900000);
-            
             if(!p) return eliteAviso("SELECT PATIENT");
             const doc = new jsPDF();
-            
             doc.setDrawColor(30, 41, 59);
             doc.setLineWidth(0.5);
             doc.line(20, 25, 190, 25);
-            
             doc.setTextColor(15, 23, 42);
             doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
             doc.text("HEALTH INSURANCE CLAIM FORM (SUPERBILL)", 20, 20);
-            
             doc.setFontSize(9);
             doc.text("PHYSICIAN / PROVIDER INFO", 120, 40);
             doc.setFont("helvetica", "normal");
             doc.text(`Name: DR. ${docData.nombre_doctor}`, 120, 46);
             doc.text(`NPI/Tax ID: PENDING`, 120, 51);
             doc.text(`Address: ${docData.direccion_consultorio}`, 120, 56, {maxWidth: 70});
-
             doc.setFont("helvetica", "bold");
             doc.text("PATIENT INFO", 20, 40);
             doc.setFont("helvetica", "normal");
             doc.text(`Full Name: ${p.nombre_paciente}`, 20, 46);
             doc.text(`Insurance ID: ${insuranceId.toUpperCase()}`, 20, 51);
             doc.text(`Date of Service: ${fecha}`, 20, 56);
-
             doc.autoTable({
                 startY: 70,
                 head: [['DATE', 'CPT CODE', 'DIAGNOSIS (ICD-10)', 'DESCRIPTION', 'CHARGES']],
@@ -678,16 +686,13 @@
                 headStyles: { fillColor: [15, 23, 42] },
                 theme: 'grid'
             });
-
             const finalY = doc.lastAutoTable.finalY + 30;
             doc.line(20, finalY, 90, finalY);
             doc.setFontSize(8);
             doc.text("PROVIDER SIGNATURE", 20, finalY + 5);
             doc.text("I certify that the services listed above were medically necessary.", 20, finalY + 15);
-            
             doc.setTextColor(203, 213, 225);
             doc.text(`CONTROL ID: KB-USA-${folio}`, 150, 280);
-
             doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
             eliteAviso("SUPERBILL GENERATED ✦");
         }
