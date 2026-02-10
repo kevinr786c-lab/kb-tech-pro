@@ -326,10 +326,24 @@
 function seleccionarPaciente(c) {
     currentPatient = c;
 
+    // 1. Pone el nombre y la hora en el panel izquierdo
     document.getElementById('patient-display').innerText = c.nombre_paciente;
     document.getElementById('patient-time-display').innerText = `${c.hora.slice(0,5)} HS`;
 
-    eliteAviso("PACIENTE SELECCIONADO");
+    // 2. MOTOR DE NOTAS (Aquí está el truco)
+    const notaPanel = document.getElementById('nota-del-doctor-panel');
+    const notaTxt = document.getElementById('txt-nota-doctor');
+
+    // Revisamos si en el campo 'telefono' el Dr. escribió algo que empiece con "INSTRUCCIÓN:"
+    // (Asegúrate de que el Dr. escriba esa palabra exacta en su app)
+    if (c.telefono && c.telefono.includes("INSTRUCCIÓN:")) {
+        notaPanel.classList.remove('hidden'); // Muestra el cuadro amarillo
+        notaTxt.innerText = c.telefono.replace("INSTRUCCIÓN:", "").trim(); // Limpia el texto
+    } else {
+        notaPanel.classList.add('hidden'); // Lo esconde si no hay nada
+    }
+
+    eliteAviso("PACIENTE SELECCIONADO ✦");
 }
 
             citas.forEach(c => {
