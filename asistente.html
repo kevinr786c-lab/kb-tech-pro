@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-       <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
     :root { --main: #6366f1; --bg: #f8fafc; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; text-align: left; }
@@ -310,6 +309,14 @@
                 contenedor.innerHTML = '<div class="text-center py-20 opacity-20"><p class="text-5xl mb-4">📭</p><p class="font-black italic uppercase text-xs">Sin actividad para este día</p></div>'; 
                 return; 
             }
+function seleccionarPaciente(c) {
+    currentPatient = c;
+
+    document.getElementById('patient-display').innerText = c.nombre_paciente;
+    document.getElementById('patient-time-display').innerText = `${c.hora.slice(0,5)} HS`;
+
+    eliteAviso("PACIENTE SELECCIONADO");
+}
 
             citas.forEach(c => {
                 let semaforoClase = "u-verde"; 
@@ -537,33 +544,25 @@
 }
 
 function cerrarModal() { 
-    // 1. Ocultamos el contenedor
-    document.getElementById('modal-container').style.display = 'none'; 
-    
-    // 2. Reseteamos el ancho (ADN Maestro)
+    const modal = document.getElementById('modal-container');
+
+    modal.style.display = 'none';
+    modal.style.pointerEvents = 'none';
+
     document.querySelector('.modal-content').style.maxWidth = "550px";
-    
-    // 3. LA CLAVE: Liberamos el mouse y el scroll
     document.body.style.overflow = 'auto';
-    document.body.style.pointerEvents = 'auto'; 
-    
-    // 4. Limpieza de residuos de clics previos
-    window.scrollTo(window.scrollX, window.scrollY); 
+    document.body.style.pointerEvents = 'auto';
+
+    // Limpieza dura de eventos fantasma
+    setTimeout(() => {
+        modal.style.pointerEvents = 'auto';
+    }, 50);
 }
+
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
         
-        async function abrirNuevoPaciente() {
-            document.getElementById('modal-icon').innerText = "👤";
-            document.getElementById('modal-title').innerText = "Nueva Cita";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase"><input type="time" id="n-hora" class="input-kb mb-3" value="12:00"><input type="date" id="n-fecha" class="input-kb" value="${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}">`;
-            document.getElementById('modal-confirm-btn').onclick = async () => {
-                await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
-                eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas();
-            };
-            abrirModal();
-        }
-
+       
         function abrirCobroPremium(cita) {
             const p = cita || currentPatient;
             if(!p) return eliteAviso("SELECCIONE PACIENTE");
