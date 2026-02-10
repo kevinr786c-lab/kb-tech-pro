@@ -450,16 +450,68 @@
             cargarCitas(); cerrarModal();
         }
       
-        function seleccionarPaciente(cita) {
-            currentPatient = cita;
-            document.getElementById('patient-display').innerText = cita.nombre_paciente;
-            document.getElementById('patient-time-display').innerText = `Cita: ${cita.hora.slice(0,5)} HS`;
-            const panelNota = document.getElementById('nota-del-doctor-panel');
-            if(cita.telefono && cita.telefono.includes("DOCTOR DICE:")) {
-                panelNota.classList.remove('hidden');
-                document.getElementById('txt-nota-doctor').innerText = cita.telefono.replace("DOCTOR DICE:", "").trim();
-            } else { panelNota.classList.add('hidden'); }
+        async function abrirNuevoPaciente() {
+    // 1. Preparamos el modal con el ADN visual de app.html
+    document.getElementById('modal-icon').innerText = "👤";
+    document.getElementById('modal-title').innerText = "Nueva Cita";
+    
+    // Sugerimos la fecha actual o la que se esté visualizando
+    const fechaSugerida = fechaVisualizacion.toISOString().split('T')[0];
+    
+    document.getElementById('modal-body').innerHTML = `
+        <div class="space-y-4">
+            <input type="text" id="n-nombre" placeholder="NOMBRE DEL PACIENTE" class="input-kb uppercase">
+            <div class="grid grid-cols-2 gap-4">
+                <input type="time" id="n-hora" class="input-kb" value="12:00">
+                <input type="date" id="n-fecha" class="input-kb" value="${fechaSugerida}">
+            </div>
+        </div>`;
+
+    // 2. Definimos la acción del botón de confirmar
+    document.getElementById('modal-confirm-btn').onclick = async () => {
+        const nombre = document.getElementById('n-nombre').value.toUpperCase();
+        const fecha = document.getElementById('n-fecha').value;
+        const hora = document.getElementById('n-hora').value + ":00";
+
+        if(!nombre) return eliteAviso("FALTA NOMBRE");
+
+        // 3. Envío directo a su base de datos Supabase
+        const res = await fetch(`${URL_DB}/rest/v1/Citas`, { 
+            method: 'POST', 
+            headers: { 
+                'apikey': KEY_DB, 
+                'Authorization': `Bearer ${KEY_DB}`, 
+                'Content-Type': 'application/json' 
+            }, 
+            body: JSON.stringify({ 
+                doctor_id: docId, 
+                nombre_paciente: nombre, 
+                fecha: fecha, 
+                hora: hora, 
+                pagado: false, 
+                monto: 0 
+            }) 
+        });
+
+        if(res.ok) {
+            eliteAviso("AGENDADO CON ÉXITO ✅");
+            
+            // LA REPARACIÓN CRÍTICA:
+            cerrarModal(); // Llama a la función que libera el mouse
+            
+            // Refresco instantáneo de la agenda para que aparezca la nueva cita
+            cargarCitas(); 
+            
+            // Si el calendario maestro está abierto al fondo, lo refresca también
+            if(document.getElementById('days-container')) {
+                abrirCalendarioMaestro();
+            }
+        } else {
+            eliteAviso("ERROR EN EL REGISTRO ❌");
         }
+    };
+    abrirModal();
+}
 
         function abrirModificarCita(cita) {
             document.getElementById('modal-icon').innerText = "⚙️";
