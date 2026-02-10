@@ -323,7 +323,7 @@
             });
         } 
 
-        // REPARADO: Lógica de navegación multimes y carga dinámica
+        // REPARADO: Navegación dinámica y corrección de interacción en días ocupados
         async function abrirCalendarioMaestro() { 
             const m = calFecha.getMonth(), y = calFecha.getFullYear();
             const mesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -332,7 +332,7 @@
             document.getElementById('modal-title').innerText = "Radar de Ocupación";
             document.querySelector('.modal-content').style.maxWidth = "850px"; 
 
-            // REPARADO: Fetch que se actualiza según la navegación
+            // REPARADO: Fetch que se actualiza según la navegación entre meses
             const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=gte.${y}-${String(m+1).padStart(2,'0')}-01&fecha=lte.${y}-${String(m+1).padStart(2,'0')}-${new Date(y, m+1, 0).getDate()}`, { headers: {'apikey': KEY_DB} });
             const citasMes = await res.json();
             const mapa = {};
@@ -374,7 +374,10 @@
 
                 const dayEl = document.createElement('div');
                 dayEl.className = `cal-day border-2 ${color}`;
-                dayEl.innerHTML = `${d}<span class="text-[6px] absolute bottom-1 right-1 opacity-40">${count || ''}</span>`;
+                // REPARADO: Pointer-events-none en spans internos para que el clic siempre caiga en el div dayEl
+                dayEl.innerHTML = `
+                    <span class="pointer-events-none">${d}</span>
+                    <span class="text-[6px] absolute bottom-1 right-1 opacity-40 pointer-events-none">${count || ''}</span>`;
                 dayEl.onclick = () => mostrarDetallesDia(f, citasMes, d, mesNombres[m]);
                 container.appendChild(dayEl);
             }
@@ -447,17 +450,17 @@
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
         function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}?text=Hola ${currentPatient.nombre_paciente}`); }
         
-        // REPARADO: Agendado manual sincronizado con la navegación actual del radar
+        // REPARADO: Cita manual sincronizada con la fecha en la que estás navegando en el Radar
         async function abrirNuevoPaciente() {
-            // Sincronizamos la fecha del Radar con la fecha sugerida de nueva cita
-            const suggestedDate = `${calFecha.getFullYear()}-${String(calFecha.getMonth()+1).padStart(2,'0')}-${String(calFecha.getDate()).padStart(2,'0')}`;
+            const m = calFecha.getMonth(), y = calFecha.getFullYear(), d = calFecha.getDate();
+            const syncRadarDate = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             
             document.getElementById('modal-icon').innerText = "👤";
             document.getElementById('modal-title').innerText = "Nueva Cita";
             document.getElementById('modal-body').innerHTML = `
                 <input type="text" id="n-nombre" placeholder="NOMBRE" class="input-kb mb-3 uppercase">
                 <input type="time" id="n-hora" class="input-kb mb-3" value="12:00">
-                <input type="date" id="n-fecha" class="input-kb" value="${suggestedDate}">`;
+                <input type="date" id="n-fecha" class="input-kb" value="${syncRadarDate}">`;
             
             document.getElementById('modal-confirm-btn').onclick = async () => {
                 await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: document.getElementById('n-nombre').value.toUpperCase(), fecha: document.getElementById('n-fecha').value, hora: document.getElementById('n-hora').value + ":00", pagado: false, monto: 0 }) });
