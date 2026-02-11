@@ -126,15 +126,19 @@
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Ir a Recepción</span>
             </button>
             <hr class="border-slate-800 my-6">
-            <div class="space-y-4">
-                <p class="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em] italic">Configuración de Sucursal</p>
-                <div class="space-y-3">
-                    <input type="text" id="edit-direccion" placeholder="DIRECCIÓN CONSULTORIO" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase">
-                    <textarea id="edit-bio" placeholder="BIOGRAFÍA PROFESIONAL" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase h-20 resize-none"></textarea>
-                    <input type="text" id="edit-insta" placeholder="USUARIO INSTAGRAM" class="w-full bg-slate-800 border-none rounded-xl p-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-indigo-500">
-                    <button onclick="actualizarConfiguracionWeb()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-indigo-500 transition shadow-lg">Actualizar Sucursal Digital ✦</button>
-                </div>
-            </div>
+           <div class="space-y-4">
+    <p class="text-[9px] font-black uppercase text-indigo-400 tracking-[0.2em] italic text-center">Gestión de Perfil Maestro</p>
+    <div class="p-6 bg-indigo-500/5 border border-indigo-500/20 rounded-[2.5rem] text-center space-y-4">
+        <div class="text-4xl">🛠️</div>
+        <p class="text-[8px] font-bold text-slate-400 uppercase leading-relaxed px-2">
+            Configuración avanzada de horarios, servicios, fotos y seguros.
+        </p>
+        <button onclick="window.location.href='configurar-perfil.html?id=' + docId" 
+                class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase hover:bg-white hover:text-indigo-600 transition-all shadow-xl shadow-indigo-900/20 active:scale-95">
+            Configurar Perfil ✦
+        </button>
+    </div>
+</div>
             <hr class="border-slate-800 my-6">
             <div class="p-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl space-y-3">
                 <p class="text-[8px] font-black uppercase text-rose-500 tracking-widest italic">Seguridad del Nodo</p>
