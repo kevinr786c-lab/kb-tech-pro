@@ -291,7 +291,7 @@
                     document.getElementById('contenido-panel').classList.remove('hidden');
                     setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 50);
                     document.getElementById('doc-assigned').innerText = `Nodo Maestro: Dr. ${globalDocData.nombre_doctor}`;
-                    cargarCitas(); setInterval(cargarCitas, 30000);
+                    ); setInterval(cargarCitas, 30000);
                     eliteAviso("ACCESO CONCEDIDO ✦");
                 }, 600);
             } else { 
@@ -301,12 +301,20 @@
             }
         }
 
-        async function cargarCitas() {
+        async function ) {
             const hoyStr = `${fechaVisualizacion.getFullYear()}-${String(fechaVisualizacion.getMonth()+1).padStart(2,'0')}-${String(fechaVisualizacion.getDate()).padStart(2,'0')}`;
             document.getElementById('fecha-actual-display').innerText = `📅 AGENDA: ${hoyStr}`;
             
-            const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
-            const citas = await res.json();
+           // --- LÍNEA 308 (SE MANTIENE IGUAL) ---
+const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
+
+// --- LÍNEA 309: INYECCIÓN DE FILTRO MAESTRO ---
+const citasRaw = await res.json();
+const citas = citasRaw.filter(c => {
+    const horaCita = c.hora.slice(0, 5); // Extrae "09:00"
+    // Rango operativo K.B Tech: 7:00 AM a 7:00 PM
+    return horaCita >= "07:00" && horaCita <= "19:00";
+});
             
             let recaudado = 0, proyectado = 0;
             citas.forEach(c => {
@@ -326,9 +334,9 @@
 function seleccionarPaciente(c) {
     currentPatient = c;
 
-    // 1. Pone el nombre y la hora en el panel izquierdo
+    // 1. Pone el nombre y la  en el panel izquierdo
     document.getElementById('patient-display').innerText = c.nombre_paciente;
-    document.getElementById('patient-time-display').innerText = `${c.hora.slice(0,5)} HS`;
+    document.getElementById('patient-time-display').innerText = `${c..slice(0,5)} HS`;
 
     // 2. MOTOR DE NOTAS (Aquí está el truco)
     const notaPanel = document.getElementById('nota-del-doctor-panel');
@@ -365,7 +373,7 @@ function seleccionarPaciente(c) {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="px-3 py-0.5 bg-slate-100 text-slate-500 rounded-full text-[7px] font-black uppercase tracking-widest">${servicioLabel}</span>
-                                <span class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter">${c.hora.slice(0,5)} HS</span>
+                                <span class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter">${c..slice(0,5)} HS</span>
                             </div>
                             <p class="font-black text-xl text-slate-800 uppercase leading-none mb-1 blur-sensitive">${c.nombre_paciente}</p>
                             <p class="text-[9px] font-bold ${c.pagado ? 'text-emerald-500' : 'text-slate-400'} italic uppercase tracking-tighter">
@@ -460,7 +468,7 @@ function seleccionarPaciente(c) {
     const sidebar = document.getElementById('day-details-sidebar');
     const filtradas = citas
         .filter(c => c.fecha === fecha)
-        .sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
+        .sort((a, b) => (a. || '').localeCompare(b. || ''));
 
     sidebar.innerHTML = `
         <div class="mb-6">
@@ -470,7 +478,7 @@ function seleccionarPaciente(c) {
         <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2">
             ${filtradas.map(c => `
                 <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-                    <p class="text-[8px] font-black text-indigo-500 mb-1">${c.hora ? c.hora.slice(0,5) : '00:00'} HS</p>
+                    <p class="text-[8px] font-black text-indigo-500 mb-1">${c. ? c..slice(0,5) : '00:00'} HS</p>
                     <p class="text-[11px] font-black text-slate-800 uppercase leading-none mb-2">${c.nombre_paciente || 'SIN NOMBRE'}</p>
                     <div class="flex gap-2">
                         <button onclick="${c.telefono ? `window.open('https://wa.me/' + '${c.telefono}'.split(' ')[0])` : `alert('No hay teléfono')`}" class="text-[8px] font-black text-emerald-500 uppercase">WhatsApp</button>
@@ -485,7 +493,7 @@ function seleccionarPaciente(c) {
 
         function enfocarDia(fecha) {
             fechaVisualizacion = new Date(fecha + "T12:00:00");
-            cargarCitas(); cerrarModal();
+            ); cerrarModal();
         }
       
         async function abrirNuevoPaciente() {
@@ -500,7 +508,7 @@ function seleccionarPaciente(c) {
         <div class="space-y-4">
             <input type="text" id="n-nombre" placeholder="NOMBRE DEL PACIENTE" class="input-kb uppercase">
             <div class="grid grid-cols-2 gap-4">
-                <input type="time" id="n-hora" class="input-kb" value="12:00">
+                <input type="time" id="n-" class="input-kb" value="12:00">
                 <input type="date" id="n-fecha" class="input-kb" value="${fechaSugerida}">
             </div>
         </div>`;
@@ -509,7 +517,7 @@ function seleccionarPaciente(c) {
     document.getElementById('modal-confirm-btn').onclick = async () => {
         const nombre = document.getElementById('n-nombre').value.toUpperCase();
         const fecha = document.getElementById('n-fecha').value;
-        const hora = document.getElementById('n-hora').value + ":00";
+        const  = document.getElementById('n-').value + ":00";
 
         if(!nombre) return eliteAviso("FALTA NOMBRE");
 
@@ -538,7 +546,7 @@ function seleccionarPaciente(c) {
             cerrarModal(); // Llama a la función que libera el mouse
             
             // Refresco instantáneo de la agenda para que aparezca la nueva cita
-            cargarCitas(); 
+            ); 
             
             // Si el calendario maestro está abierto al fondo, lo refresca también
             if(document.getElementById('days-container')) {
@@ -652,7 +660,7 @@ function cerrarModal() {
                 if(metodo.includes("Tarjeta")) amt = amt * 1.035;
                 const montoFinal = (divisa === 'USD') ? (amt * tc) : amt;
                 await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${p.id}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pagado: true, monto: Math.round(montoFinal), telefono: `PAGO: ${divisa} | ${metodo.toUpperCase()} (TC: ${tc})` }) });
-                eliteAviso("COBRO REGISTRADO ✅"); cerrarModal(); cargarCitas();
+                eliteAviso("COBRO REGISTRADO ✅"); cerrarModal(); );
             };
             abrirModal();
         }
