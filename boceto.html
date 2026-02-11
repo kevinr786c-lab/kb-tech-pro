@@ -3,19 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica de Colposcopía Tijuana | Portal Oficial</title>
+    <title>Clínica de Colposcopía Tijuana | El Gold Standard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
-        body { font-family: 'Montserrat', sans-serif; scroll-behavior: smooth; }
+        body { font-family: 'Montserrat', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
         .serif { font-family: 'Playfair Display', serif; }
         .bg-lila-soft { background-color: #f3f0ff; }
         .border-lila { border-color: #b19cd9; }
         .text-lila { color: #8e44ad; }
+
+        /* 🌸 EFECTO FLORES EN MOVIMIENTO */
+        .flower {
+            position: fixed; top: -10%; z-index: 0;
+            user-select: none; pointer-events: none;
+            animation: fall linear infinite;
+            opacity: 0.6;
+            filter: blur(1px); /* Suaviza las flores para que no distraigan */
+        }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        .accordion-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #f7f3ff; border-radius: 0.75rem; transition: background-color 0.3s; }
+        .accordion-header:hover { background-color: #e8e1f5; }
+        .accordion-content { padding: 1rem; background-color: #ffffff; border-radius: 0 0 0.75rem 0.75rem; display: none; overflow: hidden; transition: max-height 0.3s ease-out; max-height: 0; }
+        .accordion-content.active { max-height: 500px; /* Ajusta según el contenido */ }
     </style>
 </head>
 <body class="bg-white text-slate-800">
+
+    <div id="flower-container"></div>
 
     <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 px-6 py-4 flex justify-between items-center">
         <div class="text-lila font-bold text-lg tracking-tighter uppercase">Clínica de Colposcopía <br><span class="text-slate-400 text-xs">Tijuana</span></div>
@@ -23,13 +42,14 @@
             <a href="#inicio" class="hover:text-lila">Inicio</a>
             <a href="#sobre-mi" class="hover:text-lila">Especialista</a>
             <a href="#servicios" class="hover:text-lila">Servicios</a>
+            <a href="#educacion" class="hover:text-lila">Educación</a>
             <a href="#contacto" class="hover:text-lila">Contacto</a>
         </div>
         <a href="#citas" class="bg-lila text-white px-5 py-2 rounded-full text-[10px] font-bold shadow-lg shadow-purple-200">AGENDAR</a>
     </nav>
 
-    <section id="inicio" class="py-20 px-6 bg-lila-soft grid md:grid-cols-2 gap-12 items-center">
-        <div class="max-w-xl mx-auto md:ml-20">
+    <section id="inicio" class="relative py-20 px-6 bg-lila-soft grid md:grid-cols-2 gap-12 items-center overflow-hidden">
+        <div class="max-w-xl mx-auto md:ml-20 z-10">
             <h1 class="serif text-5xl text-slate-900 mb-4">Cuidando tu salud con atención personalizada.</h1>
             <p class="text-slate-500 mb-8 font-light italic">Especialista en Ginecología y Obstetricia certificada.</p>
             <div class="flex gap-4">
@@ -37,7 +57,7 @@
                 <a href="#servicios" class="border border-slate-300 px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Ver Servicios</a>
             </div>
         </div>
-        <div class="flex justify-center">
+        <div class="flex justify-center z-10">
             <div class="w-80 h-[450px] bg-slate-200 rounded-[3rem] shadow-2xl border-8 border-white overflow-hidden">
                 <img src="FOTO_DRA_ALBA.jpg" alt="Dra. Alba Rojas" class="w-full h-full object-cover">
             </div>
@@ -88,9 +108,49 @@
         </div>
     </section>
 
+    <section id="educacion" class="py-24 px-6 max-w-4xl mx-auto">
+        <h2 class="serif text-3xl text-center mb-12">Educación para tu Salud</h2>
+        <div class="space-y-6">
+            <div class="accordion-item shadow-md rounded-2xl">
+                <div class="accordion-header text-lila font-bold">
+                    <span>¿Qué es una Colposcopía y para qué sirve?</span>
+                    <i class="fas fa-chevron-down text-slate-500"></i>
+                </div>
+                <div class="accordion-content text-slate-600 text-sm">
+                    <p class="mb-2">La colposcopía es un estudio de alta precisión para detectar lesiones en el cuello del útero. Se realiza con un microscopio especial (colposcopio) que permite visualizar la zona con gran detalle.</p>
+                    <p>Es fundamental para el diagnóstico temprano de infecciones por VPH y la prevención del cáncer cervicouterino.</p>
+                </div>
+            </div>
+            <div class="accordion-item shadow-md rounded-2xl">
+                <div class="accordion-header text-lila font-bold">
+                    <span>¿Cómo debo prepararme para mi revisión ginecológica?</span>
+                    <i class="fas fa-chevron-down text-slate-500"></i>
+                </div>
+                <div class="accordion-content text-slate-600 text-sm">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Evita relaciones sexuales 48 horas previas al examen.</li>
+                        <li>No utilices óvulos, cremas o duchas vaginales 48 horas antes.</li>
+                        <li>Preferentemente, no debes estar en tu periodo menstrual (salvo indicaciones especiales de la doctora).</li>
+                    </ul>
+                    <p class="mt-2">Una preparación adecuada asegura la mayor precisión en tus resultados.</p>
+                </div>
+            </div>
+            <div class="accordion-item shadow-md rounded-2xl">
+                <div class="accordion-header text-lila font-bold">
+                    <span>¿Cuáles son los beneficios de un chequeo ginecológico anual?</span>
+                    <i class="fas fa-chevron-down text-slate-500"></i>
+                </div>
+                <div class="accordion-content text-slate-600 text-sm">
+                    <p class="mb-2">Realizar tu revisión ginecológica anualmente permite la detección temprana de posibles problemas de salud, incluso antes de que presenten síntomas.</p>
+                    <p>Esto incluye la prevención y tratamiento oportuno de infecciones, VPH, y otras condiciones que, si se detectan a tiempo, tienen un mejor pronóstico.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="citas" class="py-24 px-6 max-w-xl mx-auto text-center">
         <h2 class="serif text-3xl mb-4 text-lila">Agenda tu Consulta</h2>
-        <p class="text-slate-500 mb-10 text-sm">Completa el formulario y nuestro equipo te contactará para confirmar.</p>
+        <p class="text-slate-500 mb-10 text-sm">Completa el formulario y nuestro equipo te contactará para confirmar tu cita.</p>
         <form class="space-y-4 text-left">
             <input type="text" placeholder="Nombre Completo" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-lila">
             <input type="tel" placeholder="WhatsApp / Teléfono" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-lila">
@@ -98,6 +158,7 @@
                 <option>Motivo de Consulta</option>
                 <option>Check-up Integral $1,500</option>
                 <option>Control Prenatal</option>
+                <option>Colposcopía</option>
                 <option>Urgencia / Dolor</option>
             </select>
             <button class="w-full py-4 bg-lila text-white rounded-xl font-bold uppercase tracking-widest shadow-xl shadow-purple-200">Enviar Solicitud</button>
@@ -128,5 +189,50 @@
         </div>
     </footer>
 
+    <script>
+        // --- SCRIPT PARA FLORES EN MOVIMIENTO ---
+        function createFlower() {
+            const container = document.getElementById('flower-container');
+            const flower = document.createElement('div');
+            flower.className = 'flower';
+            flower.innerHTML = '🌸'; // Puedes cambiar por SVG de flores lila si prefieres
+            flower.style.left = Math.random() * 100 + 'vw';
+            flower.style.animationDuration = Math.random() * 5 + 3 + 's'; // Duración más larga
+            flower.style.fontSize = Math.random() * 15 + 8 + 'px'; // Tamaño más pequeño y sutil
+            container.appendChild(flower);
+            setTimeout(() => { flower.remove(); }, 8000); // Duración de vida más larga
+        }
+        setInterval(createFlower, 400); // Menos flores, más espaciadas
+
+
+        // --- SCRIPT PARA ACORDEÓN DE FAQ ---
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('i');
+
+                // Cierra otros acordeones
+                document.querySelectorAll('.accordion-content.active').forEach(activeContent => {
+                    if (activeContent !== content) {
+                        activeContent.classList.remove('active');
+                        activeContent.style.maxHeight = 0;
+                        activeContent.previousElementSibling.querySelector('i').classList.remove('fa-chevron-up');
+                        activeContent.previousElementSibling.querySelector('i').classList.add('fa-chevron-down');
+                    }
+                });
+
+                // Abre o cierra el acordeón actual
+                content.classList.toggle('active');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+
+                if (content.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                } else {
+                    content.style.maxHeight = 0;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
