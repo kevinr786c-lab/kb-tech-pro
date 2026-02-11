@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; transition: 0.5s; scrollbar-width: none; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; transition: 0.5s; scrollbar-width: none; text-align: left; }
         body::-webkit-scrollbar { display: none; }
         :root { --main-color: #6366f1; }
         .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 3rem; }
@@ -23,11 +23,9 @@
         }
         .seguro-pill.active, .feature-pill.active { background: var(--main-color); color: white; border-color: white; box-shadow: 0 10px 20px -5px var(--main-color); }
 
-        .service-row { background: rgba(255,255,255,0.03); border-radius: 1.5rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-
+        .service-row { background: rgba(255, 255, 255, 0.03); border-radius: 1.5rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
         .gemini-star { color: var(--main-color); animation: pulse-star 3s infinite; display: inline-block; }
         @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
-        
         .gps-active { color: #10b981; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
     </style>
@@ -67,44 +65,51 @@
             </div>
 
             <div class="space-y-6">
-    <h3 class="font-black text-[10px] uppercase text-indigo-400 tracking-[0.3em] italic">📅 Logística Operativa</h3>
-    
-    <div class="grid grid-cols-2 gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-        <div class="col-span-2 text-[7px] font-black uppercase text-slate-500 mb-1">Lunes a Viernes</div>
-        <div class="space-y-1">
-            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Apertura</label>
-            <input type="time" id="h_inicio" value="09:00" class="input-kb">
-        </div>
-        <div class="space-y-1">
-            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Cierre</label>
-            <input type="time" id="h_fin" value="12:30" class="input-kb">
-        </div>
-    </div>
+                <h3 class="font-black text-[10px] uppercase text-indigo-400 tracking-[0.3em] italic">📅 Logística Operativa</h3>
+                
+                <div class="grid grid-cols-2 gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div class="col-span-2 text-[7px] font-black uppercase text-slate-500 mb-1">Lunes a Viernes</div>
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Apertura</label>
+                        <input type="time" id="h_inicio" value="09:00" class="input-kb">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Cierre</label>
+                        <input type="time" id="h_fin" value="12:30" class="input-kb">
+                    </div>
+                </div>
 
-    <div class="grid grid-cols-2 gap-3 p-4 bg-white/5 rounded-2xl border border-indigo-500/20">
-        <div class="col-span-2 text-[7px] font-black uppercase text-indigo-400 mb-1 italic">Sábados Operativos</div>
-        <div class="space-y-1">
-            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Apertura</label>
-            <input type="time" id="h_sabado_inicio" value="09:00" class="input-kb">
-        </div>
-        <div class="space-y-1">
-            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Cierre</label>
-            <input type="time" id="h_sabado_fin" value="14:30" class="input-kb">
-        </div>
-    </div>
+                <div class="p-4 bg-indigo-500/5 rounded-2xl border border-indigo-500/20">
+                    <label class="text-[8px] font-black uppercase ml-2 text-indigo-400 italic">⏱️ Margen Operativo (Limpieza)</label>
+                    <select id="tiempo_limpieza" class="input-kb mt-2 appearance-none cursor-pointer">
+                        <option value="0">SIN TIEMPO EXTRA</option>
+                        <option value="10">10 MINUTOS EXTRA</option>
+                        <option value="15" selected>15 MINUTOS EXTRA</option>
+                        <option value="20">20 MINUTOS EXTRA</option>
+                    </select>
+                </div>
 
-    <select id="duracion" class="input-kb appearance-none cursor-pointer">
-        <option value="20">20 MINUTOS</option>
-        <option value="30" selected>30 MINUTOS</option>
-        <option value="45">45 MINUTOS</option>
-        <option value="60">1 HORA</option>
-    </select>
-    
-    <div class="flex gap-2">
-        <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-english">🇺🇸 English</div>
-        <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-park">🅿️ Parking</div>
-    </div>
-</div>
+                <select id="duracion" class="input-kb appearance-none cursor-pointer">
+                    <option value="20">20 MINUTOS (BASE)</option>
+                    <option value="30" selected>30 MINUTOS (BASE)</option>
+                    <option value="45">45 MINUTOS (BASE)</option>
+                    <option value="60">1 HORA (BASE)</option>
+                </select>
+                
+                <div class="flex gap-2">
+                    <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-english">🇺🇸 English</div>
+                    <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-park">🅿️ Parking</div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 p-8 bg-rose-500/5 rounded-[2.5rem] border border-rose-500/10 space-y-6">
+                <h3 class="font-black text-[10px] uppercase text-rose-400 tracking-[0.3em] italic">🏖️ Días de Descanso y Exclusión (Búnker)</h3>
+                <p class="text-[8px] text-slate-500 uppercase font-bold tracking-widest px-2">Agregue vacaciones, cumpleaños o días festivos para bloquear la agenda:</p>
+                <div id="contenedor-fechas-bloqueo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <button type="button" onclick="agregarFechaBloqueo()" class="border-2 border-dashed border-rose-500/20 rounded-2xl p-4 text-[9px] font-black text-rose-400 hover:bg-rose-500/10 transition">+ AGREGAR FECHA</button>
+                </div>
+            </div>
+
             <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-[10px] uppercase text-amber-400 tracking-[0.3em] italic">💰 Menú de Servicios y Costos</h3>
@@ -115,20 +120,6 @@
                         <input type="text" placeholder="Ej: Consulta Inicial" class="bg-transparent flex-1 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-nombre">
                         <input type="number" placeholder="MXN" class="bg-transparent w-24 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-precio">
                     </div>
-                </div>
-            </div>
-
-            <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
-                <h3 class="font-black text-[10px] uppercase text-sky-400 tracking-[0.3em] italic">🏥 Seguros Aceptados (USA & MX)</h3>
-                <div id="contenedor-seguros" class="flex flex-wrap gap-3">
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Blue Shield</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Aetna</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Cigna</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">MetLife</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">AXA</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">GNP Seguros</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Allianz</div>
-                    <div class="seguro-pill" onclick="this.classList.toggle('active')">Medi-Cal</div>
                 </div>
             </div>
 
@@ -145,34 +136,9 @@
             </div>
 
             <div class="space-y-6">
-                <h3 class="font-black text-[10px] uppercase text-amber-400 tracking-[0.3em] italic">📸 Estética Digital</h3>
-                
-                <div class="space-y-2">
-                    <div class="flex gap-2">
-                        <input type="text" id="foto_consultorio" placeholder="Foto Consultorio..." class="input-kb flex-1">
-                        <button type="button" onclick="document.getElementById('upload-cons').click()" class="bg-amber-500 px-4 rounded-2xl text-[10px] font-black hover:bg-white hover:text-amber-500 transition">SUBIR</button>
-                    </div>
-                    <input type="file" id="upload-cons" class="hidden" accept="image/*" onchange="subirImagen(this, 'foto_consultorio')">
-                </div>
-
-                <div class="space-y-2">
-                    <div class="flex gap-2">
-                        <input type="text" id="foto_equipo" placeholder="Foto Equipo..." class="input-kb flex-1">
-                        <button type="button" onclick="document.getElementById('upload-equipo').click()" class="bg-amber-500 px-4 rounded-2xl text-[10px] font-black hover:bg-white hover:text-amber-500 transition">SUBIR</button>
-                    </div>
-                    <input type="file" id="upload-equipo" class="hidden" accept="image/*" onchange="subirImagen(this, 'foto_equipo')">
-                </div>
-            </div>
-
-            <div class="space-y-6">
                 <h3 class="font-black text-[10px] uppercase text-sky-400 tracking-[0.3em] italic">📱 Redes de Contacto</h3>
                 <input type="text" id="instagram" placeholder="Instagram" class="input-kb">
                 <input type="text" id="facebook" placeholder="Facebook" class="input-kb">
-            </div>
-
-            <div class="md:col-span-2 space-y-4 pt-4 border-t border-white/10 text-center">
-                <button type="button" onclick="sugerirConIA()" class="btn-ia text-[9px] font-black text-white px-6 py-2 rounded-full mb-2 transition shadow-lg">✨ GENERAR BIO CON IA ✦</button>
-                <textarea id="bio" rows="4" placeholder="Describe tu visión médica..." class="input-kb resize-none"></textarea>
             </div>
 
             <div class="md:col-span-2 pt-6">
@@ -187,8 +153,6 @@
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         let currentDocData = null;
 
-        const CATALOGO_TEMAS = { "Ginecología": "#f43f5e", "Pediatría": "#fb923c", "Odontología": "#0ea5e9", "Cardiología": "#e11d48", "General": "#6366f1" };
-
         async function init() {
             if (!docId) return alert("Error de Nodo.");
             const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}` } });
@@ -196,42 +160,29 @@
             currentDocData = data[0];
             if (currentDocData) {
                 document.getElementById('welcome-doc').innerText = `Dr. ${currentDocData.nombre_doctor}`;
-                document.documentElement.style.setProperty('--main-color', CATALOGO_TEMAS[currentDocData.especialidad] || "#6366f1");
             }
         }
 
+        function agregarFechaBloqueo() {
+            const container = document.getElementById('contenedor-fechas-bloqueo');
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center bg-white/5 p-3 rounded-2xl border border-rose-500/10";
+            div.innerHTML = `<input type="date" class="bg-transparent text-[10px] font-black outline-none text-rose-400 flex-1" name="fecha-exclusion">
+                             <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
+            container.insertBefore(div, container.lastElementChild);
+        }
+
         async function subirImagen(input, targetId) {
-            const file = input.files[0];
-            if (!file) return;
-
+            const file = input.files[0]; if (!file) return;
             const btn = input.previousElementSibling.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "🌀"; 
-            btn.disabled = true;
-
-            const formData = new FormData();
-            formData.append("image", file);
-
+            const originalText = btn.innerText; btn.innerText = "🌀"; btn.disabled = true;
+            const formData = new FormData(); formData.append("image", file);
             try {
-                const res = await fetch("https://api.imgbb.com/1/upload?key=67f677f3747372291583e74853039648", {
-                    method: "POST",
-                    body: formData
-                });
+                const res = await fetch("https://api.imgbb.com/1/upload?key=67f677f3747372291583e74853039648", { method: "POST", body: formData });
                 const data = await res.json();
-                
-                if (data.success) {
-                    document.getElementById(targetId).value = data.data.url;
-                    btn.innerText = "✅";
-                } else {
-                    alert("Error al procesar imagen");
-                    btn.innerText = "❌";
-                }
-            } catch (err) {
-                console.error(err);
-                btn.innerText = "ERR";
-            } finally {
-                setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 2000);
-            }
+                if (data.success) { document.getElementById(targetId).value = data.data.url; btn.innerText = "✅"; }
+            } catch (err) { btn.innerText = "ERR"; }
+            finally { setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 2000); }
         }
 
         function agregarServicio() {
@@ -253,84 +204,55 @@
             });
         }
 
-        async function sugerirConIA() {
-            const bio = document.getElementById('bio');
-            const prompts = { "Pediatría": "Especialista en crecimiento infantil...", "General": "Comprometido con la salud preventiva..." };
-            bio.value = prompts[currentDocData.especialidad] || prompts["General"];
-        }
-
         document.getElementById('form-config').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-save');
-            btn.innerText = "SINCRONIZANDO..."; 
-            btn.disabled = true;
+            btn.innerText = "SINCRONIZANDO..."; btn.disabled = true;
 
-            const nombres = document.getElementsByName('srv-nombre');
-            const precios = document.getElementsByName('srv-precio');
+            // Recolección de Servicios
+            const srvNombres = document.getElementsByName('srv-nombre');
+            const srvPrecios = document.getElementsByName('srv-precio');
             const serviciosArray = [];
-            for(let i=0; i<nombres.length; i++) {
-                if(nombres[i].value) serviciosArray.push({ nombre: nombres[i].value, precio: precios[i].value });
+            for(let i=0; i<srvNombres.length; i++) {
+                if(srvNombres[i].value) serviciosArray.push({ nombre: srvNombres[i].value, precio: srvPrecios[i].value });
             }
+
+            // Recolección de Fechas de Bloqueo
+            const exclusiones = Array.from(document.getElementsByName('fecha-exclusion')).map(el => el.value).filter(v => v !== "");
 
             const metadatosJSON = JSON.stringify({
                 instagram: document.getElementById('instagram').value,
                 facebook: document.getElementById('facebook').value,
                 url_foto_perfil: document.getElementById('url_foto_perfil').value,
-                url_foto_equipo: document.getElementById('foto_equipo').value,
                 direccion: document.getElementById('direccion').value,
                 lat: document.getElementById('latitud').value,
                 lng: document.getElementById('longitud').value,
                 seguros: Array.from(document.querySelectorAll('.seguro-pill.active')).map(el => el.innerText),
-                english: document.getElementById('feat-english').classList.contains('active'),
-                parking: document.getElementById('feat-park').classList.contains('active'),
-                servicios: serviciosArray
+                servicios: serviciosArray,
+                fechas_excluidas: exclusiones, // 🏖️ Guardamos festivos y vacaciones
+                tiempo_limpieza: parseInt(document.getElementById('tiempo_limpieza').value) // ⏱️ Guardamos margen operativo
             });
 
-const payload = {
-    cedula: document.getElementById('cedula').value,
-    aviso_cofepris: document.getElementById('cofepris').value || null,
-    biografia: document.getElementById('bio').value,
-    url_logo: document.getElementById('url_logo').value,
-    url_foto_consultorio: document.getElementById('foto_consultorio').value,
-    
-    // CORRECCIÓN CLAVE: Usamos los nombres exactos del SQL
-    hora_inicio: document.getElementById('h_inicio').value + ":00", 
-    hora_fin: document.getElementById('h_fin').value + ":00",
-    
-    // Esta columna 'horario_sabado' debe ser creada en Supabase si aún no existe
-    horario_sabado: `${document.getElementById('h_sabado_inicio').value} - ${document.getElementById('h_sabado_fin').value}`,
-    
-    duracion_cita_min: parseInt(document.getElementById('duracion').value),
-    redes_sociales: metadatosJSON
-};
+            const payload = {
+                cedula: document.getElementById('cedula').value,
+                aviso_cofepris: document.getElementById('cofepris').value || null,
+                hora_inicio: document.getElementById('h_inicio').value + ":00", 
+                hora_fin: document.getElementById('h_fin').value + ":00",
+                duracion_cita_min: parseInt(document.getElementById('duracion').value),
+                redes_sociales: metadatosJSON // Inyectamos todo el búnker de configuración aquí
+            };
 
             try {
                 const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
                     method: 'PATCH',
-                    headers: { 
-                        'apikey': KEY_DB, 
-                        'Authorization': `Bearer ${KEY_DB}`, 
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal' 
-                    },
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
                     body: JSON.stringify(payload)
                 });
-
                 if (response.ok) {
                     alert("🚀 Nodo Maestro Sincronizado.");
-                    const planCheck = sessionStorage.getItem('kb_plan_elegido');
-                    window.location.href = (planCheck == "0") ? `appsolo.html?id=${docId}` : `app.html?id=${docId}`;
-                } else {
-                    const error = await response.json();
-                    console.error("Error Supabase:", error);
-                    alert("Error de sincronización.");
-                    btn.disabled = false;
-                    btn.innerText = "Inaugurar Sucursal Digital";
+                    location.reload();
                 }
-            } catch (err) {
-                console.error("Fallo crítico:", err);
-                btn.disabled = false;
-            }
+            } catch (err) { alert("Error de sincronización."); btn.disabled = false; }
         });
         init();
     </script>
