@@ -236,20 +236,15 @@
                 let start, end;
 
                 if (diaSemana === 6) {
-                    // SÁBADO: De 9:00 AM a 2:30 PM (Límite 15 para pintar las 14:00 y 14:30)
-                    start = 9;
-                    end = 15;
+                    start = 9; end = 15;
                 } else if (diaSemana === 0) {
-                    // DOMINGO: Nodo en Mantenimiento
                     grid.innerHTML = "<p class='col-span-3 text-center text-[9px] font-black uppercase text-rose-500 py-4 italic'>DOMINGO: MANTENIMIENTO TÉCNICO 🛠️</p>";
                     return;
                 } else {
-                    // LUNES A VIERNES: Ajuste +1 para evitar corte a las 11:30
                     start = parseInt(configHoras.inicio.split(':')[0]);
                     end = parseInt(configHoras.fin.split(':')[0]) + 1;
                 }
 
-                // Blindaje Maestro K.B Tech (Siempre dentro del rango de soporte 7-7)
                 start = Math.max(start, 7);
                 end = Math.min(end, 20); 
 
@@ -276,23 +271,41 @@
 
         document.getElementById('form-cita').onsubmit = async (e) => {
             e.preventDefault();
+            
+            // Recolección de Inteligencia
             const h = document.getElementById('hora-sel').value;
             const f = document.getElementById('fecha-sel').value;
             const sNom = document.getElementById('servicio-nombre').value;
             const sMon = document.getElementById('monto-sel').value;
+            const nombrePaciente = document.getElementById('nombre').value.toUpperCase().trim();
             
-            if(!h || !f || !sNom) return eliteAviso("ERROR: DATOS INCOMPLETOS");
+            if(!h || !f || !sNom || !nombrePaciente) return eliteAviso("ERROR: DATOS INCOMPLETOS");
 
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "ESTABLECIENDO CONEXIÓN..."; btn.disabled = true;
+            btn.innerText = "ESCANEANDO PERÍMETRO..."; btn.disabled = true;
 
             try {
+                // 🛡️ BLINDAJE ANTI-DUPLICADOS: Escaneo de nombre y fecha
+                const checkRes = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&nombre_paciente=eq.${nombrePaciente}&fecha=eq.${f}`, {
+                    headers: { 'apikey': KEY_DB }
+                });
+                const duplicados = await checkRes.json();
+
+                if (duplicados && duplicados.length > 0) {
+                    eliteAviso("⚠️ YA TIENES UNA CITA AGENDADA ESTE DÍA");
+                    btn.disabled = false;
+                    btn.innerText = "Finalizar Reservación ✦";
+                    return;
+                }
+
+                // Si el perímetro está limpio, procedemos al registro
+                btn.innerText = "ESTABLECIENDO CONEXIÓN...";
                 const res = await fetch(`${URL_DB}/rest/v1/Citas`, {
                     method: 'POST',
                     headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         doctor_id: docId,
-                        nombre_paciente: document.getElementById('nombre').value.toUpperCase(),
+                        nombre_paciente: nombrePaciente,
                         telefono: (document.getElementById('lada').value + document.getElementById('telefono').value) + " | " + sNom,
                         fecha: f, hora: h, pagado: false, monto: parseInt(sMon)
                     })
