@@ -179,7 +179,7 @@
     const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
     const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
     const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-    let currentPatient = null, globalDocData = null, divisa = 'MXN', tc = 17.50;
+    let currentPatient = null, globalDocData = null, tc = 17.50;
     let fechaVisualizacion = new Date(), calFecha = new Date();
 
     const CATALOGO_TEMAS = {
@@ -187,7 +187,6 @@
         "Odontología": ["#0ea5e9", "#10b981", "#22d3ee", "#1e3a8a", "#6366f1"],
         "Pediatría": ["#fb923c", "#38bdf8", "#4ade80", "#f472b6", "#818cf8"],
         "Cardiología": ["#e11d48", "#1e293b", "#0284c7", "#9f1239", "#4f46e5"],
-        "Bienestar (Nutri/Psico)": ["#059669", "#a855f7", "#fbbf24", "#0ea5e9", "#10b981"],
         "General": ["#1e3a8a", "#6366f1", "#10b981", "#be123c", "#4338ca"]
     };
 
@@ -410,6 +409,7 @@
         cargarCitas(); cerrarModal();
     }
 
+    // 🛡️ RADAR ANTI-DUPLICADOS INTEGRADO
     async function abrirNuevoPaciente() {
         document.getElementById('modal-icon').innerText = "👤";
         document.getElementById('modal-title').innerText = "Nueva Cita";
@@ -423,7 +423,6 @@
             
             if(!nombre) return eliteAviso("FALTA NOMBRE");
 
-            // 🛡️ RADAR ANTI-DUPLICADOS
             const btn = document.getElementById('modal-confirm-btn');
             btn.innerText = "VERIFICANDO..."; btn.disabled = true;
 
@@ -483,10 +482,12 @@
 
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
     
+    // 🟢 COMUNICACIÓN ESTRATÉGICA WHATSAPP
     function contactarWhatsApp() {
-        if(!currentPatient) return alert("Seleccione paciente");
-        const tel = currentPatient.telefono.split('|')[0].trim();
-        window.open(`https://wa.me/${tel}`, '_blank');
+        if(!currentPatient) return eliteAviso("SELECCIONE PACIENTE");
+        const telRaw = currentPatient.telefono.split('|')[0].trim();
+        const telLimpio = telRaw.replace(/\D/g, '');
+        window.open(`https://wa.me/${telLimpio}`, '_blank');
     }
 
     function abrirCobroPremium(cita) {
@@ -535,7 +536,7 @@
         abrirModal();
     }
 
-    verificarAcceso(); // Inicia el proceso de acceso
+    verificarAcceso(); 
 </script>
 </body>
 </html>
