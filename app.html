@@ -50,7 +50,6 @@
         #progress-bar-fill { height: 100%; width: 0%; background: var(--main-color); transition: 1s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 15px var(--main-color); }
         .garita-card { background: #f8fafc; border-radius: 1.5rem; padding: 1rem; border: 1px solid #e2e8f0; }
 
-        /* --- CIRUGÍA: ESTILOS TERMINAL IA --- */
         #ia-panel { position: fixed; right: -400px; top: 0; width: 380px; height: 100vh; background: rgba(255,255,255,0.95); backdrop-filter: blur(40px); border-left: 1px solid #e2e8f0; z-index: 99999; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: -20px 0 50px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         #ia-panel.open { right: 0; }
         #ia-toggle { position: fixed; right: 7rem; bottom: 2rem; width: 4rem; height: 4rem; background: var(--main-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px var(--main-glow); transition: 0.3s; font-size: 1.5rem; }
@@ -126,7 +125,7 @@
                 <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Ir a Recepción</span>
             </button>
             <hr class="border-slate-800 my-6">
-           <div class="space-y-4">
+            <div class="space-y-4">
     <p class="text-[9px] font-black uppercase text-indigo-400 tracking-[0.2em] italic text-center">Gestión de Perfil Maestro</p>
     <div class="p-6 bg-indigo-500/5 border border-indigo-500/20 rounded-[2.5rem] text-center space-y-4">
         <div class="text-4xl">🛠️</div>
@@ -221,10 +220,15 @@
             </div>
 
             <div class="lg:col-span-8">
-                <div class="flex justify-between items-end mb-10 px-4 text-left">
-                    <h2 class="text-4xl font-black italic uppercase tracking-tighter">Agenda <span class="text-indigo-600">Live</span></h2>
-                    <div class="bg-white shadow-sm px-6 py-2 rounded-2xl text-[10px] font-black text-slate-600 uppercase border border-slate-100 flex items-center gap-3">
-                        <span>Citas: <span id="total-hoy" class="text-sm ml-1 text-indigo-600">0</span></span>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 px-4 gap-4">
+                    <div>
+                        <h2 class="text-4xl font-black italic uppercase tracking-tighter">Agenda <span class="text-indigo-600">Live</span></h2>
+                        <p id="fecha-actual-label" class="text-[9px] font-black text-indigo-500 uppercase tracking-widest italic mt-1">Sincronizando radar...</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white shadow-xl p-2 rounded-[1.5rem] border border-slate-100">
+                        <button onclick="cambiarDia(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-full transition-all font-black text-lg">‹</button>
+                        <input type="date" id="picker-agenda" onchange="irAFECHA(this.value)" class="bg-transparent border-none text-[10px] font-black uppercase outline-none px-2 text-center cursor-pointer">
+                        <button onclick="cambiarDia(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-full transition-all font-black text-lg">›</button>
                     </div>
                 </div>
                 <div id="contenedor-citas" class="grid gap-5"></div>
@@ -237,6 +241,7 @@
     const docId = new URLSearchParams(window.location.search).get('id')?.trim();
     const TC = 18.50; 
     let currentPatientId = null, globalDocData = null;
+    let fechaAgendaActual = new Date(); // <--- VARIABLE MAESTRA DE TIEMPO
 
     const CATALOGO_TEMAS = {
         "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite" }],
@@ -246,6 +251,18 @@
         "Bienestar (Nutri/Psico)": [{ id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen" }, { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental" }, { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri" }, { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia" }, { id: 5, color: "#10b981", icon: "🥑", tag: "Fit" }],
         "General": [{ id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" }, { id: 2, color: "#6366f1", icon: "🏥", tag: "Moderno" }, { id: 3, color: "#10b981", icon: "🩺", tag: "Básico" }, { id: 4, color: "#be123c", icon: "🚑", tag: "Urgencia" }, { id: 5, color: "#4338ca", icon: "🏢", tag: "Corp" }]
     };
+
+    // --- NUEVAS FUNCIONES DE NAVEGACIÓN TEMPORAL ---
+    function cambiarDia(delta) {
+        fechaAgendaActual.setDate(fechaAgendaActual.getDate() + delta);
+        syncMaster();
+    }
+
+    function irAFECHA(valor) {
+        if(!valor) return;
+        fechaAgendaActual = new Date(valor + "T12:00:00");
+        syncMaster();
+    }
 
     // FUNCIONES IA K.B TECH
     function toggleIA() {
@@ -344,15 +361,6 @@
                 
                 if (Notification.permission !== 'granted') Notification.requestPermission();
                 
-                document.getElementById('edit-direccion').value = globalDocData.direccion_consultorio || "";
-                document.getElementById('edit-bio').value = globalDocData.biografia || "";
-                if(globalDocData.redes_sociales) {
-                    try {
-                        const redes = JSON.parse(globalDocData.redes_sociales);
-                        document.getElementById('edit-insta').value = redes.instagram || "";
-                    } catch(e) { document.getElementById('edit-insta').value = ""; }
-                }
-
                 eliteAviso("ACCESO CONCEDIDO ✦");
                 syncMaster(); 
                 setInterval(syncMaster, 15000);
@@ -365,24 +373,22 @@
     }
 
     async function syncMaster() {
-        // --- CIRUGÍA DE PRECISIÓN: RELOJ LOCAL TIJUANA/EE.UU. ---
-        const hoyObj = new Date();
-        // Forzamos el formato YYYY-MM-DD basado en la localidad del usuario, no del servidor
-        const hoy = hoyObj.toLocaleDateString('sv-SE'); 
-        
-        console.log("Sincronizando Nodo para fecha local:", hoy);
+        // --- CALIBRACIÓN DE FECHA LOCAL ---
+        const hoyStr = fechaAgendaActual.toLocaleDateString('sv-SE'); // YYYY-MM-DD
+        const labelStr = fechaAgendaActual.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
 
-        const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
+        document.getElementById('picker-agenda').value = hoyStr;
+        document.getElementById('fecha-actual-label').innerText = labelStr.toUpperCase();
+
+        const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY } });
         const citasRaw = await res.json();
         
-        // --- FILTRADO MAESTRO K.B TECH ---
-        // Ampliamos el radar de 07:00 a 23:59 para que el Dr. vea su actividad todo el día
+        // FILTRO MAESTRO 7-24
         const citas = citasRaw.filter(c => {
             const horaCita = c.hora.slice(0, 5);
             return horaCita >= "07:00" && horaCita <= "23:59";
         });
 
-        // --- CÁLCULO FINANCIERO Y RENDERIZADO ---
         let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
         const counts = {};
         citas.forEach(c => { counts[c.nombre_paciente] = (counts[c.nombre_paciente] || 0) + 1; });
@@ -398,6 +404,7 @@
             
             if(triageMsg.includes("URGENTE") || triageMsg.includes("DOLOR")) {
                 pinColor = "#ef4444";
+                if (Notification.permission === "granted") new Notification("🚨 ALERTA: " + c.nombre_paciente, { body: "Prioridad inmediata." });
             } else if(triageMsg.includes("PRIORIDAD")) {
                 pinColor = "#f59e0b";
             }
@@ -424,13 +431,11 @@
                         <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl shadow-inner active:scale-95 transition">📹</button>
                     </div>
                 </div>`;
-        }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
+        }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas para este día</p>';
         
-        // Actualizar contadores
         document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
         document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
         document.getElementById('proyeccion-faltante').innerText = `$${faltante.toLocaleString()}.00 MXN`;
-        document.getElementById('total-hoy').innerText = citas.length;
         const progress = citas.length > 0 ? (pagadasCount / citas.length) * 100 : 0;
         document.getElementById('progress-bar-fill').style.width = progress + "%";
     }
@@ -479,31 +484,8 @@
     function mostrarBalance() { 
         const bal = document.getElementById('balance-display');
         bal.classList.toggle('hidden');
-        if(!bal.classList.contains('hidden')) {
-            bal.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 400, easing: 'ease-out' });
-        }
     }
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-
-   // CORRECCIÓN EN actualizarConfiguracionWeb
-async function actualizarConfiguracionWeb() {
-    const dir = document.getElementById('edit-direccion').value;
-    const bio = document.getElementById('edit-bio').value;
-    
-    // Cambiamos 'biografia' por el nombre exacto del SQL
-    const payload = { 
-        direccion_consultorio: dir, 
-        biografia: bio 
-    };
-    
-    const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
-        method: 'PATCH', 
-        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(payload) 
-    });
-    
-    if(res.ok) { eliteAviso("SUCURSAL ACTUALIZADA ✦"); toggleMenu(); }
-}
 
     async function cambiarPin() {
         const n = document.getElementById('nuevo-pin-input').value;
@@ -531,48 +513,9 @@ async function actualizarConfiguracionWeb() {
         const nota = document.getElementById('dra-response-input').value;
         const fecha = new Date().toLocaleDateString();
         const ventana = window.open('', '', 'width=800,height=900');
-        ventana.document.write(`
-            <html>
-            <head>
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-                    body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; background: white; line-height: 1.5; }
-                    .header { border-bottom: 3px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
-                    .doc-info h1 { margin: 0; font-size: 28px; font-weight: 900; text-transform: uppercase; color: #1e293b; }
-                    .doc-info p { margin: 2px 0; color: #64748b; font-weight: 600; font-size: 14px; }
-                    .recipe-meta { text-align: right; font-size: 12px; color: #94a3b8; }
-                    .paciente-box { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #6366f1; }
-                    .paciente-box h2 { margin: 0; font-size: 10px; text-transform: uppercase; color: #6366f1; letter-spacing: 1px; font-weight: 900; }
-                    .paciente-box p { margin: 5px 0 0 0; font-size: 18px; font-weight: 700; }
-                    .rx-symbol { font-size: 40px; font-weight: 900; color: #6366f1; margin-bottom: 10px; opacity: 0.3; }
-                    .prescripcion { min-height: 400px; font-size: 16px; white-space: pre-wrap; color: #334155; }
-                    .footer { margin-top: 50px; padding-top: 20px; text-align: center; border-top: 1px solid #e2e8f0; }
-                    .firma-linea { width: 250px; border-top: 2px solid #1e293b; margin: 0 auto 10px auto; }
-                    .cedula { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="doc-info">
-                        <h1>Dr. ${doc.nombre_doctor}</h1>
-                        <p>${doc.especialidad || 'MÉDICO ESPECIALISTA'}</p>
-                        <p>${doc.direccion_consultorio || 'TIJUANA, B.C.'}</p>
-                    </div>
-                    <div class="recipe-meta"><p>FECHA: <b>${fecha}</b></p></div>
-                </div>
-                <div class="paciente-box"><h2>PACIENTE</h2><p>${pac}</p></div>
-                <div class="rx-symbol">Rx</div>
-                <div class="prescripcion">${nota}</div>
-                <div class="footer">
-                    <div class="firma-linea"></div>
-                    <p><b>FIRMA DEL MÉDICO</b></p>
-                    <p class="cedula">Cédula Profesional: ${doc.cedula || 'VERIFICAR ORIGINAL'}</p>
-                </div>
-                <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }<\/script>
-            </body>
-            </html>
-        `);
+        ventana.document.write(`<html><body style="font-family:sans-serif;padding:50px;"><h1>Dr. ${doc.nombre_doctor}</h1><p>${doc.especialidad}</p><hr><h3>Paciente: ${pac}</h3><p>${nota}</p></body></html>`);
         ventana.document.close();
+        ventana.print();
     }
 
     if ('serviceWorker' in navigator) {
