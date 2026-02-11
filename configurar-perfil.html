@@ -286,7 +286,6 @@
                 servicios: serviciosArray
             });
 
-           // --- ACTUALIZACIÓN DEL PAYLOAD MAESTRO ---
 const payload = {
     cedula: document.getElementById('cedula').value,
     aviso_cofepris: document.getElementById('cofepris').value || null,
@@ -294,8 +293,11 @@ const payload = {
     url_logo: document.getElementById('url_logo').value,
     url_foto_consultorio: document.getElementById('foto_consultorio').value,
     
-    // Aquí se guarda la configuración de tiempos que acabas de crear
-    horario_semana: `${document.getElementById('h_inicio').value} - ${document.getElementById('h_fin').value}`,
+    // CORRECCIÓN CLAVE: Usamos los nombres exactos del SQL
+    hora_inicio: document.getElementById('h_inicio').value + ":00", 
+    hora_fin: document.getElementById('h_fin').value + ":00",
+    
+    // Esta columna 'horario_sabado' debe ser creada en Supabase si aún no existe
     horario_sabado: `${document.getElementById('h_sabado_inicio').value} - ${document.getElementById('h_sabado_fin').value}`,
     
     duracion_cita_min: parseInt(document.getElementById('duracion').value),
