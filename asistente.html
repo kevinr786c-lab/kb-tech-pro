@@ -376,13 +376,19 @@
         const notaPanel = document.getElementById('nota-del-doctor-panel');
         const notaTxt = document.getElementById('txt-nota-doctor');
 
-        if (c.telefono && c.telefono.includes("INSTRUCCIÓN:")) {
+        // --- CALIBRACIÓN DE RADAR DE MENSAJES K.B TECH ---
+        // Buscamos tanto "INSTRUCCIÓN:" como "DOCTOR DICE:"
+        if (c.telefono && (c.telefono.includes("INSTRUCCIÓN:") || c.telefono.includes("DOCTOR DICE:"))) {
             notaPanel.classList.remove('hidden');
-            notaTxt.innerText = c.telefono.replace("INSTRUCCIÓN:", "").trim();
+            // Limpiamos el texto para que solo se vea el mensaje
+            notaTxt.innerText = c.telefono
+                .replace("INSTRUCCIÓN:", "")
+                .replace("DOCTOR DICE:", "💊")
+                .trim();
         } else {
             notaPanel.classList.add('hidden');
         }
-        eliteAviso("PACIENTE SELECCIONADO ✦");
+        eliteAviso("PACIENTE EN FOCO ✦");
     }
 
     async function abrirCalendarioMaestro() { 
