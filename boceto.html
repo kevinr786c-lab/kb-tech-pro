@@ -3,86 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica de Colposcopía Tijuana | 3D Experience</title>
+    <title>Clínica de Colposcopía Tijuana | Portal Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
-        body { margin: 0; background: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        #canvas-container { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
-        .content-layer { position: relative; z-index: 10; }
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(168, 85, 247, 0.1); }
-        .text-gradient { background: linear-gradient(to right, #8e44ad, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
+        body { font-family: 'Montserrat', sans-serif; scroll-behavior: smooth; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .bg-lila-soft { background-color: #f3f0ff; }
+        .border-lila { border-color: #b19cd9; }
+        .text-lila { color: #8e44ad; }
     </style>
 </head>
-<body>
+<body class="bg-white text-slate-800">
 
-    <div id="canvas-container"></div>
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 px-6 py-4 flex justify-between items-center">
+        <div class="text-lila font-bold text-lg tracking-tighter uppercase">Clínica de Colposcopía <br><span class="text-slate-400 text-xs">Tijuana</span></div>
+        <div class="hidden md:flex gap-6 text-[10px] font-bold uppercase tracking-widest">
+            <a href="#inicio" class="hover:text-lila">Inicio</a>
+            <a href="#sobre-mi" class="hover:text-lila">Especialista</a>
+            <a href="#servicios" class="hover:text-lila">Servicios</a>
+            <a href="#contacto" class="hover:text-lila">Contacto</a>
+        </div>
+        <a href="#citas" class="bg-lila text-white px-5 py-2 rounded-full text-[10px] font-bold shadow-lg shadow-purple-200">AGENDAR</a>
+    </nav>
 
-    <div class="content-layer">
-        <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
-            <h2 class="font-bold text-xl tracking-tighter text-purple-900">CLÍNICA DE COLPOSCOPÍA <span class="text-purple-500">TIJUANA</span></h2>
-            <a href="URL_AGENDA" class="bg-purple-600 text-white px-6 py-2 rounded-full text-xs font-bold hover:bg-purple-700 transition">AGENDAR AHORA</a>
-        </nav>
+    <section id="inicio" class="py-20 px-6 bg-lila-soft grid md:grid-cols-2 gap-12 items-center">
+        <div class="max-w-xl mx-auto md:ml-20">
+            <h1 class="serif text-5xl text-slate-900 mb-4">Cuidando tu salud con atención personalizada.</h1>
+            <p class="text-slate-500 mb-8 font-light italic">Especialista en Ginecología y Obstetricia certificada.</p>
+            <div class="flex gap-4">
+                <a href="#citas" class="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition">Agendar Cita</a>
+                <a href="#servicios" class="border border-slate-300 px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Ver Servicios</a>
+            </div>
+        </div>
+        <div class="flex justify-center">
+            <div class="w-80 h-[450px] bg-slate-200 rounded-[3rem] shadow-2xl border-8 border-white overflow-hidden">
+                <img src="FOTO_DRA_ALBA.jpg" alt="Dra. Alba Rojas" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </section>
 
-        <section class="min-h-screen flex flex-col items-center justify-center text-center px-4">
-            <h1 class="text-5xl md:text-7xl font-bold text-slate-900 mb-6 tracking-tight">
-                Tecnología que cuida <br> <span class="text-gradient">Tu Bienestar.</span>
-            </h1>
-            <p class="max-w-xl text-slate-500 text-lg mb-10">
-                Ubicados en el corazón de Zona Río, Plaza Siqueiros. Especialistas en salud ginecológica integral.
-            </p>
-            
-            <div class="glass-card p-8 rounded-[2rem] max-w-2xl w-full grid md:grid-cols-2 gap-8 text-left">
-                <div>
-                    <h3 class="text-purple-600 font-bold uppercase text-[10px] tracking-widest mb-2">Ubicación Estratégica</h3>
-                    <p class="text-sm text-slate-600">C. David Alfaro Siqueiros #2800, Int. L16. Plaza Siqueiros, Zona Río.</p>
-                </div>
-                <div>
-                    <h3 class="text-purple-600 font-bold uppercase text-[10px] tracking-widest mb-2">Acceso Táctico</h3>
-                    <p class="text-sm text-slate-600">2do piso (Elevador) o 1er piso (Escaleras). Estacionamiento subterráneo disponible.</p>
+    <section id="sobre-mi" class="py-24 px-6 max-w-5xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-16">
+            <div>
+                <h2 class="serif text-3xl mb-6 border-b-2 border-lila pb-2 inline-block">Sobre la Especialista</h2>
+                <p class="text-slate-600 leading-relaxed mb-6 text-sm">Formación académica de excelencia y compromiso constante con la salud femenina en Baja California.</p>
+                <ul class="space-y-3 text-xs font-bold text-slate-500 uppercase">
+                    <li><i class="fas fa-graduation-cap text-lila mr-2"></i> Especialidad en Ginecología y Obstetricia</li>
+                    <li><i class="fas fa-certificate text-lila mr-2"></i> Diplomado en Colposcopía</li>
+                    <li><i class="fas fa-id-card text-lila mr-2"></i> Cédula Profesional: [INSERTE AQUÍ]</li>
+                </ul>
+            </div>
+            <div class="bg-slate-50 p-8 rounded-3xl">
+                <h3 class="font-bold text-sm uppercase tracking-widest mb-4">Asociaciones</h3>
+                <div class="flex flex-wrap gap-4 opacity-60">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 text-[10px] font-bold">COLEGIO MÉDICO BC</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 text-[10px] font-bold">FEDERACIÓN GINECOLOGÍA</div>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
 
-    <script>
-        // --- MOTOR 3D (THREE.JS) ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+    <section id="servicios" class="py-24 bg-slate-900 text-white px-6">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="serif text-4xl text-center mb-16">Servicios de Especialidad</h2>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-8 border border-white/10 rounded-3xl hover:bg-white/5 transition">
+                    <i class="fas fa-microscope text-3xl mb-6 text-lila"></i>
+                    <h3 class="font-bold mb-4">Colposcopía</h3>
+                    <p class="text-xs text-slate-400">Detección oportuna de lesiones con tecnología digital.</p>
+                </div>
+                <div class="p-8 border border-white/10 rounded-3xl hover:bg-white/5 transition">
+                    <i class="fas fa-baby text-3xl mb-6 text-lila"></i>
+                    <h3 class="font-bold mb-4">Control Prenatal</h3>
+                    <p class="text-xs text-slate-400">Seguimiento integral para un embarazo seguro.</p>
+                </div>
+                <div class="p-8 border border-white/10 rounded-3xl hover:bg-white/5 transition">
+                    <i class="fas fa-wave-square text-3xl mb-6 text-lila"></i>
+                    <h3 class="font-bold mb-4">Ultrasonido</h3>
+                    <p class="text-xs text-slate-400">Diagnóstico pélvico y transvaginal de alta precisión.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Crear una esfera de puntos lila
-        const geometry = new THREE.IcosahedronGeometry(4, 2);
-        const material = new THREE.PointsMaterial({ color: 0xb19cd9, size: 0.05 });
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
+    <section id="citas" class="py-24 px-6 max-w-xl mx-auto text-center">
+        <h2 class="serif text-3xl mb-4 text-lila">Agenda tu Consulta</h2>
+        <p class="text-slate-500 mb-10 text-sm">Completa el formulario y nuestro equipo te contactará para confirmar.</p>
+        <form class="space-y-4 text-left">
+            <input type="text" placeholder="Nombre Completo" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-lila">
+            <input type="tel" placeholder="WhatsApp / Teléfono" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-lila">
+            <select class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-lila">
+                <option>Motivo de Consulta</option>
+                <option>Check-up Integral $1,500</option>
+                <option>Control Prenatal</option>
+                <option>Urgencia / Dolor</option>
+            </select>
+            <button class="w-full py-4 bg-lila text-white rounded-xl font-bold uppercase tracking-widest shadow-xl shadow-purple-200">Enviar Solicitud</button>
+        </form>
+    </section>
 
-        camera.position.z = 8;
+    <footer id="contacto" class="bg-slate-50 py-20 px-6 border-t border-slate-200">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-12 mb-16 text-sm">
+            <div>
+                <h4 class="font-bold mb-4 uppercase tracking-tighter">Dirección</h4>
+                <p class="text-slate-500">C. David Alfaro Siqueiros #2800, Int. L16.<br>Plaza Siqueiros, Zona Río, Tijuana.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 uppercase tracking-tighter">Horarios</h4>
+                <p class="text-slate-500">Lun - Vie: 9:00 AM - 6:00 PM<br>Sábados: 9:00 AM - 2:00 PM</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 uppercase tracking-tighter">Contacto</h4>
+                <p class="text-slate-500">Tel: (664) XXX-XXXX<br>WhatsApp: (664) XXX-XXXX</p>
+            </div>
+        </div>
+        <div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between text-[10px] text-slate-400 uppercase font-bold tracking-widest">
+            <p>&copy; 2026 Clínica de Colposcopía Tijuana | K.B Tech Solution</p>
+            <div class="flex gap-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-lila">Aviso de Privacidad</a>
+                <a href="#" class="hover:text-lila">Aviso Médico</a>
+            </div>
+        </div>
+    </footer>
 
-        // Animación y reacción al mouse
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) / 100;
-            mouseY = (e.clientY - window.innerHeight / 2) / 100;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            points.rotation.y += 0.002;
-            points.rotation.x += (mouseY - points.rotation.x) * 0.05;
-            points.rotation.y += (mouseX - points.rotation.y) * 0.05;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
 </body>
 </html>
