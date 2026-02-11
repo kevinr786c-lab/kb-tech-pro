@@ -18,15 +18,19 @@
         body { font-family: 'Outfit', sans-serif; color: var(--dark-slate); scroll-behavior: smooth; overflow-x: hidden; }
         .serif { font-family: 'Playfair Display', serif; }
         
+        /* 🌸 EFECTO ZEN FLOWERS */
         #flower-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
         .flower { position: absolute; top: -10%; animation: fall linear infinite; opacity: 0.5; filter: blur(0.5px); }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
+        /* HEADER GLASSMORPHISM */
         .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(155, 89, 182, 0.1); }
 
+        /* INTERACTIVIDAD: TRIAJE CARD */
         .triaje-card { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
         .triaje-card:hover { border-color: var(--lila-main); transform: translateY(-10px) scale(1.02); background: white; box-shadow: 0 30px 60px -12px rgba(155, 89, 182, 0.15); }
 
+        /* BOTÓN WHATSAPP PULSANTE */
         .wp-pulse { position: fixed; bottom: 30px; right: 30px; z-index: 100; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
 
@@ -42,13 +46,10 @@
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
-    <nav class="glass-header sticky top-0 z-50 px-6 md:px-20 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <img src="https://dgatsbnqgplalxwewpvs.supabase.co/storage/v1/object/public/fotos-clinica/logo_dra_alba.png" alt="Logo Dra. Alba Patricia" class="h-14 md:h-16 w-auto object-contain">
-            <div class="flex flex-col border-l border-slate-200 pl-4">
-                <h1 class="text-lg font-black text-slate-800 tracking-tighter uppercase leading-none">Clínica de Colposcopía</h1>
-                <p class="text-[9px] tracking-[0.4em] text-purple-500 font-bold italic">TIJUANA • MÉXICO</p>
-            </div>
+    <nav class="glass-header sticky top-0 z-50 px-6 md:px-20 py-5 flex justify-between items-center">
+        <div class="flex flex-col">
+            <h1 class="text-2xl font-black text-slate-800 tracking-tighter uppercase leading-none">Clínica de Colposcopía</h1>
+            <p class="text-[10px] tracking-[0.5em] text-purple-500 font-bold italic">TIJUANA • MÉXICO</p>
         </div>
         <div class="hidden lg:flex gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
             <a href="#inicio" class="hover:text-purple-600 transition">Inicio</a>
@@ -75,7 +76,7 @@
             </div>
             <div class="relative" data-aos="zoom-in" data-aos-delay="200">
                 <div class="w-full aspect-[4/5] bg-slate-200 rounded-[5rem] overflow-hidden border-[20px] border-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)]">
-                    <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover" alt="Dra. Alba Patricia Rojas">
+                    <img src="FOTO_PRINCIPAL_DRA.jpg" class="w-full h-full object-cover" alt="Dra. Especialista">
                 </div>
                 <div class="absolute -bottom-10 -right-10 bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-50 flex items-center gap-4">
                     <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white">
@@ -150,11 +151,11 @@
             <div class="grid grid-cols-2 gap-4" data-aos="fade-left">
                 <div class="bg-white/5 aspect-square rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center">
                     <i class="fas fa-user-md text-3xl text-purple-400 mb-4"></i>
-                    <p class="text-[10px] font-black uppercase tracking-widest italic text-white">Dra. Alba Patricia Rojas</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest italic">Dra. Alba Patricia Rojas</p>
                 </div>
                 <div class="bg-white/5 aspect-square rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center translate-y-8">
                     <i class="fas fa-hospital text-3xl text-purple-400 mb-4"></i>
-                    <p class="text-[10px] font-black uppercase tracking-widest italic text-white">Clínica de Colposcopía Tijuana</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest italic">Clínica de Colposcopía Tijuana</p>
                 </div>
             </div>
         </div>
@@ -173,7 +174,7 @@
                         ¿Qué es una colposcopía?
                         <span class="text-purple-500 transition-transform group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
                     </summary>
-                    <p class="text-sm text-slate-500 mt-6 leading-relaxed text-justify">Es un procedimiento ginecológico que permite observar de forma amplificada el cuello del útero, la vagina y la vulva para detectar lesiones o cambios celulares sospechosos que no se ven a simple vista.</p>
+                    <p class="text-sm text-slate-500 mt-6 leading-relaxed">Es un procedimiento ginecológico que permite observar de forma amplificada el cuello del útero, la vagina y la vulva para detectar lesiones o cambios celulares sospechosos que no se ven a simple vista.</p>
                 </details>
 
                 <details class="group bg-slate-50 rounded-3xl p-6 transition-all border border-transparent open:border-purple-200 open:bg-white">
@@ -225,25 +226,22 @@
                         <i class="fas fa-elevator text-2xl text-purple-500"></i>
                         <div>
                             <p class="font-bold uppercase text-[11px] tracking-widest text-slate-900 mb-1">Acceso a la Clínica</p>
-                            <p class="text-slate-500 text-sm font-bold italic text-purple-600">2do piso por elevador o 1er piso por escaleras.</p>
+                            <p class="text-slate-500 text-sm font-bold italic">2do piso por elevador o 1er piso por escaleras.</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="h-[500px] bg-slate-200 rounded-[4rem] overflow-hidden shadow-2xl border-[12px] border-white" data-aos="fade-left">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3364.5772322361!2d-117.0163353!3d32.5233157!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80d9484735555555%3A0x6a0c0c0c0c0c0c0c!2sPlaza%20Siqueiros!5e0!3m2!1ses-419!2smx!4v1700000000000!5m2!1ses-419!2smx" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3364.3840250686665!2d-117.0142954!3d32.5159079!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80d949febe878771%3A0x11a25595cd3b7d2b!2sC.%20David%20Alfaro%20Siqueiros%202800%2C%20Zona%20Urbana%20Rio%20Tijuana%2C%2022010%20Tijuana%2C%20B.C.!5e0!3m2!1ses-419!2smx!4v1700000000000!5m2!1ses-419!2smx" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
     </section>
 
     <footer class="bg-white py-20 px-6 border-t border-slate-100">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-            <div class="flex flex-col items-center md:items-start gap-4">
-                <img src="https://dgatsbnqgplalxwewpvs.supabase.co/storage/v1/object/public/fotos-clinica/logo_dra_alba.png" alt="Logo Dra. Alba" class="h-12 w-auto grayscale hover:grayscale-0 transition-all">
-                <div>
-                    <h4 class="text-lg font-black text-slate-800 uppercase leading-none text-center md:text-left">Clínica de Colposcopía</h4>
-                    <p class="text-[9px] font-black text-purple-500 uppercase tracking-[0.5em] mt-2 italic text-center md:text-left">Desarrollado por K.B Tech Solution ✦</p>
-                </div>
+            <div class="flex flex-col items-center md:items-start">
+                <h4 class="text-xl font-black text-slate-800 uppercase leading-none">Clínica de Colposcopía</h4>
+                <p class="text-[9px] font-black text-purple-500 uppercase tracking-[0.5em] mt-2 italic">Desarrollado por K.B Tech Solution ✦</p>
             </div>
             <div class="flex flex-wrap justify-center gap-10">
                 <a href="#" class="legal-link uppercase tracking-widest">Aviso de Privacidad</a>
@@ -257,6 +255,7 @@
     <script>
         AOS.init({ duration: 1200, once: true });
 
+        // Motor de Flores Zen
         function createFlower() {
             const container = document.getElementById('flower-container');
             const flower = document.createElement('div');
