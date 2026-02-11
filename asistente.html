@@ -12,9 +12,7 @@
     :root { --main: #6366f1; --bg: #f8fafc; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); transition: 0.5s; overflow-x: hidden; text-align: left; }
     
-    /* MODO PRIVACIDAD EXPANDIDO */
     body.privacy-mode .blur-sensitive { filter: blur(15px); pointer-events: none; transition: 0.4s; }
-
     .glass-panel { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.02); }
     .input-kb { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: #f1f5f9; border: 2px solid transparent; font-weight: 700; outline: none; transition: 0.3s; font-size: 0.9rem; }
     .input-kb:focus { border-color: var(--main); background: white; }
@@ -22,28 +20,13 @@
     #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(25px); padding: 1.2rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
     #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
-    /* MODERNIZACIÓN PANTALLA DE BLOQUEO (BÚNKER) */
     .glass-panel-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.1); border-radius: 3rem; position: relative; overflow: hidden; }
     .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: scan 3s infinite linear; opacity: 0.5; }
     @keyframes scan { 0% { top: 0% } 100% { top: 100% } }
     .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); transition: 0.3s; }
     .pin-dot.filled { background: var(--main); border-color: var(--main); box-shadow: 0 0 15px var(--main); }
 
-    .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(15px);
-    z-index: 20000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-
-    /* 👇 ESTO ES LO QUE FALTABA */
-    pointer-events: none;
-}
-
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; pointer-events: auto; }
     .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 3rem; padding: 3rem; position: relative; transition: 0.3s; }
     #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40000; }
     
@@ -58,7 +41,7 @@
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
     .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; border: 2px solid transparent; position: relative; }
     .cal-day:hover { transform: scale(1.1); z-index: 10; }
-    .cal-day * { pointer-events: none; } /* FIX: Permite el clic en el día aunque haya puntos o números */
+    .cal-day * { pointer-events: none; }
 
     #contenido-panel { max-width: 1450px !important; width: 95% !important; margin: 0 auto; display: flex; flex-direction: column; }
     main.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2.5rem; align-items: flex-start; }
@@ -66,31 +49,16 @@
     #panel-principal-agenda { grid-column: span 8 / span 8; }
     #tabla-citas-body { width: 100% !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 1.5rem !important; }
 
-    /* --- AJUSTE QUIRÚRGICO RESPONSIVO CELULAR (ESTILO APP.HTML) --- */
     @media (max-width: 1024px) {
         main.grid { display: flex !important; flex-direction: column !important; }
         .lg\:col-span-4, #panel-principal-agenda { width: 100% !important; }
         #contenido-panel { width: 100% !important; padding: 1rem !important; }
-        
-        /* Ajuste de tarjetas de cita para que no se amontonen en móvil */
-        #tabla-citas-body > div {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 1.5rem !important;
-            padding: 1.5rem !important;
-        }
-        
-        /* Los botones de acción ocupan el ancho total en móvil */
-        #tabla-citas-body > div > div:last-child {
-            width: 100% !important;
-            justify-content: flex-end !important;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 1rem;
-        }
+        #tabla-citas-body > div { flex-direction: column !important; align-items: flex-start !important; gap: 1.5rem !important; padding: 1.5rem !important; }
+        #tabla-citas-body > div > div:last-child { width: 100% !important; justify-content: flex-end !important; border-top: 1px solid #f1f5f9; padding-top: 1rem; }
     }
 </style>
 </head>
-<body class="p-4 md:p-10 pb-32">
+<body class="p-4 md:p-10 pb-32 text-left">
 
     <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-[0.2em] text-[9px]"></p></div>
 
@@ -112,22 +80,15 @@
     <div id="pantalla-bloqueo" class="fixed inset-0 bg-[#020617] z-[50000] flex items-center justify-center p-6">
         <div class="max-w-md w-full glass-panel-dark p-12 text-center shadow-2xl">
             <div class="scanner-line"></div>
-            <div id="lock-icon" class="text-7xl mb-6 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all duration-700">👩‍💼</div>
+            <div id="lock-icon" class="text-7xl mb-6">👩‍💼</div>
             <h2 class="text-3xl font-black italic tracking-tighter uppercase mb-2 text-white">Recepción K.B</h2>
             <p class="text-[9px] text-indigo-400 uppercase tracking-[0.4em] font-black mb-10 italic">Acceso Operativo ✦ Terminal de Control</p>
-            
             <div class="flex justify-center gap-4 mb-8">
-                <div class="pin-dot" id="dot-1"></div>
-                <div class="pin-dot" id="dot-2"></div>
-                <div class="pin-dot" id="dot-3"></div>
-                <div class="pin-dot" id="dot-4"></div>
+                <div class="pin-dot" id="dot-1"></div><div class="pin-dot" id="dot-2"></div>
+                <div class="pin-dot" id="dot-3"></div><div class="pin-dot" id="dot-4"></div>
             </div>
-
             <input type="password" id="pin-acceso" oninput="updateDots()" class="w-0 h-0 opacity-0 absolute" maxlength="4" autofocus>
-            
-            <button onclick="verificarAcceso()" id="unlock-btn" class="w-full py-6 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(99,102,241,0.3)] active:scale-95 hover:bg-white hover:text-indigo-600 transition-all duration-500">
-                Entrar al Nodo
-            </button>
+            <button onclick="verificarAcceso()" id="unlock-btn" class="w-full py-6 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">Entrar al Nodo</button>
         </div>
     </div>
 
@@ -135,7 +96,7 @@
         <button onclick="toggleMenu()" class="absolute top-8 right-8 text-2xl">✕</button>
         <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-12 italic" id="menu-title-tech">Herramientas Pro</h3>
         <nav class="space-y-4">
-            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl" id="btn-cal-pro"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Radar de Citas</span></button>
+            <button onclick="toggleMenu(); abrirCalendarioMaestro()" class="flex items-center gap-5 w-full p-5 bg-indigo-600 rounded-3xl shadow-xl"><div class="text-2xl">📅</div><span class="text-[11px] font-black uppercase tracking-widest">Radar de Citas</span></button>
             <button onclick="toggleMenu(); abrirNuevoPaciente()" class="flex items-center gap-5 w-full p-5 bg-slate-800 rounded-3xl"><div class="text-2xl">➕</div><span class="text-[11px] font-black uppercase tracking-widest">Nueva Cita</span></button>
             <button onclick="window.location.href='app.html?id=' + docId" class="flex items-center gap-5 w-full p-5 bg-indigo-500/10 border border-indigo-500/30 rounded-3xl text-indigo-400 hover:bg-indigo-600 hover:text-white transition text-left">
                 <div class="text-2xl">🩺</div><span class="text-[11px] font-black uppercase tracking-widest">Ir a Nodo Maestro</span>
@@ -213,7 +174,7 @@
         </main>
     </div>
 
-  <script>
+<script>
     const { jsPDF } = window.jspdf;
     const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co";
     const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
@@ -280,7 +241,7 @@
             document.documentElement.style.setProperty('--main', color);
             document.getElementById('brand-text').style.color = color;
             document.getElementById('card-paciente').style.borderColor = color;
-            document.getElementById('btn-cal-pro').style.backgroundColor = color;
+            document.getElementById('btn-cal-pro')?.style.setProperty('background-color', color);
             document.getElementById('menu-title-tech').style.color = color;
             
             document.getElementById('lock-icon').style.transform = "rotate(360deg) scale(1.2)";
@@ -309,7 +270,6 @@
         const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY_DB } });
         const citasRaw = await res.json();
         
-        // FILTRO MAESTRO 7-7
         const citas = citasRaw.filter(c => {
             const horaCita = c.hora.slice(0, 5);
             return horaCita >= "07:00" && horaCita <= "19:00";
@@ -376,15 +336,9 @@
         const notaPanel = document.getElementById('nota-del-doctor-panel');
         const notaTxt = document.getElementById('txt-nota-doctor');
 
-        // --- CALIBRACIÓN DE RADAR DE MENSAJES K.B TECH ---
-        // Buscamos tanto "INSTRUCCIÓN:" como "DOCTOR DICE:"
         if (c.telefono && (c.telefono.includes("INSTRUCCIÓN:") || c.telefono.includes("DOCTOR DICE:"))) {
             notaPanel.classList.remove('hidden');
-            // Limpiamos el texto para que solo se vea el mensaje
-            notaTxt.innerText = c.telefono
-                .replace("INSTRUCCIÓN:", "")
-                .replace("DOCTOR DICE:", "💊")
-                .trim();
+            notaTxt.innerText = c.telefono.replace("INSTRUCCIÓN:", "").replace("DOCTOR DICE:", "💊").trim();
         } else {
             notaPanel.classList.add('hidden');
         }
@@ -461,11 +415,36 @@
         document.getElementById('modal-title').innerText = "Nueva Cita";
         const fechaSugerida = fechaVisualizacion.toISOString().split('T')[0];
         document.getElementById('modal-body').innerHTML = `<div class="space-y-4"><input type="text" id="n-nombre" placeholder="NOMBRE DEL PACIENTE" class="input-kb uppercase"><div class="grid grid-cols-2 gap-4"><input type="time" id="n-hora" class="input-kb" value="12:00"><input type="date" id="n-fecha" class="input-kb" value="${fechaSugerida}"></div></div>`;
+        
         document.getElementById('modal-confirm-btn').onclick = async () => {
-            const nombre = document.getElementById('n-nombre').value.toUpperCase(), fecha = document.getElementById('n-fecha').value, hora = document.getElementById('n-hora').value + ":00";
+            const nombre = document.getElementById('n-nombre').value.toUpperCase().trim();
+            const fecha = document.getElementById('n-fecha').value;
+            const hora = document.getElementById('n-hora').value + ":00";
+            
             if(!nombre) return eliteAviso("FALTA NOMBRE");
-            const res = await fetch(`${URL_DB}/rest/v1/Citas`, { method: 'POST', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ doctor_id: docId, nombre_paciente: nombre, fecha: fecha, hora: hora, pagado: false, monto: 0 }) });
-            if(res.ok) { eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas(); }
+
+            // 🛡️ RADAR ANTI-DUPLICADOS
+            const btn = document.getElementById('modal-confirm-btn');
+            btn.innerText = "VERIFICANDO..."; btn.disabled = true;
+
+            try {
+                const checkRes = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&nombre_paciente=eq.${nombre}&fecha=eq.${fecha}`, { headers: { 'apikey': KEY_DB } });
+                const duplicados = await checkRes.json();
+
+                if (duplicados && duplicados.length > 0) {
+                    eliteAviso("⚠️ PACIENTE YA AGENDADO HOY");
+                    btn.disabled = false; btn.innerText = "Confirmar";
+                    return;
+                }
+
+                const res = await fetch(`${URL_DB}/rest/v1/Citas`, { 
+                    method: 'POST', 
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ doctor_id: docId, nombre_paciente: nombre, fecha: fecha, hora: hora, pagado: false, monto: 0 }) 
+                });
+
+                if(res.ok) { eliteAviso("AGENDADO ✅"); cerrarModal(); cargarCitas(); }
+            } catch (e) { eliteAviso("ERROR DE CONEXIÓN"); btn.disabled = false; btn.innerText = "Confirmar"; }
         };
         abrirModal();
     }
@@ -503,11 +482,13 @@
     }
 
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+    
     function contactarWhatsApp() {
-            if(!currentPatient) return alert("Seleccione paciente");
-            const tel = currentPatient.telefono.split('|')[0].trim();
-            window.open(`https://wa.me/${tel}`, '_blank');
-        }
+        if(!currentPatient) return alert("Seleccione paciente");
+        const tel = currentPatient.telefono.split('|')[0].trim();
+        window.open(`https://wa.me/${tel}`, '_blank');
+    }
+
     function abrirCobroPremium(cita) {
         const p = cita || currentPatient;
         if(!p) return eliteAviso("SELECCIONE PACIENTE");
@@ -554,161 +535,7 @@
         abrirModal();
     }
 
-    function init() { }
-    init();
-        // --- MOTOR DE PDF EVOLUCIONADO (ÉLITE) ---
-        function generarFacturaSAT_Premium() {
-            const p = currentPatient;
-            const docData = globalDocData;
-            const rfc = document.getElementById('billing-data').value || "XAXX010101000";
-            const amt = document.getElementById('pay-amount').value || 0;
-            const fecha = new Date().toLocaleDateString('es-MX');
-            const folio = Math.floor(100000 + Math.random() * 900000);
-            
-            if(!p) return eliteAviso("SELECCIONE PACIENTE");
-            const doc = new jsPDF();
-            
-            // Estética Corporativa
-            doc.setFillColor(15, 23, 42); 
-            doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(22);
-            doc.setFont("helvetica", "bold");
-            doc.text("K.B MEDICAL HUB", 20, 25);
-            doc.setFontSize(8);
-            doc.text("SISTEMA DE FACTURACIÓN INTEGRAL BINACIONAL", 20, 32);
-            
-            // Folio y Fecha
-            doc.setTextColor(255, 255, 255);
-            doc.text(`FOLIO: KB-${folio}`, 160, 22);
-            doc.text(`FECHA: ${fecha}`, 160, 28);
-
-            // Datos Emisor
-            doc.setTextColor(30, 41, 59);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "bold");
-            doc.text("DATOS DEL PRESTADOR", 20, 55);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.text(`DR. ${docData.nombre_doctor.toUpperCase()}`, 20, 62);
-            doc.text(`${docData.especialidad.toUpperCase()}`, 20, 67);
-            doc.text(`CÉDULA: ${docData.cedula || '---'}`, 20, 72);
-            doc.text(`${docData.direccion_consultorio || 'TIJUANA, B.C.'}`, 20, 77);
-
-            // Línea divisoria
-            doc.setDrawColor(226, 232, 240);
-            doc.line(20, 85, 190, 85);
-
-            // Datos Receptor
-            doc.setFont("helvetica", "bold");
-            doc.text("RECEPTOR / PACIENTE", 20, 95);
-            doc.setFont("helvetica", "normal");
-            doc.text(`NOMBRE: ${p.nombre_paciente}`, 20, 102);
-            doc.text(`RFC: ${rfc.toUpperCase()}`, 20, 107);
-            doc.text("USO CFDI: G03 - GASTOS EN GENERAL", 20, 112);
-
-            // Tabla de Servicios
-            doc.autoTable({
-                startY: 120,
-                head: [['CANT', 'CÓDIGO SAT', 'DESCRIPCIÓN', 'MONTO']],
-                body: [['1', '83111502', 'CONSULTA MÉDICA ESPECIALIZADA', `$${amt}.00 MXN`]],
-                headStyles: { fillColor: [99, 102, 241], fontSize: 9 },
-                styles: { fontSize: 8, cellPadding: 5 },
-                theme: 'striped'
-            });
-
-            // Sello Digital Mock
-            const finalY = doc.lastAutoTable.finalY + 20;
-            doc.setFontSize(7);
-            doc.setTextColor(148, 163, 184);
-            doc.text("CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACIÓN DIGITAL DEL SAT:", 20, finalY);
-            doc.setFont("courier", "normal");
-            doc.text(`||1.1|KB-TECH-${folio}|${fecha}|SAT970701NN3|KBT${Math.random().toString(36).substring(7).toUpperCase()}||`, 20, finalY + 5, {maxWidth: 170});
-            
-            // Branding Fondo
-            doc.setFontSize(40);
-            doc.setTextColor(241, 245, 249);
-            doc.text("K.B TECH VERIFIED", 45, 250, { angle: 45 });
-
-            doc.save(`FACTURA_${p.nombre_paciente}.pdf`);
-            eliteAviso("FACTURA GENERADA ✦");
-        }
-
-        function generarSuperbillUSA_Premium() {
-            const p = currentPatient;
-            const docData = globalDocData;
-            const insuranceId = document.getElementById('billing-data').value || "SELF-PAY";
-            const amt = document.getElementById('pay-amount').value || 0;
-            const fecha = new Date().toLocaleDateString('en-US');
-            const folio = Math.floor(100000 + Math.random() * 900000);
-            
-            if(!p) return eliteAviso("SELECT PATIENT");
-            const doc = new jsPDF();
-            
-            // Header USA Style
-            doc.setDrawColor(30, 41, 59);
-            doc.setLineWidth(0.5);
-            doc.line(20, 25, 190, 25);
-            
-            doc.setTextColor(15, 23, 42);
-            doc.setFontSize(16);
-            doc.setFont("helvetica", "bold");
-            doc.text("HEALTH INSURANCE CLAIM FORM (SUPERBILL)", 20, 20);
-            
-            doc.setFontSize(9);
-            doc.text("PHYSICIAN / PROVIDER INFO", 120, 40);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Name: DR. ${docData.nombre_doctor}`, 120, 46);
-            doc.text(`NPI/Tax ID: PENDING`, 120, 51);
-            doc.text(`Address: ${docData.direccion_consultorio}`, 120, 56, {maxWidth: 70});
-
-            doc.setFont("helvetica", "bold");
-            doc.text("PATIENT INFO", 20, 40);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Full Name: ${p.nombre_paciente}`, 20, 46);
-            doc.text(`Insurance ID: ${insuranceId.toUpperCase()}`, 20, 51);
-            doc.text(`Date of Service: ${fecha}`, 20, 56);
-
-            // Table of Charges
-            doc.autoTable({
-                startY: 70,
-                head: [['DATE', 'CPT CODE', 'DIAGNOSIS (ICD-10)', 'DESCRIPTION', 'CHARGES']],
-                body: [[fecha, '99213', 'Z00.00', 'OFFICE VISIT - ESTABLISHED', `$${(amt/tc).toFixed(2)} USD`]],
-                headStyles: { fillColor: [15, 23, 42] },
-                theme: 'grid'
-            });
-
-            // Footer Legal
-            const finalY = doc.lastAutoTable.finalY + 30;
-            doc.line(20, finalY, 90, finalY);
-            doc.setFontSize(8);
-            doc.text("PROVIDER SIGNATURE", 20, finalY + 5);
-            doc.text("I certify that the services listed above were medically necessary.", 20, finalY + 15);
-            
-            // Folio Tracking
-            doc.setTextColor(203, 213, 225);
-            doc.text(`CONTROL ID: KB-USA-${folio}`, 150, 280);
-
-            doc.save(`SUPERBILL_${p.nombre_paciente}.pdf`);
-            eliteAviso("SUPERBILL GENERATED ✦");
-        }
-
-        function calcularCambio() {
-            const m = parseFloat(document.getElementById('pay-amount').value) || 0;
-            const r = parseFloat(document.getElementById('cash-received').value) || 0;
-            const c = r - m;
-            const d = document.getElementById('change-display');
-            if(c >= 0) {
-                d.innerText = `CAMBIO: $${c.toFixed(2)} ${divisa}`;
-                d.className = "text-center text-emerald-500 font-black italic tracking-widest text-lg py-2";
-            } else {
-                d.innerText = "ESPERANDO EFECTIVO...";
-                d.className = "text-center text-slate-400 font-bold italic py-2";
-            }
-        }
-
-        async function init() { }
-        init();
-    </script>
+    verificarAcceso(); // Inicia el proceso de acceso
+</script>
 </body>
 </html>
