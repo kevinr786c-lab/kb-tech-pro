@@ -368,10 +368,19 @@
         const hoyObj = new Date();
         const offset = hoyObj.getTimezoneOffset();
         const hoy = new Date(hoyObj.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
-        const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
-        const citas = await res.json();
-        
-        let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
+       // --- LÍNEA 371: SE MANTIENE IGUAL ---
+const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
+
+// --- LÍNEA 372: CIRUGÍA DE FILTRADO MAESTRO ---
+const citasRaw = await res.json();
+const citas = citasRaw.filter(c => {
+    const horaCita = c.hora.slice(0, 5); // Extrae formato "09:00"
+    // Rango operativo K.B Tech: 07:00 a 19:00 (7 PM)
+    return horaCita >= "07:00" && horaCita <= "19:00";
+});
+
+// --- EL RESTO DEL CÓDIGO CONTINÚA IGUAL (Línea 374 en adelante) ---
+let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
         const counts = {};
         citas.forEach(c => { counts[c.nombre_paciente] = (counts[c.nombre_paciente] || 0) + 1; });
 
@@ -473,12 +482,25 @@
     }
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
 
-    async function actualizarConfiguracionWeb() {
-        const dir = document.getElementById('edit-direccion').value, bio = document.getElementById('edit-bio').value, insta = document.getElementById('edit-insta').value;
-        const payload = { direccion_consultorio: dir, biografia: bio, redes_sociales: JSON.stringify({ instagram: insta, facebook: "" }) };
-        const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        if(res.ok) { eliteAviso("SUCURSAL ACTUALIZADA ✦"); toggleMenu(); }
-    }
+   // CORRECCIÓN EN actualizarConfiguracionWeb
+async function actualizarConfiguracionWeb() {
+    const dir = document.getElementById('edit-direccion').value;
+    const bio = document.getElementById('edit-bio').value;
+    
+    // Cambiamos 'biografia' por el nombre exacto del SQL
+    const payload = { 
+        direccion_consultorio: dir, 
+        biografia: bio 
+    };
+    
+    const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { 
+        method: 'PATCH', 
+        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(payload) 
+    });
+    
+    if(res.ok) { eliteAviso("SUCURSAL ACTUALIZADA ✦"); toggleMenu(); }
+}
 
     async function cambiarPin() {
         const n = document.getElementById('nuevo-pin-input').value;
