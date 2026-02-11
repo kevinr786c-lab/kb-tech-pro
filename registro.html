@@ -3,158 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B CORP | CENTRAL INTELLIGENCE</title>
+    <title>Registro Médico | K.B Tech</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
-        body { margin: 0; background: #000; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
-        canvas { position: fixed; top: 0; left: 0; z-index: 1; }
-        .ui-layer { position: relative; z-index: 10; pointer-events: none; height: 100vh; width: 100vw; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; }
-        .interactive { pointer-events: auto; }
-        .glass-card { background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 2.5rem; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .conf-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.8rem; padding: 8px 12px; font-size: 9px; color: #fff; outline: none; margin-bottom: 8px; }
-        .conf-input:focus { border-color: #6366f1; background: rgba(99,102,241,0.05); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glow-text { text-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; transition: 0.5s; overflow-x: hidden; }
+        .preview-phone { width: 260px; height: 500px; border: 12px solid #1e293b; border-radius: 3rem; position: relative; overflow: hidden; background: #f8fafc; transition: 0.5s; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5); }
+        .color-dot { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.3s; border: 3px solid transparent; }
+        .color-dot.active { border-color: white; transform: scale(1.2); box-shadow: 0 0 20px rgba(99,102,241,0.5); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .modal-pago { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); }
+        .badge-plan { background: #6366f1; color: white; padding: 4px 12px; border-radius: 99px; font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .gemini-star { color: #6366f1; animation: pulse-star 3s infinite; display: inline-block; }
+        @keyframes pulse-star { 0%, 100% { opacity: 1; transform: scale(1.2); } 50% { opacity: 0.4; transform: scale(1); } }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
 
-    <div class="ui-layer">
-        <header class="flex justify-between items-start ml-28"> 
-            <div class="space-y-1">
-                <h1 class="text-5xl font-black italic tracking-tighter glow-text">K.B <span class="text-indigo-500">CORP</span></h1>
-                <p id="live-clock" class="text-[10px] font-mono text-indigo-400 uppercase tracking-[0.6em]"></p>
-            </div>
-            <div class="text-right interactive">
-                <p class="text-[12px] font-black uppercase tracking-[0.3em]">Comandante Kevin Reyes</p>
-                <p class="text-[9px] text-emerald-500 font-bold uppercase tracking-widest italic animate-pulse">Laboratorio de Diseño Activo ✦</p>
-            </div>
-        </header>
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 space-y-8 text-left">
+            <header class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-5xl font-black italic tracking-tighter mb-2 uppercase">K.B <span id="text-logo" class="text-indigo-400">TECH</span></h1>
+                    <p class="text-slate-400 text-xs uppercase tracking-[0.4em] font-bold italic"><span class="gemini-star">✦</span> Gemini Engine ✦ Sincronizando Nodo</p>
+                </div>
+                <div id="plan-display-badge" class="badge-plan italic">Sincronizando...</div>
+            </header>
 
-        <div class="grid grid-cols-12 gap-8 items-center mb-10">
-            <div class="col-span-4 space-y-6 overflow-y-auto max-h-[75vh] no-scrollbar interactive">
-                
-                <div class="glass-card border-l-2 border-indigo-500/50">
-                    <p class="text-[9px] font-black uppercase text-indigo-400 tracking-[0.4em] mb-4 italic">Web Identity Design (Cocina Visual) 🎨</p>
+            <form id="form-registro" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-[7px] text-slate-500 font-black uppercase ml-2">Selección de Template</label>
-                        <select id="conf-template" class="conf-input text-indigo-400 font-bold">
-                            <option value="1">MINIMALIST (White Clean)</option>
-                            <option value="2">DARK MODE (Premium Elite)</option>
-                            <option value="3">MEDICAL HUB (Professional)</option>
-                            <option value="4">CAMALEÓN (Adaptive)</option>
+                        <label class="text-[10px] font-black uppercase text-slate-500 ml-4 italic">Nombre del Especialista</label>
+                        <input type="text" id="nombre" placeholder="Ej. Dr. Rivera" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none focus:border-white transition-all text-sm font-bold text-white uppercase" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-slate-500 ml-4 italic">Especialidad Médica</label>
+                        <select id="especialidad" onchange="cambiarCatalogo()" class="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700 outline-none text-sm font-bold text-white appearance-none cursor-pointer">
+                            <option value="Ginecología">Ginecología</option>
+                            <option value="Odontología">Odontología</option>
+                            <option value="Pediatría">Pediatría</option>
+                            <option value="Cardiología">Cardiología</option>
+                            <option value="Bienestar (Nutri/Psico)">Bienestar (Nutri/Psico)</option>
+                            <option value="General">General</option>
                         </select>
-
-                        <label class="text-[7px] text-slate-500 font-black uppercase ml-2">ADN Visual (Media)</label>
-                        <input type="text" id="conf-foto" placeholder="URL FOTO DE LA DRA (PNG Recomendado)" class="conf-input">
-                        <input type="text" id="conf-logo" placeholder="URL LOGO CONSULTORIO / CLÍNICA" class="conf-input">
-                        
-                        <label class="text-[7px] text-slate-500 font-black uppercase ml-2">Credenciales y Seguros</label>
-                        <input type="text" id="conf-cedula" placeholder="CÉDULA MÉDICA (SAT)" class="conf-input uppercase">
-                        <input type="text" id="conf-npi" placeholder="NPI / TAX ID (USA)" class="conf-input uppercase">
-                        
-                        <button onclick="cocinarPerfilWeb()" class="w-full py-4 bg-indigo-600 rounded-2xl text-[10px] font-black uppercase italic shadow-lg shadow-indigo-900/40 hover:bg-white hover:text-black transition-all">Sincronizar Diseño ✦</button>
                     </div>
                 </div>
 
-                <div class="glass-card border-l-2 border-slate-500/50">
-                    <p class="text-[9px] font-black uppercase text-slate-500 tracking-[0.4em] mb-4 italic">Seleccionar Nodo para Cocinar</p>
-                    <select id="select-doc-migracion" class="w-full bg-black/40 text-[11px] font-bold p-4 rounded-2xl border border-white/10 outline-none uppercase text-indigo-300 mb-2"></select>
-                </div>
-            </div>
-
-            <div class="col-span-5 px-4 text-center">
-                <div id="tijuana-map" class="relative w-full h-[450px] bg-white/[0.02] rounded-[3rem] border border-white/5 interactive flex items-center justify-center overflow-hidden shadow-2xl">
-                    <div class="opacity-10 absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent"></div>
-                    <div class="z-20 text-center">
-                        <div id="preview-avatar" class="w-24 h-24 rounded-full bg-slate-800 mx-auto mb-4 border-2 border-indigo-500 shadow-xl overflow-hidden flex items-center justify-center text-4xl">👩‍⚕️</div>
-                        <h2 id="preview-name" class="text-2xl font-black uppercase italic tracking-tighter italic">Dra. ---</h2>
-                        <p id="preview-spec" class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-1 italic">---</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-card p-6 rounded-[2.5rem] border border-white/5">
+                        <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Foto de Perfil (Avatar)</label>
+                        <input type="file" id="foto_perfil" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-indigo-500 file:text-white hover:file:bg-indigo-400 cursor-pointer">
+                    </div>
+                    <div class="glass-card p-6 rounded-[2.5rem] border border-white/5">
+                        <label class="text-[9px] font-black uppercase text-indigo-400 mb-2 block italic">Cédula o ID (Validación)</label>
+                        <input type="file" id="foto_cedula" accept="image/*" class="text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
                     </div>
                 </div>
-                <div class="mt-8 interactive">
-                    <button onclick="entrarAlNodo()" class="px-16 py-5 bg-white text-black rounded-3xl font-black text-xs uppercase italic tracking-[0.3em] shadow-[0_0_50px_rgba(255,255,255,0.1)] hover:scale-110 transition-all">
-                        Lanzar Nodo Maestro 🩺
-                    </button>
-                </div>
-            </div>
 
-            <div class="col-span-3">
-                <div class="glass-card h-[450px] flex flex-col">
-                    <p class="text-[9px] font-black uppercase text-emerald-500 tracking-[0.4em] mb-6 italic text-center">Data Sync Logs</p>
-                    <div id="terminal-logs" class="terminal-box text-emerald-400/80 no-scrollbar flex-grow"></div>
+                <div class="glass-card p-8 rounded-[3rem] space-y-6">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[10px] font-black uppercase text-indigo-400 tracking-[0.3em] italic">Catálogo Camaleón</p>
+                        <span id="theme-tag" class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase italic text-white tracking-widest">Seleccione</span>
+                    </div>
+                    <div id="contenedor-colores" class="flex gap-6 flex-wrap"></div>
+                </div>
+
+                <div class="flex items-center gap-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
+                    <div class="flex-grow">
+                        <p class="text-[9px] font-black uppercase text-indigo-400 mb-1 italic">Inversión del Nodo</p>
+                        <p class="text-4xl font-black text-white" id="precio-display">$0 <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span></p>
+                    </div>
+                    <button type="submit" id="btn-activar" class="px-10 py-5 bg-indigo-500 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg hover:bg-indigo-400 transition-all active:scale-95">Activar Nodo</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="lg:col-span-5 flex flex-col items-center">
+            <div id="preview-box" class="preview-phone">
+                <div id="prev-bg-icon" class="absolute top-10 right-[-40px] text-[15rem] opacity-5 text-slate-900 pointer-events-none italic">🏥</div>
+                <div class="p-8 text-slate-800 space-y-8 relative h-full flex flex-col justify-center bg-white/90 text-center">
+                    <div id="prev-icon" class="text-6xl mb-2">🏥</div>
+                    <div class="h-4 w-32 bg-slate-200 rounded-full mx-auto mb-2"></div>
+                    <p id="prev-desc" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest px-4 italic"></p>
+                    <div id="prev-button" class="h-14 w-full rounded-[1.5rem] shadow-xl"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-pago" class="hidden fixed inset-0 modal-pago z-50 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-[3rem] p-8 text-slate-800 shadow-2xl border-t-[12px] border-indigo-500">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">🏦</div>
+                <h2 class="text-2xl font-black uppercase italic tracking-tighter">Pasarela BBVA</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic tracking-[0.3em]">Kevin Brayan Reyes Cruz</p>
+            </div>
+            <div class="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
+                <div>
+                    <p class="text-[9px] font-black text-indigo-500 uppercase italic">Clabe Interbancaria</p>
+                    <p class="font-black text-lg tracking-wider">012 028 01552459156 8</p>
+                </div>
+                <div class="pt-2 border-t border-slate-200">
+                    <p class="text-[9px] font-black text-slate-400 uppercase italic">Concepto de Transferencia</p>
+                    <p class="font-bold italic text-indigo-600" id="pago-concepto">CARGANDO...</p>
+                </div>
+            </div>
+            <p class="text-[10px] text-center text-slate-500 mb-6 font-medium italic">Al confirmar el pago, Gemini Engine ✦ validará la transacción y activará tu Nodo Maestro automáticamente.</p>
+            <button onclick="irANodo()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl hover:bg-slate-900 transition-all active:scale-95">He realizado la transferencia</button>
         </div>
     </div>
 
     <script>
         const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co"; 
         const KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"; 
+        let ultimoIdGenerado = null;
 
-        // --- 📊 LOGIC MAESTRA ---
-        async function syncCEO() {
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, { headers: { 'apikey': KEY_DB } });
-            const docs = await res.json();
-            const selectMig = document.getElementById('select-doc-migracion');
-            selectMig.innerHTML = '<option value="">ELEGIR DOCTOR...</option>';
-            docs.forEach(d => {
-                const opt = document.createElement('option');
-                opt.value = d.id; opt.text = d.nombre_doctor.toUpperCase();
-                selectMig.appendChild(opt);
+        // --- DETECCIÓN DE PLAN REFORZADA ---
+        const planElegido = parseInt(sessionStorage.getItem('kb_plan_elegido')) || 0;
+        const infoPlanes = [
+            { nombre: "Aspirante", precio: "$999", color: "#64748b" },
+            { nombre: "Dominio", precio: "$1,599", color: "#6366f1" },
+            { nombre: "Corporativo", precio: "Consultoría", color: "#f59e0b" }
+        ];
+
+        const planActual = infoPlanes[planElegido];
+        const badge = document.getElementById('plan-display-badge');
+        badge.innerText = `ECOSISTEMA: ${planActual.nombre.toUpperCase()}`;
+        badge.style.background = planActual.color;
+        document.getElementById('precio-display').innerHTML = `${planActual.precio} <span class="text-xs text-slate-500 italic font-normal uppercase tracking-normal">MXN/mes</span>`;
+
+        const CATALOGO = {
+            "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral", desc: "Rose Quartz" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique", desc: "Lavender Silk" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal", desc: "Pink Velvet" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico", desc: "Nature Essence" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite", desc: "Premium Care" }],
+            "Odontología": [{ id: 1, color: "#0ea5e9", icon: "💎", tag: "Clínico", desc: "Arctic Bright" }, { id: 2, color: "#10b981", icon: "🌿", tag: "Orgánico", desc: "Emerald Fresh" }, { id: 3, color: "#22d3ee", icon: "❄️", tag: "Estético", desc: "Ice Smile" }, { id: 4, color: "#1e3a8a", icon: "🛡️", tag: "Cirugía", desc: "Titanium Pro" }, { id: 5, color: "#6366f1", icon: "⚡", tag: "Tech", desc: "Digital Dentist" }],
+            "Pediatría": [{ id: 1, color: "#fb923c", icon: "🧸", tag: "Infantil", desc: "Sunny Kids" }, { id: 2, color: "#38bdf8", icon: "🚀", tag: "Lúdico", desc: "Sky Dreams" }, { id: 3, color: "#4ade80", icon: "🦖", tag: "Aventura", desc: "Dino Jungle" }, { id: 4, color: "#f472b6", icon: "🍭", tag: "Tierno", desc: "Candy Health" }, { id: 5, color: "#818cf8", icon: "🌙", tag: "Paz", desc: "Starry Night" }],
+            "Cardiología": [{ id: 1, color: "#e11d48", icon: "❤️", tag: "Precisión", desc: "Vital Pulse" }, { id: 2, color: "#1e293b", icon: "⚡", tag: "Digital", desc: "Tech Heart" }, { id: 3, color: "#0284c7", icon: "🌊", tag: "Vascular", desc: "Flow System" }, { id: 4, color: "#9f1239", icon: "🩸", tag: "Hema", desc: "Deep Crimson" }, { id: 5, color: "#4f46e5", icon: "🛰️", tag: "Remoto", desc: "Cyber Cardio" }],
+            "Bienestar (Nutri/Psico)": [{ id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen", desc: "Zen Leaf" }, { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental", desc: "Mind Flow" }, { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri", desc: "Vital Food" }, { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia", desc: "Deep Therapy" }, { id: 5, color: "#10b981", icon: "🥑", tag: "Fit", desc: "Clean Eating" }],
+            "General": [{ id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido", desc: "Deep Ocean" }, { id: 2, color: "#6366f1", icon: "🏥", tag: "Moderno", desc: "Tech Navy" }, { id: 3, color: "#10b981", icon: "🩺", tag: "Básico", desc: "Clinic Green" }, { id: 4, color: "#be123c", icon: "🚑", tag: "Urgencia", desc: "Urgency Red" }, { id: 5, color: "#4338ca", icon: "🏢", tag: "Corp", desc: "City Medical" }]
+        };
+
+        let currentSelection = { template_id: 1, color: "#6366f1" };
+
+        function cambiarCatalogo() {
+            const esp = document.getElementById('especialidad').value;
+            const contenedor = document.getElementById('contenedor-colores');
+            let temas = CATALOGO[esp] || CATALOGO["General"];
+
+            // --- LIBERACIÓN DEL MODO CAMALEÓN ---
+            // Hemos eliminado el recorte (slice) para que todos vean los 5 temas
+            
+            contenedor.innerHTML = "";
+            temas.forEach((t) => {
+                const dot = document.createElement('div');
+                dot.className = `color-dot`;
+                dot.style.backgroundColor = t.color;
+                dot.onclick = () => {
+                    document.querySelectorAll('.color-dot').forEach(d => { d.classList.remove('active'); d.style.borderColor = "transparent"; });
+                    dot.classList.add('active');
+                    dot.style.borderColor = "white";
+                    currentSelection = { template_id: t.id, color: t.color };
+                    document.getElementById('prev-button').style.backgroundColor = t.color;
+                    document.getElementById('prev-icon').innerText = t.icon;
+                    document.getElementById('prev-bg-icon').innerText = t.icon;
+                    document.getElementById('theme-tag').innerText = t.tag;
+                    document.getElementById('prev-desc').innerText = t.desc;
+                    document.getElementById('text-logo').style.color = t.color;
+                };
+                contenedor.appendChild(dot);
             });
+            if(contenedor.firstChild) contenedor.firstChild.click();
         }
 
-        document.getElementById('select-doc-migracion').addEventListener('change', async (e) => {
-            const id = e.target.value; if(!id) return;
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${id}`, { headers: { 'apikey': KEY_DB } });
-            const data = await res.json();
-            const d = data[0];
-            if(d) {
-                // Llenar la Cocina
-                document.getElementById('conf-template').value = d.template_id || 1;
-                document.getElementById('conf-foto').value = d.foto_url || "";
-                document.getElementById('conf-logo').value = d.logo_seguro_url || "";
-                document.getElementById('conf-cedula').value = d.cedula || "";
-                document.getElementById('conf-npi').value = d.npi || "";
-                
-                // Actualizar Vista Previa
-                document.getElementById('preview-name').innerText = d.nombre_doctor;
-                document.getElementById('preview-spec').innerText = d.especialidad;
-                if(d.foto_url) document.getElementById('preview-avatar').innerHTML = `<img src="${d.foto_url}" class="w-full h-full object-cover">`;
+        async function subirAStorage(inputElement, folder) {
+            const file = inputElement.files[0];
+            if (!file) return null;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}.${fileExt}`;
+            const filePath = `${folder}/${fileName}`;
+
+            const res = await fetch(`${URL_DB}/storage/v1/object/medicos_assets/${filePath}`, {
+                method: 'POST',
+                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': file.type },
+                body: file
+            });
+            if (!res.ok) throw new Error("Error en subida");
+            return `${URL_DB}/storage/v1/object/public/medicos_assets/${filePath}`;
+        }
+
+        document.getElementById('form-registro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-activar');
+            btn.innerText = "GEMINI ✦: SUBIENDO ARCHIVOS..."; 
+            btn.disabled = true;
+
+            try {
+                const urlPerfil = await subirAStorage(document.getElementById('foto_perfil'), 'perfiles');
+                const urlCedula = await subirAStorage(document.getElementById('foto_cedula'), 'cedulas');
+
+                const nombre = document.getElementById('nombre').value.trim();
+                const payload = {
+                    nombre_doctor: nombre,
+                    email: `${nombre.toLowerCase().replace(/\s+/g, '.')}.${Math.floor(Math.random() * 1000)}@kbtech.com`,
+                    especialidad: document.getElementById('especialidad').value,
+                    plan: planActual.nombre,
+                    plan_nivel: planElegido,
+                    template_id: parseInt(currentSelection.template_id),
+                    foto_perfil_url: urlPerfil,
+                    foto_cedula_url: urlCedula,
+                    creado_en: new Date().toISOString()
+                };
+
+                const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos`, {
+                    method: 'POST',
+                    headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (res.ok && data.length > 0) {
+                    ultimoIdGenerado = data[0].id;
+                    document.getElementById('pago-concepto').innerText = `KB-TJ-${nombre.split(' ')[0].toUpperCase()}-${ultimoIdGenerado.substring(0,4)}`;
+                    document.getElementById('modal-pago').classList.remove('hidden');
+                }
+            } catch (e) { 
+                alert("Error de enlace. Verifique conexión."); 
+                btn.disabled = false; btn.innerText = "Reintentar";
             }
         });
 
-        async function cocinarPerfilWeb() {
-            const id = document.getElementById('select-doc-migracion').value;
-            if(!id) return alert("SELECCIONA A QUIÉN VAS A COCINAR EL PERFIL");
-            
-            const recipe = {
-                template_id: parseInt(document.getElementById('conf-template').value),
-                foto_url: document.getElementById('conf-foto').value,
-                logo_seguro_url: document.getElementById('conf-logo').value,
-                cedula: document.getElementById('conf-cedula').value.toUpperCase(),
-                npi: document.getElementById('conf-npi').value.toUpperCase()
-            };
-
-            const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${id}`, {
-                method: 'PATCH',
-                headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(recipe)
-            });
-
-            if(res.ok) alert("¡PERFIL COCINADO Y PUBLICADO! ✅");
+        function irANodo() {
+            if(ultimoIdGenerado) {
+                const btn = event.target;
+                btn.innerText = "GEMINI ✦: VALIDANDO...";
+                setTimeout(() => {
+                    // CABLEADO FINAL: 0 = Aspirante (appsolo), 1 = Dominio (configurar)
+                    window.location.href = (planElegido === 0) ? `appsolo.html?id=${ultimoIdGenerado}` : `configurar-perfil.html?id=${ultimoIdGenerado}`;
+                }, 1500);
+            }
         }
-
-        function entrarAlNodo() {
-            const id = document.getElementById('select-doc-migracion').value;
-            if(!id) return alert("ELIGE UN DOCTOR");
-            window.location.href = `app.html?id=${id}`;
-        }
-
-        syncCEO();
+        cambiarCatalogo();
     </script>
 </body>
 </html>
