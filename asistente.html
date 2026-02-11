@@ -497,8 +497,11 @@
     }
 
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
-    function contactarWhatsApp() { if(currentPatient) window.open(`https://wa.me/${currentPatient.telefono.split(' ')[0]}`); }
-
+    function contactarWhatsApp() {
+            if(!currentPatient) return alert("Seleccione paciente");
+            const tel = currentPatient.telefono.split('|')[0].trim();
+            window.open(`https://wa.me/${tel}`, '_blank');
+        }
     function abrirCobroPremium(cita) {
         const p = cita || currentPatient;
         if(!p) return eliteAviso("SELECCIONE PACIENTE");
