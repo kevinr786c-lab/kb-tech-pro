@@ -3,99 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica de Colposcopía Tijuana | Salud Femenina</title>
+    <title>Clínica de Colposcopía Tijuana | 3D Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap');
-        
-        body { font-family: 'Quicksand', sans-serif; background: #fafaff; overflow-x: hidden; }
-        
-        /* 🌸 EFECTO FLORES EN MOVIMIENTO */
-        .flower {
-            position: fixed; top: -10%; z-index: 0;
-            user-select: none; pointer-events: none;
-            animation: fall linear infinite;
-            opacity: 0.6;
-        }
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
-        }
-
-        .glass-premium {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(177, 156, 217, 0.2);
-            box-shadow: 0 8px 32px rgba(177, 156, 217, 0.1);
-        }
-
-        .text-lila { color: #8e44ad; }
-        .bg-lila { background: #b19cd9; }
-        .bg-lila-dark { background: #8e44ad; }
-
-        .hero-gradient {
-            background: linear-gradient(135deg, #f3e8ff 0%, #ffffff 100%);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+        body { margin: 0; background: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: 0; pointer-events: none; }
+        .content-layer { position: relative; z-index: 10; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(168, 85, 247, 0.1); }
+        .text-gradient { background: linear-gradient(to right, #8e44ad, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
 
-    <div id="flower-container"></div>
+    <div id="canvas-container"></div>
 
-    <nav class="fixed w-full z-50 glass-premium px-8 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <img src="logo_dra_alba.png" alt="Logo" class="h-12">
-            <span class="font-bold text-lg text-lila tracking-tighter">CLÍNICA DE COLPOSCOPÍA <br> <small class="text-slate-400">TIJUANA</small></span>
-        </div>
-        <div class="hidden md:flex gap-8 text-sm font-bold text-slate-600 uppercase tracking-widest">
-            <a href="#" class="hover:text-lila">Inicio</a>
-            <a href="#servicios" class="hover:text-lila">Servicios</a>
-            <a href="#testimonios" class="hover:text-lila">Pacientes</a>
-        </div>
-    </nav>
+    <div class="content-layer">
+        <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
+            <h2 class="font-bold text-xl tracking-tighter text-purple-900">CLÍNICA DE COLPOSCOPÍA <span class="text-purple-500">TIJUANA</span></h2>
+            <a href="URL_AGENDA" class="bg-purple-600 text-white px-6 py-2 rounded-full text-xs font-bold hover:bg-purple-700 transition">AGENDAR AHORA</a>
+        </nav>
 
-    <section class="relative pt-32 pb-20 px-6 hero-gradient flex flex-col items-center text-center">
-        <div class="z-10 max-w-3xl">
-            <span class="bg-lila/20 text-lila font-bold px-4 py-1 rounded-full text-xs uppercase tracking-widest">Tecnología Médica de Vanguardia</span>
-            <h1 class="text-4xl md:text-6xl font-light text-slate-800 mt-6 mb-8">Un Nuevo Nivel en <br><strong class="font-bold text-lila">Cuidado Femenino</strong></h1>
-            <p class="text-slate-500 text-lg mb-10">Especialistas en detección oportuna y tratamientos avanzados en Tijuana, Zona Río.</p>
-            <a href="URL_TU_AGENDA" class="bg-lila-dark text-white px-10 py-4 rounded-full font-bold shadow-xl shadow-purple-200 hover:scale-105 transition-all inline-block">AGENDAR CONSULTA</a>
-        </div>
-    </section>
-
-    <section id="servicios" class="py-20 px-6 max-w-6xl mx-auto relative z-10">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-            <div class="glass-premium p-8 rounded-[3rem] border-b-4 border-lila">
-                <h2 class="text-2xl font-bold text-lila mb-6">Chequeo Ginecológico Integral</h2>
-                <p class="text-slate-600 mb-6 font-medium">Nuestra consulta más completa para tu tranquilidad.</p>
-                <div class="text-4xl font-bold text-slate-800 mb-8">$1,500 <small class="text-sm text-slate-400">MXN</small></div>
-                <ul class="space-y-4 text-slate-500 mb-8">
-                    <li>✦ Consulta y Revisión Clínica</li>
-                    <li>✦ Ultrasonido Pélvico o Transvaginal</li>
-                    <li>✦ Colposcopía Especializada</li>
-                    <li>✦ Papanicolaou</li>
-                    <li>✦ Exploración Clínica de Mamas</li>
-                </ul>
+        <section class="min-h-screen flex flex-col items-center justify-center text-center px-4">
+            <h1 class="text-5xl md:text-7xl font-bold text-slate-900 mb-6 tracking-tight">
+                Tecnología que cuida <br> <span class="text-gradient">Tu Bienestar.</span>
+            </h1>
+            <p class="max-w-xl text-slate-500 text-lg mb-10">
+                Ubicados en el corazón de Zona Río, Plaza Siqueiros. Especialistas en salud ginecológica integral.
+            </p>
+            
+            <div class="glass-card p-8 rounded-[2rem] max-w-2xl w-full grid md:grid-cols-2 gap-8 text-left">
+                <div>
+                    <h3 class="text-purple-600 font-bold uppercase text-[10px] tracking-widest mb-2">Ubicación Estratégica</h3>
+                    <p class="text-sm text-slate-600">C. David Alfaro Siqueiros #2800, Int. L16. Plaza Siqueiros, Zona Río.</p>
+                </div>
+                <div>
+                    <h3 class="text-purple-600 font-bold uppercase text-[10px] tracking-widest mb-2">Acceso Táctico</h3>
+                    <p class="text-sm text-slate-600">2do piso (Elevador) o 1er piso (Escaleras). Estacionamiento subterráneo disponible.</p>
+                </div>
             </div>
-            <div class="space-y-6">
-                <h3 class="text-3xl font-light text-slate-800 italic">"Detección oportuna para una vida plena."</h3>
-                <p class="text-slate-500">En <strong>Clínica de Colposcopía Tijuana</strong>, utilizamos los protocolos más estrictos de salud para asegurar tu bienestar. No somos solo una consulta, somos tu equipo de salud.</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <script>
-        function createFlower() {
-            const container = document.getElementById('flower-container');
-            const flower = document.createElement('div');
-            flower.className = 'flower';
-            flower.innerHTML = '🌸'; // Puedes cambiar por SVG de flores lila si prefieres
-            flower.style.left = Math.random() * 100 + 'vw';
-            flower.style.animationDuration = Math.random() * 3 + 2 + 's'; 
-            flower.style.fontSize = Math.random() * 20 + 10 + 'px';
-            container.appendChild(flower);
-            setTimeout(() => { flower.remove(); }, 5000);
+        // --- MOTOR 3D (THREE.JS) ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Crear una esfera de puntos lila
+        const geometry = new THREE.IcosahedronGeometry(4, 2);
+        const material = new THREE.PointsMaterial({ color: 0xb19cd9, size: 0.05 });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        camera.position.z = 8;
+
+        // Animación y reacción al mouse
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) / 100;
+            mouseY = (e.clientY - window.innerHeight / 2) / 100;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            points.rotation.y += 0.002;
+            points.rotation.x += (mouseY - points.rotation.x) * 0.05;
+            points.rotation.y += (mouseX - points.rotation.y) * 0.05;
+            renderer.render(scene, camera);
         }
-        setInterval(createFlower, 300);
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
