@@ -376,7 +376,7 @@ const citasRaw = await res.json();
 const citas = citasRaw.filter(c => {
     const horaCita = c.hora.slice(0, 5); // Extrae formato "09:00"
     // Rango operativo K.B Tech: 07:00 a 19:00 (7 PM)
-    return horaCita >= "07:00" && horaCita <= "19:00";
+    return horaCita >= "07:00" && horaCita <= "23:59";
 });
 
 // --- EL RESTO DEL CÓDIGO CONTINÚA IGUAL (Línea 374 en adelante) ---
