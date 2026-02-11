@@ -67,29 +67,44 @@
             </div>
 
             <div class="space-y-6">
-                <h3 class="font-black text-[10px] uppercase text-indigo-400 tracking-[0.3em] italic">📅 Logística Operativa</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[8px] font-black uppercase ml-2 text-slate-500">Apertura</label>
-                        <input type="time" id="h_inicio" value="09:00" class="input-kb">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[8px] font-black uppercase ml-2 text-slate-500">Cierre</label>
-                        <input type="time" id="h_fin" value="18:00" class="input-kb">
-                    </div>
-                </div>
-                <select id="duracion" class="input-kb appearance-none cursor-pointer">
-                    <option value="20">20 MINUTOS</option>
-                    <option value="30" selected>30 MINUTOS</option>
-                    <option value="45">45 MINUTOS</option>
-                    <option value="60">1 HORA</option>
-                </select>
-                <div class="flex gap-2">
-                    <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-english">🇺🇸 English</div>
-                    <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-park">🅿️ Parking</div>
-                </div>
-            </div>
+    <h3 class="font-black text-[10px] uppercase text-indigo-400 tracking-[0.3em] italic">📅 Logística Operativa</h3>
+    
+    <div class="grid grid-cols-2 gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+        <div class="col-span-2 text-[7px] font-black uppercase text-slate-500 mb-1">Lunes a Viernes</div>
+        <div class="space-y-1">
+            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Apertura</label>
+            <input type="time" id="h_inicio" value="09:00" class="input-kb">
+        </div>
+        <div class="space-y-1">
+            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Cierre</label>
+            <input type="time" id="h_fin" value="12:30" class="input-kb">
+        </div>
+    </div>
 
+    <div class="grid grid-cols-2 gap-3 p-4 bg-white/5 rounded-2xl border border-indigo-500/20">
+        <div class="col-span-2 text-[7px] font-black uppercase text-indigo-400 mb-1 italic">Sábados Operativos</div>
+        <div class="space-y-1">
+            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Apertura</label>
+            <input type="time" id="h_sabado_inicio" value="09:00" class="input-kb">
+        </div>
+        <div class="space-y-1">
+            <label class="text-[8px] font-black uppercase ml-2 text-slate-400">Cierre</label>
+            <input type="time" id="h_sabado_fin" value="14:30" class="input-kb">
+        </div>
+    </div>
+
+    <select id="duracion" class="input-kb appearance-none cursor-pointer">
+        <option value="20">20 MINUTOS</option>
+        <option value="30" selected>30 MINUTOS</option>
+        <option value="45">45 MINUTOS</option>
+        <option value="60">1 HORA</option>
+    </select>
+    
+    <div class="flex gap-2">
+        <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-english">🇺🇸 English</div>
+        <div class="feature-pill flex-1 text-center" onclick="this.classList.toggle('active')" id="feat-park">🅿️ Parking</div>
+    </div>
+</div>
             <div class="md:col-span-2 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="font-black text-[10px] uppercase text-amber-400 tracking-[0.3em] italic">💰 Menú de Servicios y Costos</h3>
@@ -271,17 +286,21 @@
                 servicios: serviciosArray
             });
 
-            const payload = {
-                cedula: document.getElementById('cedula').value,
-                aviso_cofepris: document.getElementById('cofepris').value || null,
-                biografia: document.getElementById('bio').value,
-                url_logo: document.getElementById('url_logo').value,
-                url_foto_consultorio: document.getElementById('foto_consultorio').value,
-                hora_inicio: document.getElementById('h_inicio').value + ":00",
-                hora_fin: document.getElementById('h_fin').value + ":00",
-                duracion_cita_min: parseInt(document.getElementById('duracion').value),
-                redes_sociales: metadatosJSON
-            };
+           // --- ACTUALIZACIÓN DEL PAYLOAD MAESTRO ---
+const payload = {
+    cedula: document.getElementById('cedula').value,
+    aviso_cofepris: document.getElementById('cofepris').value || null,
+    biografia: document.getElementById('bio').value,
+    url_logo: document.getElementById('url_logo').value,
+    url_foto_consultorio: document.getElementById('foto_consultorio').value,
+    
+    // Aquí se guarda la configuración de tiempos que acabas de crear
+    horario_semana: `${document.getElementById('h_inicio').value} - ${document.getElementById('h_fin').value}`,
+    horario_sabado: `${document.getElementById('h_sabado_inicio').value} - ${document.getElementById('h_sabado_fin').value}`,
+    
+    duracion_cita_min: parseInt(document.getElementById('duracion').value),
+    redes_sociales: metadatosJSON
+};
 
             try {
                 const response = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, {
