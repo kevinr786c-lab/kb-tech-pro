@@ -17,7 +17,6 @@
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; appearance: none; }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        /* NUEVO GRID DE CALENDARIO */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
         .day-header { font-size: 7px; font-weight: 800; text-transform: uppercase; color: #94a3b8; text-align: center; padding-bottom: 5px; }
         .date-card { aspect-ratio: 1/1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: 0.3s; cursor: pointer; }
@@ -110,8 +109,9 @@
         const docId = new URLSearchParams(window.location.search).get('id')?.trim();
         
         let planNivel = 0;
+        let globalDocData = null; 
         let configHoras = { inicio: "09:00", fin: "17:00" };
-        let currentViewDate = new Date(); // Fecha para controlar la navegación del calendario
+        let currentViewDate = new Date(); 
 
         const CATALOGO_TEMAS = {
             "Ginecología": ["#f43f5e"], "Odontología": ["#0ea5e9"], "Pediatría": ["#fb923c"], "General": ["#6366f1"]
@@ -131,6 +131,7 @@
                 const data = await res.json();
                 const doc = data[0];
                 if(doc) {
+                    globalDocData = doc; 
                     planNivel = doc.plan === 'Dominio' || doc.plan === 'Corporativo' ? 1 : 0;
                     configHoras.inicio = doc.hora_inicio || "09:00";
                     configHoras.fin = doc.hora_fin || "17:00";
@@ -184,7 +185,6 @@
             renderCalendarGrid();
         }
 
-        // NUEVA FUNCIÓN: RENDERIZADO EN GRID (CALENDARIO COMPLETO)
         function renderCalendarGrid() {
             const container = document.getElementById('date-slider');
             container.innerHTML = "";
@@ -198,7 +198,6 @@
             const today = new Date();
             today.setHours(0,0,0,0);
 
-            // Espacios vacíos para el inicio del mes
             for(let e=0; e < firstDay; e++) {
                 const empty = document.createElement('div');
                 container.appendChild(empty);
@@ -232,11 +231,32 @@
                 const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${fecha}`, { headers: {'apikey': KEY_DB} });
                 const ocupadas = (await res.json()).map(c => c.hora.slice(0,5));
                 grid.innerHTML = "";
-                let start = parseInt(configHoras.inicio.split(':')[0]);
-                let end = parseInt(configHoras.fin.split(':')[0]);
+
+                const diaSemana = new Date(fecha + "T12:00:00").getDay(); 
+                let start, end;
+
+                if (diaSemana === 6) {
+                    // SÁBADO: De 9:00 AM a 2:30 PM (Límite 15 para pintar las 14:00 y 14:30)
+                    start = 9;
+                    end = 15;
+                } else if (diaSemana === 0) {
+                    // DOMINGO: Nodo en Mantenimiento
+                    grid.innerHTML = "<p class='col-span-3 text-center text-[9px] font-black uppercase text-rose-500 py-4 italic'>DOMINGO: MANTENIMIENTO TÉCNICO 🛠️</p>";
+                    return;
+                } else {
+                    // LUNES A VIERNES: Ajuste +1 para evitar corte a las 11:30
+                    start = parseInt(configHoras.inicio.split(':')[0]);
+                    end = parseInt(configHoras.fin.split(':')[0]) + 1;
+                }
+
+                // Blindaje Maestro K.B Tech (Siempre dentro del rango de soporte 7-7)
+                start = Math.max(start, 7);
+                end = Math.min(end, 20); 
+
                 for(let h = start; h < end; h++) {
                     const slots = [h < 10 ? `0${h}:00` : `${h}:00`];
                     if(planNivel > 0) slots.push(h < 10 ? `0${h}:30` : `${h}:30`);
+                    
                     slots.forEach(t => {
                         const pill = document.createElement('div');
                         pill.className = `time-pill ${ocupadas.includes(t) ? 'disabled' : ''}`;
@@ -260,7 +280,6 @@
             const f = document.getElementById('fecha-sel').value;
             const sNom = document.getElementById('servicio-nombre').value;
             const sMon = document.getElementById('monto-sel').value;
-            const motivo = document.getElementById('motivo-consulta').value.toUpperCase();
             
             if(!h || !f || !sNom) return eliteAviso("ERROR: DATOS INCOMPLETOS");
 
