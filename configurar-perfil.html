@@ -23,7 +23,7 @@
         }
         .seguro-pill.active, .feature-pill.active { background: var(--main-color); color: white; border-color: white; box-shadow: 0 10px 20px -5px var(--main-color); }
 
-        .service-row { background: rgba(255,255,255,0.03); border-radius: 1.5rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .service-row { background: rgba(255, 255, 255, 0.03); border-radius: 1.5rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 py-20">
@@ -129,13 +129,32 @@
                 
                 try {
                     const meta = JSON.parse(doc.redes_sociales || "{}");
-                    // Cargar Horario Sábado
                     if(meta.horario_sabado) {
                         const [s_ini, s_fin] = meta.horario_sabado.split('-');
                         document.getElementById('h_sabado_inicio').value = s_ini.trim();
                         document.getElementById('h_sabado_fin').value = s_fin.trim();
                     }
                     if(meta.tiempo_limpieza) document.getElementById('tiempo_limpieza').value = meta.tiempo_limpieza;
+                    
+                    // Cargar exclusiones y servicios si ya existen...
+                    if(meta.fechas_excluidas) {
+                        meta.fechas_excluidas.forEach(f => {
+                             const container = document.getElementById('contenedor-fechas-bloqueo');
+                             const div = document.createElement('div');
+                             div.className = "flex gap-2 items-center bg-white/5 p-3 rounded-2xl border border-rose-500/10";
+                             div.innerHTML = `<input type="date" value="${f}" class="bg-transparent text-[10px] font-black outline-none text-rose-400 flex-1" name="fecha-exclusion"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
+                             container.insertBefore(div, container.lastElementChild);
+                        });
+                    }
+                    if(meta.servicios) {
+                        meta.servicios.forEach(s => {
+                            const container = document.getElementById('contenedor-servicios');
+                            const div = document.createElement('div');
+                            div.className = "service-row flex gap-3 items-center";
+                            div.innerHTML = `<input type="text" value="${s.nombre}" class="bg-transparent flex-1 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-nombre"><input type="number" value="${s.precio}" class="bg-transparent w-24 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-precio"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
+                            container.appendChild(div);
+                        });
+                    }
                 } catch(e) {}
             }
         }
@@ -144,8 +163,7 @@
             const container = document.getElementById('contenedor-fechas-bloqueo');
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center bg-white/5 p-3 rounded-2xl border border-rose-500/10";
-            div.innerHTML = `<input type="date" class="bg-transparent text-[10px] font-black outline-none text-rose-400 flex-1" name="fecha-exclusion">
-                             <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
+            div.innerHTML = `<input type="date" class="bg-transparent text-[10px] font-black outline-none text-rose-400 flex-1" name="fecha-exclusion"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
             container.insertBefore(div, container.lastElementChild);
         }
 
@@ -166,9 +184,7 @@
             const container = document.getElementById('contenedor-servicios');
             const div = document.createElement('div');
             div.className = "service-row flex gap-3 items-center";
-            div.innerHTML = `<input type="text" placeholder="Servicio" class="bg-transparent flex-1 text-sm font-bold outline-none text-white" name="srv-nombre">
-                             <input type="number" placeholder="MXN" class="bg-transparent w-24 text-sm font-bold outline-none text-white" name="srv-precio">
-                             <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
+            div.innerHTML = `<input type="text" placeholder="Servicio" class="bg-transparent flex-1 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-nombre"><input type="number" placeholder="Precio" class="bg-transparent w-24 text-sm font-bold outline-none text-white border-b border-white/10" name="srv-precio"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 font-black">✕</button>`;
             container.appendChild(div);
         }
 
@@ -189,7 +205,6 @@
                 servicios: serviciosArray,
                 fechas_excluidas: exclusiones,
                 tiempo_limpieza: parseInt(document.getElementById('tiempo_limpieza').value),
-                // 📡 AQUÍ GUARDAMOS EL HORARIO DIFERENCIADO DEL SÁBADO
                 horario_sabado: `${document.getElementById('h_sabado_inicio').value} - ${document.getElementById('h_sabado_fin').value}`
             });
 
@@ -206,8 +221,8 @@
                 body: JSON.stringify(payload)
             });
 
-            if (response.ok) { alert("🚀 Nodo Maestro Actualizado."); location.reload(); }
-            else { alert("Falla técnica."); btn.disabled = false; btn.innerText = "🚀 Guardar Configuración"; }
+            if (response.ok) { alert("🚀 Nodo Maestro Sincronizado."); location.reload(); }
+            else { alert("Falla técnica."); btn.disabled = false; btn.innerText = "🚀 Guardar Configuración Maestro"; }
         });
 
         init();
