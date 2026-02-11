@@ -4,524 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K.B DOCTOR | NODO MAESTRO ✦</title>
-    
-    <link rel="manifest" href="manifest.json">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; transition: 0.5s ease; text-align: left; }
-        :root { --main-color: #6366f1; --main-glow: rgba(99, 102, 241, 0.2); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; text-align: left; }
+        :root { --main: #6366f1; --glow: rgba(99, 102, 241, 0.2); }
         
-        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.1); z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.25); }
+        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; z-index: 100000; transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1); }
         #elite-toast.active { transform: translateX(-50%) translateY(0); }
 
-        .glass-panel-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.1); border-radius: 3rem; position: relative; overflow: hidden; }
-        
-        .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--main-color), transparent); animation: scan 3s infinite linear; opacity: 0.5; }
-        @keyframes scan { 0% { top: 0% } 100% { top: 100% } }
-
-        .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); transition: 0.3s; }
-        .pin-dot.filled { background: var(--main-color); border-color: var(--main-color); box-shadow: 0 0 15px var(--main-color); }
-
-        .pin-master { width: 12px; height: 12px; border-radius: 50%; position: relative; display: inline-block; margin-right: 10px; }
-        .pin-glow { position: absolute; inset: -4px; border-radius: 50%; opacity: 0.4; animation: pulse-pin 2s infinite; }
-        
-        @keyframes pulse-pin { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(2.5); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
-
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
-        .card-appointment { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.03); border-radius: 2rem; position: relative; overflow: hidden; }
-        .card-appointment:hover { transform: scale(1.01) translateY(-3px); border-color: var(--main-color) !important; box-shadow: 0 20px 40px var(--main-glow); }
+        .card-appointment { transition: 0.3s ease; border-radius: 2rem; border-left: 6px solid transparent; }
+        .card-appointment:hover { transform: translateY(-3px); box-shadow: 0 20px 40px var(--glow); }
         
-        .u-rojo { border-left: 6px solid #ef4444 !important; background: linear-gradient(90deg, #fef2f2 0%, white 100%); }
-        .u-amarillo { border-left: 6px solid #f59e0b !important; background: linear-gradient(90deg, #fffbeb 0%, white 100%); }
-        .u-verde { border-left: 6px solid #10b981 !important; }
+        .u-rojo { border-color: #ef4444 !important; background: #fff5f5; }
+        .u-amarillo { border-color: #f59e0b !important; background: #fffbeb; }
+        .u-verde { border-color: #10b981 !important; }
         
-        .input-premium { background: #f1f5f9; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; width: 100%; outline: none; transition: 0.3s; font-weight: 700; }
-        .input-premium:focus { border-color: var(--main-color); background: #fff; box-shadow: 0 0 20px var(--main-glow); }
-        
-        #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; overflow-y: auto; }
-        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 8px; font-weight: 900; text-transform: uppercase; }
-        
-        #btn-ingresos { position: fixed; bottom: 2rem; right: 2rem; width: 4rem; height: 4rem; background: linear-gradient(135deg, #fbbf24, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); transition: 0.3s; }
-        
-        #progress-bar-container { height: 4px; width: 100%; background: #e2e8f0; position: fixed; top: 0; left: 0; z-index: 200000; }
-        #progress-bar-fill { height: 100%; width: 0%; background: var(--main-color); transition: 1s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 15px var(--main-color); }
-        .garita-card { background: #f8fafc; border-radius: 1.5rem; padding: 1rem; border: 1px solid #e2e8f0; }
-
-        #ia-panel { position: fixed; right: -400px; top: 0; width: 380px; height: 100vh; background: rgba(255,255,255,0.95); backdrop-filter: blur(40px); border-left: 1px solid #e2e8f0; z-index: 99999; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: -20px 0 50px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        #side-menu { transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100000; }
+        #ia-panel { position: fixed; right: -400px; top: 0; width: 380px; height: 100vh; background: white; z-index: 99999; transition: 0.6s ease; box-shadow: -20px 0 50px rgba(0,0,0,0.1); }
         #ia-panel.open { right: 0; }
-        #ia-toggle { position: fixed; right: 7rem; bottom: 2rem; width: 4rem; height: 4rem; background: var(--main-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 1000; box-shadow: 0 10px 25px var(--main-glow); transition: 0.3s; font-size: 1.5rem; }
-        #ia-toggle:hover { transform: scale(1.1) rotate(15deg); }
-        .msg-ia { background: #f1f5f9; border-radius: 1.5rem 1.5rem 1.5rem 0; padding: 15px; margin-bottom: 12px; font-size: 11px; font-weight: 600; color: #334155; line-height: 1.4; }
-        .msg-user { background: var(--main-color); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; padding: 15px; margin-bottom: 12px; font-size: 11px; text-align: right; margin-left: auto; width: fit-content; font-weight: 800; }
     </style>
 </head>
 <body class="min-h-screen">
-    <div id="progress-bar-container"><div id="progress-bar-fill"></div></div>
     <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p></div>
-    <div id="btn-ingresos" title="Balance Financiero" onclick="mostrarBalance()">💰</div>
 
-    <div id="ia-toggle" onclick="toggleIA()" title="Asistente K.B AI">✦</div>
-    <div id="ia-panel">
-        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-white/50">
-            <div>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600">K.B TECH ENGINE</h3>
-                <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest italic">Sincronización Neural Beta</p>
-            </div>
-            <button onclick="toggleIA()" class="text-slate-300 hover:text-indigo-600 transition">✕</button>
+    <div id="ia-toggle" onclick="toggleIA()" class="fixed right-8 bottom-8 w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white cursor-pointer shadow-2xl z-[1000] hover:scale-110 transition">✦</div>
+    <div id="ia-panel" class="flex flex-col">
+        <div class="p-8 border-b flex justify-between items-center">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-indigo-600">K.B TECH ENGINE</h3>
+            <button onclick="toggleIA()">✕</button>
         </div>
-        <div id="ia-chat-box" class="flex-1 overflow-y-auto p-8 space-y-4 scroll-smooth">
-            <div class="msg-ia italic text-slate-500 text-[9px] uppercase font-black tracking-widest">✦ Nodo central activo. Comandante, estoy listo para procesar sus requerimientos.</div>
-        </div>
-        <div class="p-6 bg-slate-50/80 backdrop-filter blur-sm">
-            <div class="relative">
-                <input type="text" id="ia-input" placeholder="ORDEN DE COMANDO..." class="w-full p-5 pr-14 rounded-[1.5rem] border-none text-[9px] font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500 shadow-inner bg-white" onkeypress="if(event.key==='Enter') enviarComandoIA()">
-                <button onclick="enviarComandoIA()" class="absolute right-4 top-3.5 w-8 h-8 flex items-center justify-center bg-indigo-600 text-white rounded-full text-xs shadow-lg hover:bg-indigo-700 transition">➜</button>
-            </div>
+        <div id="ia-chat-box" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div class="p-6 bg-slate-50">
+            <input type="text" id="ia-input" placeholder="ORDEN DE COMANDO..." class="w-full p-4 rounded-2xl text-[10px] font-black uppercase outline-none shadow-inner" onkeypress="if(event.key==='Enter') enviarComandoIA()">
         </div>
     </div>
 
-    <div id="pantalla-bloqueo" class="fixed inset-0 bg-[#020617] z-[50000] flex items-center justify-center p-6">
-        <div class="max-w-md w-full glass-panel-dark p-12 text-center shadow-2xl">
-            <div class="scanner-line"></div>
-            <div id="lock-icon" class="text-7xl mb-6 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all duration-700">🩺</div>
-            <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-2 text-white">Nodo Maestro</h2>
-            <p class="text-[9px] text-indigo-400 uppercase tracking-[0.4em] font-black mb-10 italic">Validación Maestro ✦ K.B Tech</p>
-            
-            <div class="flex justify-center gap-4 mb-8">
-                <div class="pin-dot" id="dot-1"></div>
-                <div class="pin-dot" id="dot-2"></div>
-                <div class="pin-dot" id="dot-3"></div>
-                <div class="pin-dot" id="dot-4"></div>
-            </div>
-
-            <input type="password" id="pin-acceso" oninput="updateDots()" class="w-0 h-0 opacity-0 absolute" maxlength="4" autofocus>
-            
-            <button onclick="verificarAcceso()" id="unlock-btn" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(99,102,241,0.3)] active:scale-95 hover:bg-white hover:text-indigo-600 transition-all duration-500">
-                Sincronizar Acceso
-            </button>
+    <div id="pantalla-bloqueo" class="fixed inset-0 bg-slate-950 z-[50000] flex items-center justify-center p-6 text-center">
+        <div class="max-w-md w-full p-10 bg-slate-900 rounded-[3rem] border border-white/10">
+            <div class="text-6xl mb-6">🩺</div>
+            <h2 class="text-white font-black uppercase italic tracking-tighter text-2xl">Nodo Maestro</h2>
+            <input type="password" id="pin-acceso" placeholder="PIN" maxlength="4" class="w-full mt-8 bg-transparent text-white text-center text-4xl tracking-[0.5em] font-black outline-none border-b border-indigo-500 pb-2">
+            <button onclick="verificarAcceso()" class="w-full mt-10 py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest">Entrar al Búnker</button>
         </div>
     </div>
 
-    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-8 text-white text-left">
-        <button onclick="toggleMenu()" class="absolute top-6 right-6 text-2xl hover:text-indigo-400">✕</button>
-        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-10 italic">Centro de Control</h3>
-        <nav class="space-y-4">
-            <button onclick="verMiSitio()" class="flex items-center gap-4 w-full p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl hover:bg-indigo-600 transition text-left">
-                <div class="text-xl">🌐</div><span class="text-[10px] font-black uppercase">Ver Sucursal Digital</span>
-            </button>
-            <button onclick="copiarLinkCitas()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-indigo-600 transition text-left">
-                <div class="text-xl">🔗</div><span class="text-[10px] font-black uppercase">Link para Pacientes</span>
-            </button>
-            <button onclick="abrirReporteGastos()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl hover:bg-indigo-600 transition text-left">
-                <div class="text-xl">💸</div><span class="text-[10px] font-black uppercase">Auditoría Gastos</span>
-            </button>
-            <button id="btn-insumos-menu" onclick="abrirReporteLogistica()" class="flex items-center gap-4 w-full p-4 bg-slate-800 rounded-2xl text-amber-500 hover:bg-amber-600 hover:text-white transition text-left">
-                <div class="text-xl">📦</div><span class="text-[10px] font-black uppercase">Insumos Almacén</span>
-            </button>
-            <button onclick="window.location.href='asistente.html?id=' + docId" class="flex items-center gap-4 w-full p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl hover:bg-emerald-600 transition text-left text-emerald-500 hover:text-white">
-                <div class="text-xl">👩‍💼</div><span class="text-[10px] font-black uppercase">Ir a Recepción</span>
-            </button>
-            <hr class="border-slate-800 my-6">
-            <div class="space-y-4">
-    <p class="text-[9px] font-black uppercase text-indigo-400 tracking-[0.2em] italic text-center">Gestión de Perfil Maestro</p>
-    <div class="p-6 bg-indigo-500/5 border border-indigo-500/20 rounded-[2.5rem] text-center space-y-4">
-        <div class="text-4xl">🛠️</div>
-        <p class="text-[8px] font-bold text-slate-400 uppercase leading-relaxed px-2">
-            Configuración avanzada de horarios, servicios, fotos y seguros.
-        </p>
-        <button onclick="window.location.href='configurar-perfil.html?id=' + docId" 
-                class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase hover:bg-white hover:text-indigo-600 transition-all shadow-xl shadow-indigo-900/20 active:scale-95">
-            Configurar Perfil ✦
-        </button>
-    </div>
-</div>
-            <hr class="border-slate-800 my-6">
-            <div class="p-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl space-y-3">
-                <p class="text-[8px] font-black uppercase text-rose-500 tracking-widest italic">Seguridad del Nodo</p>
-                <input type="password" id="nuevo-pin-input" placeholder="NUEVO PIN (4)" maxlength="4" class="w-full bg-slate-800 border-none rounded-xl p-3 text-center text-xl tracking-[0.5em] font-black outline-none focus:ring-1 focus:ring-rose-500">
-                <button onclick="cambiarPin()" class="w-full py-3 bg-rose-600 text-white rounded-xl font-black text-[9px] uppercase hover:bg-rose-500 transition shadow-lg">Actualizar Acceso 🔐</button>
-            </div>
-        </nav>
-    </div>
-
-    <div id="contenido-panel" class="hidden opacity-0 transition-opacity duration-1000 max-w-7xl mx-auto p-6 md:p-10 text-left">
+    <div id="contenido-panel" class="hidden max-w-7xl mx-auto p-6 md:p-10">
         <nav class="flex justify-between items-center mb-16">
-            <div class="text-left">
-                <h1 class="text-5xl font-black italic tracking-tighter uppercase">K.B <span id="logo-tech" class="text-indigo-600 transition-colors duration-500">Doctor</span> <span id="master-star" class="transition-colors duration-500">✦</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic">Nodo Maestro: <span id="nav-doc-name" class="text-slate-800 transition-colors duration-500"></span></p>
-                <p id="doc-esp-label" class="text-[9px] font-black text-slate-400/50 mt-1 uppercase tracking-widest italic"></p>
+            <div>
+                <h1 class="text-5xl font-black italic uppercase tracking-tighter">K.B <span class="text-indigo-600">Doctor</span> ✦</h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] mt-2 italic"><span id="nav-doc-name"></span> | <span id="doc-esp-label"></span></p>
             </div>
-            <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl active:scale-95 transition">
-                <div class="space-y-1.5"><div class="w-6 h-0.5 bg-white"></div><div class="w-4 h-0.5 bg-indigo-500"></div></div>
-            </button>
+            <button onclick="toggleMenu()" class="p-4 bg-slate-900 text-white rounded-2xl shadow-xl">MENU</button>
         </nav>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <div class="lg:col-span-4 space-y-6">
-                
-                <div class="glass-panel p-8 shadow-sm border border-slate-100 mb-6">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 italic text-indigo-600">📡 Radar Garitas (California-TJ)</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="garita-card">
-                            <p class="text-[8px] font-bold text-slate-400 uppercase">San Ysidro RL</p>
-                            <p class="text-xl font-black text-indigo-600">45 MIN</p>
-                        </div>
-                        <div class="garita-card">
-                            <p class="text-[8px] font-bold text-slate-400 uppercase">Otay Mesa</p>
-                            <p class="text-xl font-black text-emerald-600">20 MIN</p>
-                        </div>
-                    </div>
-                    <p class="text-[7px] mt-4 text-slate-400 font-bold uppercase italic tracking-widest">Sincronizado cada 5 min con CBP ✦</p>
-                </div>
-
-                <div id="panel-intercom" class="glass-panel p-8 shadow-sm border border-slate-100 locked-feature relative overflow-hidden">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 italic text-indigo-600">Expediente Maestro</h3>
-                    <div class="p-6 bg-slate-50 rounded-3xl border border-dashed border-indigo-200 mb-6 text-center">
+            <div class="lg:col-span-4">
+                <div class="glass-panel p-8">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 text-indigo-600 italic">Expediente Live</h3>
+                    <div class="p-6 bg-slate-50 rounded-3xl text-center mb-6">
                         <p id="dra-patient-name" class="text-xl font-black text-slate-800 italic uppercase tracking-tighter">---</p>
                     </div>
-                    <div id="timeline-expediente" class="max-h-48 overflow-y-auto mb-6 px-2 text-[10px]">
-                        <div id="timeline-content" class="font-bold text-slate-600 uppercase italic">Seleccione paciente...</div>
+                    <textarea id="dra-response-input" class="w-full p-4 bg-slate-100 rounded-2xl text-xs h-32 uppercase outline-none mb-4" placeholder="Nota médica o receta..."></textarea>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="enviarRespuestaDra()" class="py-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase">Guardar Nota</button>
+                        <button onclick="generarReceta()" class="py-4 border-2 border-indigo-600 text-indigo-600 rounded-2xl font-black text-[9px] uppercase">Imprimir PDF</button>
                     </div>
-                    <div class="space-y-4 pt-4 border-t border-slate-100">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="text-[9px] font-black uppercase text-indigo-600 italic tracking-widest">Receta y Notas</label>
-                            <button onclick="activarDictado()" id="btn-dictado" class="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full font-black text-[8px] uppercase hover:bg-indigo-600 hover:text-white transition shadow-sm active:scale-95 border border-indigo-100">
-                                <span id="mic-icon">🎤</span> <span id="mic-text">Dictar por Voz</span>
-                            </button>
-                        </div>
-                        <textarea id="dra-response-input" class="input-premium h-24 text-xs uppercase" placeholder="Escribir receta..."></textarea>
-                        <button onclick="enviarRespuestaDra()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg active:scale-95 transition">Guardar Nota</button>
-                        <button onclick="generarReceta()" class="w-full py-4 border-2 border-indigo-600 text-indigo-600 rounded-2xl font-black text-[10px] uppercase hover:bg-indigo-600 hover:text-white transition active:scale-95 flex items-center justify-center gap-2"><span>🖨️</span> Generar Receta Oficial ✦</button>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden hidden" id="balance-display">
-                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 italic">Balance Hoy (Binacional)</p>
-                    <div class="space-y-6">
-                        <div>
-                            <p class="text-[8px] font-bold text-slate-500 uppercase">Pesos Hoy</p>
-                            <p class="text-4xl font-black italic tracking-tighter" id="ganancia-mxn">$0.00</p>
-                        </div>
-                        <div class="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                            <p class="text-[8px] font-bold text-emerald-400 uppercase">Dólares Hoy</p>
-                            <p class="text-3xl font-black italic text-emerald-400 tracking-tighter" id="ganancia-usd">$0.00</p>
-                            <p class="text-[7px] text-emerald-400/50 mt-1 uppercase font-bold">TC: 18.50 ✦</p>
-                        </div>
-                        <div class="pt-4 border-t border-white/5">
-                            <p class="text-[8px] font-bold text-indigo-400 uppercase">Proyección Faltante</p>
-                            <p class="text-xl font-black italic tracking-tighter text-slate-400" id="proyeccion-faltante">$0.00 MXN</p>
-                        </div>
-                    </div>
-                    <button onclick="mostrarBalance()" class="mt-6 text-[8px] font-black uppercase text-indigo-400 underline">Cerrar Balance</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 px-4 gap-4">
-                    <div>
-                        <h2 class="text-4xl font-black italic uppercase tracking-tighter">Agenda <span class="text-indigo-600">Live</span></h2>
-                        <p id="fecha-actual-label" class="text-[9px] font-black text-indigo-500 uppercase tracking-widest italic mt-1">Sincronizando radar...</p>
-                    </div>
-                    <div class="flex items-center gap-2 bg-white shadow-xl p-2 rounded-[1.5rem] border border-slate-100">
-                        <button onclick="cambiarDia(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-full transition-all font-black text-lg">‹</button>
-                        <input type="date" id="picker-agenda" onchange="irAFECHA(this.value)" class="bg-transparent border-none text-[10px] font-black uppercase outline-none px-2 text-center cursor-pointer">
-                        <button onclick="cambiarDia(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-full transition-all font-black text-lg">›</button>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+                    <h2 class="text-4xl font-black italic uppercase tracking-tighter">Agenda <span class="text-indigo-600">Live</span></h2>
+                    <div class="flex items-center gap-2 bg-white shadow-xl p-2 rounded-2xl border">
+                        <button onclick="cambiarDia(-1)" class="w-10 h-10 font-black text-xl">‹</button>
+                        <input type="date" id="picker-agenda" onchange="irAFECHA(this.value)" class="text-[10px] font-black uppercase outline-none cursor-pointer">
+                        <button onclick="cambiarDia(1)" class="w-10 h-10 font-black text-xl">›</button>
                     </div>
                 </div>
-                <div id="contenedor-citas" class="grid gap-5"></div>
+                <div id="contenedor-citas" class="space-y-4"></div>
             </div>
         </main>
     </div>
 
+    <div id="side-menu" class="fixed inset-y-0 right-0 w-80 bg-slate-900 shadow-2xl translate-x-full p-10 text-white">
+        <button onclick="toggleMenu()" class="mb-10 text-indigo-400 font-black tracking-widest">✕ CERRAR</button>
+        <div class="space-y-4">
+            <button onclick="copiarLinkCitas()" class="w-full p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl text-[10px] font-black uppercase">🔗 Link para Pacientes</button>
+            <button onclick="window.location.href='configurar-perfil.html?id='+docId" class="w-full p-6 bg-indigo-600 rounded-3xl text-[10px] font-black uppercase mt-10">Configurar Perfil 🛠️</button>
+        </div>
+    </div>
+
     <script>
-    const URL = "https://dgatsbnqgplalxwewpvs.supabase.co", KEY = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
+    const URL_DB = "https://dgatsbnqgplalxwewpvs.supabase.co", KEY_DB = "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i";
     const docId = new URLSearchParams(window.location.search).get('id')?.trim();
-    const TC = 18.50; 
-    let currentPatientId = null, globalDocData = null;
-    let fechaAgendaActual = new Date(); // <--- VARIABLE MAESTRA DE TIEMPO
-
-    const CATALOGO_TEMAS = {
-        "Ginecología": [{ id: 1, color: "#f43f5e", icon: "🌸", tag: "Floral" }, { id: 2, color: "#8b5cf6", icon: "🔮", tag: "Boutique" }, { id: 3, color: "#fb7185", icon: "🌷", tag: "Maternal" }, { id: 4, color: "#059669", icon: "🍃", tag: "Orgánico" }, { id: 5, color: "#1e293b", icon: "💎", tag: "Élite" }],
-        "Odontología": [{ id: 1, color: "#0ea5e9", icon: "💎", tag: "Clínico" }, { id: 2, color: "#10b981", icon: "🌿", tag: "Orgánico" }, { id: 3, color: "#22d3ee", icon: "❄️", tag: "Estético" }, { id: 4, color: "#1e3a8a", icon: "🛡️", tag: "Cirugía" }, { id: 5, color: "#6366f1", icon: "⚡", tag: "Tech" }],
-        "Pediatría": [{ id: 1, color: "#fb923c", icon: "🧸", tag: "Infantil" }, { id: 2, color: "#38bdf8", icon: "🚀", tag: "Lúdico" }, { id: 3, color: "#4ade80", icon: "🦖", tag: "Aventura" }, { id: 4, color: "#f472b6", icon: "🍭", tag: "Tierno" }, { id: 5, color: "#818cf8", icon: "🌙", tag: "Paz" }],
-        "Cardiología": [{ id: 1, color: "#e11d48", icon: "❤️", tag: "Precisión" }, { id: 2, color: "#1e293b", icon: "⚡", tag: "Digital" }, { id: 3, color: "#0284c7", icon: "🌊", tag: "Vascular" }, { id: 4, color: "#9f1239", icon: "🩸", tag: "Hema" }, { id: 5, color: "#4f46e5", icon: "🛰️", tag: "Remoto" }],
-        "Bienestar (Nutri/Psico)": [{ id: 1, color: "#059669", icon: "🧘‍♂️", tag: "Zen" }, { id: 2, color: "#a855f7", icon: "🧠", tag: "Mental" }, { id: 3, color: "#fbbf24", icon: "🍎", tag: "Nutri" }, { id: 4, color: "#0ea5e9", icon: "🌊", tag: "Terapia" }, { id: 5, color: "#10b981", icon: "🥑", tag: "Fit" }],
-        "General": [{ id: 1, color: "#1e3a8a", icon: "⚖️", tag: "Sólido" }, { id: 2, color: "#6366f1", icon: "🏥", tag: "Moderno" }, { id: 3, color: "#10b981", icon: "🩺", tag: "Básico" }, { id: 4, color: "#be123c", icon: "🚑", tag: "Urgencia" }, { id: 5, color: "#4338ca", icon: "🏢", tag: "Corp" }]
-    };
-
-    // --- NUEVAS FUNCIONES DE NAVEGACIÓN TEMPORAL ---
-    function cambiarDia(delta) {
-        fechaAgendaActual.setDate(fechaAgendaActual.getDate() + delta);
-        syncMaster();
-    }
-
-    function irAFECHA(valor) {
-        if(!valor) return;
-        fechaAgendaActual = new Date(valor + "T12:00:00");
-        syncMaster();
-    }
-
-    // FUNCIONES IA K.B TECH
-    function toggleIA() {
-        document.getElementById('ia-panel').classList.toggle('open');
-    }
-
-    async function enviarComandoIA() {
-        const input = document.getElementById('ia-input');
-        const box = document.getElementById('ia-chat-box');
-        const orden = input.value.trim();
-        if(!orden) return;
-
-        box.innerHTML += `<div class="msg-user">${orden}</div>`;
-        input.value = "";
-        box.scrollTop = box.scrollHeight;
-
-        const loadingId = "loading-" + Date.now();
-        box.innerHTML += `<div id="${loadingId}" class="msg-ia italic animate-pulse">SINCRONIZANDO CON NODO OREGÓN...</div>`;
-
-        try {
-            const URL_IA = "https://kb-tech-brain.onrender.com/preguntar";
-            const res = await fetch(URL_IA, {
-                method: 'POST',
-                mode: 'cors',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ prompt: orden })
-            });
-
-            if (!res.ok) throw new Error(`ERROR ${res.status}: SERVIDOR EN REPOSO`);
-
-            const data = await res.json();
-            
-            document.getElementById(loadingId).remove();
-            
-            if (data && data.respuesta) {
-                box.innerHTML += `<div class="msg-ia">${data.respuesta}</div>`;
-            } else if (typeof data === 'string') {
-                box.innerHTML += `<div class="msg-ia">${data}</div>`;
-            } else {
-                box.innerHTML += `<div class="msg-ia text-amber-500 font-bold">ERROR: EL CEREBRO NO DEVOLVIÓ DATOS LEGIBLES.</div>`;
-            }
-        } catch (err) {
-            document.getElementById(loadingId).classList.remove('animate-pulse');
-            document.getElementById(loadingId).classList.add('text-rose-500', 'font-black');
-            document.getElementById(loadingId).innerText = "ERROR CRÍTICO: " + err.message + ". REINTENTANDO VÍNCULO...";
-        }
-        box.scrollTop = box.scrollHeight;
-    }
-
-    // FUNCIONES DE BÚNKER (CONTROL DE DOTS)
-    function updateDots() {
-        const val = document.getElementById('pin-acceso').value;
-        for(let i=1; i<=4; i++) {
-            document.getElementById(`dot-${i}`).classList.toggle('filled', val.length >= i);
-        }
-    }
-
-    document.querySelector('.glass-panel-dark').addEventListener('click', () => {
-        document.getElementById('pin-acceso').focus();
-    });
+    let globalDocData = null, currentPatientId = null, fechaAgendaActual = new Date();
 
     function eliteAviso(msg) {
         const toast = document.getElementById('elite-toast');
         document.getElementById('toast-msg').innerText = msg;
         toast.classList.add('active');
-        setTimeout(() => toast.classList.remove('active'), 4000);
+        setTimeout(() => toast.classList.remove('active'), 3000);
     }
 
     async function verificarAcceso() {
         const pin = document.getElementById('pin-acceso').value;
-        const res = await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: { 'apikey': KEY } });
+        const res = await fetch(`${URL_DB}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { headers: {'apikey': KEY_DB} });
         const data = await res.json();
         globalDocData = data[0];
-        
-        if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
-            document.getElementById('lock-icon').style.transform = "rotate(360deg) scale(1.5)";
-            document.getElementById('lock-icon').innerText = "✅";
-            
-            setTimeout(() => {
-                const opciones = CATALOGO_TEMAS[globalDocData.especialidad] || CATALOGO_TEMAS["General"];
-                const temaElegido = opciones.find(t => t.id == globalDocData.template_id) || opciones[0];
-                
-                document.documentElement.style.setProperty('--main-color', temaElegido.color);
-                document.getElementById('logo-tech').style.color = temaElegido.color;
-                document.getElementById('master-star').style.color = temaElegido.color;
-                document.getElementById('nav-doc-name').innerText = globalDocData.nombre_doctor.toUpperCase();
-                document.getElementById('nav-doc-name').style.color = temaElegido.color;
-                document.getElementById('doc-esp-label').innerText = globalDocData.especialidad.toUpperCase();
 
-                document.getElementById('pantalla-bloqueo').classList.add('hidden');
-                document.getElementById('contenido-panel').classList.remove('hidden');
-                setTimeout(() => document.getElementById('contenido-panel').style.opacity = "1", 100);
-                
-                if (Notification.permission !== 'granted') Notification.requestPermission();
-                
-                eliteAviso("ACCESO CONCEDIDO ✦");
-                syncMaster(); 
-                setInterval(syncMaster, 15000);
-            }, 800);
-        } else { 
-            eliteAviso("PIN INVÁLIDO"); 
-            document.getElementById('pin-acceso').value = "";
-            updateDots();
-        }
+        if(globalDocData && pin === (globalDocData.pin_acceso || "0000")) {
+            document.getElementById('nav-doc-name').innerText = globalDocData.nombre_doctor.toUpperCase();
+            document.getElementById('doc-esp-label').innerText = globalDocData.especialidad.toUpperCase();
+            document.getElementById('pantalla-bloqueo').classList.add('hidden');
+            document.getElementById('contenido-panel').classList.remove('hidden');
+            syncMaster();
+            setInterval(syncMaster, 15000);
+        } else { eliteAviso("PIN INVÁLIDO"); }
     }
 
     async function syncMaster() {
-        // --- CALIBRACIÓN DE FECHA LOCAL ---
-        const hoyStr = fechaAgendaActual.toLocaleDateString('sv-SE'); // YYYY-MM-DD
-        const labelStr = fechaAgendaActual.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
-
+        const hoyStr = fechaAgendaActual.toLocaleDateString('sv-SE');
         document.getElementById('picker-agenda').value = hoyStr;
-        document.getElementById('fecha-actual-label').innerText = labelStr.toUpperCase();
-
-        const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: { 'apikey': KEY } });
-        const citasRaw = await res.json();
+        const res = await fetch(`${URL_DB}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoyStr}&order=hora.asc`, { headers: {'apikey': KEY_DB} });
+        const citas = await res.json();
         
-        // FILTRO MAESTRO 7-24
-        const citas = citasRaw.filter(c => {
-            const horaCita = c.hora.slice(0, 5);
-            return horaCita >= "07:00" && horaCita <= "23:59";
-        });
-
-        let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
-        const counts = {};
-        citas.forEach(c => { counts[c.nombre_paciente] = (counts[c.nombre_paciente] || 0) + 1; });
-
         document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
-            if(c.pagado) {
-                c.telefono?.includes("USD") ? usd += parseFloat(c.monto || 0) : mxn += parseFloat(c.monto || 0);
-                pagadasCount++;
-            } else { faltante += 1200; }
-            
-            let pinColor = "#10b981"; 
-            let triageMsg = (c.telefono || "").toUpperCase();
-            
-            if(triageMsg.includes("URGENTE") || triageMsg.includes("DOLOR")) {
-                pinColor = "#ef4444";
-                if (Notification.permission === "granted") new Notification("🚨 ALERTA: " + c.nombre_paciente, { body: "Prioridad inmediata." });
-            } else if(triageMsg.includes("PRIORIDAD")) {
-                pinColor = "#f59e0b";
-            }
-            
-            let semClase = pinColor === "#ef4444" ? "u-rojo" : (pinColor === "#f59e0b" ? "u-amarillo" : "u-verde");
-            const isVip = counts[c.nombre_paciente] > 1 ? '<span class="ml-2 text-[10px] text-indigo-500 animate-pulse">⭐ VIP</span>' : '';
-            
+            const semClase = c.telefono?.includes("URGENTE") ? "u-rojo" : (c.telefono?.includes("PRIORIDAD") ? "u-amarillo" : "u-verde");
             return `
-                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semClase}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
-                    <div class="flex items-center gap-14">
-                        <span class="text-4xl font-black italic w-24" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
+                <div class="card-appointment glass-panel p-8 flex items-center justify-between cursor-pointer ${semClase}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
+                    <div class="flex items-center gap-8">
+                        <span class="text-3xl font-black italic text-indigo-600">${c.hora.slice(0,5)}</span>
                         <div>
-                            <h3 class="font-black text-slate-800 text-lg uppercase flex items-center">
-                                <div class="pin-master" style="background: ${pinColor}">
-                                    <div class="pin-glow" style="background: ${pinColor}"></div>
-                                </div>
-                                ${c.nombre_paciente} ${isVip}
-                            </h3>
-                            <p class="text-[10px] font-black uppercase text-slate-400 italic">${c.telefono || 'VERIFICADO'}</p>
+                            <h3 class="font-black text-slate-800 uppercase">${c.nombre_paciente}</h3>
+                            <p class="text-[9px] font-black text-slate-400">${c.telefono || 'CONFIRMADO'}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
-                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl shadow-inner active:scale-95 transition">📹</button>
-                    </div>
+                    <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">📹</button>
                 </div>`;
-        }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas para este día</p>';
-        
-        document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
-        document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
-        document.getElementById('proyeccion-faltante').innerText = `$${faltante.toLocaleString()}.00 MXN`;
-        const progress = citas.length > 0 ? (pagadasCount / citas.length) * 100 : 0;
-        document.getElementById('progress-bar-fill').style.width = progress + "%";
+        }).join('') || '<p class="text-center py-20 opacity-20 font-black uppercase italic">Sin actividad registrada</p>';
     }
 
-    async function enfocarpaciente(id, nombre) {
+    function enfocarpaciente(id, nombre) {
         currentPatientId = id;
         document.getElementById('dra-patient-name').innerText = nombre;
-        const res = await fetch(`${URL}/rest/v1/Citas?nombre_paciente=eq.${nombre}&doctor_id=eq.${docId}&order=fecha.desc`, { headers: { 'apikey': KEY } });
-        const historial = await res.json();
-        document.getElementById('timeline-content').innerHTML = historial.slice(0,5).map(h => `
-            <div class="timeline-item mb-4 pb-2 border-b border-slate-50">
-                <p class="text-[8px] text-slate-400 font-black mb-1">${h.fecha}</p>
-                <p class="leading-tight text-xs font-bold uppercase">${h.telefono ? h.telefono.replace('DOCTOR DICE:', '💊').replace('RECEPCIÓN DICE:', '📋').replace('PAGO:', '💰') : '🩺 Consulta Base'}</p>
-            </div>`).join('');
+        eliteAviso("PACIENTE EN FOCO");
     }
 
     async function enviarRespuestaDra() {
         const resp = document.getElementById('dra-response-input').value;
         if(!currentPatientId || !resp) return eliteAviso("FALTA NOTA");
-        await fetch(`${URL}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "DOCTOR DICE: " + resp.toUpperCase() }) });
+        await fetch(`${URL_DB}/rest/v1/Citas?id=eq.${currentPatientId}`, { method: 'PATCH', headers: { 'apikey': KEY_DB, 'Authorization': `Bearer ${KEY_DB}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ telefono: "DOCTOR: " + resp.toUpperCase() }) });
         eliteAviso("ENVIADO ✅");
         document.getElementById('dra-response-input').value = "";
         syncMaster();
     }
 
-    async function abrirReporteGastos() {
-        const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.GASTO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-        const logs = await res.json();
-        if (logs.length === 0) return alert("💸 NO HAY GASTOS");
-        alert("💸 AUDITORÍA GASTOS:\n\n" + logs.map(l => `• ${l.concepto}: $${l.monto}`).join('\n'));
-    }
-
-    async function abrirReporteLogistica() {
-        const res = await fetch(`${URL}/rest/v1/Finanzas_Logistica?doctor_id=eq.${docId}&categoria=eq.INSUMO&order=created_at.desc`, { headers: { 'apikey': KEY } });
-        const logs = await res.json();
-        if (logs.length === 0) return alert("📦 ALMACÉN EN ORDEN");
-        alert("📦 REPORTE FALTANTES:\n\n" + logs.map(l => `• ${l.concepto}`).join('\n'));
-    }
-
-    function copiarLinkCitas() { 
-        const link = window.location.origin + window.location.pathname.replace('app.html', 'agendar.html') + "?id=" + docId;
-        navigator.clipboard.writeText(link).then(() => eliteAviso("LINK COPIADO ✅"));
-    }
-
-    function verMiSitio() { window.open(`web.html?id=${docId}`, '_blank'); }
-    function mostrarBalance() { 
-        const bal = document.getElementById('balance-display');
-        bal.classList.toggle('hidden');
-    }
+    function cambiarDia(d) { fechaAgendaActual.setDate(fechaAgendaActual.getDate() + d); syncMaster(); }
+    function irAFECHA(v) { if(v) { fechaAgendaActual = new Date(v + "T12:00:00"); syncMaster(); } }
     function toggleMenu() { document.getElementById('side-menu').classList.toggle('translate-x-full'); }
+    function toggleIA() { document.getElementById('ia-panel').classList.toggle('open'); }
+    function copiarLinkCitas() { navigator.clipboard.writeText(window.location.href.replace('app.html', 'agendar.html')).then(() => eliteAviso("LINK COPIADO")); }
 
-    async function cambiarPin() {
-        const n = document.getElementById('nuevo-pin-input').value;
-        if(n && n.length === 4) {
-            await fetch(`${URL}/rest/v1/Perfiles_Medicos?id=eq.${docId}`, { method: 'PATCH', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ pin_acceso: n }) });
-            eliteAviso("PIN ACTUALIZADO ✅");
-            document.getElementById('nuevo-pin-input').value = "";
-            toggleMenu();
-        }
-    }
-
-    function activarDictado() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitRecognition;
-        if (!SpeechRecognition) return eliteAviso("NO COMPATIBLE");
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'es-MX';
-        recognition.onstart = () => eliteAviso("ESCUCHANDO...");
-        recognition.onresult = (event) => { document.getElementById('dra-response-input').value += " " + event.results[0][0].transcript.toUpperCase(); };
-        recognition.start();
+    async function enviarComandoIA() {
+        const input = document.getElementById('ia-input'), box = document.getElementById('ia-chat-box');
+        if(!input.value) return;
+        box.innerHTML += `<div class="msg-user">${input.value.toUpperCase()}</div>`;
+        input.value = "";
+        setTimeout(() => { box.innerHTML += `<div class="msg-ia italic uppercase">Sincronizando con nodo central...</div>`; box.scrollTop = box.scrollHeight; }, 500);
     }
 
     function generarReceta() {
-        const doc = globalDocData;
         const pac = document.getElementById('dra-patient-name').innerText;
         const nota = document.getElementById('dra-response-input').value;
-        const fecha = new Date().toLocaleDateString();
+        if(pac === "---") return eliteAviso("SELECCIONE PACIENTE");
         const ventana = window.open('', '', 'width=800,height=900');
-        ventana.document.write(`<html><body style="font-family:sans-serif;padding:50px;"><h1>Dr. ${doc.nombre_doctor}</h1><p>${doc.especialidad}</p><hr><h3>Paciente: ${pac}</h3><p>${nota}</p></body></html>`);
+        ventana.document.write(`<html><body style="font-family:sans-serif;padding:60px;"><h1>DR. ${globalDocData.nombre_doctor}</h1><p>${globalDocData.especialidad}</p><hr><br><h3>PACIENTE: ${pac}</h3><br><p style="font-size:1.2rem;line-height:1.6;">${nota}</p></body></html>`);
         ventana.document.close();
         ventana.print();
-    }
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Offline', err));
-        });
     }
     </script>
 </body>
