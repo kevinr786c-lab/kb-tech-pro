@@ -364,55 +364,69 @@
         }
     }
 
-  async function syncMaster() {
-    const hoy = new Date().toISOString().split('T')[0];
+    async function syncMaster() {
+        // --- CIRUGÍA DE PRECISIÓN: RELOJ LOCAL TIJUANA/EE.UU. ---
+        const hoyObj = new Date();
+        // Forzamos el formato YYYY-MM-DD basado en la localidad del usuario, no del servidor
+        const hoy = hoyObj.toLocaleDateString('sv-SE'); 
+        
+        console.log("Sincronizando Nodo para fecha local:", hoy);
 
-    const res = await fetch(
-        `${URL}/rest/v1/Citas?doctor_id=eq.${docId}` +
-        `&fecha=gte.${hoy}T00:00:00` +
-        `&fecha=lt.${hoy}T23:59:59` +
-        `&order=hora.asc`,
-        {
-            headers: {
-                'apikey': KEY,
-                'Authorization': `Bearer ${KEY}`
+        const res = await fetch(`${URL}/rest/v1/Citas?doctor_id=eq.${docId}&fecha=eq.${hoy}&order=hora.asc`, { headers: { 'apikey': KEY } });
+        const citasRaw = await res.json();
+        
+        // --- FILTRADO MAESTRO K.B TECH ---
+        // Ampliamos el radar de 07:00 a 23:59 para que el Dr. vea su actividad todo el día
+        const citas = citasRaw.filter(c => {
+            const horaCita = c.hora.slice(0, 5);
+            return horaCita >= "07:00" && horaCita <= "23:59";
+        });
+
+        // --- CÁLCULO FINANCIERO Y RENDERIZADO ---
+        let mxn = 0, usd = 0, faltante = 0, pagadasCount = 0;
+        const counts = {};
+        citas.forEach(c => { counts[c.nombre_paciente] = (counts[c.nombre_paciente] || 0) + 1; });
+
+        document.getElementById('contenedor-citas').innerHTML = citas.map(c => {
+            if(c.pagado) {
+                c.telefono?.includes("USD") ? usd += parseFloat(c.monto || 0) : mxn += parseFloat(c.monto || 0);
+                pagadasCount++;
+            } else { faltante += 1200; }
+            
+            let pinColor = "#10b981"; 
+            let triageMsg = (c.telefono || "").toUpperCase();
+            
+            if(triageMsg.includes("URGENTE") || triageMsg.includes("DOLOR")) {
+                pinColor = "#ef4444";
+            } else if(triageMsg.includes("PRIORIDAD")) {
+                pinColor = "#f59e0b";
             }
-        }
-    );
-
-    const citas = await res.json();
-
-    document.getElementById('contenedor-citas').innerHTML =
-        citas.length
-            ? citas.map(c => `
-                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${c.telefono?.includes('URGENTE') ? 'u-rojo' : 'u-verde'}"
-                    onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
-
+            
+            let semClase = pinColor === "#ef4444" ? "u-rojo" : (pinColor === "#f59e0b" ? "u-amarillo" : "u-verde");
+            const isVip = counts[c.nombre_paciente] > 1 ? '<span class="ml-2 text-[10px] text-indigo-500 animate-pulse">⭐ VIP</span>' : '';
+            
+            return `
+                <div class="card-appointment glass-panel p-10 flex items-center justify-between cursor-pointer ${semClase}" onclick="enfocarpaciente('${c.id}', '${c.nombre_paciente}')">
                     <div class="flex items-center gap-14">
-                        <span class="text-4xl font-black italic text-indigo-600">
-                            ${c.hora.slice(0,5)}
-                        </span>
+                        <span class="text-4xl font-black italic w-24" style="color: var(--main-color)">${c.hora.slice(0,5)}</span>
                         <div>
-                            <h3 class="font-black text-slate-800 text-lg uppercase">
-                                ${c.nombre_paciente}
+                            <h3 class="font-black text-slate-800 text-lg uppercase flex items-center">
+                                <div class="pin-master" style="background: ${pinColor}">
+                                    <div class="pin-glow" style="background: ${pinColor}"></div>
+                                </div>
+                                ${c.nombre_paciente} ${isVip}
                             </h3>
-                            <p class="text-[10px] font-black text-slate-400">
-                                ${c.telefono || 'VERIFICADO'}
-                            </p>
+                            <p class="text-[10px] font-black uppercase text-slate-400 italic">${c.telefono || 'VERIFICADO'}</p>
                         </div>
                     </div>
-
-                    <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">
-                        ${c.pagado ? 'Pagado' : 'Pendiente'}
-                    </span>
-                </div>
-            `).join('')
-            : `<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">
-                Sin Citas Hoy
-              </p>`;
-}
-
+                    <div class="flex items-center gap-4">
+                        <span class="status-badge ${c.pagado ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">${c.pagado ? 'Pagado' : 'Pendiente'}</span>
+                        <button onclick="event.stopPropagation(); window.open('https://meet.jit.si/KB-${docId}-${c.id}', '_blank')" class="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-2xl shadow-inner active:scale-95 transition">📹</button>
+                    </div>
+                </div>`;
+        }).join('') || '<p class="text-center py-40 opacity-20 font-black italic uppercase tracking-[0.6em]">Sin Citas Hoy</p>';
         
+        // Actualizar contadores
         document.getElementById('ganancia-mxn').innerText = `$${mxn.toLocaleString()}.00`;
         document.getElementById('ganancia-usd').innerText = `$${usd.toLocaleString()}.00`;
         document.getElementById('proyeccion-faltante').innerText = `$${faltante.toLocaleString()}.00 MXN`;
