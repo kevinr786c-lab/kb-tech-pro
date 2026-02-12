@@ -3,180 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONFIGURACIÓN | K.B TECH ✦</title>
+    <title>K.B SYSTEM | ACCESO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 2.5rem; }
-        .input-kb { width: 100%; padding: 1rem; border-radius: 1.25rem; background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; font-weight: 700; transition: 0.3s; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 2.5rem; }
+        .input-kb { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; font-weight: 700; transition: 0.3s; }
         .input-kb:focus { border-color: #6366f1; outline: none; background: rgba(255,255,255,0.1); }
-        .btn-save { background: #6366f1; transition: 0.4s; font-weight: 800; letter-spacing: 0.1em; }
-        .btn-save:hover { transform: scale(1.02); box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.5); }
+        .btn-access { background: #6366f1; transition: 0.4s; font-weight: 800; letter-spacing: 0.1em; }
+        .btn-access:hover { transform: scale(1.02); box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.5); }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="flex items-center justify-center min-h-screen p-6">
 
-    <div class="max-w-5xl mx-auto glass p-8 md:p-12 shadow-2xl border-t-[8px] border-indigo-500">
-        <header class="mb-10 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-black italic uppercase italic">Control de <span class="text-indigo-400">Parámetros</span> ✦</h1>
-                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.5em] mt-2">K.B Tech Solution — Engine Nivel 4</p>
-            </div>
-            <button onclick="window.location.href='asistente.html'" class="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-xl text-[10px] font-black uppercase transition">Volver al Radar 🛰️</button>
+    <div class="max-w-md w-full glass p-10 md:p-14 shadow-2xl border-t-[8px] border-indigo-500 text-center">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase leading-none">K.B <span class="text-indigo-400">SYSTEM</span></h1>
+            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.5em] mt-3">Auth Protocol Nivel 4</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            
-            <section class="space-y-6">
-                <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest italic">🛡️ Patrón de Disponibilidad</h3>
-                <div id="contenedor-semana" class="space-y-3"></div>
-                <button id="btnGuardarSemana" class="w-full btn-save p-4 rounded-2xl text-[10px] uppercase">Sincronizar Patrón Semanal ⚡</button>
-            </section>
-
-            <div class="space-y-8">
-                <section class="p-6 bg-rose-500/5 rounded-[2rem] border border-rose-500/10">
-                    <h3 class="text-[10px] font-black uppercase text-rose-400 mb-4 tracking-widest italic">🏖️ Zonas de Exclusión</h3>
-                    <div class="flex gap-2 mb-4">
-                        <input type="date" id="fecha-bloqueo" class="input-kb flex-1 text-xs">
-                        <button id="btnBloquear" class="bg-rose-500 px-6 rounded-xl font-black text-[9px] uppercase tracking-tighter">Bloquear</button>
-                    </div>
-                    <div id="lista-bloqueos" class="space-y-2 max-h-40 overflow-y-auto pr-2"></div>
-                </section>
-
-                <section class="p-6 bg-white/5 rounded-[2rem] border border-white/5">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-[10px] font-black uppercase text-amber-400 tracking-widest italic">💰 Catálogo</h3>
-                        <button id="btnAddSrv" class="bg-amber-500 text-[8px] font-black px-3 py-1 rounded-full">+ ADD</button>
-                    </div>
-                    <div id="lista-servicios" class="space-y-2"></div>
-                    <button id="btnGuardarSrv" class="w-full bg-white text-slate-900 p-4 rounded-xl text-[9px] font-black uppercase mt-4 hover:bg-amber-500 hover:text-white transition">Actualizar Catálogo 💎</button>
-                </section>
+        <div class="space-y-6">
+            <div class="text-left">
+                <input type="email" id="email" class="input-kb" placeholder="Email de Operaciones">
             </div>
+            <div class="text-left">
+                <input type="password" id="password" class="input-kb" placeholder="••••••••">
+            </div>
+            
+            <button id="btnLogin" class="w-full btn-access p-5 rounded-2xl text-[12px] uppercase mt-4 active:scale-95 transition">Ingresar al Búnker 🚀</button>
         </div>
+
+        <p id="error-msg" class="text-[10px] font-black text-rose-500 mt-6 uppercase hidden">⚠️ Credenciales Inválidas</p>
     </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+// 🛰️ CONEXIÓN AL PROYECTO
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-// PRIORIDAD TÁCTICA: Identificar al Comandante
-const urlParams = new URLSearchParams(window.location.search);
-const docId = urlParams.get('id') || localStorage.getItem('user_id') || '3a5f9882-628d-4e94-811c-2c9769396e62';
+document.getElementById('btnLogin').onclick = async () => {
+    const emailVal = document.getElementById('email').value;
+    const passVal = document.getElementById('password').value;
+    const btn = document.getElementById('btnLogin');
+    const msg = document.getElementById('error-msg');
 
-/* ===========================
-    🧬 LÓGICA DE HORARIOS
-   =========================== */
-async function cargarSemana() {
-    const { data } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).order('dia_semana');
-    const diasStr = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-    const container = document.getElementById('contenedor-semana');
-    
-    container.innerHTML = diasStr.map((nombre, i) => {
-        const config = data?.find(h => h.dia_semana === i+1) || { activo: false, hora_inicio: '09:00', hora_fin: '17:00' };
-        return `
-            <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 dia-row" data-dia="${i+1}">
-                <input type="checkbox" class="chk-activo" ${config.activo ? 'checked' : ''}>
-                <p class="text-[9px] font-black uppercase w-16 text-slate-400">${nombre.slice(0,3)}</p>
-                <input type="time" class="bg-transparent text-[10px] font-bold h-ini outline-none" value="${config.hora_inicio.slice(0,5)}">
-                <input type="time" class="bg-transparent text-[10px] font-bold h-fin outline-none" value="${config.hora_fin.slice(0,5)}">
-            </div>
-        `;
-    }).join('');
-}
+    if(!emailVal || !passVal) return;
 
-document.getElementById('btnGuardarSemana').onclick = async () => {
-    const btn = document.getElementById('btnGuardarSemana');
-    btn.innerText = "SINCRONIZANDO...";
-    const filas = document.querySelectorAll('.dia-row');
-    
-    for (let f of filas) {
-        const rowData = {
-            doctor_id: docId,
-            dia_semana: parseInt(f.dataset.dia),
-            hora_inicio: f.querySelector('.h-ini').value + ":00",
-            hora_fin: f.querySelector('.h-fin').value + ":00",
-            activo: f.querySelector('.chk-activo').checked
-        };
-        // Upsert usando la restricción de doctor y día
-        await supabase.from('Horarios_Doctor').upsert(rowData, { onConflict: 'doctor_id, dia_semana' });
+    btn.innerText = "VERIFICANDO ADN...";
+    msg.classList.add('hidden');
+
+    // 🔐 LOGIN REAL CON SUPABASE AUTH
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailVal,
+        password: passVal
+    });
+
+    if (error) {
+        btn.innerText = "REINTENTAR";
+        msg.classList.remove('hidden');
+        return;
     }
-    btn.innerText = "SINCRONIZADO ✅";
-    setTimeout(() => btn.innerText = "Sincronizar Patrón Semanal ⚡", 2000);
-};
 
-/* ===========================
-    🏖️ LÓGICA DE BLOQUEOS
-   =========================== */
-async function cargarBloqueos() {
-    const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id', docId).gte('fecha', new Date().toISOString().slice(0,10));
-    document.getElementById('lista-bloqueos').innerHTML = data ? data.map(b => `
-        <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-rose-500/20">
-            <span class="text-[10px] font-black text-rose-400 italic">${b.fecha}</span>
-            <button onclick="window.borrarBloqueo('${b.id}')" class="text-rose-500 text-xs">✕</button>
-        </div>
-    `).join('') : '';
-}
+    const user = data.user;
 
-document.getElementById('btnBloquear').onclick = async () => {
-    const f = document.getElementById('fecha-bloqueo').value;
-    if(!f) return;
-    await supabase.from('Bloqueos').insert({ doctor_id: docId, fecha: f, motivo: 'Bloqueo Manual' });
-    document.getElementById('fecha-bloqueo').value = '';
-    cargarBloqueos();
-};
+    // 🔎 OBTENER ROL DESDE TABLA USUARIOS (Sincronizado con su esquema SQL)
+    const { data: usuario, error: errorTabla } = await supabase
+        .from('Usuarios')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
 
-window.borrarBloqueo = async (id) => {
-    await supabase.from('Bloqueos').delete().eq('id', id);
-    cargarBloqueos();
-};
-
-/* ===========================
-    💰 LÓGICA DE SERVICIOS
-   =========================== */
-async function cargarServicios() {
-    const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', docId);
-    if(data) {
-        document.getElementById('lista-servicios').innerHTML = '';
-        data.forEach(s => agregarFilaServicio(s.nombre, s.precio, s.duracion_min));
+    if (!usuario) {
+        btn.innerText = "FALLA DE PERFIL";
+        alert("Autenticado pero sin perfil en tabla Usuarios. Contacte al Comandante.");
+        return;
     }
-}
 
-function agregarFilaServicio(nombre = '', precio = '', duracion = 30) {
-    const div = document.createElement('div');
-    div.className = "flex gap-2 items-center bg-white/5 p-3 rounded-xl srv-item";
-    div.innerHTML = `
-        <input type="text" placeholder="Servicio" class="bg-transparent flex-1 text-[9px] font-bold srv-n outline-none" value="${nombre}">
-        <input type="number" placeholder="$" class="bg-transparent w-12 text-[9px] font-bold srv-p outline-none" value="${precio}">
-        <input type="number" placeholder="Min" class="bg-transparent w-10 text-[8px] font-bold srv-d outline-none text-indigo-400" value="${duracion}">
-        <button onclick="this.parentElement.remove()" class="text-rose-500 text-xs">✕</button>
-    `;
-    document.getElementById('lista-servicios').appendChild(div);
-}
+    // 🎒 GUARDAR IDENTIDAD EN LA MOCHILA
+    localStorage.setItem('user_id', user.id);
+    localStorage.setItem('rol', usuario.rol);
+    localStorage.setItem('nombre_usuario', usuario.nombre);
 
-document.getElementById('btnAddSrv').onclick = () => agregarFilaServicio();
+    // 🔁 REDIRECCIÓN INTELIGENTE (Su lógica maestra)
+    btn.innerText = "ACCESO CONCEDIDO ✅";
+    btn.style.background = "#10b981";
 
-document.getElementById('btnGuardarSrv').onclick = async () => {
-    const items = document.querySelectorAll('.srv-item');
-    const batch = Array.from(items).map(i => ({
-        doctor_id: docId,
-        nombre: i.querySelector('.srv-n').value,
-        precio: parseFloat(i.querySelector('.srv-p').value) || 0,
-        duracion_min: parseInt(i.querySelector('.srv-d').value) || 30,
-        activo: true
-    }));
-    
-    // Limpieza estratégica y reinyección
-    await supabase.from('Servicios').delete().eq('doctor_id', docId);
-    if(batch.length > 0) await supabase.from('Servicios').insert(batch);
-    alert("CATÁLOGO ACTUALIZADO EN EL BÚNKER 💎");
+    setTimeout(() => {
+        if (usuario.rol === 'doctor') {
+            window.location.href = `configurar-perfil.html?id=${user.id}`;
+        }
+        else if (usuario.rol === 'admin' || usuario.rol === 'asistente') {
+            window.location.href = 'asistente.html';
+        }
+    }, 800);
 };
-
-// INICIALIZACIÓN
-cargarSemana();
-cargarBloqueos();
-cargarServicios();
 </script>
 </body>
 </html>
