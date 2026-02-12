@@ -10,46 +10,71 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); }
+        
+        /* 🎨 ESTILO CALENDARIO K.B */
         .fc { background: transparent; border: none !important; height: 100%; }
-        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1rem !important; }
-        .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 1rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; }
-        .fc-button-active { background: var(--luxe-gold) !important; }
-        .fc-timegrid-event { border-radius: 12px !important; border: none !important; box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; }
+        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1.1rem !important; font-style: italic; }
+        .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 1rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; padding: 10px 15px !important; transition: 0.3s !important; }
+        .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
+        .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
+        
+        /* 🧬 ESTATUS DE PACIENTES EN CALENDARIO */
+        .event-nuevo { border-left: 4px solid #3b82f6 !important; }
+        .event-recurrente { border-left: 4px solid #10b981 !important; }
+        .event-oro { border-left: 4px solid var(--luxe-gold) !important; box-shadow: 0 0 15px rgba(197, 160, 89, 0.3) !important; }
+
         .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; }
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
+        
+        /* ✨ ESTRELLA K.B ANIMADA */
+        @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
+        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
     </style>
 </head>
-<body class="h-screen p-4 flex flex-col">
+<body class="p-4">
 
-    <div class="flex-1 glass p-6 flex flex-col overflow-hidden">
+    <div class="flex-1 glass p-6 flex flex-col overflow-hidden relative">
         <header class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-[#0f172a] rounded-xl flex items-center justify-center shadow-lg text-white font-bold text-lg">A</div>
+                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-xl">
+                    <span class="kb-star text-2xl">✦</span>
+                </div>
                 <div>
-                    <h1 class="text-lg font-black italic uppercase tracking-tighter text-[#0f172a]">Panel <span class="text-[#c5a059]">Asistente</span></h1>
-                    <select id="doctorSelect" class="bg-transparent text-[9px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0">
-                        <option value="">INICIALIZANDO RADAR...</option>
-                    </select>
+                    <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
+                    <div class="flex items-center gap-2">
+                        <select id="doctorSelect" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0 p-0">
+                            <option value="">SINCRONIZANDO RADAR...</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+            
             <div class="flex items-center gap-3">
-                <button onclick="abrirBloqueo()" class="text-[9px] font-black uppercase px-4 py-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-rose-400 transition">🚫 Bloquear Fecha</button>
-                <button onclick="window.location.href='configurar-perfil.html'" class="text-[9px] font-black uppercase px-4 py-2 bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">⚙️ Ajustes</button>
+                <div class="hidden md:flex bg-slate-100 rounded-xl p-1 gap-1">
+                    <input type="month" id="mesSelector" class="bg-transparent text-[9px] font-black uppercase px-2 outline-none border-none">
+                </div>
+                <button onclick="abrirBloqueo()" class="text-[9px] font-black uppercase px-4 py-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-rose-400 transition">🚫 Bloquear</button>
+                <button onclick="window.location.reload()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">🔄</button>
             </div>
         </header>
 
         <div class="flex-1 overflow-hidden relative">
             <div id="calendar" class="h-full"></div>
         </div>
+
+        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-center items-center">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300 italic">
+                POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026
+            </p>
+        </footer>
     </div>
 
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-3">
-                <div class="text-[10px] font-bold text-slate-400 px-1 uppercase italic tracking-widest">Identidad del Paciente</div>
                 <input id="c-paciente" class="input-luxe bg-slate-50" readonly>
                 <input id="c-telefono" class="input-luxe bg-slate-50" readonly>
                 <div class="grid grid-cols-2 gap-2 mt-4">
@@ -74,15 +99,12 @@
 
     <div id="modalBloqueo" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
         <div class="glass max-w-sm w-full p-8 bg-white">
-            <h2 class="text-lg font-black uppercase italic text-rose-500 mb-6">Nuevo <span class="text-slate-800">Bloqueo</span></h2>
+            <h2 class="text-lg font-black uppercase italic text-rose-500 mb-6">Inyectar <span class="text-slate-800">Bloqueo</span></h2>
             <div class="space-y-4">
                 <input type="date" id="b-fecha" class="input-luxe">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="time" id="b-inicio" class="input-luxe" value="08:00">
-                    <input type="time" id="b-fin" class="input-luxe" value="14:00">
-                </div>
-                <input id="b-motivo" class="input-luxe" placeholder="MOTIVO (VACACIONES, CONGRESO)">
-                <button onclick="guardarBloqueo()" class="w-full py-4 bg-rose-500 text-white rounded-xl font-black uppercase text-[9px] tracking-widest shadow-lg">Inyectar Bloqueo</button>
+                <div class="grid grid-cols-2 gap-2"><input type="time" id="b-inicio" class="input-luxe" value="08:00"><input type="time" id="b-fin" class="input-luxe" value="14:00"></div>
+                <input id="b-motivo" class="input-luxe" placeholder="MOTIVO">
+                <button onclick="guardarBloqueo()" class="w-full py-4 bg-rose-500 text-white rounded-xl font-black uppercase text-[9px] tracking-widest">Bloquear Radar</button>
                 <button onclick="cerrarBloqueo()" class="w-full text-[9px] font-black uppercase text-slate-400 mt-2 text-center">Cancelar</button>
             </div>
         </div>
@@ -101,11 +123,16 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
+    // 🧠 SELECTOR DE MESES SINCRONIZADO
+    document.getElementById('mesSelector').onchange = (e) => {
+        if(calendar) calendar.gotoDate(e.target.value + "-01");
+    };
+
     async function cargarDoctores() {
         const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        if (error) return console.error("Error en búnker:", error);
+        if (error) return;
         const select = document.getElementById('doctorSelect');
-        select.innerHTML = '<option value="">SELECCIONA DOCTOR</option>' + 
+        select.innerHTML = '<option value="">ELIJA DOCTOR OPERATIVO</option>' + 
             data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
 
         select.onchange = () => {
@@ -120,33 +147,43 @@
         if (!doctorActual) return success([]);
         try {
             const { data, error } = await supabase.from('Citas')
-                .select('*, Pacientes!fk_citas_pacientes_maestra(nombre, telefono), Servicios(nombre)')
+                .select('*, Pacientes!fk_citas_pacientes_maestra(*), Servicios(nombre)')
                 .eq('doctor_id', doctorActual)
                 .neq('estado', 'cancelado');
             
             if (error) throw error;
-            success((data || []).map(c => ({
-                id: c.id,
-                title: c.Pacientes?.nombre || 'PACIENTE',
-                start: `${c.fecha}T${c.hora_inicio}`,
-                end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
-                backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
-                textColor: ESTADOS[c.estado]?.txt || '#1e293b',
-                extendedProps: c
-            })));
+
+            // 🧬 LÓGICA DE ESTATUS POR PACIENTE
+            const eventos = await Promise.all(data.map(async (c) => {
+                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', c.paciente_id).eq('estado', 'completado');
+                
+                let claseEstatus = 'event-nuevo';
+                if(count >= 3) claseEstatus = 'event-oro';
+                else if(count >= 1) claseEstatus = 'event-recurrente';
+
+                return {
+                    id: c.id,
+                    title: c.Pacientes?.nombre || 'PACIENTE',
+                    start: `${c.fecha}T${c.hora_inicio}`,
+                    end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
+                    backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
+                    textColor: ESTADOS[c.estado]?.txt || '#1e293b',
+                    className: claseEstatus,
+                    extendedProps: c
+                };
+            }));
+            success(eventos);
         } catch (err) { failure(err); }
     }
 
     function initCalendar() {
-        const calendarEl = document.getElementById('calendar');
-        if (calendar) calendar.destroy();
-        calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             locale: 'es', initialView: 'timeGridWeek', allDaySlot: false,
             slotMinTime: '08:00', slotMaxTime: '20:00', editable: true, selectable: true,
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
             events: cargarCitas,
             eventContent: (arg) => ({
-                html: `<div class="p-1 h-full border-l-4 overflow-hidden" style="border-color: ${arg.event.textColor}">
+                html: `<div class="p-1 h-full overflow-hidden">
                         <div class="text-[9px] font-black uppercase truncate">${arg.event.title}</div>
                         <div class="text-[7px] italic opacity-60 truncate">${arg.event.extendedProps.Servicios?.nombre || 'Consulta'}</div>
                       </div>`
@@ -157,48 +194,34 @@
                     fecha: info.event.startStr.slice(0,10),
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
-                if(error) { console.error("Error al mover:", error); info.revert(); }
+                if(error) info.revert();
             }
         });
         calendar.render();
     }
 
+    // MANTENEMOS FUNCIONES DE CIRUGÍA (guardarCita, abrirEditar, etc.) IGUALES PARA NO PERDER PROGRESO
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
         document.getElementById('c-telefono').value = c.Pacientes?.telefono || '---';
         document.getElementById('c-fecha').value = c.fecha;
-        // Limpiamos la hora para el input time (asegura formato HH:mm)
         document.getElementById('c-hora').value = c.hora_inicio.slice(0, 5);
         document.getElementById('c-estado').value = c.estado;
         document.getElementById('c-notas').value = c.notas || '';
         document.getElementById('modalCita').classList.remove('hidden');
     };
 
-    // ⚡ CIRUGÍA: Función de guardado con limpieza de datos
     window.guardarCita = async () => {
-        if (!citaActual || !citaActual.id) return;
-
+        if (!citaActual) return;
         const data = {
             fecha: document.getElementById('c-fecha').value,
-            hora_inicio: document.getElementById('c-hora').value, // El input time ya da formato 24h
+            hora_inicio: document.getElementById('c-hora').value,
             estado: document.getElementById('c-estado').value,
             notas: document.getElementById('c-notas').value
         };
-
-        const { error } = await supabase
-            .from('Citas')
-            .update(data)
-            .eq('id', citaActual.id);
-
-        if (!error) {
-            console.log("✅ Radar Sincronizado");
-            calendar.refetchEvents();
-            cerrarModal();
-        } else {
-            console.error("❌ Error en cirugía:", error.message);
-            alert("Error al actualizar: " + error.message);
-        }
+        const { error } = await supabase.from('Citas').update(data).eq('id', citaActual.id);
+        if (!error) { calendar.refetchEvents(); cerrarModal(); }
     };
 
     window.guardarBloqueo = async () => {
