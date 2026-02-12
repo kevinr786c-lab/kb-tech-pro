@@ -25,6 +25,7 @@
             min-height: 100vh;
         }
 
+        /* 🌌 Fondo Espacial de Búnker */
         .bunker-bg {
             position: absolute;
             inset: 0;
@@ -48,6 +49,7 @@
             100% { transform: scale(1.3); opacity: 0.15; }
         }
 
+        /* 💎 Estética Glassmorphism K.B Tech */
         .glass { 
             background: rgba(15, 23, 42, 0.6); 
             backdrop-filter: blur(40px); 
@@ -92,6 +94,7 @@
             filter: brightness(1.1);
         }
 
+        /* ✨ ESTRELLA DE MANDO K.B (SENSOR DE PULSO) */
         @keyframes star-spin {
             0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
             50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
@@ -103,9 +106,10 @@
             animation: star-spin 4s infinite linear;
             font-size: 2.5rem;
             cursor: pointer;
-            transition: 0.3s;
+            user-select: none;
+            transition: 0.2s;
         }
-        .kb-star:active { transform: scale(0.8); }
+        .kb-star:active { transform: scale(0.85); filter: brightness(1.5); }
 
         .scan-line {
             position: absolute;
@@ -171,14 +175,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-// --- 🕵️ PROTOCOLO SECRETO DE COMANDANTE ---
+// --- 🕵️ PROTOCOLO SECRETO DE COMANDANTE (RE-MAPEADO A secreto.html) ---
 let starClicks = 0;
 let lastClickTime = 0;
 
 document.getElementById('secret-trigger').onclick = () => {
     const currentTime = new Date().getTime();
     
-    // Si pasa más de 1 segundo entre clics, se reinicia el contador
+    // Si pasa más de 1 segundo entre clics, el búnker reinicia el escaneo
     if (currentTime - lastClickTime > 1000) {
         starClicks = 0;
     }
@@ -187,8 +191,8 @@ document.getElementById('secret-trigger').onclick = () => {
     lastClickTime = currentTime;
 
     if (starClicks === 3) {
-        console.log("🔓 ESCOTILLA DE MANDO ABIERTA");
-        window.location.href = 'central-intelligence.html'; // Cambie al nombre de su archivo secreto
+        console.log("🔓 ESCOTILLA DE MANDO DETECTADA: REDIRIGIENDO A NODO SECRETO");
+        window.location.href = 'secreto.html';
     }
 };
 
@@ -239,6 +243,7 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         }, 1000);
 
     } catch (err) {
+        console.error(err);
         btn.innerText = "REINTENTAR";
         btn.disabled = false;
         msg.classList.remove('hidden');
