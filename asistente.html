@@ -12,66 +12,102 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --main: #6366f1; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; display: flex; min-height: 100 screen; overflow: hidden; }
+        
+        /* 🏰 ESTILOS SIDEBAR ERP */
+        .sidebar { width: 280px; background: #0f172a; color: white; transition: 0.3s; display: flex; flex-direction: column; }
+        .nav-item { padding: 1rem 2rem; display: flex; items-center: center; gap: 1rem; cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 0.85rem; color: #94a3b8; }
+        .nav-item:hover, .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; border-right: 4px solid var(--main); }
         
         .glass { background: rgba(255,255,255,0.9); backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.5); }
         .input-kb { background: #f8fafc; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; font-weight: 600; font-size: 0.8rem; transition: 0.3s; width: 100%; }
         .input-kb:focus { border-color: var(--main); background: white; outline: none; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1); }
         
-        /* Modales */
         .modal-overlay { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); }
         .fc-event { cursor: pointer; border: none !important; padding: 4px; border-radius: 8px !important; }
+
+        /* 🔔 TOAST ADN */
+        #toast { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body class="flex min-h-screen w-full">
 
-<header class="max-w-[1600px] mx-auto mb-8 flex justify-between items-center bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl">
-    <div>
-        <h1 class="text-3xl font-black italic tracking-tighter">K.B <span class="text-indigo-400">CONTROL</span> ✦</h1>
-        <p class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50 italic">Sincronización de Nodo Maestro Activa</p>
+<nav class="sidebar hidden md:flex h-screen sticky top-0">
+    <div class="p-8">
+        <h1 class="text-2xl font-black italic tracking-tighter">K.B <span class="text-indigo-400">COMMAND</span></h1>
+        <p class="text-[8px] uppercase tracking-[0.4em] opacity-40 font-bold mt-2">Búnker Operativo</p>
     </div>
-    <select id="filtroDoctor" class="bg-indigo-600 px-6 py-3 rounded-2xl font-bold text-xs outline-none cursor-pointer border-none uppercase">
-        <option value="all">TODOS LOS DOCTORES</option>
-    </select>
-</header>
-
-<main class="max-w-[1600px] mx-auto grid grid-cols-12 gap-8">
     
-    <aside class="col-span-12 lg:col-span-3 space-y-6">
-        <div class="glass p-8 shadow-xl">
-            <h3 class="text-[10px] font-black uppercase text-indigo-600 mb-6 tracking-widest italic">Inyectar Cita</h3>
-            <div class="space-y-4">
-                <input id="tel" class="input-kb" placeholder="Teléfono (10 dígitos)" maxlength="10">
-                <input id="nom" class="input-kb" placeholder="Nombre del Paciente">
-                <select id="doc" class="input-kb"></select>
-                <select id="ser" class="input-kb"></select>
-                <input type="time" id="hor" class="input-kb">
-                <button id="btnAgendar" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all shadow-lg active:scale-95">Agendar Misión 📡</button>
+    <div class="mt-4 flex-1">
+        <div class="nav-item active"><span>📊</span> Dashboard</div>
+        <div class="nav-item"><span>📅</span> Agenda</div>
+        <div class="nav-item"><span>👥</span> Pacientes</div>
+        <div class="nav-item"><span>💰</span> Pagos</div>
+        <div class="nav-item"><span>📈</span> Reportes</div>
+        <div class="nav-item"><span>⚙️</span> Configuración</div>
+    </div>
+
+    <div class="p-8 mt-auto border-t border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs">AK</div>
+            <div>
+                <p class="text-[10px] font-black uppercase">Amigo Kev</p>
+                <p class="text-[8px] text-slate-500 uppercase font-bold" id="labelRol">Cargando Rol...</p>
             </div>
         </div>
+    </div>
+</nav>
 
-        <div id="panelAcciones" class="glass p-8 hidden border-2 border-indigo-100 shadow-2xl">
-            <h3 class="text-[10px] font-black uppercase mb-4 text-slate-400">Control de Cita</h3>
-            <div id="btnsAccion" class="flex flex-col gap-3"></div>
+<main class="flex-1 overflow-y-auto h-screen p-4 md:p-8">
+
+    <header class="max-w-[1600px] mx-auto mb-8 flex justify-between items-center bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl">
+        <div>
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Torre de <span class="text-indigo-400">Control</span> ✦</h1>
+            <p class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50 italic">Logística de Citas Binacional</p>
         </div>
-    </aside>
+        <select id="filtroDoctor" class="bg-indigo-600 px-6 py-3 rounded-2xl font-bold text-xs outline-none cursor-pointer border-none uppercase">
+            <option value="all">TODOS LOS DOCTORES</option>
+        </select>
+    </header>
 
-    <section class="col-span-12 lg:col-span-9 glass p-6 shadow-xl min-h-[750px]">
-        <div id="calendar"></div>
-    </section>
+    <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-8">
+        
+        <aside class="col-span-12 lg:col-span-3 space-y-6">
+            <div class="glass p-8 shadow-xl">
+                <h3 class="text-[10px] font-black uppercase text-indigo-600 mb-6 tracking-widest italic">Inyectar Cita</h3>
+                <div class="space-y-4">
+                    <input id="tel" class="input-kb" placeholder="Teléfono (10 dígitos)" maxlength="10">
+                    <input id="nom" class="input-kb" placeholder="Nombre del Paciente">
+                    <select id="doc" class="input-kb"></select>
+                    <select id="ser" class="input-kb"></select>
+                    <input type="time" id="hor" class="input-kb">
+                    <button id="btnAgendar" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all shadow-lg active:scale-95">Agendar Misión 📡</button>
+                </div>
+            </div>
+
+            <div id="panelAcciones" class="glass p-8 hidden border-2 border-indigo-100 shadow-2xl">
+                <h3 class="text-[10px] font-black uppercase mb-4 text-slate-400">Control de Cita</h3>
+                <div id="btnsAccion" class="flex flex-col gap-3"></div>
+            </div>
+        </aside>
+
+        <section class="col-span-12 lg:col-span-9 glass p-6 shadow-xl min-h-[750px]">
+            <div id="calendar"></div>
+        </section>
+    </div>
 </main>
+
+<div id="toast" class="fixed bottom-6 right-6 hidden bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl text-[10px] font-black uppercase tracking-widest z-[9999] border border-slate-700 animate-bounce"></div>
 
 <div id="modalCobro" class="modal-overlay fixed inset-0 z-[999] hidden flex items-center justify-center p-4">
     <div class="glass max-w-md w-full p-10 shadow-2xl bg-white">
         <h2 class="text-2xl font-black italic mb-2 uppercase tracking-tighter">Cierre de <span class="text-indigo-600">Caja</span></h2>
         <p id="infoPago" class="text-xs font-bold text-slate-400 mb-8 uppercase"></p>
-        
         <div class="space-y-6">
             <div>
                 <label class="text-[10px] font-black uppercase ml-2">Monto a Cobrar</label>
                 <input id="montoPago" type="number" class="input-kb text-2xl font-black text-indigo-600" step="0.01">
             </div>
-            
             <div>
                 <label class="text-[10px] font-black uppercase ml-2">Método de Pago</label>
                 <select id="metodoPago" class="input-kb font-bold">
@@ -80,7 +116,6 @@
                     <option value="Transferencia">Transferencia 🏦</option>
                 </select>
             </div>
-
             <div class="flex gap-4 pt-4">
                 <button onclick="cerrarModalCobro()" class="flex-1 p-4 rounded-2xl font-bold text-xs uppercase bg-slate-100 text-slate-400">Cancelar</button>
                 <button id="btnConfirmarPago" class="flex-1 p-4 rounded-2xl font-black text-xs uppercase bg-emerald-500 text-white shadow-lg shadow-emerald-200">Registrar Pago 💰</button>
@@ -92,42 +127,54 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// 1. CONEXIÓN AL BÚNKER
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
+
+/* ===========================
+    🔐 SESIÓN Y ROL ADN
+   =========================== */
+const rolUsuario = localStorage.getItem('rol') || 'asistente';
+document.getElementById('labelRol').innerText = `Rango: ${rolUsuario}`;
+
+function checkPermiso(accion) {
+    const permisos = {
+        asistente: ['crear', 'ver', 'confirmar'],
+        doctor: ['ver', 'atender', 'completar'],
+        admin: ['todo']
+    };
+    return permisos[rolUsuario]?.includes(accion) || permisos[rolUsuario]?.includes('todo');
+}
+
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+async function logAccion(citaId, accion) {
+    try {
+        await supabase.from('Logs').insert({ cita_id: citaId, accion: accion, usuario: rolUsuario });
+    } catch(e) { console.error("Falla en Log:", e); }
+}
 
 let calendar, citaActiva = null;
 
-/* ===========================
-    MOTOR DE DATOS (DB)
-   =========================== */
 const db = {
     async asegurarPaciente(tel, nom) {
         let { data } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
         if (!data) data = (await supabase.from('Pacientes').insert({ nombre: nom, telefono: tel }).select().single()).data;
         return data;
     },
-    async obtenerDoctores() {
-        return (await supabase.from('Perfiles_Medicos').select('id, Usuarios(nombre), especialidad')).data;
-    },
-    async obtenerServicios(docId) {
-        return (await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true)).data;
-    },
-    async registrarCita(data) {
-        return await supabase.from('Citas').insert(data);
-    },
-    async actualizarEstado(id, estado) {
-        return await supabase.from('Citas').update({ estado }).eq('id', id);
-    },
-    async registrarPago(pago) {
-        // Guardar en tabla Pagos y actualizar tabla Citas como pagado
-        await supabase.from('Pagos').insert(pago);
-        await supabase.from('Citas').update({ pagado: true, estado: 'completado' }).eq('id', pago.cita_id);
+    async obtenerDoctores() { return (await supabase.from('Perfiles_Medicos').select('id, Usuarios(nombre), especialidad')).data; },
+    async obtenerServicios(docId) { return (await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true)).data; },
+    async registrarCita(data) { return await supabase.from('Citas').insert(data); },
+    async actualizarEstado(id, estado) { 
+        const res = await supabase.from('Citas').update({ estado }).eq('id', id);
+        await logAccion(id, `Estado cambiado a ${estado}`);
+        return res;
     }
 };
 
-/* ===========================
-    CALENDARIO TÁCTICO
-   =========================== */
 function initCalendar() {
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         locale: 'es',
@@ -141,7 +188,6 @@ function initCalendar() {
             let q = supabase.from('Citas').select('*, Pacientes(nombre, telefono), Servicios(nombre, precio)');
             if(filtroDoctor.value !== 'all') q = q.eq('doctor_id', filtroDoctor.value);
             const { data } = await q;
-            
             success(data.map(c => ({
                 id: c.id,
                 title: `${c.Pacientes.nombre} — ${c.Servicios.nombre}`,
@@ -150,6 +196,18 @@ function initCalendar() {
                 backgroundColor: colorEstado(c.estado),
                 extendedProps: c
             })));
+        },
+        eventDrop: async (info) => {
+            if (!checkPermiso('confirmar')) {
+                info.revert();
+                toast('⛔ Acceso Denegado: Rol insuficiente');
+                return;
+            }
+            const nuevaHora = info.event.start.toTimeString().slice(0,5);
+            const nuevaFecha = info.event.startStr.slice(0,10);
+            await supabase.from('Citas').update({ fecha: nuevaFecha, hora_inicio: nuevaHora }).eq('id', info.event.id);
+            await logAccion(info.event.id, 'Reagendada vía Drag&Drop');
+            toast('📅 Radar Actualizado');
         },
         eventClick: (info) => {
             citaActiva = info.event.extendedProps;
@@ -160,48 +218,35 @@ function initCalendar() {
 }
 
 function colorEstado(e) {
-    return { 'pendiente': '#f59e0b', 'atendiendo': '#6366f1', 'completado': '#10b981', 'cancelado': '#ef4444' }[e] || '#94a3b8';
+    return { pendiente:'#f59e0b', confirmado:'#0ea5e9', atendiendo:'#6366f1', completado:'#10b981', cancelado:'#ef4444' }[e] || '#94a3b8';
 }
 
-/* ===========================
-    INTERFAZ DE USUARIO (UI)
-   =========================== */
 async function initUI() {
     const docs = await db.obtenerDoctores();
-    doc.innerHTML = docs.map(d => `<option value="${d.id}">${d.Usuarios.nombre} (${d.especialidad})</option>`).join('');
+    doc.innerHTML = docs.map(d => `<option value="${d.id}">${d.Usuarios.nombre}</option>`).join('');
     filtroDoctor.innerHTML += doc.innerHTML;
-
     doc.onchange = () => cargarServicios(doc.value);
     filtroDoctor.onchange = () => calendar.refetchEvents();
-    
     await cargarServicios(docs[0].id);
 
-    // EFECTO MEMORIA
     tel.oninput = async () => {
         if (tel.value.length === 10) {
             const { data } = await supabase.from('Pacientes').select('nombre').eq('telefono', tel.value).maybeSingle();
-            if (data) { nom.value = data.nombre; nom.classList.add('bg-green-50'); }
-        } else { nom.classList.remove('bg-green-50'); }
+            if (data) { nom.value = data.nombre; nom.classList.add('bg-green-50'); toast('🎯 Paciente Reconocido'); }
+        }
     };
 
     btnAgendar.onclick = async () => {
-        if(!tel.value || !nom.value || !hor.value) return alert("⚠️ Faltan datos críticos");
+        if(!checkPermiso('crear')) return toast('⛔ No tienes rango para agendar');
         const paciente = await db.asegurarPaciente(tel.value, nom.value);
         const serv = ser.selectedOptions[0];
-        
         await db.registrarCita({
-            doctor_id: doc.value,
-            paciente_id: paciente.id,
-            servicio_id: ser.value,
-            fecha: calendar.getDate().toISOString().slice(0, 10),
-            hora_inicio: hor.value,
-            duracion_total: Number(serv.dataset.d),
-            monto: Number(serv.dataset.p),
-            estado: 'pendiente'
+            doctor_id: doc.value, paciente_id: paciente.id, servicio_id: ser.value,
+            fecha: calendar.getDate().toISOString().slice(0, 10), hora_inicio: hor.value,
+            duracion_total: Number(serv.dataset.d), monto: Number(serv.dataset.p), estado: 'pendiente'
         });
-        
         calendar.refetchEvents();
-        alert("✅ CITA REGISTRADA");
+        toast('🚀 Cita en Radar');
     };
 }
 
@@ -212,52 +257,41 @@ async function cargarServicios(docId) {
 
 function mostrarPanelAcciones(c) {
     panelAcciones.classList.remove('hidden');
-    btnsAccion.innerHTML = `
-        <button onclick="updateStatus('atendiendo')" class="bg-indigo-600 text-white p-4 rounded-2xl text-[10px] font-black uppercase hover:bg-indigo-700">Marcar Llegada ⚡</button>
-        <button onclick="abrirModalCobro()" class="bg-emerald-500 text-white p-4 rounded-2xl text-[10px] font-black uppercase hover:bg-emerald-600">Finalizar y Cobrar 💰</button>
-        <button onclick="abrirWA('${c.Pacientes.telefono}')" class="bg-green-500 text-white p-4 rounded-2xl text-[10px] font-black uppercase hover:bg-green-600">WhatsApp 📱</button>
-    `;
+    let btns = '';
+    if (checkPermiso('atender')) btns += `<button onclick="updateStatus('atendiendo')" class="bg-indigo-600 text-white p-4 rounded-2xl text-[10px] font-black uppercase">Marcar Llegada ⚡</button>`;
+    if (checkPermiso('completado')) btns += `<button onclick="abrirModalCobro()" class="bg-emerald-500 text-white p-4 rounded-2xl text-[10px] font-black uppercase">Finalizar y Cobrar 💰</button>`;
+    btns += `<button onclick="abrirWA('${c.Pacientes.telefono}')" class="bg-green-500 text-white p-4 rounded-2xl text-[10px] font-black uppercase">WhatsApp 📱</button>`;
+    btnsAccion.innerHTML = btns;
 }
 
 window.updateStatus = async (st) => {
     await db.actualizarEstado(citaActiva.id, st);
     calendar.refetchEvents();
     panelAcciones.classList.add('hidden');
+    toast(`✅ Estado: ${st.toUpperCase()}`);
 };
 
-/* ===========================
-    LÓGICA DE COBRO (MODAL)
-   =========================== */
 window.abrirModalCobro = () => {
     modalCobro.classList.remove('hidden');
-    infoPago.innerText = `Paciente: ${citaActiva.Pacientes.nombre} | Servicio: ${citaActiva.Servicios.nombre}`;
+    infoPago.innerText = `Paciente: ${citaActiva.Pacientes.nombre}`;
     montoPago.value = citaActiva.monto || 0;
 };
-
 window.cerrarModalCobro = () => modalCobro.classList.add('hidden');
 
 btnConfirmarPago.onclick = async () => {
-    btnConfirmarPago.disabled = true;
-    try {
-        await db.registrarPago({
-            cita_id: citaActiva.id,
-            monto: Number(montoPago.value),
-            metodo: metodoPago.value
-        });
-        alert("✅ PAGO REGISTRADO Y CITA FINALIZADA");
-        cerrarModalCobro();
-        panelAcciones.classList.add('hidden');
-        calendar.refetchEvents();
-    } catch (e) { alert(e.message); }
-    finally { btnConfirmarPago.disabled = false; }
+    await supabase.from('Pagos').insert({ cita_id: citaActiva.id, monto: Number(montoPago.value), metodo: metodoPago.value });
+    await supabase.from('Citas').update({ pagado: true, estado: 'completado' }).eq('id', citaActiva.id);
+    await logAccion(citaActiva.id, 'Pago Registrado');
+    toast('💰 Caja Cerrada con Éxito');
+    cerrarModalCobro();
+    panelAcciones.classList.add('hidden');
+    calendar.refetchEvents();
 };
 
-window.abrirWA = (t) => window.open(`https://wa.me/52${t}?text=Hola, recordatorio de tu cita en K.B Tech Solution.`, '_blank');
+window.abrirWA = (t) => window.open(`https://wa.me/52${t}?text=K.B Tech Solution informa: Tu cita está próxima.`, '_blank');
 
-// INIT
 initCalendar();
 initUI();
 </script>
-
 </body>
 </html>
