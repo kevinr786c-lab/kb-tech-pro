@@ -18,9 +18,6 @@
         .modal-blur { backdrop-filter: blur(15px); background: rgba(2, 6, 23, 0.85); }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
-        /* Ajuste para que el calendario se vea bien en fondo oscuro */
-        .fc { --fc-border-color: rgba(255,255,255,0.05); --fc-page-bg-color: transparent; }
-        .fc-timegrid-slot { height: 3em !important; }
     </style>
 </head>
 <body class="p-4 h-screen">
@@ -71,28 +68,21 @@
     <div id="app" class="h-full flex flex-col">
         <header class="flex justify-between items-center mb-6 px-4">
             <h1 class="text-3xl font-black italic uppercase tracking-tighter">Torre de <span class="text-indigo-400">Control</span> ✦</h1>
-            <div class="text-right">
-                <p id="nombreDoc" class="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic"></p>
-                <p class="text-[8px] text-slate-500 font-bold uppercase tracking-[0.3em]">Sincronización Nodo K.B Activa</p>
-            </div>
+            <p id="nombreDoc" class="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic"></p>
         </header>
 
         <div class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
             <aside class="col-span-12 lg:col-span-3 glass p-6 overflow-y-auto">
                 <h3 class="text-[10px] font-black uppercase mb-6 text-indigo-400 tracking-widest italic">Inyectar Misión</h3>
-                <div class="space-y-2">
-                    <input id="tel" class="input-kb" placeholder="TELÉFONO" maxlength="10">
-                    <input id="nom" class="input-kb" placeholder="PACIENTE">
-                    <select id="servicio" class="input-kb cursor-pointer">
-                        <option value="" disabled selected>Seleccione Servicio</option>
-                    </select>
-                    <input type="time" id="hora" class="input-kb">
-                    <button id="btnAgendar" class="w-full bg-indigo-600 hover:bg-indigo-500 transition-all p-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-500/20">Agendar en Radar</button>
-                </div>
+                <input id="tel" class="input-kb" placeholder="TELÉFONO" maxlength="10">
+                <input id="nom" class="input-kb" placeholder="PACIENTE">
+                <select id="servicio" class="input-kb"></select>
+                <input type="time" id="hora" class="input-kb">
+                <button id="btnAgendar" class="w-full bg-indigo-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-500/20">Agendar en Radar</button>
             </aside>
 
             <section class="col-span-12 lg:col-span-9 glass p-4 overflow-hidden relative">
-                <div id="calendar" class="h-full"></div>
+                <div id="calendar"></div>
             </section>
         </div>
     </div>
@@ -102,7 +92,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-// USAMOS EL ID FIJO QUE HEMOS ESTADO USANDO PARA EL DOCTOR
+// ID DEL DOCTOR MAESTRO SEGÚN SQL
 const doctorId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 let calendar, citaSeleccionada = null;
 
@@ -124,20 +114,13 @@ function showToast(msg) {
 
 // CARGAR EVENTOS
 async function cargarEventos(info, success) {
-    const { data, error } = await supabase
-        .from('Citas')
-        .select(`*, Pacientes(*), Servicios(*)`)
-        .eq('doctor_id', doctorId)
-        .neq('estado', 'cancelado');
-    
-    if (error) { console.error(error); return; }
-
+    const { data } = await supabase.from('Citas').select(`*, Pacientes(*), Servicios(*)`).eq('doctor_id', doctorId).neq('estado', 'cancelado');
     success(data.map(c => ({
         id: c.id, 
         title: `${c.Pacientes.nombre} | ${c.Servicios.nombre}`,
         start: `${c.fecha}T${c.hora_inicio}`,
-        // Cálculo de fin basado en la duración guardada
-        end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita) * 60000),
+        // Sincronizado: duracion_cita (minutos) + buffer_min
+        end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita + (c.Servicios.buffer_min || 0)) * 60000),
         backgroundColor: ESTADOS[c.estado]?.color || '#ccc',
         extendedProps: c
     })));
@@ -151,39 +134,34 @@ window.abrirModal = async (cita) => {
     
     const st = ESTADOS[cita.estado] || ESTADOS.pendiente;
     const pill = document.getElementById('m-status-pill');
-    pill.innerText = st.txt; 
-    pill.style.backgroundColor = st.color + '20'; 
-    pill.style.color = st.color;
+    pill.innerText = st.txt; pill.style.backgroundColor = st.color + '20'; pill.style.color = st.color;
     
     document.getElementById('m-whatsapp').href = `https://wa.me/52${cita.Pacientes.telefono}`;
     document.getElementById('m-notas').value = cita.notas || '';
 
-    const { data: hist } = await supabase.from('Citas')
-        .select('fecha, estado')
-        .eq('paciente_id', cita.paciente_id)
-        .order('fecha', { ascending: false })
-        .limit(5);
-
+    const { data: hist } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', cita.paciente_id).order('fecha', { ascending: false }).limit(5);
     document.getElementById('m-historial').innerHTML = hist.map(h => `<li>📅 ${h.fecha} — ${ESTADOS[h.estado]?.txt || h.estado}</li>`).join('');
+    
     document.getElementById('modalCita').classList.remove('hidden');
 };
 
 window.cerrarModal = () => { document.getElementById('modalCita').classList.add('hidden'); };
 
+document.getElementById('m-notas').onblur = async () => {
+    if (!citaSeleccionada) return;
+    const { error } = await supabase.from('Citas').update({ notas: document.getElementById('m-notas').value }).eq('id', citaSeleccionada.id);
+    if(!error) showToast('📝 NOTAS ACTUALIZADAS');
+};
+
 window.cambiarEstado = async (nuevoEstado) => {
     let payload = { estado: nuevoEstado };
     if (nuevoEstado === 'completado') {
-        const monto = prompt('💰 Confirmar Monto Cobrado:', citaSeleccionada.monto || 0);
+        const monto = prompt('💰 Monto cobrado (MXN):', citaSeleccionada.monto || 0);
         if (monto === null) return;
         payload.monto = Number(monto); payload.pagado = true;
     }
-    
     const { error } = await supabase.from('Citas').update(payload).eq('id', citaSeleccionada.id);
-    if (!error) {
-        showToast(`SISTEMA: CITA ${nuevoEstado.toUpperCase()}`);
-        cerrarModal(); 
-        calendar.refetchEvents();
-    }
+    if (!error) { showToast(`ESTADO: ${nuevoEstado.toUpperCase()}`); cerrarModal(); calendar.refetchEvents(); }
 };
 
 document.getElementById('btnAgendar').onclick = async () => {
@@ -192,52 +170,36 @@ document.getElementById('btnAgendar').onclick = async () => {
     const hor = document.getElementById('hora').value;
     const servSel = document.getElementById('servicio').selectedOptions[0];
 
-    if(!tel || !nom || !hor || !servSel.value) return showToast('⚠️ DATOS INCOMPLETOS');
+    if(!tel || !nom || !hor || !servSel) return showToast('⚠️ DATOS INCOMPLETOS');
 
     try {
         let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-        if(!pac) {
-            const { data: newPac } = await supabase.from('Pacientes').insert({ nombre: nom.toUpperCase(), telefono: tel }).select().single();
-            pac = newPac;
-        }
+        if(!pac) pac = (await supabase.from('Pacientes').insert({ nombre: nom.toUpperCase(), telefono: tel }).select().single()).data;
 
         const { error } = await supabase.from('Citas').insert({
-            doctor_id: doctorId,
-            paciente_id: pac.id,
-            servicio_id: document.getElementById('servicio').value,
-            fecha: new Date().toISOString().slice(0,10), // Agenda para hoy por defecto en admin
+            doctor_id: doctorId, paciente_id: pac.id, servicio_id: document.getElementById('servicio').value,
+            fecha: new Date().toISOString().slice(0,10), 
             hora_inicio: hor, 
-            duracion_cita: parseInt(servSel.dataset.d), 
+            duracion_cita: parseInt(servSel.dataset.d), // Sincronizado
             monto: Number(servSel.dataset.p),
             estado: 'pendiente'
         });
-
         if(error) throw error;
-        showToast('✅ MISIÓN REGISTRADA EN RADAR');
+        showToast('✅ CITA REGISTRADA');
         calendar.refetchEvents();
-    } catch(e) { showToast(`❌ ERROR: ${e.message}`); }
+    } catch(e) { showToast(`❌ ${e.message}`); }
 };
 
-// INICIALIZACIÓN
 (async () => {
-    // Cargar nombre del doctor
-    const { data: docData } = await supabase.from('Perfiles_Medicos').select('*, Usuarios(nombre)').eq('id', doctorId).single();
-    if(docData) document.getElementById('nombreDoc').innerText = `MODO OPERATIVO: DR. ${docData.Usuarios.nombre}`;
+    const { data: p } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
+    if(p) document.getElementById('nombreDoc').innerText = `MODO OPERATIVO: ${p.nombre}`;
 
-    // Cargar servicios
     const { data: srv } = await supabase.from('Servicios').select('*').eq('doctor_id', doctorId).eq('activo', true);
-    document.getElementById('servicio').innerHTML += srv.map(s => `<option value="${s.id}" data-d="${s.duracion_total}" data-p="${s.precio}">${s.nombre.toUpperCase()}</option>`).join('');
+    document.getElementById('servicio').innerHTML = srv.map(s => `<option value="${s.id}" data-d="${s.duracion_min}" data-p="${s.precio}">${s.nombre}</option>`).join('');
     
-    // Configurar Calendario
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        locale: 'es',
-        initialView: 'timeGridDay',
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
-        slotMinTime: '07:00',
-        slotMaxTime: '22:00',
-        allDaySlot: false,
-        nowIndicator: true,
-        events: cargarEventos,
+        locale: 'es', initialView: 'timeGridDay', slotMinTime: '08:00', slotMaxTime: '20:00',
+        allDaySlot: false, nowIndicator: true, events: cargarEventos,
         eventClick: (info) => abrirModal(info.event.extendedProps)
     });
     calendar.render();
