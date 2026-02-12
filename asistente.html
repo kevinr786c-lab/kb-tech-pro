@@ -3,243 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | RADAR OPERATIVO ✦</title>
+    <title>K.B SYSTEM | RADAR PRO ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        :root { --main: #6366f1; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: white; display: flex; min-height: 100vh; overflow: hidden; }
-        
-        .sidebar { width: 280px; background: #0f172a; border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
-        .nav-item { padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 0.85rem; color: #94a3b8; }
-        .nav-item:hover, .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; border-right: 4px solid var(--main); }
-        
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border-radius: 2.5rem; border: 1px solid rgba(255,255,255,0.08); }
-        .input-kb { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.25rem; padding: 1rem; font-weight: 600; font-size: 0.8rem; color: white; transition: 0.3s; width: 100%; }
-        .input-kb:focus { border-color: var(--main); outline: none; background: rgba(255,255,255,0.1); }
-        
-        #calendar { background: transparent; color: white; padding: 20px; }
-        .fc { --fc-border-color: rgba(255,255,255,0.05); --fc-today-bg-color: rgba(99, 102, 241, 0.1); }
-        .fc-event { border: none !important; padding: 4px; border-radius: 8px !important; font-weight: 800; font-size: 0.7rem; }
-        
-        .modal-overlay { background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(10px); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: white; overflow: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.08); border-radius: 2rem; }
+        .input-kb { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 0.75rem; color: white; width: 100%; margin-bottom: 0.5rem; outline: none; }
+        .fc-event { border: none !important; padding: 5px; border-radius: 10px !important; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        #toast { transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform: translateY(100px); opacity: 0; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        .modal-blur { backdrop-filter: blur(15px); background: rgba(2, 6, 23, 0.85); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="p-4 h-screen">
 
-<nav class="sidebar hidden md:flex h-screen sticky top-0">
-    <div class="p-8">
-        <h1 class="text-2xl font-black italic tracking-tighter uppercase">K.B <span class="text-indigo-400">TECH</span></h1>
-        <p class="text-[8px] uppercase tracking-[0.4em] opacity-40 font-bold mt-2">Búnker Operativo</p>
-    </div>
-    
-    <div class="mt-4 flex-1">
-        <div class="nav-item active" onclick="location.reload()"><span>📊</span> Radar Global</div>
-        <div id="btnConfig" class="nav-item"><span>⚙️</span> Ajustar Nodo</div>
-        <div class="nav-item text-rose-500 mt-10" onclick="logout()"><span>🚪</span> Cerrar Búnker</div>
+    <div id="toast" class="fixed bottom-10 right-10 z-[9999] glass px-8 py-4 border-l-4 border-indigo-500 flex items-center gap-4">
+        <p id="toast-msg" class="text-[10px] font-black uppercase tracking-widest"></p>
     </div>
 
-    <div class="p-8 mt-auto border-t border-white/5">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center font-bold text-indigo-400" id="userInitial">..</div>
-            <div>
-                <p class="text-[10px] font-black uppercase tracking-tight" id="userName">Cargando...</p>
-                <p class="text-[8px] text-slate-500 uppercase font-bold" id="labelRol">Rango: --</p>
+    <div id="modalCita" class="fixed inset-0 z-[1000] hidden modal-blur flex items-center justify-center p-4">
+        <div class="glass max-w-2xl w-full p-8 shadow-2xl border-indigo-500/20 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 id="m-paciente" class="text-2xl font-black italic uppercase tracking-tighter text-indigo-400">---</h2>
+                    <p id="m-servicio" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">---</p>
+                </div>
+                <button onclick="cerrarModal()" class="text-slate-500 hover:text-white transition">✕</button>
             </div>
-        </div>
-    </div>
-</nav>
 
-<main class="flex-1 overflow-y-auto h-screen p-4 md:p-8">
-    <header class="max-w-[1600px] mx-auto mb-8 flex justify-between items-center bg-white/5 border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
-        <div>
-            <h1 class="text-3xl font-black italic tracking-tighter uppercase leading-none">Torre de <span class="text-indigo-400">Control</span> ✦</h1>
-            <p class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50 italic mt-2">Logística Digital Tijuana / San Diego</p>
-        </div>
-        <select id="filtroDoctor" class="hidden bg-indigo-600 px-6 py-3 rounded-2xl font-black text-[10px] outline-none cursor-pointer border-none uppercase tracking-widest"></select>
-    </header>
-
-    <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-8">
-        <aside class="col-span-12 lg:col-span-3 space-y-6">
-            <div class="glass p-8 shadow-xl">
-                <h3 class="text-[10px] font-black uppercase text-indigo-400 mb-6 tracking-widest italic">Inyectar Misión (Cita)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div class="space-y-4">
-                    <input id="tel" class="input-kb" placeholder="TELÉFONO PACIENTE" maxlength="10">
-                    <input id="nom" class="input-kb" placeholder="NOMBRE COMPLETO">
-                    <select id="doc" class="input-kb hidden"></select> <select id="ser" class="input-kb"></select>
-                    <input type="time" id="hor" class="input-kb">
-                    <button id="btnAgendar" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-500 transition-all shadow-lg active:scale-95">Agendar en Radar 📡</button>
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                        <div id="m-status-pill" class="text-[10px] font-black uppercase px-3 py-1 rounded-full">---</div>
+                        <a id="m-whatsapp" href="#" target="_blank" class="text-emerald-400 text-xl hover:scale-110 transition">📱</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="cambiarEstado('confirmado')" class="bg-sky-500/10 hover:bg-sky-500 text-sky-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-sky-500/20">Confirmar</button>
+                        <button onclick="cambiarEstado('atendiendo')" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-indigo-500/20">Atender</button>
+                        <button onclick="cambiarEstado('completado')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-emerald-500/20">Cobrar</button>
+                        <button onclick="cambiarEstado('no_asistio')" class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-amber-500/20">Faltó</button>
+                    </div>
+                    <button onclick="cambiarEstado('cancelado')" class="w-full bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-rose-500/20 italic">Cancelar Cita</button>
+                </div>
+
+                <div class="flex flex-col">
+                    <p class="text-[9px] font-black uppercase text-indigo-400 tracking-widest mb-2">Notas del Doctor</p>
+                    <textarea id="m-notas" class="w-full h-32 bg-black/30 border border-white/10 rounded-xl p-3 text-[10px] outline-none focus:border-indigo-500 transition" placeholder="Observaciones rápidas..."></textarea>
                 </div>
             </div>
 
-            <div id="panelAcciones" class="glass p-8 hidden border-2 border-indigo-500/20 shadow-2xl">
-                <h3 class="text-[10px] font-black uppercase mb-4 text-slate-500 tracking-tighter">Control de Unidad</h3>
-                <div id="btnsAccion" class="flex flex-col gap-3"></div>
-            </div>
-        </aside>
-
-        <section class="col-span-12 lg:col-span-9 glass p-4 shadow-xl min-h-[750px] relative overflow-hidden">
-            <div id="calendar"></div>
-        </section>
-    </div>
-</main>
-
-<div id="modalCobro" class="modal-overlay fixed inset-0 z-[999] hidden flex items-center justify-center p-4">
-    <div class="glass max-w-sm w-full p-10 bg-[#0f172a] border-indigo-500/30">
-        <h2 class="text-2xl font-black italic mb-2 uppercase tracking-tighter">Cierre de <span class="text-indigo-400">Caja</span></h2>
-        <p id="infoPago" class="text-[10px] font-bold text-slate-500 mb-8 uppercase tracking-widest"></p>
-        <div class="space-y-6">
-            <input id="montoPago" type="number" class="input-kb text-3xl font-black text-indigo-400 text-center">
-            <select id="metodoPago" class="input-kb font-bold">
-                <option value="Efectivo">Efectivo 💵</option>
-                <option value="Tarjeta">Tarjeta 💳</option>
-                <option value="Transferencia">Transferencia 🏦</option>
-            </select>
-            <div class="flex gap-4">
-                <button onclick="cerrarModalCobro()" class="flex-1 p-4 rounded-2xl font-bold text-[10px] uppercase bg-white/5 hover:bg-white/10">Cancelar</button>
-                <button id="btnConfirmarPago" class="flex-1 p-4 rounded-2xl font-black text-[10px] uppercase bg-emerald-600 text-white shadow-lg">Finalizar 💰</button>
+            <div class="mt-6 border-t border-white/5 pt-6">
+                <p class="text-[9px] font-black uppercase text-indigo-400 tracking-widest mb-4">Historial Reciente (Últimas 5)</p>
+                <ul id="m-historial" class="space-y-2 text-[9px] text-slate-400 italic"></ul>
             </div>
         </div>
     </div>
-</div>
 
-<div id="toast" class="fixed bottom-6 right-6 hidden bg-white text-slate-900 px-6 py-4 rounded-2xl shadow-2xl text-[10px] font-black uppercase tracking-widest border border-indigo-500 z-[10000]"></div>
+    <div id="app" class="h-full flex flex-col hidden">
+        <header class="flex justify-between items-center mb-6 px-4">
+            <h1 class="text-3xl font-black italic uppercase tracking-tighter">Torre de <span class="text-indigo-400">Control</span> ✦</h1>
+            <p id="nombreDoc" class="text-[10px] font-black text-indigo-400 uppercase tracking-widest"></p>
+        </header>
+
+        <div class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
+            <aside class="col-span-12 lg:col-span-3 glass p-6 overflow-y-auto">
+                <h3 class="text-[10px] font-black uppercase mb-6 text-indigo-400 tracking-widest italic">Inyectar Misión</h3>
+                <input id="tel" class="input-kb" placeholder="TELÉFONO" maxlength="10">
+                <input id="nom" class="input-kb" placeholder="PACIENTE">
+                <select id="servicio" class="input-kb"></select>
+                <input type="time" id="hora" class="input-kb">
+                <button id="btnAgendar" class="w-full bg-indigo-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-500/20">Agendar en Radar</button>
+            </aside>
+
+            <section class="col-span-12 lg:col-span-9 glass p-4 overflow-hidden relative">
+                <div id="calendar"></div>
+            </section>
+        </div>
+    </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-// 🎒 CARGAR MOCHILA
-const currentUserId = localStorage.getItem('user_id');
-const rolUsuario = localStorage.getItem('rol');
-const nombreUsuario = localStorage.getItem('nombre_usuario');
+let user, calendar, citaSeleccionada = null;
 
-if(!currentUserId) window.location.href = 'index.html';
+const ESTADOS = {
+    pendiente: { color: '#64748b', txt: 'Pendiente' },
+    confirmado: { color: '#0ea5e9', txt: 'Confirmado ✅' },
+    atendiendo: { color: '#6366f1', txt: 'En Consulta 🩺' },
+    completado: { color: '#10b981', txt: 'Completado 💰' },
+    cancelado: { color: '#ef4444', txt: 'Cancelado ✕' },
+    no_asistio: { color: '#f59e0b', txt: 'No Asistió ⚠️' }
+};
 
-document.getElementById('userName').innerText = nombreUsuario;
-document.getElementById('labelRol').innerText = `RANGO: ${rolUsuario.toUpperCase()}`;
-document.getElementById('userInitial').innerText = nombreUsuario.slice(0,2).toUpperCase();
-
-window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
-document.getElementById('btnConfig').onclick = () => window.location.href = `configurar-perfil.html?id=${currentUserId}`;
-
-function toast(msg) {
+function showToast(msg) {
     const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.remove('hidden');
-    setTimeout(() => t.classList.add('hidden'), 3000);
+    document.getElementById('toast-msg').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-let calendar, citaActiva = null;
+async function initSession() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) { window.location.href = 'index.html'; return; }
+    user = data.session.user;
+    const { data: p } = await supabase.from('Usuarios').select('nombre').eq('id', user.id).single();
+    if(p) document.getElementById('nombreDoc').innerText = `MODO OPERATIVO: ${p.nombre}`;
+}
 
-async function initCalendar() {
+// CARGAR EVENTOS CON BUFFER
+async function cargarEventos(info, success) {
+    const { data } = await supabase.from('Citas').select(`*, Pacientes(*), Servicios(*)`).eq('doctor_id', user.id).neq('estado', 'cancelado');
+    success(data.map(c => ({
+        id: c.id, 
+        title: `${c.Pacientes.nombre} | ${c.Servicios.nombre}`,
+        start: `${c.fecha}T${c.hora_inicio}`,
+        end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_total + c.Servicios.buffer_minutos) * 60000),
+        backgroundColor: ESTADOS[c.estado]?.color || '#ccc',
+        extendedProps: c
+    })));
+}
+
+// MODAL Y EXPEDIENTE
+window.abrirModal = async (cita) => {
+    citaSeleccionada = cita;
+    document.getElementById('m-paciente').innerText = cita.Pacientes.nombre;
+    document.getElementById('m-servicio').innerText = cita.Servicios.nombre;
+    
+    const st = ESTADOS[cita.estado];
+    const pill = document.getElementById('m-status-pill');
+    pill.innerText = st.txt; pill.style.backgroundColor = st.color + '20'; pill.style.color = st.color;
+    
+    document.getElementById('m-whatsapp').href = `https://wa.me/52${cita.Pacientes.telefono}`;
+    document.getElementById('m-notas').value = cita.notas || '';
+
+    // Historial dinámico
+    const { data: hist } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', cita.paciente_id).order('fecha', { ascending: false }).limit(5);
+    document.getElementById('m-historial').innerHTML = hist.map(h => `<li>📅 ${h.fecha} — ${ESTADOS[h.estado]?.txt || h.estado}</li>`).join('');
+    
+    document.getElementById('modalCita').classList.remove('hidden');
+};
+
+window.cerrarModal = () => { citaSeleccionada = null; document.getElementById('modalCita').classList.add('hidden'); };
+
+// GUARDAR NOTAS (Auto-Save al salir del textarea)
+document.getElementById('m-notas').onblur = async () => {
+    if (!citaSeleccionada) return;
+    const nota = document.getElementById('m-notas').value;
+    const { error } = await supabase.from('Citas').update({ notas: nota }).eq('id', citaSeleccionada.id);
+    if(!error) showToast('📝 NOTAS ACTUALIZADAS');
+};
+
+window.cambiarEstado = async (nuevoEstado) => {
+    let payload = { estado: nuevoEstado };
+    if (nuevoEstado === 'completado') {
+        const monto = prompt('💰 Monto cobrado (MXN):', citaSeleccionada.monto || 0);
+        if (!monto) return;
+        payload.monto = Number(monto); payload.pagado = true;
+    }
+    if (['cancelado', 'no_asistio'].includes(nuevoEstado) && !confirm('¿Confirmar acción?')) return;
+
+    const { error } = await supabase.from('Citas').update(payload).eq('id', citaSeleccionada.id);
+    if (!error) {
+        showToast(`ESTADO: ${nuevoEstado.toUpperCase()}`);
+        cerrarModal(); calendar.refetchEvents();
+    }
+};
+
+document.getElementById('btnAgendar').onclick = async () => {
+    const tel = document.getElementById('tel').value;
+    const nom = document.getElementById('nom').value;
+    const hor = document.getElementById('hora').value;
+    const servSel = document.getElementById('servicio').selectedOptions[0];
+
+    if(!tel || !nom || !hor) return showToast('⚠️ DATOS INCOMPLETOS');
+
+    try {
+        let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+        if(!pac) pac = (await supabase.from('Pacientes').insert({ nombre: nom.toUpperCase(), telefono: tel }).select().single()).data;
+
+        const { error } = await supabase.from('Citas').insert({
+            doctor_id: user.id, paciente_id: pac.id, servicio_id: document.getElementById('servicio').value,
+            fecha: calendar.getDate().toISOString().slice(0,10), hora_inicio: hor, 
+            duracion_total: parseInt(servSel.dataset.d), estado: 'pendiente'
+        });
+        if(error) throw error;
+        showToast('✅ CITA REGISTRADA');
+        calendar.refetchEvents();
+    } catch(e) { showToast(`❌ ${e.message}`); }
+};
+
+// INIT SISTEMAS
+(async () => {
+    await initSession();
+    const { data: srv } = await supabase.from('Servicios').select('*').eq('doctor_id', user.id).eq('activo', true);
+    document.getElementById('servicio').innerHTML = srv.map(s => `<option value="${s.id}" data-d="${s.duracion_total}">${s.nombre}</option>`).join('');
+    
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         locale: 'es', initialView: 'timeGridDay', slotMinTime: '07:00', slotMaxTime: '21:00',
-        editable: true, nowIndicator: true, allDaySlot: false,
-        events: async (info, success) => {
-            // SEGURIDAD: Si es Doctor, solo ve lo suyo. Si es Admin, ve todo o por filtro.
-            let query = supabase.from('Citas').select('*, Pacientes(nombre, telefono), Servicios(nombre, precio)');
-            
-            if(rolUsuario === 'doctor') {
-                query = query.eq('doctor_id', currentUserId);
-            } else if(filtroDoctor.value && filtroDoctor.value !== 'all') {
-                query = query.eq('doctor_id', filtroDoctor.value);
-            }
-            
-            const { data } = await query;
-            success(data.map(c => ({
-                id: c.id, title: `${c.Pacientes.nombre} — ${c.Servicios.nombre}`,
-                start: `${c.fecha}T${c.hora_inicio}`,
-                end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + c.duracion_total * 60000),
-                backgroundColor: colorEstado(c.estado), extendedProps: c
-            })));
-        },
-        eventClick: (info) => {
-            citaActiva = info.event.extendedProps;
-            mostrarPanelAcciones(citaActiva);
-        }
+        allDaySlot: false, nowIndicator: true, events: cargarEventos,
+        eventClick: (info) => abrirModal(info.event.extendedProps)
     });
     calendar.render();
-}
-
-function colorEstado(e) {
-    return { pendiente:'#f59e0b', confirmado:'#0ea5e9', atendiendo:'#6366f1', completado:'#10b981', cancelado:'#ef4444' }[e] || '#94a3b8';
-}
-
-async function initUI() {
-    // Manejo de Doctores para el Admin
-    if(rolUsuario === 'admin') {
-        const { data: docs } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        const selector = document.getElementById('filtroDoctor');
-        selector.classList.remove('hidden');
-        selector.innerHTML = '<option value="all">TODOS LOS DOCTORES</option>' + 
-                            docs.map(d => `<option value="${d.id}">${d.nombre.toUpperCase()}</option>`).join('');
-        selector.onchange = () => calendar.refetchEvents();
-    }
-
-    // Cargar Servicios del Nodo Actual
-    const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', currentUserId).eq('activo', true);
-    document.getElementById('ser').innerHTML = servs.map(s => `<option value="${s.id}" data-d="${s.duracion_total}" data-p="${s.precio}">${s.nombre} ($${s.precio})</option>`).join('');
-
-    // Registro de Cita
-    document.getElementById('btnAgendar').onclick = async () => {
-        const telVal = document.getElementById('tel').value;
-        const nomVal = document.getElementById('nom').value;
-        const horVal = document.getElementById('hor').value;
-        const servSel = document.getElementById('ser').selectedOptions[0];
-
-        if(!telVal || !nomVal || !horVal) return toast('⚠️ DATOS INCOMPLETOS');
-
-        let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', telVal).maybeSingle();
-        if(!pac) pac = (await supabase.from('Pacientes').insert({ nombre: nomVal, telefono: telVal }).select().single()).data;
-
-        await supabase.from('Citas').insert({
-            doctor_id: currentUserId, paciente_id: pac.id, servicio_id: document.getElementById('ser').value,
-            fecha: calendar.getDate().toISOString().slice(0, 10), hora_inicio: horVal,
-            duracion_total: Number(servSel.dataset.d), monto: Number(servSel.dataset.p), estado: 'pendiente'
-        });
-
-        calendar.refetchEvents();
-        toast('🚀 CITA EN RADAR');
-    };
-}
-
-function mostrarPanelAcciones(c) {
-    const panel = document.getElementById('panelAcciones');
-    panel.classList.remove('hidden');
-    document.getElementById('btnsAccion').innerHTML = `
-        <button onclick="updateStatus('atendiendo')" class="bg-indigo-600 text-white p-4 rounded-2xl text-[10px] font-black uppercase">Atender Paciente ⚡</button>
-        <button onclick="abrirModalCobro()" class="bg-emerald-600 text-white p-4 rounded-2xl text-[10px] font-black uppercase font-black">Finalizar y Cobrar 💰</button>
-        <button onclick="window.open('https://wa.me/52${c.Pacientes.telefono}')" class="bg-white/10 text-white p-4 rounded-2xl text-[10px] font-black uppercase">WhatsApp 📱</button>
-    `;
-}
-
-window.updateStatus = async (st) => {
-    await supabase.from('Citas').update({ estado: st }).eq('id', citaActiva.id);
-    calendar.refetchEvents();
-    document.getElementById('panelAcciones').classList.add('hidden');
-};
-
-window.abrirModalCobro = () => {
-    document.getElementById('modalCobro').classList.remove('hidden');
-    document.getElementById('infoPago').innerText = `Paciente: ${citaActiva.Pacientes.nombre}`;
-    document.getElementById('montoPago').value = citaActiva.monto;
-};
-
-window.cerrarModalCobro = () => document.getElementById('modalCobro').classList.add('hidden');
-
-document.getElementById('btnConfirmarPago').onclick = async () => {
-    await supabase.from('Pagos').insert({ cita_id: citaActiva.id, monto: Number(document.getElementById('montoPago').value), metodo: document.getElementById('metodoPago').value });
-    await supabase.from('Citas').update({ estado: 'completado', pagado: true }).eq('id', citaActiva.id);
-    toast('💰 CAJA CERRADA EXITOSAMENTE');
-    cerrarModalCobro();
-    calendar.refetchEvents();
-};
-
-initCalendar();
-initUI();
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('loading').classList.add('hidden');
+})();
 </script>
 </body>
 </html>
