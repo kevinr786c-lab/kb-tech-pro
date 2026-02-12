@@ -10,12 +10,10 @@
         :root { --main: #6366f1; } 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; color: #0f172a; }
 
-        /* --- UI PREMIUM --- */
         .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        /* --- CALENDARIO TÁCTICO --- */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
         .day-header { font-size: 7px; font-weight: 800; text-transform: uppercase; color: #94a3b8; text-align: center; }
         .date-card { aspect-ratio: 1/1.2; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; cursor: pointer; transition: 0.3s; }
@@ -40,8 +38,8 @@
     <div id="main-node-container" class="max-w-md w-full glass-card p-8 md:p-10 rounded-[3.5rem] relative overflow-hidden">
         <header class="text-center mb-10">
             <div class="text-5xl mb-4">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Escaneando Doctor...</h1>
-            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Sincronizando Nodo K.B</p>
+            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Escaneando...</h1>
+            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Sincronización Nodo K.B Activa</p>
         </header>
 
         <form id="form-cita" class="space-y-6">
@@ -89,10 +87,7 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// 1. CONEXIÓN AL BÚNKER
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-
-// Obtener ID del doctor desde la URL (ej: index.html?id=...) o usar uno por defecto para pruebas
 const docId = new URLSearchParams(window.location.search).get('id') || '3a5f9882-628d-4e94-811c-2c9769396e62';
 
 function eliteAviso(msg) {
@@ -102,12 +97,8 @@ function eliteAviso(msg) {
     setTimeout(() => t.classList.remove('active'), 4000);
 }
 
-/* ===========================
-    SINCRONIZACIÓN INICIAL
-   =========================== */
 async function init() {
     try {
-        // Cargar Datos del Doctor
         const { data: doc } = await supabase.from('Perfiles_Medicos').select('*, Usuarios(nombre)').eq('id', docId).single();
         if(doc) {
             document.getElementById('doc-name').innerText = `DR. ${doc.Usuarios.nombre}`;
@@ -125,18 +116,15 @@ async function cargarServicios(id) {
         data.map(s => `<option value="${s.id}" data-duracion="${s.duracion_total}" data-precio="${s.precio}">${s.nombre.toUpperCase()} — $${s.precio}</option>`).join('');
 }
 
-/* ===========================
-    LÓGICA DE CALENDARIO
-   =========================== */
 function renderCalendar() {
     const container = document.getElementById('date-slider');
     const now = new Date();
     document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long', year:'numeric'});
 
-    for(let i=0; i<14; i++) { // Mostrar 14 días a partir de hoy
+    for(let i=0; i<14; i++) {
         const d = new Date();
         d.setDate(now.getDate() + i);
-        if(d.getDay() === 0) continue; // Saltar domingos
+        if(d.getDay() === 0) continue; 
 
         const iso = d.toISOString().slice(0,10);
         const card = document.createElement('div');
@@ -152,44 +140,52 @@ function renderCalendar() {
     }
 }
 
+/* ===========================
+    🧠 MOTOR DE DISPONIBILIDAD (NIVEL 4)
+   =========================== */
 async function cargarHorasDisponibles(fecha) {
     const grid = document.getElementById('time-grid');
-    grid.innerHTML = "<p class='col-span-3 text-[8px] font-black uppercase animate-pulse text-center'>Escaneando...</p>";
+    grid.innerHTML = "<p class='col-span-3 text-[8px] font-black uppercase animate-pulse text-center'>Escaneando Perímetro...</p>";
 
-    // Obtener citas ya ocupadas
-    const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fecha);
-    const horasOcupadas = ocupadas.map(o => o.hora_inicio.slice(0,5));
+    try {
+        // LLAMADA AL RPC (Cerebro SQL)
+        const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
+            p_doctor: docId,
+            p_fecha: fecha
+        });
 
-    grid.innerHTML = "";
-    const horarios = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00"];
-    
-    horarios.forEach(h => {
-        const pill = document.createElement('div');
-        const isOcupada = horasOcupadas.includes(h);
-        pill.className = `time-pill ${isOcupada ? 'disabled' : ''}`;
-        pill.innerText = h;
-        if(!isOcupada) {
+        if (error) throw error;
+        grid.innerHTML = "";
+
+        if (!slots || slots.length === 0) {
+            grid.innerHTML = "<p class='col-span-3 text-center text-[9px] font-black uppercase text-rose-500 py-4 italic'>SIN DISPONIBILIDAD 🛡️</p>";
+            return;
+        }
+
+        slots.forEach(s => {
+            const pill = document.createElement('div');
+            pill.className = `time-pill`;
+            pill.innerText = s.hora;
             pill.onclick = () => {
                 document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
                 pill.classList.add('selected');
-                document.getElementById('hora-sel').value = h;
+                document.getElementById('hora-sel').value = s.hora;
+                eliteAviso(`OBJETIVO: ${s.hora} HRS`);
             };
-        }
-        grid.appendChild(pill);
-    });
+            grid.appendChild(pill);
+        });
+    } catch (err) {
+        eliteAviso("ERROR EN EL NODO MAESTRO");
+    }
 }
 
-/* ===========================
-    ENVÍO DE MISIÓN (POST)
-   =========================== */
 document.getElementById('form-cita').onsubmit = async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btn-submit');
-    btn.innerText = "INYECTANDO DATOS...";
+    btn.innerText = "INYECTANDO...";
     btn.disabled = true;
 
     try {
-        // 1. Asegurar Paciente (Efecto Memoria)
         const tel = document.getElementById('telefono').value;
         const nombreP = document.getElementById('nombre').value.toUpperCase();
         let { data: paciente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
@@ -198,7 +194,6 @@ document.getElementById('form-cita').onsubmit = async (e) => {
             paciente = data;
         }
 
-        // 2. Agendar Cita
         const servOpt = document.getElementById('select-servicios').selectedOptions[0];
         const { error } = await supabase.from('Citas').insert({
             doctor_id: docId,
@@ -212,12 +207,11 @@ document.getElementById('form-cita').onsubmit = async (e) => {
         });
 
         if(!error) {
-            eliteAviso("✅ MISIÓN COMPLETADA CON ÉXITO");
+            eliteAviso("✅ RESERVACIÓN EXITOSA");
             setTimeout(() => location.reload(), 3000);
         } else { throw error; }
-
     } catch (err) {
-        eliteAviso("❌ ERROR DE CONEXIÓN AL BÚNKER");
+        eliteAviso("❌ FALLA EN EL BÚNKER");
         btn.disabled = false;
         btn.innerText = "Finalizar Reservación ✦";
     }
