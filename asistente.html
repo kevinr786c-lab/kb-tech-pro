@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | RADAR PRO LUXE ✦</title>
+    <title>K.B SYSTEM | TORRE DE CONTROL LUXE ✦</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        
+
         :root {
             --luxe-gold: #c5a059;
             --luxe-white: #ffffff;
@@ -20,116 +22,83 @@
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--luxe-bg); 
             color: #1e293b; 
-            overflow: hidden; 
         }
 
-        /* 💎 ESTILO LUXE WHITE */
         .glass { 
             background: rgba(255, 255, 255, 0.9); 
             backdrop-filter: blur(20px); 
             border: 1px solid rgba(197, 160, 89, 0.2); 
-            border-radius: 2.5rem; 
+            border-radius: 2rem; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.03);
         }
 
-        .input-kb { 
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 1rem; 
-            padding: 1rem; 
-            color: #1e293b; 
-            width: 100%; 
-            margin-bottom: 0.75rem; 
-            outline: none;
-            transition: 0.3s;
-        }
-        .input-kb:focus { border-color: var(--luxe-gold); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
-
-        /* 📅 CALENDARIO LUXE */
-        .fc { background: white; border-radius: 2rem; padding: 1.5rem; border: none !important; }
-        .fc-header-toolbar { margin-bottom: 2rem !important; }
-        .fc-toolbar-title { font-weight: 800; text-transform: uppercase; letter-spacing: -1px; color: #0f172a; }
-        .fc-button { background: #0f172a !important; border: none !important; border-radius: 1rem !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: 10px !important; padding: 0.8rem 1.5rem !important; }
+        /* ===== FULLCALENDAR LUXE STYLE ===== */
+        .fc { background: transparent; border: none !important; }
+        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: #0f172a; font-size: 1.2rem !important; }
+        .fc-button { background: #0f172a !important; border: none !important; border-radius: 0.8rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; }
         .fc-button-active { background: var(--luxe-gold) !important; }
-
-        /* 💊 BLOQUES DE CITA */
-        .fc-event { 
-            border: none !important; 
-            padding: 8px !important; 
-            border-radius: 12px !important; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05) !important;
-            transition: 0.3s !important;
-        }
-        .fc-event:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1) !important; }
-        .fc-event-title { font-weight: 800 !important; font-size: 10px !important; }
-
-        #toast { transition: 0.5s; transform: translateY(100px); opacity: 0; }
-        #toast.show { transform: translateY(0); opacity: 1; }
         
-        .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: var(--luxe-gold); border-radius: 10px; }
+        /* Estilo de los bloques (Eventos) */
+        .fc-timegrid-event { 
+            border-radius: 12px !important; 
+            border: none !important; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+            padding: 4px !important;
+        }
+        .fc-col-header-cell { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 10px 0 !important; color: #64748b; }
+        .fc-timegrid-slot { height: 60px !important; border-bottom: 1px solid #f1f5f9 !important; }
+        .fc-timegrid-axis-cbox { font-size: 10px; color: #94a3b8; }
+
+        /* Modal Blur */
+        .modal-blur { backdrop-filter: blur(10px); background: rgba(15, 23, 42, 0.3); }
     </style>
 </head>
-<body class="p-4 h-screen">
 
-    <div id="toast" class="fixed bottom-10 right-10 z-[9999] glass px-8 py-4 border-l-4 border-[#c5a059] flex items-center gap-4">
-        <p id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-[#0f172a]"></p>
-    </div>
+<body class="h-screen p-4 flex flex-col">
 
-    <div id="modalCita" class="fixed inset-0 z-[1000] hidden modal-blur flex items-center justify-center p-4">
-        <div class="glass max-w-2xl w-full p-10 shadow-2xl overflow-y-auto">
-            <div class="flex justify-between items-start mb-8">
+    <div class="flex-1 glass p-6 flex flex-col overflow-hidden">
+        <header class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-[#0f172a] rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-white text-xl">🩺</span>
+                </div>
                 <div>
-                    <h2 id="m-paciente" class="text-3xl font-black italic uppercase tracking-tighter text-[#0f172a]">---</h2>
-                    <p id="m-servicio" class="text-[11px] font-bold text-[#c5a059] uppercase tracking-[0.3em] mt-1">---</p>
+                    <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">
+                        Radar <span class="text-[#c5a059]">Operativo</span>
+                    </h1>
+                    <p id="nombreDoc" class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Sincronizando Búnker...</p>
                 </div>
-                <button onclick="cerrarModal()" class="text-slate-400 hover:text-black transition text-2xl">✕</button>
             </div>
+            <div class="flex gap-2">
+                 <button onclick="calendar.changeView('timeGridDay')" class="text-[9px] font-bold uppercase px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">Hoy</button>
+                 <button onclick="calendar.changeView('timeGridWeek')" class="text-[9px] font-bold uppercase px-4 py-2 bg-[#0f172a] text-white rounded-lg shadow-md">Semana</button>
+            </div>
+        </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div class="space-y-4">
-                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex justify-between items-center">
-                        <div id="m-status-pill" class="text-[10px] font-black uppercase px-4 py-2 rounded-full">---</div>
-                        <a id="m-whatsapp" href="#" target="_blank" class="text-emerald-500 text-2xl hover:scale-110 transition">📱</a>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="cambiarEstado('confirmado')" class="bg-sky-50 text-sky-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-sky-100 hover:bg-sky-600 hover:text-white">Confirmar</button>
-                        <button onclick="cambiarEstado('atendiendo')" class="bg-indigo-50 text-indigo-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-indigo-100 hover:bg-indigo-600 hover:text-white">Atender</button>
-                        <button onclick="cambiarEstado('completado')" class="bg-emerald-50 text-emerald-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-emerald-100 hover:bg-emerald-600 hover:text-white">Cobrar</button>
-                        <button onclick="cambiarEstado('no_asistio')" class="bg-amber-50 text-amber-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-amber-100 hover:bg-amber-600 hover:text-white">Faltó</button>
-                    </div>
-                    <button onclick="cambiarEstado('cancelado')" class="w-full bg-rose-50 text-rose-500 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-rose-100 italic hover:bg-rose-500 hover:text-white">Cancelar Cita</button>
-                </div>
-                <div class="flex flex-col">
-                    <p class="text-[10px] font-black uppercase text-[#c5a059] tracking-widest mb-3">Notas Médicas</p>
-                    <textarea id="m-notas" class="w-full h-full bg-slate-50 border border-slate-100 rounded-3xl p-5 text-sm outline-none focus:border-[#c5a059] transition" placeholder="Escribir notas..."></textarea>
-                </div>
-            </div>
+        <div class="flex-1 overflow-hidden">
+            <div id="calendar" class="h-full"></div>
         </div>
     </div>
 
-    <div id="app" class="h-full flex flex-col">
-        <header class="flex justify-between items-center mb-8 px-6">
-            <h1 class="text-4xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">LUXE</span> ✦</h1>
-            <p id="nombreDoc" class="text-[11px] font-black text-[#c5a059] uppercase tracking-widest italic"></p>
-        </header>
+    <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
+        <div class="glass max-w-lg w-full p-8 bg-white shadow-2xl">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 id="m-paciente" class="text-2xl font-black uppercase italic text-[#0f172a] tracking-tighter"></h2>
+                    <p id="m-servicio" class="text-[10px] font-bold uppercase text-[#c5a059] tracking-widest mt-1"></p>
+                </div>
+                <button onclick="cerrarModal()" class="text-slate-300 hover:text-rose-500 transition text-xl">✕</button>
+            </div>
 
-        <div class="grid grid-cols-12 gap-8 flex-1 overflow-hidden">
-            <aside class="col-span-12 lg:col-span-3 glass p-8 overflow-y-auto bg-white/80">
-                <h3 class="text-[11px] font-black uppercase mb-8 text-[#c5a059] tracking-widest italic border-b pb-4">Inyectar Misión</h3>
-                <input id="tel" class="input-kb" placeholder="TELÉFONO">
-                <input id="nom" class="input-kb" placeholder="NOMBRE DEL PACIENTE">
-                <select id="servicio" class="input-kb">
-                    <option value="" disabled selected>SELECCIONE SERVICIO</option>
-                </select>
-                <input type="time" id="hora" class="input-kb">
-                <button id="btnAgendar" class="w-full bg-[#0f172a] text-[#c5a059] p-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl hover:bg-[#c5a059] hover:text-white transition">Agendar en Radar</button>
-            </aside>
+            <div class="flex items-center gap-4 mb-6">
+                <span id="m-estado" class="text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest"></span>
+                <a id="m-whatsapp" target="_blank" class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center hover:bg-emerald-500 hover:text-white transition shadow-sm">📱</a>
+            </div>
 
-            <section class="col-span-12 lg:col-span-9 glass p-6 overflow-hidden bg-white/50">
-                <div id="calendar"></div>
-            </section>
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase text-slate-400 ml-2 italic">Notas del Doctor</p>
+                <textarea id="m-notas" readonly class="w-full h-32 bg-slate-50 rounded-2xl p-4 text-xs text-slate-600 outline-none border border-slate-100 italic" placeholder="Sin notas registradas..."></textarea>
+            </div>
         </div>
     </div>
 
@@ -139,122 +108,77 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
 const doctorId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
-let calendar, citaSeleccionada = null;
+let calendar;
 
 const ESTADOS = {
-    pendiente: { color: '#94a3b8', txt: 'Pendiente' },
-    confirmado: { color: '#c5a059', txt: 'Confirmado ✅' },
-    atendiendo: { color: '#6366f1', txt: 'En Consulta 🩺' },
-    completado: { color: '#10b981', txt: 'Completado 💰' },
-    cancelado: { color: '#ef4444', txt: 'Cancelado ✕' },
-    no_asistio: { color: '#f59e0b', txt: 'No Asistió ⚠️' }
+    pendiente:  { bg:'#f1f5f9', txt:'#64748b', label:'Pendiente' },
+    confirmado: { bg:'#eef2ff', txt:'#c5a059', label:'Confirmado' },
+    atendiendo: { bg:'#f0fdf4', txt:'#10b981', label:'En consulta' },
+    completado: { bg:'#0f172a', txt:'#c5a059', label:'Finalizado' },
+    cancelado:  { bg:'#fef2f2', txt:'#ef4444', label:'Cancelado' }
 };
 
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toast-msg').innerText = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-}
-
 async function cargarEventos(info, success) {
-    const { data } = await supabase.from('Citas').select(`*, Pacientes(*), Servicios(*)`).eq('doctor_id', doctorId).neq('estado', 'cancelado');
+    const { data } = await supabase.from('Citas').select('*, Pacientes(*), Servicios(*)').eq('doctor_id', doctorId).neq('estado','cancelado');
     if(data) {
         success(data.map(c => ({
-            id: c.id, 
-            title: `👤 ${c.Pacientes.nombre} \n 🩺 ${c.Servicios.nombre}`,
+            id: c.id,
+            // Sincronización de Coordenadas: Inicio y Fin basados en duracion_cita
             start: `${c.fecha}T${c.hora_inicio}`,
-            end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita) * 60000),
-            backgroundColor: ESTADOS[c.estado]?.color || '#ccc',
+            end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
+            backgroundColor: ESTADOS[c.estado]?.bg || '#f1f5f9',
+            textColor: ESTADOS[c.estado]?.txt || '#1e293b',
             extendedProps: c
         })));
     }
 }
 
-window.abrirModal = async (cita) => {
-    citaSeleccionada = cita;
+// RENDER DE BLOQUE (Como la referencia)
+function renderEvento(arg) {
+    const c = arg.event.extendedProps;
+    return {
+        html: `
+        <div class="p-1 h-full flex flex-col justify-center overflow-hidden">
+            <div class="flex items-center gap-1 mb-1">
+                <div class="w-1 h-1 rounded-full bg-current opacity-50"></div>
+                <span class="text-[8px] font-black uppercase opacity-60">${arg.timeText}</span>
+            </div>
+            <div class="text-[10px] font-extrabold uppercase truncate tracking-tighter">${c.Pacientes?.nombre || 'Paciente'}</div>
+            <div class="text-[8px] font-medium italic opacity-70 truncate">${c.Servicios?.nombre || 'Consulta'}</div>
+        </div>`
+    };
+}
+
+window.abrirModal = (cita) => {
+    const st = ESTADOS[cita.estado] || ESTADOS.pendiente;
     document.getElementById('m-paciente').innerText = cita.Pacientes.nombre;
     document.getElementById('m-servicio').innerText = cita.Servicios.nombre;
-    const st = ESTADOS[cita.estado] || ESTADOS.pendiente;
-    const pill = document.getElementById('m-status-pill');
-    pill.innerText = st.txt; pill.style.backgroundColor = st.color + '15'; pill.style.color = st.color;
+    const pill = document.getElementById('m-estado');
+    pill.innerText = st.label; pill.style.background = st.bg; pill.style.color = st.txt;
     document.getElementById('m-whatsapp').href = `https://wa.me/52${cita.Pacientes.telefono}`;
     document.getElementById('m-notas').value = cita.notas || '';
     document.getElementById('modalCita').classList.remove('hidden');
 };
 
-window.cerrarModal = () => { document.getElementById('modalCita').classList.add('hidden'); };
-
-document.getElementById('btnAgendar').onclick = async () => {
-    const tel = document.getElementById('tel').value;
-    const nom = document.getElementById('nom').value;
-    const hor = document.getElementById('hora').value;
-    const servId = document.getElementById('servicio').value;
-    const servSel = document.getElementById('servicio').selectedOptions[0];
-
-    if(!tel || !nom || !hor || !servId) return showToast('⚠️ DATOS INCOMPLETOS');
-
-    try {
-        let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-        if(!pac) {
-            const { data, error } = await supabase.from('Pacientes').insert({ nombre: nom.toUpperCase(), telefono: tel }).select().single();
-            if(error) throw error;
-            pac = data;
-        }
-
-        const { error } = await supabase.from('Citas').insert({
-            doctor_id: doctorId, 
-            paciente_id: pac.id, 
-            servicio_id: servId,
-            fecha: new Date().toISOString().slice(0,10), 
-            hora_inicio: hor, 
-            duracion_cita: parseInt(servSel.getAttribute('data-d')), 
-            monto: Number(servSel.getAttribute('data-p')),
-            estado: 'pendiente'
-        });
-        if(error) throw error;
-        showToast('✅ CITA REGISTRADA EN EL BÚNKER');
-        calendar.refetchEvents();
-    } catch(e) { showToast(`❌ ${e.message}`); }
-};
-
-window.cambiarEstado = async (nuevoEstado) => {
-    let payload = { estado: nuevoEstado };
-    if (nuevoEstado === 'completado') {
-        const monto = prompt('💰 Monto cobrado (MXN):', citaSeleccionada.monto || 0);
-        if (monto === null) return;
-        payload.monto = Number(monto); payload.pagado = true;
-    }
-    const { error } = await supabase.from('Citas').update(payload).eq('id', citaSeleccionada.id);
-    if (!error) { showToast(`ESTADO ACTUALIZADO`); cerrarModal(); calendar.refetchEvents(); }
-};
+window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
 
 (async () => {
-    const { data: p } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
-    if(p) document.getElementById('nombreDoc').innerText = `MODO OPERATIVO: ${p.nombre}`;
+    const { data:doc } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
+    if(doc) document.getElementById('nombreDoc').innerText = `Dr. ${doc.nombre} | Nodo Maestro`;
 
-    const { data: srv } = await supabase.from('Servicios').select('*').eq('doctor_id', doctorId).eq('activo', true);
-    if(srv) {
-        document.getElementById('servicio').innerHTML += srv.map(s => `<option value="${s.id}" data-d="${s.duracion_min}" data-p="${s.precio}">${s.nombre}</option>`).join('');
-    }
-    
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        locale: 'es', 
-        initialView: 'timeGridDay', 
-        slotMinTime: '08:00', 
-        slotMaxTime: '20:00',
-        allDaySlot: false, 
-        nowIndicator: true, 
+        locale: 'es',
+        initialView: 'timeGridWeek',
+        headerToolbar: false, // Controlamos nosotros los botones para más lujo
+        allDaySlot: false,
+        slotMinTime: '08:00',
+        slotMaxTime: '19:00',
+        expandRows: true,
+        height: 'auto',
+        nowIndicator: true,
         events: cargarEventos,
-        eventClick: (info) => abrirModal(info.event.extendedProps),
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'timeGridDay,timeGridWeek'
-        },
-        eventDidMount: (info) => {
-            info.el.style.border = 'none';
-        }
+        eventContent: renderEvento,
+        eventClick: (info) => abrirModal(info.event.extendedProps)
     });
     calendar.render();
 })();
