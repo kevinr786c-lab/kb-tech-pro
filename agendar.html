@@ -16,22 +16,27 @@
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
         .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
-        .memoria-tag { background: #f0fdf4; color: #10b981; padding: 0.2rem 0.6rem; border-radius: 0.5rem; font-size: 0.6rem; font-weight: 900; display: none; }
+        
+        /* ESTILOS DE ESTATUS */
+        .badge-estatus { display: none; padding: 0.3rem 0.8rem; border-radius: 0.7rem; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.3s; }
+        .estatus-nuevo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .estatus-recurrente { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .estatus-oro { background: #fefce8; color: #a16207; border: 1px solid #fef08a; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <div class="max-w-md w-full glass p-8 shadow-2xl">
         <header class="text-center mb-8">
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter">Cargando Búnker...</h1>
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Agendamiento Inteligente</p>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">Cargando Búnker...</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Inteligencia Médica</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
             <div>
                 <div class="flex justify-between items-center mb-2 px-1">
                     <p class="text-[10px] font-black uppercase text-slate-400 italic">Identificación (Teléfono)</p>
-                    <span id="memoria-status" class="memoria-tag italic tracking-tighter">✓ PACIENTE RECORDADO</span>
+                    <span id="badge-paciente" class="badge-estatus italic"></span>
                 </div>
                 <input type="tel" id="telefono" placeholder="10 DÍGITOS" class="input-elite" maxlength="10" required>
             </div>
@@ -51,11 +56,10 @@
                 <input type="date" id="fecha" class="input-elite">
             </div>
 
-            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2">
-                </div>
+            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2"></div>
 
             <input type="hidden" id="hora_seleccionada">
-            <button type="submit" id="confirmar-btn" class="btn-mision">Confirmar Cita ✦</button>
+            <button type="submit" id="confirmar-btn" class="btn-mision">Confirmar Reservación ✦</button>
         </form>
     </div>
 
@@ -64,44 +68,56 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
     const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
-    // 🧠 LÓGICA DE MEMORIA: Detectar paciente al escribir el teléfono
+    // 🧠 LÓGICA DE INTELIGENCIA: Reconocimiento y Clasificación
     document.getElementById('telefono').addEventListener('input', async (e) => {
         const tel = e.target.value;
+        const badge = document.getElementById('badge-paciente');
+
         if (tel.length === 10) {
-            const { data, error } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
-            if (data) {
-                document.getElementById('nombre').value = data.nombre;
-                document.getElementById('email').value = data.email || '';
-                document.getElementById('fecha_nacimiento').value = data.fecha_nacimiento || '';
-                document.getElementById('memoria-status').style.display = 'block';
-                console.log("✅ ADN Recuperado del búnker.");
+            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
+            
+            if (pac) {
+                // Autocompletar datos
+                document.getElementById('nombre').value = pac.nombre;
+                document.getElementById('email').value = pac.email || '';
+                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
+
+                // Escaneo de historial para asignar Rango
+                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id);
+                
+                badge.style.display = 'block';
+                if (count >= 3) {
+                    badge.innerText = "✦ PACIENTE ORO";
+                    badge.className = "badge-estatus estatus-oro italic";
+                } else if (count >= 1) {
+                    badge.innerText = "✓ RECURRENTE";
+                    badge.className = "badge-estatus estatus-recurrente italic";
+                }
+            } else {
+                // Es un paciente nuevo
+                badge.style.display = 'block';
+                badge.innerText = "+ PACIENTE NUEVO";
+                badge.className = "badge-estatus estatus-nuevo italic";
             }
         } else {
-            document.getElementById('memoria-status').style.display = 'none';
+            badge.style.display = 'none';
         }
     });
 
-    // 🛡️ REGLA DE BIOSEGURIDAD: Cargar horas respetando el buffer
+    // 🛡️ RADAR DE DISPONIBILIDAD
     async function actualizarRadar() {
         const fecha = document.getElementById('fecha').value;
         const servId = document.getElementById('servicio').value;
         const radar = document.getElementById('radar-horas');
-        
         if (!fecha || !servId) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black animate-pulse">Escaneando Radar...</p>';
-
-        const servSelect = document.getElementById('servicio');
-        const duracionTotal = parseInt(servSelect.selectedOptions[0].dataset.total);
-
-        const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
-            p_doctor: docId,
-            p_fecha: fecha,
-            p_duracion: duracionTotal
+        radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black animate-pulse">Analizando Radar...</p>';
+        const serv = document.getElementById('servicio').selectedOptions[0];
+        const { data: slots } = await supabase.rpc('obtener_horarios_disponibles', {
+            p_doctor: docId, p_fecha: fecha, p_duracion: parseInt(serv.dataset.total)
         });
 
-        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[8px] font-black text-rose-500">BÚNKER OCUPADO</p>';
-
+        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[8px] font-black text-rose-500">BÚNKER TOTALMENTE OCUPADO</p>';
         slots?.forEach(s => {
             const pill = document.createElement('div');
             pill.className = 'time-pill';
@@ -118,7 +134,7 @@
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
-    // INICIO: Cargar catálogo y nombre del doctor
+    // INICIALIZACIÓN
     async function init() {
         const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
         document.getElementById('doc-name').innerText = `DR. ${doc.nombre}`;
@@ -130,7 +146,7 @@
             opt.value = s.id;
             opt.dataset.total = s.duracion_total;
             opt.dataset.monto = s.precio;
-            opt.innerText = `${s.nombre.toUpperCase()} ($${s.precio})`;
+            opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
             select.appendChild(opt);
         });
     }
@@ -138,40 +154,33 @@
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
-        btn.disabled = true; btn.innerText = "Sincronizando...";
-
-        // 1. Asegurar Paciente (Memoria)
         const tel = document.getElementById('telefono').value;
-        const nombre = document.getElementById('nombre').value.toUpperCase();
-        const email = document.getElementById('email').value;
-        const fnac = document.getElementById('fecha_nacimiento').value;
+        const hora = document.getElementById('hora_seleccionada').value;
+        
+        if(!hora) return alert("Seleccione una hora en el radar.");
+        
+        btn.disabled = true; btn.innerText = "Sincronizando con Búnker...";
 
         let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
         if (!pac) {
-            const { data } = await supabase.from('Pacientes').insert({ nombre, telefono: tel, email, fecha_nacimiento: fnac }).select().single();
+            const { data } = await supabase.from('Pacientes').insert({ 
+                nombre: document.getElementById('nombre').value.toUpperCase(), 
+                telefono: tel, 
+                email: document.getElementById('email').value,
+                fecha_nacimiento: document.getElementById('fecha_nacimiento').value
+            }).select().single();
             pac = data;
         }
 
-        // 2. Inyectar Cita
         const serv = document.getElementById('servicio').selectedOptions[0];
         const { error } = await supabase.from('Citas').insert({
-            doctor_id: docId,
-            paciente_id: pac.id,
-            servicio_id: serv.value,
-            fecha: document.getElementById('fecha').value,
-            hora_inicio: document.getElementById('hora_seleccionada').value,
-            duracion_cita: parseInt(serv.dataset.total),
-            monto: parseFloat(serv.dataset.monto),
-            estado: 'pendiente'
+            doctor_id: docId, paciente_id: pac.id, servicio_id: serv.value,
+            fecha: document.getElementById('fecha').value, hora_inicio: hora,
+            duracion_cita: parseInt(serv.dataset.total), monto: parseFloat(serv.dataset.monto), estado: 'pendiente'
         });
 
-        if (error) {
-            alert("Error: " + error.message);
-            btn.disabled = false; btn.innerText = "Reintentar";
-        } else {
-            alert("✅ Cita Confirmada. El radar ha sido actualizado.");
-            location.reload();
-        }
+        if (error) { alert("Error: " + error.message); btn.disabled = false; btn.innerText = "Reintentar"; }
+        else { alert("✅ MISIÓN CONFIRMADA."); location.reload(); }
     };
 
     init();
