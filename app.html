@@ -1,35 +1,229 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel del Doctor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.B DOCTOR | NODO MAESTRO ✦</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+        :root { --main: #6366f1; --glow: rgba(99, 102, 241, 0.2); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; }
+        
+        /* 💎 ESTILO K.B TECH SOLUTION */
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
+        .card-cita { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2rem; border: 1px solid rgba(0,0,0,0.02); }
+        .card-cita:hover { transform: scale(1.02) translateY(-4px); box-shadow: 0 20px 40px var(--glow); }
+
+        /* 🚥 TRIAGE DE COLOR (ADN COMANDANTE) */
+        .u-rojo { border-left: 10px solid #ef4444 !important; background: linear-gradient(90deg, #fef2f2 0%, white 100%); }
+        .u-amarillo { border-left: 10px solid #f59e0b !important; background: linear-gradient(90deg, #fffbeb 0%, white 100%); }
+        .u-verde { border-left: 10px solid #10b981 !important; }
+
+        .btn-maestro { padding: 1rem; background: var(--main); color: white; border-radius: 1.25rem; font-weight: 800; transition: 0.3s; }
+        .btn-maestro:active { transform: scale(0.9); }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.3s; }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; transform: scale(1.2); }
+    </style>
 </head>
+<body class="min-h-screen p-4 md:p-10">
 
-<body class="bg-gray-100">
+    <nav class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+        <div class="text-center md:text-left">
+            <h1 class="text-5xl font-black italic uppercase tracking-tighter">K.B <span id="logo-tech" style="color: var(--main)">Doctor</span> ✦</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic">Sincronización de Nodo Maestro Activa</p>
+        </div>
+        
+        <div class="flex items-center gap-3 bg-white shadow-2xl p-3 rounded-[2rem] border border-slate-100">
+            <span class="text-[9px] font-black uppercase text-indigo-600 pl-4 italic">Radar:</span>
+            <input type="date" id="fechaAgenda" class="bg-transparent border-none text-[11px] font-black uppercase outline-none px-2 cursor-pointer">
+        </div>
+    </nav>
 
-  <!-- HEADER -->
-  <header class="bg-white shadow p-4">
-    <h1 class="text-xl font-bold">Panel del Doctor</h1>
-  </header>
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <div class="lg:col-span-4 space-y-6">
+            <div class="glass-panel p-8 shadow-sm border border-slate-100">
+                <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 text-indigo-600 italic">Identidad de Nodo</h3>
+                <div id="doctor-info" class="space-y-2">
+                    <p class="text-2xl font-black uppercase italic tracking-tighter" id="display-nombre-doc">Dr. Cargando...</p>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase" id="display-especialidad">Sincronizando con Búnker...</p>
+                    </div>
+                </div>
+                <hr class="my-8 border-slate-100">
+                <div class="space-y-4">
+                    <button onclick="window.location.href='asistente.html'" class="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 transition shadow-xl">
+                        Abrir Recepción 👩‍💼
+                    </button>
+                    <button onclick="localStorage.clear(); location.reload();" class="w-full py-3 border-2 border-slate-100 text-slate-400 rounded-[1.5rem] font-black text-[9px] uppercase hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition">
+                        Cerrar Sesión 🔐
+                    </button>
+                </div>
+            </div>
+        </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="p-6">
+        <div class="lg:col-span-8">
+            <div id="contenedor-citas" class="space-y-4">
+                </div>
+        </div>
 
-    <!-- FILTRO FECHA -->
-    <div class="mb-4">
-      <input type="date" id="filtroFecha" class="border p-2 rounded">
-    </div>
+    </main>
 
-    <!-- CONTENEDOR DE CITAS -->
-    <div id="listaCitas" class="space-y-3">
-      <!-- Aquí se renderizan dinámicamente -->
-    </div>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  </main>
+        /* 📁 1️⃣ CONEXIÓN AL BÚNKER */
+        const supabase = createClient(
+            "https://dgatsbnqgplalxwewpvs.supabase.co", 
+            "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"
+        );
 
-  <!-- SOLO ESTE SCRIPT -->
-  <script type="module" src="./src/ui/doctor.ui.js"></script>
+        /* 📁 2️⃣ SERVICIO DE CITAS (Lógica de Negocio) */
+        const citasService = {
+            async obtenerCitasDoctor(doctorId, fecha) {
+                const { data, error } = await supabase
+                    .from('Citas')
+                    .select(`
+                        *,
+                        Pacientes (nombre, telefono),
+                        Servicios (nombre)
+                    `)
+                    .eq('doctor_id', doctorId)
+                    .eq('fecha', fecha)
+                    .order('hora_inicio', { ascending: true });
+                
+                if (error) throw error;
+                return data;
+            }
+        };
 
+        /* 📁 5️⃣ DOCTOR UI (El Código del Comandante) */
+        const doctorUI = {
+            async init() {
+                console.log("🚀 Nodo Maestro Sincronizado");
+                this.configurarCalendario();
+
+                // ID de prueba si no existe (TU UUID REAL DEBE IR AQUÍ)
+                if (!localStorage.getItem('doctor_id')) {
+                    localStorage.setItem('doctor_id', '730a84e4-785c-4861-83d2-d69818816c4c');
+                }
+
+                await this.cargarCitasDelDia();
+            },
+
+            async cargarCitasDelDia() {
+                const contenedor = document.getElementById('contenedor-citas');
+                const fecha = this.obtenerFechaSeleccionada();
+                const doctorId = this.obtenerDoctorId();
+
+                contenedor.innerHTML = `
+                    <div class="p-20 text-center animate-pulse italic text-slate-400 uppercase text-[9px] tracking-[0.5em]">
+                        Sincronizando Radar con Supabase...
+                    </div>
+                `;
+
+                try {
+                    const citas = await citasService.obtenerCitasDoctor(doctorId, fecha);
+
+                    if (citas.length === 0) {
+                        contenedor.innerHTML = `
+                            <div class="p-20 text-center opacity-30 font-black italic uppercase tracking-widest text-xs">
+                                Sin actividad en el radar para este día
+                            </div>`;
+                        return;
+                    }
+
+                    this.renderCitas(citas);
+                } catch (error) {
+                    contenedor.innerHTML = `
+                        <div class="p-10 text-center text-rose-500 font-bold uppercase text-xs">
+                            Error de Vínculo: ${error.message}
+                        </div>`;
+                }
+            },
+
+            renderCitas(citas) {
+                const contenedor = document.getElementById('contenedor-citas');
+                contenedor.innerHTML = citas.map(c => this.renderCita(c)).join('');
+                this.bindEventos();
+            },
+
+            renderCita(cita) {
+                const prioridad = this.calcularTriage(cita.estado);
+                return `
+                    <div class="card-cita ${prioridad} glass-panel p-8 mb-4 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-10">
+                            <span class="text-4xl font-black italic text-indigo-600">
+                                ${cita.hora_inicio.slice(0,5)}
+                            </span>
+                            <div>
+                                <h3 class="font-black text-slate-800 uppercase text-lg tracking-tighter">
+                                    ${cita.Pacientes ? cita.Pacientes.nombre : 'PACIENTE SIN NOMBRE'}
+                                </h3>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase italic">
+                                    ${cita.Servicios ? cita.Servicios.nombre : 'CONSULTA GENERAL'}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <span class="text-[8px] font-black uppercase px-4 py-1.5 rounded-full bg-slate-100 tracking-widest text-slate-500">
+                                ${cita.estado}
+                            </span>
+                            <button class="btn-maestro btn-expediente shadow-lg shadow-indigo-200" data-paciente="${cita.paciente_id}">
+                                🩺
+                            </button>
+                        </div>
+                    </div>
+                `;
+            },
+
+            bindEventos() {
+                document.querySelectorAll('.btn-expediente').forEach(btn => {
+                    btn.addEventListener('click', () =>
+                        this.verExpediente(btn.dataset.paciente)
+                    );
+                });
+            },
+
+            verExpediente(id) {
+                alert("📁 Accediendo al Expediente del Paciente ID: \n" + id);
+                // Aquí se activará la fase 2: src/services/pacientes.service.js
+            },
+
+            calcularTriage(estado) {
+                const e = estado.toLowerCase();
+                if (e === 'urgente' || e === 'dolor') return 'u-rojo';
+                if (e === 'pendiente' || e === 'espera') return 'u-amarillo';
+                return 'u-verde';
+            },
+
+            obtenerFechaSeleccionada() {
+                const input = document.getElementById('fechaAgenda');
+                if (!input.value) {
+                    const hoy = new Date().toISOString().slice(0, 10);
+                    input.value = hoy;
+                }
+                return input.value;
+            },
+
+            obtenerDoctorId() {
+                return localStorage.getItem('doctor_id');
+            },
+
+            configurarCalendario() {
+                document.getElementById('fechaAgenda').addEventListener('change', () => this.cargarCitasDelDia());
+            }
+        };
+
+        /* ==========================================
+           🏁 INICIO DE OPERACIÓN
+        ========================================== */
+        window.doctorUI = doctorUI; // Para acceso global si se requiere
+        doctorUI.init();
+
+    </script>
 </body>
 </html>
