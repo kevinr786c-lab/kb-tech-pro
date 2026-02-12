@@ -31,15 +31,15 @@
     <div class="max-w-md w-full glass-card p-8 md:p-10 rounded-[3.5rem] relative overflow-hidden">
         <header class="text-center mb-10">
             <div class="text-5xl mb-4">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Cargando...</h1>
-            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Sincronización Élite</p>
+            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Sincronizando...</h1>
+            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Nodo K.B Operativo</p>
         </header>
 
         <form id="form-cita" class="space-y-6">
             <div>
                 <p class="text-[9px] font-black uppercase text-[#c5a059] px-2 tracking-widest italic mb-2">1. Servicio solicitado</p>
                 <select id="select-servicios" class="input-premium text-xs uppercase italic tracking-wider cursor-pointer" required>
-                    <option value="" disabled selected>Cargando servicios...</option>
+                    <option value="" disabled selected>Cargando catálogo...</option>
                 </select>
             </div>
 
@@ -82,12 +82,14 @@ function eliteAviso(msg) {
 }
 
 async function init() {
-    const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-    if(doc) {
-        document.getElementById('doc-name').innerText = `DR. ${doc.nombre}`;
-        await cargarServicios();
-        renderCalendar();
-    }
+    try {
+        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
+        if(doc) {
+            document.getElementById('doc-name').innerText = `DR. ${doc.nombre}`;
+            await cargarServicios();
+            renderCalendar();
+        }
+    } catch (e) { console.error(e); }
 }
 
 async function cargarServicios() {
@@ -104,7 +106,7 @@ function renderCalendar() {
     const today = new Date();
     for (let i = 0; i < 30; i++) {
         const d = new Date(); d.setDate(today.getDate() + i);
-        if (d.getDay() === 0) continue; // Saltamos domingos
+        if (d.getDay() === 0) continue; 
         const card = document.createElement('div');
         card.className = 'date-card';
         card.innerHTML = `<span class="text-[8px] font-bold opacity-40 uppercase">${d.toLocaleDateString('es',{weekday:'short'})}</span><span class="text-lg font-black">${d.getDate()}</span>`;
@@ -121,16 +123,31 @@ function renderCalendar() {
 
 async function cargarHorasDisponibles(fecha) {
     const grid = document.getElementById('time-grid');
-    const serv = document.getElementById('select-servicios').selectedOptions[0];
-    if(!serv.value) return eliteAviso("ELIJA UN SERVICIO");
-
-    grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse'>Escaneando...</p>";
+    const servSelect = document.getElementById('select-servicios');
+    const serv = servSelect.selectedOptions[0];
     
+    if(!serv || !serv.value) {
+        eliteAviso("⚠️ ELIJA UN SERVICIO PRIMERO");
+        return;
+    }
+
+    grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse py-4'>Escaneando Radar...</p>";
+    
+    // 📡 Llamada al RPC que acabamos de inyectar por SQL
     const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
-        p_doctor: docId, p_fecha: fecha, p_duracion: parseInt(serv.dataset.d)
+        p_doctor: docId, 
+        p_fecha: fecha, 
+        p_duracion: parseInt(serv.dataset.d) || 30
     });
 
-    grid.innerHTML = slots?.length ? "" : "<p class='col-span-3 text-center text-[8px] font-black uppercase text-rose-500 py-4'>SIN ESPACIOS</p>";
+    if (error) {
+        console.error(error);
+        grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase text-rose-500 py-4'>ERROR DE CONEXIÓN</p>";
+        return;
+    }
+
+    grid.innerHTML = slots?.length ? "" : "<p class='col-span-3 text-center text-[8px] font-black uppercase text-rose-500 py-4'>SIN ESPACIOS DISPONIBLES</p>";
+    
     slots?.forEach(s => {
         const pill = document.createElement('div');
         pill.className = 'time-pill';
@@ -149,16 +166,15 @@ document.getElementById('form-cita').onsubmit = async (e) => {
     const btn = document.getElementById('btn-submit');
     const fecha = document.getElementById('fecha-sel').value;
     const hora = document.getElementById('hora-sel').value;
-    if(!fecha || !hora) return eliteAviso("ELIJA FECHA Y HORA");
+    if(!fecha || !hora) return eliteAviso("⚠️ ELIJA FECHA Y HORA");
 
     btn.disabled = true;
-    btn.innerText = "INYECTANDO...";
+    btn.innerText = "INYECTANDO DATOS...";
 
     try {
         const tel = document.getElementById('telefono').value;
         const nombre = document.getElementById('nombre').value.toUpperCase();
         
-        // 1. Upsert Paciente
         let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
         if(!pac) {
             const { data } = await supabase.from('Pacientes').insert({ nombre, telefono: tel }).select().single();
@@ -167,17 +183,23 @@ document.getElementById('form-cita').onsubmit = async (e) => {
 
         const serv = document.getElementById('select-servicios').selectedOptions[0];
         
-        // 2. Insert Cita
         const { error } = await supabase.from('Citas').insert({
-            doctor_id: docId, paciente_id: pac.id, servicio_id: document.getElementById('select-servicios').value,
-            fecha, hora_inicio: hora, duracion_cita: parseInt(serv.dataset.d), monto: Number(serv.dataset.p), estado: 'pendiente'
+            doctor_id: docId, 
+            paciente_id: pac.id, 
+            servicio_id: document.getElementById('select-servicios').value,
+            fecha, 
+            hora_inicio: hora, 
+            duracion_cita: parseInt(serv.dataset.d), 
+            monto: Number(serv.dataset.p), 
+            estado: 'pendiente'
         });
 
         if(error) throw error;
         eliteAviso("✅ RESERVACIÓN EXITOSA");
         setTimeout(() => location.reload(), 3000);
     } catch (err) {
-        eliteAviso("❌ ERROR EN EL BÚNKER");
+        console.error(err);
+        eliteAviso("❌ ERROR AL RESERVAR");
         btn.disabled = false; btn.innerText = "Confirmar Reservación ✦";
     }
 };
