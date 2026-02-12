@@ -180,7 +180,7 @@ document.getElementById('btnAgendar').onclick = async () => {
             doctor_id: doctorId, paciente_id: pac.id, servicio_id: document.getElementById('servicio').value,
             fecha: new Date().toISOString().slice(0,10), 
             hora_inicio: hor, 
-            duracion_cita: parseInt(servSel.dataset.d), // Sincronizado
+            duracion_cita: parseInt(servSel.dataset.d), // Sincronizado con tabla Citas
             monto: Number(servSel.dataset.p),
             estado: 'pendiente'
         });
@@ -195,6 +195,7 @@ document.getElementById('btnAgendar').onclick = async () => {
     if(p) document.getElementById('nombreDoc').innerText = `MODO OPERATIVO: ${p.nombre}`;
 
     const { data: srv } = await supabase.from('Servicios').select('*').eq('doctor_id', doctorId).eq('activo', true);
+    // Sincronización Táctica: usamos duracion_min para el dataset
     document.getElementById('servicio').innerHTML = srv.map(s => `<option value="${s.id}" data-d="${s.duracion_min}" data-p="${s.precio}">${s.nombre}</option>`).join('');
     
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
