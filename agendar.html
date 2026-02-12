@@ -3,204 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RESERVACIÓN ÉLITE | K.B TECH PRO ✦</title>
+    <title>K.B SYSTEM | TORRE DE CONTROL LUXE ✦</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;500;800&display=swap');
-        :root { --main: #c5a059; } /* Cambio a Dorado Luxe para consistencia */
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; color: #0f172a; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
 
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
-        .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; }
-        .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
-        
-        .scroll-calendar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; scroll-snap-type: x mandatory; scrollbar-width: none; }
-        .scroll-calendar::-webkit-scrollbar { display: none; }
+        :root {
+            --luxe-gold: #c5a059;
+            --luxe-white: #ffffff;
+            --luxe-bg: #f8f9fa;
+            --luxe-dark: #0f172a;
+        }
 
-        .date-card { min-width: 65px; aspect-ratio: 1/1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; cursor: pointer; transition: 0.3s; scroll-snap-align: start; }
-        .date-card.selected { background: var(--main); color: white; transform: scale(1.05); box-shadow: 0 10px 20px -5px var(--main); }
-        
-        .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
-        .time-pill.selected { background: var(--main); color: white; }
-        
-        .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
-        .btn-lujo:not(:disabled):hover { transform: translateY(-3px); background: var(--main); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--luxe-bg); 
+            color: #1e293b; 
+            overflow: hidden;
+        }
 
-        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; z-index: 10000; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); border: 1px solid rgba(255,255,255,0.1); }
-        #elite-toast.active { transform: translateX(-50%) translateY(0); }
+        /* 💎 CONTENEDORES GLASS LUXE */
+        .glass { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(197, 160, 89, 0.2); 
+            border-radius: 2.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05);
+        }
+
+        /* ===== FULLCALENDAR CUSTOM LUXE ===== */
+        .fc { background: transparent; border: none !important; }
+        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1.1rem !important; }
+        
+        /* Botones del calendario */
+        .fc-button { 
+            background: var(--luxe-dark) !important; 
+            border: none !important; 
+            border-radius: 1rem !important; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            font-size: 9px !important;
+            padding: 0.6rem 1.2rem !important;
+            transition: 0.3s !important;
+        }
+        .fc-button-active { background: var(--luxe-gold) !important; color: white !important; }
+        .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-1px); }
+
+        /* Estilo de los bloques de cita (Eventos) */
+        .fc-timegrid-event { 
+            border-radius: 14px !important; 
+            border: none !important; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04) !important;
+            padding: 2px !important;
+        }
+        .fc-col-header-cell { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 12px 0 !important; color: #94a3b8; border: none !important; }
+        .fc-timegrid-slot { height: 65px !important; border-bottom: 1px solid #f1f5f9 !important; }
+        .fc-timegrid-axis-frame { font-size: 10px; color: #94a3b8; font-weight: 600; }
+        .fc-scrollgrid { border: none !important; }
+
+        /* Estilo del Toast */
+        #toast { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(100px); opacity: 0; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px]"></p></div>
+<body class="h-screen p-4 flex flex-col">
 
-    <div id="main-node-container" class="max-w-md w-full glass-card p-8 md:p-10 rounded-[3.5rem] relative overflow-hidden">
-        <header class="text-center mb-10">
-            <div class="text-5xl mb-4">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Sincronizando...</h1>
-            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Nodo K.B Operativo</p>
+    <div id="toast" class="fixed bottom-10 right-10 z-[9999] glass px-8 py-4 border-l-4 border-[#c5a059] flex items-center gap-4">
+        <div class="w-2 h-2 rounded-full bg-[#c5a059] animate-ping"></div>
+        <p id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-[#0f172a]"></p>
+    </div>
+
+    <div class="flex-1 glass p-8 flex flex-col overflow-hidden">
+        
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-5">
+                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-2xl">
+                    <span class="text-white text-2xl">✦</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black italic uppercase tracking-tighter text-[#0f172a]">
+                        Radar <span class="text-[#c5a059]">Control</span>
+                    </h1>
+                    <p id="nombreDoc" class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Sincronizando Búnker...</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                 <button onclick="window.calendar.changeView('timeGridDay')" class="text-[9px] font-black uppercase px-5 py-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-[#c5a059] transition">Vista Día</button>
+                 <button onclick="window.calendar.changeView('timeGridWeek')" class="text-[9px] font-black uppercase px-5 py-3 bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">Vista Semana</button>
+            </div>
         </header>
 
-        <form id="form-cita" class="space-y-6">
-            <div class="space-y-2">
-                <p class="text-[9px] font-black uppercase text-[#c5a059] px-2 tracking-widest italic">1. Servicio solicitado</p>
-                <select id="select-servicios" class="input-premium text-xs uppercase italic tracking-wider cursor-pointer" required>
-                    <option value="" disabled selected>Cargando catálogo...</option>
-                </select>
+        <div class="flex-1 overflow-hidden">
+            <div id="calendar" class="h-full"></div>
+        </div>
+    </div>
+
+    <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
+        <div class="glass max-w-lg w-full p-10 bg-white shadow-2xl relative">
+            <button onclick="cerrarModal()" class="absolute top-8 right-8 text-slate-300 hover:text-black transition">✕</button>
+            
+            <div class="mb-8">
+                <h2 id="m-paciente" class="text-3xl font-black uppercase italic text-[#0f172a] tracking-tighter">---</h2>
+                <p id="m-servicio" class="text-[11px] font-bold uppercase text-[#c5a059] tracking-[0.3em] mt-1 italic">---</p>
+            </div>
+
+            <div class="flex items-center gap-5 mb-8">
+                <span id="m-estado" class="text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest border shadow-sm">---</span>
+                <a id="m-whatsapp" target="_blank" class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center hover:bg-emerald-500 hover:text-white transition shadow-sm">📱</a>
             </div>
 
             <div class="space-y-3">
-                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">2. Identidad del Paciente</p>
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-premium uppercase" required>
-                <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-premium" maxlength="10" required>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 italic tracking-widest">Expediente Rápido</label>
+                <textarea id="m-notas" readonly class="w-full h-32 bg-slate-50 border border-slate-100 rounded-[1.5rem] p-5 text-xs text-slate-600 outline-none italic" placeholder="Sin observaciones..."></textarea>
             </div>
-
-            <div class="space-y-3">
-                <div class="flex justify-between items-center px-2 text-[9px] font-black uppercase text-slate-400">
-                    <p>3. Fecha de Misión</p>
-                    <span id="current-month" class="font-black italic uppercase text-[#c5a059]"></span>
-                </div>
-                <div id="date-slider" class="scroll-calendar"></div>
-                <input type="hidden" id="fecha-sel" required>
-            </div>
-
-            <div class="space-y-3">
-                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">4. Horarios Disponibles</p>
-                <div id="time-grid" class="grid grid-cols-3 gap-3"></div>
-                <input type="hidden" id="hora-sel" required>
-            </div>
-
-            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación ✦</button>
-        </form>
-
-        <footer class="mt-8 text-center text-[7px] font-black text-slate-300 uppercase tracking-widest">
-            Powered by K.B Tech Pro ✦ Sincronización Élite
-        </footer>
+        </div>
     </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
-function eliteAviso(msg) {
-    const t = document.getElementById('elite-toast');
-    document.getElementById('toast-msg').innerText = msg;
-    t.classList.add('active');
-    setTimeout(() => t.classList.remove('active'), 4000);
-}
+// ID MAESTRO "AMIGO KEV"
+const doctorId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
+window.calendar = null;
 
-async function init() {
-    try {
-        const { data: doc } = await supabase.from('Perfiles_Medicos').select('*, Usuarios(nombre)').eq('id', docId).single();
-        if(doc) {
-            document.getElementById('doc-name').innerText = `DR. ${doc.Usuarios.nombre}`;
-            document.getElementById('doc-esp').innerText = doc.especialidad;
-            await cargarServicios(docId);
-            renderCalendar();
-        }
-    } catch (e) { eliteAviso("ERROR: NODO NO ENCONTRADO"); }
-}
-
-async function cargarServicios(id) {
-    // Sincronización: Cargamos duracion_min (para Citas) y duracion_total (para el Radar)
-    const { data } = await supabase.from('Servicios').select('id, nombre, precio, duracion_min, duracion_total').eq('doctor_id', id).eq('activo', true);
-    const sel = document.getElementById('select-servicios');
-    if (data) {
-        sel.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>' + 
-            data.map(s => `<option value="${s.id}" data-d="${s.duracion_min}" data-dt="${s.duracion_total}" data-p="${s.precio}">${s.nombre.toUpperCase()} — $${s.precio}</option>`).join('');
-    }
-}
-
-// ... (renderCalendar se mantiene igual para funcionalidad visual)
-
-async function cargarHorasDisponibles(fecha) {
-    const grid = document.getElementById('time-grid');
-    const servSel = document.getElementById('select-servicios').selectedOptions[0];
-    
-    if(!servSel.value) {
-        eliteAviso("⚠️ PRIMERO ELIJA UN SERVICIO");
-        return;
-    }
-
-    grid.innerHTML = "<p class='col-span-3 text-[8px] font-black uppercase animate-pulse text-center py-4 text-[#c5a059]'>Escaneando Radar...</p>";
-
-    try {
-        // Llamada al RPC usando duracion_total para asegurar el buffer en la vista
-        const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
-            p_doctor: docId,
-            p_fecha: fecha,
-            p_duracion: parseInt(servSel.dataset.dt) 
-        });
-
-        if (error) throw error;
-        grid.innerHTML = slots?.length ? "" : "<p class='col-span-3 text-center text-[9px] font-black uppercase text-rose-500 py-4 italic'>SIN DISPONIBILIDAD 🛡️</p>";
-        
-        slots?.forEach(s => {
-            const pill = document.createElement('div');
-            pill.className = `time-pill`;
-            pill.innerText = s.hora.slice(0,5);
-            pill.onclick = () => {
-                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                pill.classList.add('selected');
-                document.getElementById('hora-sel').value = s.hora;
-                eliteAviso(`OBJETIVO: ${s.hora.slice(0,5)} HRS`);
-            };
-            grid.appendChild(pill);
-        });
-    } catch (err) { eliteAviso("FALLA EN LA RED MAESTRA"); }
-}
-
-document.getElementById('form-cita').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('btn-submit');
-    const fecha = document.getElementById('fecha-sel').value;
-    const hora = document.getElementById('hora-sel').value;
-    if(!fecha || !hora) return eliteAviso("⚠️ ELIJA FECHA Y HORA");
-
-    btn.innerText = "INYECTANDO DATOS...";
-    btn.disabled = true;
-
-    try {
-        const tel = document.getElementById('telefono').value;
-        const nombreP = document.getElementById('nombre').value.toUpperCase();
-        
-        // 1. Upsert Paciente
-        let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-        if(!pac) {
-            const { data } = await supabase.from('Pacientes').insert({ nombre: nombreP, telefono: tel }).select().single();
-            pac = data;
-        }
-
-        const servOpt = document.getElementById('select-servicios').selectedOptions[0];
-        
-        // 2. Insert Cita (Sincronizado con tabla Citas)
-        const { error } = await supabase.from('Citas').insert({
-            doctor_id: docId,
-            paciente_id: pac.id,
-            servicio_id: document.getElementById('select-servicios').value,
-            fecha: fecha,
-            hora_inicio: hora,
-            duracion_cita: parseInt(servOpt.dataset.d), // Solo minutos de consulta
-            monto: Number(servOpt.dataset.p),
-            estado: 'pendiente'
-        });
-
-        if(error) throw error;
-        eliteAviso("✅ RESERVACIÓN EXITOSA");
-        setTimeout(() => location.reload(), 3000);
-
-    } catch (err) {
-        // Captura el mensaje del TRIGGER validar_choque_citas
-        eliteAviso(err.message.includes("RADAR") ? err.message : "❌ ERROR EN EL BÚNKER");
-        btn.disabled = false;
-        btn.innerText = "Confirmar Reservación ✦";
-    }
+const ESTADOS = {
+    pendiente:  { bg:'#f8fafc', txt:'#94a3b8', label:'Pendiente' },
+    confirmado: { bg:'#fffdf5', txt:'#c5a059', label:'Confirmado' },
+    atendiendo: { bg:'#f0fdf4', txt:'#10b981', label:'En consulta' },
+    completado: { bg:'#0f172a', txt:'#c5a059', label:'Finalizado' },
+    cancelado:  { bg:'#fef2f2', txt:'#ef4444', label:'Cancelado' }
 };
 
-// ... (renderCalendar init)
-init();
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// CARGA DE EVENTOS SINCRONIZADA
+async function cargarEventos(info, success, failure) {
+    try {
+        const { data, error } = await supabase.from('Citas')
+            .select('*, Pacientes(nombre, telefono), Servicios(nombre)')
+            .eq('doctor_id', doctorId)
+            .neq('estado', 'cancelado');
+
+        if (error) throw error;
+
+        const eventos = (data || []).map(c => ({
+            id: c.id,
+            title: c.Pacientes?.nombre || 'Paciente',
+            start: `${c.fecha}T${c.hora_inicio}`,
+            // Usamos duracion_cita del búnker
+            end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
+            backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
+            textColor: ESTADOS[c.estado]?.txt || '#1e293b',
+            extendedProps: c
+        }));
+        success(eventos);
+    } catch (err) {
+        showToast("ERROR DE RADAR");
+        failure(err);
+    }
+}
+
+// RENDERIZADO TIPO "PASTILLA" (Igual a la referencia)
+function renderEvento(arg) {
+    const c = arg.event.extendedProps;
+    const color = ESTADOS[c.estado]?.txt || '#c5a059';
+    return {
+        html: `
+        <div class="p-2 h-full flex flex-col justify-center border-l-4" style="border-color: ${color}">
+            <div class="flex items-center gap-1 opacity-60 mb-1">
+                <span class="text-[7px] font-black uppercase tracking-tighter">${arg.timeText}</span>
+            </div>
+            <div class="text-[9px] font-black uppercase truncate text-[#0f172a]">${c.Pacientes?.nombre || 'Externo'}</div>
+            <div class="text-[7px] font-bold italic opacity-60 truncate">${c.Servicios?.nombre || 'Consulta'}</div>
+        </div>`
+    };
+}
+
+window.abrirModal = (cita) => {
+    const st = ESTADOS[cita.estado] || ESTADOS.pendiente;
+    document.getElementById('m-paciente').innerText = cita.Pacientes.nombre;
+    document.getElementById('m-servicio').innerText = cita.Servicios.nombre;
+    const pill = document.getElementById('m-estado');
+    pill.innerText = st.label; pill.style.background = st.bg; pill.style.color = st.txt; pill.style.borderColor = st.txt + '40';
+    document.getElementById('m-whatsapp').href = `https://wa.me/52${cita.Pacientes.telefono}`;
+    document.getElementById('m-notas').value = cita.notas || '';
+    document.getElementById('modalCita').classList.remove('hidden');
+};
+
+window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
+
+// INICIALIZACIÓN
+(async () => {
+    const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
+    if (doc) document.getElementById('nombreDoc').innerText = `MODO MAESTRO: ${doc.nombre}`;
+
+    const calendarEl = document.getElementById('calendar');
+    window.calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: 'timeGridWeek',
+        headerToolbar: false, 
+        allDaySlot: false,
+        slotMinTime: '08:00',
+        slotMaxTime: '20:00',
+        expandRows: true,
+        nowIndicator: true,
+        dayHeaderFormat: { weekday: 'short', day: 'numeric' },
+        events: cargarEventos,
+        eventContent: renderEvento,
+        eventClick: (info) => window.abrirModal(info.event.extendedProps)
+    });
+    
+    window.calendar.render();
+    showToast("RADAR ACTIVADO");
+})();
 </script>
 </body>
 </html>
