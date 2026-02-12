@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -23,7 +24,6 @@
         .input-kb:focus { border-color: var(--main); background: white; outline: none; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1); }
         
         .modal-overlay { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); }
-        .fc-event { cursor: pointer; border: none !important; padding: 4px; border-radius: 8px !important; }
         #toast { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10000; }
     </style>
 </head>
@@ -122,20 +122,17 @@ const rolUsuario = localStorage.getItem('rol') || 'asistente';
 const nombreUsuario = localStorage.getItem('nombre_usuario') || 'Amigo Kev';
 const currentUserId = localStorage.getItem('user_id');
 
-// UI UPDATES
 document.getElementById('labelRol').innerText = `Rango: ${rolUsuario.toUpperCase()}`;
 document.getElementById('userName').innerText = nombreUsuario;
 document.getElementById('userInitial').innerText = nombreUsuario.slice(0,2).toUpperCase();
 
-// ⚙️ ENLACE A CONFIGURACIÓN (BLINDADO)
+// ⚙️ ENLACE A CONFIGURACIÓN (Actualizado a asistente.html context)
 document.getElementById('btnConfig').onclick = () => {
-    // Si no hay ID, no podemos configurar nada.
     if (!currentUserId) {
         toast("⛔ ERROR: NODO DE IDENTIDAD NO DETECTADO");
-        console.error("ID de usuario ausente en localStorage");
         return;
     }
-    // Redirección al archivo de perfil
+    // Redirecciona al configurador
     window.location.href = `configurar-perfil.html?id=${currentUserId}`;
 };
 
@@ -183,11 +180,6 @@ function initCalendar() {
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         locale: 'es', initialView: 'timeGridDay', slotMinTime: '07:00', slotMaxTime: '21:00',
         editable: true, nowIndicator: true, allDaySlot: false,
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'timeGridDay,timeGridWeek,dayGridMonth'
-        },
         events: async (info, success) => {
             let q = supabase.from('Citas').select('*, Pacientes(nombre, telefono), Servicios(nombre, precio)');
             if(filtroDoctor.value !== 'all') q = q.eq('doctor_id', filtroDoctor.value);
