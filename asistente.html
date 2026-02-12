@@ -30,7 +30,7 @@
                 <div>
                     <h1 class="text-lg font-black italic uppercase tracking-tighter text-[#0f172a]">Panel <span class="text-[#c5a059]">Asistente</span></h1>
                     <select id="doctorSelect" class="bg-transparent text-[9px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0">
-                        <option value="">INICIALIZANDO...</option>
+                        <option value="">INICIALIZANDO RADAR...</option>
                     </select>
                 </div>
             </div>
@@ -40,7 +40,7 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-hidden">
+        <div class="flex-1 overflow-hidden relative">
             <div id="calendar" class="h-full"></div>
         </div>
     </div>
@@ -49,10 +49,10 @@
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-3">
-                <div class="text-[10px] font-bold text-slate-400 px-1 uppercase italic tracking-widest">Paciente</div>
+                <div class="text-[10px] font-bold text-slate-400 px-1 uppercase italic tracking-widest">Identidad del Paciente</div>
                 <input id="c-paciente" class="input-luxe bg-slate-50" readonly>
                 <input id="c-telefono" class="input-luxe bg-slate-50" readonly>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2 mt-4">
                     <input type="date" id="c-fecha" class="input-luxe">
                     <input type="time" id="c-hora" class="input-luxe">
                 </div>
@@ -63,7 +63,7 @@
                     <option value="completado">Completado</option>
                     <option value="cancelado">CANCELAR CITA</option>
                 </select>
-                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS OPERATIVAS..."></textarea>
+                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS DE LA CONSULTA..."></textarea>
             </div>
             <div class="flex justify-between mt-6 gap-2">
                 <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-emerald-600 hover:text-white transition">Actualizar Radar</button>
@@ -101,23 +101,29 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
+    // 1. CARGA DE IDENTIDADES (DOCTORES)
     async function cargarDoctores() {
         const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        if (error) return;
+        if (error) return console.error("Error en búnker:", error);
         
         const select = document.getElementById('doctorSelect');
         if (data && data.length > 0) {
             select.innerHTML = data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
             doctorActual = select.value;
-            initCalendar();
+            initCalendar(); // Encendido secuencial
         }
     }
 
+    // 2. ESCANEO DE CITAS RELACIONALES
     async function cargarCitas(info, success, failure) {
         if (!doctorActual) return success([]);
         try {
             const { data, error } = await supabase.from('Citas')
-                .select('*, Pacientes!fk_citas_pacientes_maestra(nombre, telefono), Servicios(nombre)')
+                .select(`
+                    *,
+                    Pacientes!fk_citas_pacientes_maestra(nombre, telefono),
+                    Servicios(nombre)
+                `)
                 .eq('doctor_id', doctorActual)
                 .neq('estado', 'cancelado');
             
@@ -134,12 +140,18 @@
         } catch (err) { failure(err); }
     }
 
+    // 3. INICIALIZACIÓN DEL MAPA VISUAL
     function initCalendar() {
         const calendarEl = document.getElementById('calendar');
         if (calendar) calendar.destroy();
         calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'es', initialView: 'timeGridWeek', allDaySlot: false,
-            slotMinTime: '08:00', slotMaxTime: '20:00', editable: true, selectable: true,
+            locale: 'es', 
+            initialView: 'timeGridWeek', 
+            allDaySlot: false,
+            slotMinTime: '08:00', 
+            slotMaxTime: '20:00', 
+            editable: true, 
+            selectable: true,
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
             events: cargarCitas,
             eventContent: (arg) => ({
@@ -150,15 +162,17 @@
             }),
             eventClick: (info) => abrirEditar(info.event.extendedProps),
             eventDrop: async (info) => {
-                await supabase.from('Citas').update({
+                const { error } = await supabase.from('Citas').update({
                     fecha: info.event.startStr.slice(0,10),
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
+                if(error) info.revert();
             }
         });
         calendar.render();
     }
 
+    // 4. GESTIÓN OPERATIVA
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
@@ -203,6 +217,7 @@
         calendar.refetchEvents();
     };
 
+    // 🚦 INICIO DE OPERACIONES
     cargarDoctores();
 </script>
 </body>
