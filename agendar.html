@@ -81,9 +81,11 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+// Conexión principal
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-const docId = new URLSearchParams(window.location.search).get('id') || '196c57b5-68d5-4825-8607-36b5d3bc3e15';
+// ID Maestro según Usuarios_rows.sql
+const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
 function eliteAviso(msg) {
     const t = document.getElementById('elite-toast');
@@ -105,14 +107,12 @@ async function init() {
 }
 
 async function cargarServicios(id) {
-    // Usamos la columna generada duracion_total de tu tabla
+    // Sincronizado con Servicios_rows.sql: usamos duracion_total (que ya incluye el buffer)
     const { data } = await supabase.from('Servicios').select('id, nombre, precio, duracion_total').eq('doctor_id', id).eq('activo', true);
     const sel = document.getElementById('select-servicios');
     if (data && data.length > 0) {
         sel.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>' + 
             data.map(s => `<option value="${s.id}" data-duracion="${s.duracion_total}" data-precio="${s.precio}">${s.nombre.toUpperCase()} — $${s.precio}</option>`).join('');
-    } else {
-        sel.innerHTML = '<option value="" disabled selected>No hay servicios activos</option>';
     }
 }
 
@@ -205,14 +205,14 @@ document.getElementById('form-cita').onsubmit = async (e) => {
 
         const servOpt = document.getElementById('select-servicios').selectedOptions[0];
         
-        // Cirugía en el Insert: Sincronizado con tabla Citas
+        // Sincronización de inserción: Usamos duracion_cita como se definió en el búnker
         const { error } = await supabase.from('Citas').insert({
             doctor_id: docId,
             paciente_id: paciente.id,
             servicio_id: document.getElementById('select-servicios').value,
             fecha: fecha,
             hora_inicio: hora,
-            duracion_total: Number(servOpt.dataset.duracion),
+            duracion_cita: Number(servOpt.dataset.duracion),
             monto: Number(servOpt.dataset.precio),
             estado: 'pendiente'
         });
@@ -223,7 +223,7 @@ document.getElementById('form-cita').onsubmit = async (e) => {
         } else { throw error; }
     } catch (err) {
         console.error(err);
-        eliteAviso("❌ ERROR EN EL BÚNKER: " + (err.message || 'FALLA COLUMNA'));
+        eliteAviso("❌ ERROR EN EL BÚNKER");
         btn.disabled = false;
         btn.innerText = "Confirmar Reservación ✦";
     }
