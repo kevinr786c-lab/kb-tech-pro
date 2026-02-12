@@ -16,62 +16,88 @@
             --luxe-gold: #c5a059;
             --luxe-white: #ffffff;
             --luxe-bg: #f8f9fa;
+            --luxe-dark: #0f172a;
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--luxe-bg); 
             color: #1e293b; 
+            overflow: hidden;
         }
 
+        /* 💎 CONTENEDORES GLASS LUXE */
         .glass { 
-            background: rgba(255, 255, 255, 0.9); 
+            background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(20px); 
             border: 1px solid rgba(197, 160, 89, 0.2); 
-            border-radius: 2rem; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.03);
+            border-radius: 2.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05);
         }
 
-        /* ===== FULLCALENDAR LUXE STYLE ===== */
+        /* ===== FULLCALENDAR CUSTOM LUXE ===== */
         .fc { background: transparent; border: none !important; }
-        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: #0f172a; font-size: 1.2rem !important; }
-        .fc-button { background: #0f172a !important; border: none !important; border-radius: 0.8rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; }
-        .fc-button-active { background: var(--luxe-gold) !important; }
+        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1.1rem !important; }
         
-        /* Estilo de los bloques (Eventos) */
-        .fc-timegrid-event { 
-            border-radius: 12px !important; 
+        /* Botones del calendario */
+        .fc-button { 
+            background: var(--luxe-dark) !important; 
             border: none !important; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
-            padding: 4px !important;
+            border-radius: 1rem !important; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            font-size: 9px !important;
+            padding: 0.6rem 1.2rem !important;
+            transition: 0.3s !important;
         }
-        .fc-col-header-cell { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 10px 0 !important; color: #64748b; }
-        .fc-timegrid-slot { height: 60px !important; border-bottom: 1px solid #f1f5f9 !important; }
-        .fc-timegrid-axis-cbox { font-size: 10px; color: #94a3b8; }
+        .fc-button-active { background: var(--luxe-gold) !important; color: white !important; }
+        .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-1px); }
 
-        /* Modal Blur */
-        .modal-blur { backdrop-filter: blur(10px); background: rgba(15, 23, 42, 0.3); }
+        /* Estilo de los bloques de cita (Eventos) */
+        .fc-timegrid-event { 
+            border-radius: 14px !important; 
+            border: none !important; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04) !important;
+            padding: 2px !important;
+        }
+        .fc-col-header-cell { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 12px 0 !important; color: #94a3b8; border: none !important; }
+        .fc-timegrid-slot { height: 65px !important; border-bottom: 1px solid #f1f5f9 !important; }
+        .fc-timegrid-axis-frame { font-size: 10px; color: #94a3b8; font-weight: 600; }
+        .fc-scrollgrid { border: none !important; }
+
+        /* Estilo del Toast */
+        #toast { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(100px); opacity: 0; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
     </style>
 </head>
 
 <body class="h-screen p-4 flex flex-col">
 
-    <div class="flex-1 glass p-6 flex flex-col overflow-hidden">
-        <header class="flex justify-between items-center mb-6">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-[#0f172a] rounded-xl flex items-center justify-center shadow-lg">
-                    <span class="text-white text-xl">🩺</span>
+    <div id="toast" class="fixed bottom-10 right-10 z-[9999] glass px-8 py-4 border-l-4 border-[#c5a059] flex items-center gap-4">
+        <div class="w-2 h-2 rounded-full bg-[#c5a059] animate-ping"></div>
+        <p id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-[#0f172a]"></p>
+    </div>
+
+    <div class="flex-1 glass p-8 flex flex-col overflow-hidden">
+        
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-5">
+                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-2xl">
+                    <span class="text-white text-2xl">✦</span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">
-                        Radar <span class="text-[#c5a059]">Operativo</span>
+                    <h1 class="text-2xl font-black italic uppercase tracking-tighter text-[#0f172a]">
+                        Radar <span class="text-[#c5a059]">Control</span>
                     </h1>
-                    <p id="nombreDoc" class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Sincronizando Búnker...</p>
+                    <p id="nombreDoc" class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Sincronizando Búnker...</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                 <button onclick="calendar.changeView('timeGridDay')" class="text-[9px] font-bold uppercase px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">Hoy</button>
-                 <button onclick="calendar.changeView('timeGridWeek')" class="text-[9px] font-bold uppercase px-4 py-2 bg-[#0f172a] text-white rounded-lg shadow-md">Semana</button>
+            
+            <div class="flex items-center gap-3">
+                 <button onclick="window.calendar.changeView('timeGridDay')" class="text-[9px] font-black uppercase px-5 py-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-[#c5a059] transition">Vista Día</button>
+                 <button onclick="window.calendar.changeView('timeGridWeek')" class="text-[9px] font-black uppercase px-5 py-3 bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">Vista Semana</button>
             </div>
         </header>
 
@@ -81,23 +107,22 @@
     </div>
 
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
-        <div class="glass max-w-lg w-full p-8 bg-white shadow-2xl">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h2 id="m-paciente" class="text-2xl font-black uppercase italic text-[#0f172a] tracking-tighter"></h2>
-                    <p id="m-servicio" class="text-[10px] font-bold uppercase text-[#c5a059] tracking-widest mt-1"></p>
-                </div>
-                <button onclick="cerrarModal()" class="text-slate-300 hover:text-rose-500 transition text-xl">✕</button>
+        <div class="glass max-w-lg w-full p-10 bg-white shadow-2xl relative">
+            <button onclick="cerrarModal()" class="absolute top-8 right-8 text-slate-300 hover:text-black transition">✕</button>
+            
+            <div class="mb-8">
+                <h2 id="m-paciente" class="text-3xl font-black uppercase italic text-[#0f172a] tracking-tighter">---</h2>
+                <p id="m-servicio" class="text-[11px] font-bold uppercase text-[#c5a059] tracking-[0.3em] mt-1 italic">---</p>
             </div>
 
-            <div class="flex items-center gap-4 mb-6">
-                <span id="m-estado" class="text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest"></span>
-                <a id="m-whatsapp" target="_blank" class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center hover:bg-emerald-500 hover:text-white transition shadow-sm">📱</a>
+            <div class="flex items-center gap-5 mb-8">
+                <span id="m-estado" class="text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest border shadow-sm">---</span>
+                <a id="m-whatsapp" target="_blank" class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center hover:bg-emerald-500 hover:text-white transition shadow-sm">📱</a>
             </div>
 
-            <div class="space-y-2">
-                <label class="text-[9px] font-black uppercase text-slate-400 ml-2 italic">Notas del Doctor</p>
-                <textarea id="m-notas" readonly class="w-full h-32 bg-slate-50 rounded-2xl p-4 text-xs text-slate-600 outline-none border border-slate-100 italic" placeholder="Sin notas registradas..."></textarea>
+            <div class="space-y-3">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 italic tracking-widest">Expediente Rápido</label>
+                <textarea id="m-notas" readonly class="w-full h-32 bg-slate-50 border border-slate-100 rounded-[1.5rem] p-5 text-xs text-slate-600 outline-none italic" placeholder="Sin observaciones..."></textarea>
             </div>
         </div>
     </div>
@@ -107,44 +132,64 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
+// ID MAESTRO "AMIGO KEV"
 const doctorId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
-let calendar;
+window.calendar = null;
 
 const ESTADOS = {
-    pendiente:  { bg:'#f1f5f9', txt:'#64748b', label:'Pendiente' },
-    confirmado: { bg:'#eef2ff', txt:'#c5a059', label:'Confirmado' },
+    pendiente:  { bg:'#f8fafc', txt:'#94a3b8', label:'Pendiente' },
+    confirmado: { bg:'#fffdf5', txt:'#c5a059', label:'Confirmado' },
     atendiendo: { bg:'#f0fdf4', txt:'#10b981', label:'En consulta' },
     completado: { bg:'#0f172a', txt:'#c5a059', label:'Finalizado' },
     cancelado:  { bg:'#fef2f2', txt:'#ef4444', label:'Cancelado' }
 };
 
-async function cargarEventos(info, success) {
-    const { data } = await supabase.from('Citas').select('*, Pacientes(*), Servicios(*)').eq('doctor_id', doctorId).neq('estado','cancelado');
-    if(data) {
-        success(data.map(c => ({
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// CARGA DE EVENTOS SINCRONIZADA
+async function cargarEventos(info, success, failure) {
+    try {
+        const { data, error } = await supabase.from('Citas')
+            .select('*, Pacientes(nombre, telefono), Servicios(nombre)')
+            .eq('doctor_id', doctorId)
+            .neq('estado', 'cancelado');
+
+        if (error) throw error;
+
+        const eventos = (data || []).map(c => ({
             id: c.id,
-            // Sincronización de Coordenadas: Inicio y Fin basados en duracion_cita
+            title: c.Pacientes?.nombre || 'Paciente',
             start: `${c.fecha}T${c.hora_inicio}`,
+            // Usamos duracion_cita del búnker
             end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
-            backgroundColor: ESTADOS[c.estado]?.bg || '#f1f5f9',
+            backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
             textColor: ESTADOS[c.estado]?.txt || '#1e293b',
             extendedProps: c
-        })));
+        }));
+        success(eventos);
+    } catch (err) {
+        showToast("ERROR DE RADAR");
+        failure(err);
     }
 }
 
-// RENDER DE BLOQUE (Como la referencia)
+// RENDERIZADO TIPO "PASTILLA" (Igual a la referencia)
 function renderEvento(arg) {
     const c = arg.event.extendedProps;
+    const color = ESTADOS[c.estado]?.txt || '#c5a059';
     return {
         html: `
-        <div class="p-1 h-full flex flex-col justify-center overflow-hidden">
-            <div class="flex items-center gap-1 mb-1">
-                <div class="w-1 h-1 rounded-full bg-current opacity-50"></div>
-                <span class="text-[8px] font-black uppercase opacity-60">${arg.timeText}</span>
+        <div class="p-2 h-full flex flex-col justify-center border-l-4" style="border-color: ${color}">
+            <div class="flex items-center gap-1 opacity-60 mb-1">
+                <span class="text-[7px] font-black uppercase tracking-tighter">${arg.timeText}</span>
             </div>
-            <div class="text-[10px] font-extrabold uppercase truncate tracking-tighter">${c.Pacientes?.nombre || 'Paciente'}</div>
-            <div class="text-[8px] font-medium italic opacity-70 truncate">${c.Servicios?.nombre || 'Consulta'}</div>
+            <div class="text-[9px] font-black uppercase truncate text-[#0f172a]">${c.Pacientes?.nombre || 'Externo'}</div>
+            <div class="text-[7px] font-bold italic opacity-60 truncate">${c.Servicios?.nombre || 'Consulta'}</div>
         </div>`
     };
 }
@@ -154,7 +199,7 @@ window.abrirModal = (cita) => {
     document.getElementById('m-paciente').innerText = cita.Pacientes.nombre;
     document.getElementById('m-servicio').innerText = cita.Servicios.nombre;
     const pill = document.getElementById('m-estado');
-    pill.innerText = st.label; pill.style.background = st.bg; pill.style.color = st.txt;
+    pill.innerText = st.label; pill.style.background = st.bg; pill.style.color = st.txt; pill.style.borderColor = st.txt + '40';
     document.getElementById('m-whatsapp').href = `https://wa.me/52${cita.Pacientes.telefono}`;
     document.getElementById('m-notas').value = cita.notas || '';
     document.getElementById('modalCita').classList.remove('hidden');
@@ -162,25 +207,29 @@ window.abrirModal = (cita) => {
 
 window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
 
+// INICIALIZACIÓN
 (async () => {
-    const { data:doc } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
-    if(doc) document.getElementById('nombreDoc').innerText = `Dr. ${doc.nombre} | Nodo Maestro`;
+    const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
+    if (doc) document.getElementById('nombreDoc').innerText = `MODO MAESTRO: ${doc.nombre}`;
 
-    calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+    const calendarEl = document.getElementById('calendar');
+    window.calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'es',
         initialView: 'timeGridWeek',
-        headerToolbar: false, // Controlamos nosotros los botones para más lujo
+        headerToolbar: false, 
         allDaySlot: false,
         slotMinTime: '08:00',
-        slotMaxTime: '19:00',
+        slotMaxTime: '20:00',
         expandRows: true,
-        height: 'auto',
         nowIndicator: true,
+        dayHeaderFormat: { weekday: 'short', day: 'numeric' },
         events: cargarEventos,
         eventContent: renderEvento,
-        eventClick: (info) => abrirModal(info.event.extendedProps)
+        eventClick: (info) => window.abrirModal(info.event.extendedProps)
     });
-    calendar.render();
+    
+    window.calendar.render();
+    showToast("RADAR ACTIVADO");
 })();
 </script>
 </body>
