@@ -101,22 +101,37 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
+    // ⚡ CARGA DE DOCTORES (CON TU NUEVA LÓGICA DE CONTROL)
     async function cargarDoctores() {
         const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        if (error) return console.error("Error en búnker:", error);
         
-        const select = document.getElementById('doctorSelect');
-        if (data && data.length > 0) {
-            select.innerHTML = data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
-            doctorActual = select.value;
-            initCalendar();
-        } else {
-            select.innerHTML = '<option value="">SIN DOCTORES ACTIVOS</option>';
+        if (error) {
+            console.error("Error en búnker:", error);
+            return;
         }
+
+        const select = document.getElementById('doctorSelect');
+
+        // 🛡️ Menú por defecto obligatorio
+        select.innerHTML = '<option value="">SELECCIONA DOCTOR</option>' + 
+            data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
+
+        // 🚥 Control de flujo: Solo arranca cuando hay selección real
+        select.onchange = () => {
+            doctorActual = select.value;
+            if (doctorActual === "") return; // Protección contra selección nula
+
+            if (!calendar) {
+                initCalendar(); // Arranca el radar por primera vez
+            } else {
+                calendar.refetchEvents(); // Recalibra el radar existente
+            }
+        };
     }
 
+    // ESCANEO DE CITAS
     async function cargarCitas(info, success, failure) {
-        if (!doctorActual || doctorActual === "") return success([]);
+        if (!doctorActual) return success([]);
         try {
             const { data, error } = await supabase.from('Citas')
                 .select('*, Pacientes!fk_citas_pacientes_maestra(nombre, telefono), Servicios(nombre)')
@@ -136,6 +151,7 @@
         } catch (err) { failure(err); }
     }
 
+    // INICIALIZACIÓN DEL RADAR
     function initCalendar() {
         const calendarEl = document.getElementById('calendar');
         if (calendar) calendar.destroy();
@@ -162,7 +178,7 @@
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
                 if(error) {
-                    console.error("Error al mover:", error);
+                    console.error("Falla en reprogramación:", error);
                     info.revert();
                 }
             }
@@ -170,6 +186,7 @@
         calendar.render();
     }
 
+    // MODALES Y GESTIÓN
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
@@ -213,11 +230,7 @@
     window.abrirBloqueo = () => document.getElementById('modalBloqueo').classList.remove('hidden');
     window.cerrarBloqueo = () => document.getElementById('modalBloqueo').classList.add('hidden');
 
-    document.getElementById('doctorSelect').onchange = (e) => {
-        doctorActual = e.target.value;
-        if (calendar) calendar.refetchEvents();
-    };
-
+    // 🚦 INICIO DE OPERACIONES
     cargarDoctores();
 </script>
 </body>
