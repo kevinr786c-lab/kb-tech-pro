@@ -1,250 +1,263 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>K.B SYSTEM | CONTROL ELITE 📡</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.B SYSTEM | CONTROL MAESTRO ✦</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-:root { --main:#6366f1; }
-
-body{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    background:#f1f5f9;
-    color:#1e293b;
-}
-
-.glass{
-    background:rgba(255,255,255,.9);
-    backdrop-filter:blur(18px);
-    border-radius:2rem;
-    border:1px solid rgba(0,0,0,.05);
-}
-
-.input{
-    background:#f8fafc;
-    padding:1rem;
-    border-radius:1.25rem;
-    width:100%;
-    font-weight:600;
-    border:2px solid transparent;
-}
-.input:focus{
-    outline:none;
-    border-color:var(--main);
-    background:white;
-}
-
-.fc-event{
-    border:none!important;
-    border-radius:10px!important;
-    padding:4px;
-    font-size:.75rem;
-    cursor:pointer;
-}
-</style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
+        :root { --main: #6366f1; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; }
+        
+        .glass { background: rgba(255,255,255,0.9); backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.5); }
+        .input-kb { background: #f8fafc; border: 2px solid transparent; border-radius: 1.25rem; padding: 1rem; font-weight: 600; font-size: 0.8rem; transition: 0.3s; width: 100%; }
+        .input-kb:focus { border-color: var(--main); background: white; outline: none; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1); }
+        
+        /* Modales */
+        .modal-overlay { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); }
+        .fc-event { cursor: pointer; border: none !important; padding: 4px; border-radius: 8px !important; }
+    </style>
 </head>
+<body class="p-4 md:p-6">
 
-<body class="p-6">
-
-<!-- HEADER -->
-<header class="max-w-[1600px] mx-auto mb-6 flex justify-between items-center bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl">
+<header class="max-w-[1600px] mx-auto mb-8 flex justify-between items-center bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl">
     <div>
-        <h1 class="text-4xl font-black italic">K.B <span class="text-indigo-400">COMMAND</span> ✦</h1>
-        <p class="text-[10px] uppercase tracking-[.4em] opacity-50">Control de Citas Profesionales</p>
+        <h1 class="text-3xl font-black italic tracking-tighter">K.B <span class="text-indigo-400">CONTROL</span> ✦</h1>
+        <p class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50 italic">Sincronización de Nodo Maestro Activa</p>
     </div>
-
-    <div class="flex items-center gap-4">
-        <select id="filtroDoctor" class="bg-indigo-600 px-4 py-2 rounded-xl text-xs font-black uppercase"></select>
-    </div>
+    <select id="filtroDoctor" class="bg-indigo-600 px-6 py-3 rounded-2xl font-bold text-xs outline-none cursor-pointer border-none uppercase">
+        <option value="all">TODOS LOS DOCTORES</option>
+    </select>
 </header>
 
 <main class="max-w-[1600px] mx-auto grid grid-cols-12 gap-8">
+    
+    <aside class="col-span-12 lg:col-span-3 space-y-6">
+        <div class="glass p-8 shadow-xl">
+            <h3 class="text-[10px] font-black uppercase text-indigo-600 mb-6 tracking-widest italic">Inyectar Cita</h3>
+            <div class="space-y-4">
+                <input id="tel" class="input-kb" placeholder="Teléfono (10 dígitos)" maxlength="10">
+                <input id="nom" class="input-kb" placeholder="Nombre del Paciente">
+                <select id="doc" class="input-kb"></select>
+                <select id="ser" class="input-kb"></select>
+                <input type="time" id="hor" class="input-kb">
+                <button id="btnAgendar" class="w-full bg-slate-900 text-white p-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all shadow-lg active:scale-95">Agendar Misión 📡</button>
+            </div>
+        </div>
 
-<!-- FORM -->
-<aside class="col-span-12 lg:col-span-3 space-y-6">
-<div class="glass p-8 shadow-xl">
-<h3 class="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-6">Nueva Cita</h3>
+        <div id="panelAcciones" class="glass p-8 hidden border-2 border-indigo-100 shadow-2xl">
+            <h3 class="text-[10px] font-black uppercase mb-4 text-slate-400">Control de Cita</h3>
+            <div id="btnsAccion" class="flex flex-col gap-3"></div>
+        </div>
+    </aside>
 
-<input id="tel" class="input mb-3" placeholder="Teléfono">
-<input id="nom" class="input mb-3" placeholder="Paciente">
-
-<select id="doc" class="input mb-3"></select>
-<select id="ser" class="input mb-3"></select>
-
-<input type="time" id="hor" class="input mb-4">
-
-<button id="btnAgendar"
-class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black uppercase text-xs hover:bg-indigo-700">
-Agendar 📡
-</button>
-</div>
-
-<div id="panel" class="glass p-6 hidden shadow-xl">
-<h4 class="text-xs font-black uppercase mb-4">Acciones</h4>
-<div id="panelBtns" class="space-y-2"></div>
-</div>
-</aside>
-
-<!-- CALENDAR -->
-<section class="col-span-12 lg:col-span-9 glass p-6 shadow-xl min-h-[800px]">
-<div id="calendar"></div>
-</section>
-
+    <section class="col-span-12 lg:col-span-9 glass p-6 shadow-xl min-h-[750px]">
+        <div id="calendar"></div>
+    </section>
 </main>
+
+<div id="modalCobro" class="modal-overlay fixed inset-0 z-[999] hidden flex items-center justify-center p-4">
+    <div class="glass max-w-md w-full p-10 shadow-2xl bg-white">
+        <h2 class="text-2xl font-black italic mb-2 uppercase tracking-tighter">Cierre de <span class="text-indigo-600">Caja</span></h2>
+        <p id="infoPago" class="text-xs font-bold text-slate-400 mb-8 uppercase"></p>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="text-[10px] font-black uppercase ml-2">Monto a Cobrar</label>
+                <input id="montoPago" type="number" class="input-kb text-2xl font-black text-indigo-600" step="0.01">
+            </div>
+            
+            <div>
+                <label class="text-[10px] font-black uppercase ml-2">Método de Pago</label>
+                <select id="metodoPago" class="input-kb font-bold">
+                    <option value="Efectivo">Efectivo 💵</option>
+                    <option value="Tarjeta">Tarjeta 💳</option>
+                    <option value="Transferencia">Transferencia 🏦</option>
+                </select>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button onclick="cerrarModalCobro()" class="flex-1 p-4 rounded-2xl font-bold text-xs uppercase bg-slate-100 text-slate-400">Cancelar</button>
+                <button id="btnConfirmarPago" class="flex-1 p-4 rounded-2xl font-black text-xs uppercase bg-emerald-500 text-white shadow-lg shadow-emerald-200">Registrar Pago 💰</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-/* =======================
-   SUPABASE
-======================= */
-const supabase = createClient(
- 'https://ctvqjnckxmqeejbfwmkj.supabase.co',
- 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w'
-);
+// 1. CONEXIÓN AL BÚNKER
+const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-/* =======================
-   DB
-======================= */
+let calendar, citaActiva = null;
+
+/* ===========================
+    MOTOR DE DATOS (DB)
+   =========================== */
 const db = {
-    pacientes: tel =>
-        supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle(),
-
-    crearPaciente:(n,t)=>
-        supabase.from('Pacientes').insert({nombre:n,telefono:t}).select().single(),
-
-    doctores:()=>
-        supabase.from('Perfiles_Medicos').select('id,especialidad,Usuarios(nombre)'),
-
-    servicios:id=>
-        supabase.from('Servicios').select('*').eq('doctor_id',id).eq('activo',true),
-
-    citas:(doc)=>
-        supabase.from('Citas')
-        .select('*,Pacientes(nombre,telefono),Servicios(nombre)')
-        .eq(doc?'doctor_id':'id',doc||1),
-
-    mover:(id,f,h)=>
-        supabase.from('Citas').update({fecha:f,hora_inicio:h}).eq('id',id),
-
-    estado:(id,e)=>
-        supabase.from('Citas').update({estado:e}).eq('id',id)
-};
-
-/* =======================
-   CALENDAR
-======================= */
-let calendar, selectedId=null;
-
-function color(e){
-    return {pendiente:'#f59e0b',atendiendo:'#6366f1',completado:'#10b981'}[e]||'#94a3b8';
-}
-
-function initCalendar(){
-calendar = new FullCalendar.Calendar(calendarEl,{
-    locale:'es',
-    initialView:'timeGridDay',
-    editable:true,
-    slotMinTime:'07:00',
-    slotMaxTime:'21:00',
-    headerToolbar:{left:'prev,next today',center:'title',right:'timeGridDay,timeGridWeek'},
-
-    events:async(_,ok)=>{
-        const {data}=await db.citas(filtroDoctor.value);
-        ok(data.map(c=>({
-            id:c.id,
-            title:`${c.Pacientes.nombre} — ${c.Servicios.nombre}`,
-            start:`${c.fecha}T${c.hora_inicio}`,
-            end:new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime()+c.duracion_total*60000),
-            backgroundColor:color(c.estado),
-            extendedProps:{tel:c.Pacientes.telefono}
-        })));
+    async asegurarPaciente(tel, nom) {
+        let { data } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
+        if (!data) data = (await supabase.from('Pacientes').insert({ nombre: nom, telefono: tel }).select().single()).data;
+        return data;
     },
-
-    eventDrop:async i=>{
-        await db.mover(i.event.id,i.event.startStr.slice(0,10),i.event.startStr.slice(11,16));
+    async obtenerDoctores() {
+        return (await supabase.from('Perfiles_Medicos').select('id, Usuarios(nombre), especialidad')).data;
     },
-
-    eventClick:i=>{
-        selectedId=i.event.id;
-        abrirPanel(i.event);
+    async obtenerServicios(docId) {
+        return (await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true)).data;
+    },
+    async registrarCita(data) {
+        return await supabase.from('Citas').insert(data);
+    },
+    async actualizarEstado(id, estado) {
+        return await supabase.from('Citas').update({ estado }).eq('id', id);
+    },
+    async registrarPago(pago) {
+        // Guardar en tabla Pagos y actualizar tabla Citas como pagado
+        await supabase.from('Pagos').insert(pago);
+        await supabase.from('Citas').update({ pagado: true, estado: 'completado' }).eq('id', pago.cita_id);
     }
-});
-calendar.render();
-}
-
-/* =======================
-   UI
-======================= */
-async function initUI(){
-const {data}=await db.doctores();
-doc.innerHTML=data.map(d=>`<option value="${d.id}">${d.Usuarios.nombre}</option>`).join('');
-filtroDoctor.innerHTML=`<option value="">Todos</option>`+doc.innerHTML;
-
-doc.onchange=()=>loadServicios(doc.value);
-filtroDoctor.onchange=()=>calendar.refetchEvents();
-await loadServicios(doc.value);
-
-tel.oninput=async()=>{
-if(tel.value.length===10){
-const {data:p}=await db.pacientes(tel.value);
-if(p){nom.value=p.nombre;nom.classList.add('bg-green-50')}
-}else nom.classList.remove('bg-green-50');
 };
 
-btnAgendar.onclick=agendar;
+/* ===========================
+    CALENDARIO TÁCTICO
+   =========================== */
+function initCalendar() {
+    calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        locale: 'es',
+        initialView: 'timeGridDay',
+        slotMinTime: '07:00',
+        slotMaxTime: '21:00',
+        editable: true,
+        nowIndicator: true,
+        allDaySlot: false,
+        events: async (info, success) => {
+            let q = supabase.from('Citas').select('*, Pacientes(nombre, telefono), Servicios(nombre, precio)');
+            if(filtroDoctor.value !== 'all') q = q.eq('doctor_id', filtroDoctor.value);
+            const { data } = await q;
+            
+            success(data.map(c => ({
+                id: c.id,
+                title: `${c.Pacientes.nombre} — ${c.Servicios.nombre}`,
+                start: `${c.fecha}T${c.hora_inicio}`,
+                end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + c.duracion_total * 60000),
+                backgroundColor: colorEstado(c.estado),
+                extendedProps: c
+            })));
+        },
+        eventClick: (info) => {
+            citaActiva = info.event.extendedProps;
+            mostrarPanelAcciones(citaActiva);
+        }
+    });
+    calendar.render();
 }
 
-async function loadServicios(id){
-const {data}=await db.servicios(id);
-ser.innerHTML=data.map(s=>`<option value="${s.id}" data-d="${s.duracion_total}">${s.nombre}</option>`).join('');
+function colorEstado(e) {
+    return { 'pendiente': '#f59e0b', 'atendiendo': '#6366f1', 'completado': '#10b981', 'cancelado': '#ef4444' }[e] || '#94a3b8';
 }
 
-async function agendar(){
-if(!tel.value||!nom.value||!hor.value)return alert('Datos incompletos');
+/* ===========================
+    INTERFAZ DE USUARIO (UI)
+   =========================== */
+async function initUI() {
+    const docs = await db.obtenerDoctores();
+    doc.innerHTML = docs.map(d => `<option value="${d.id}">${d.Usuarios.nombre} (${d.especialidad})</option>`).join('');
+    filtroDoctor.innerHTML += doc.innerHTML;
 
-let {data:p}=await db.pacientes(tel.value);
-if(!p)p=(await db.crearPaciente(nom.value,tel.value)).data;
+    doc.onchange = () => cargarServicios(doc.value);
+    filtroDoctor.onchange = () => calendar.refetchEvents();
+    
+    await cargarServicios(docs[0].id);
 
-await supabase.from('Citas').insert({
-doctor_id:doc.value,
-paciente_id:p.id,
-servicio_id:ser.value,
-fecha:calendar.getDate().toISOString().slice(0,10),
-hora_inicio:hor.value,
-duracion_total:+ser.selectedOptions[0].dataset.d,
-estado:'pendiente'
-});
+    // EFECTO MEMORIA
+    tel.oninput = async () => {
+        if (tel.value.length === 10) {
+            const { data } = await supabase.from('Pacientes').select('nombre').eq('telefono', tel.value).maybeSingle();
+            if (data) { nom.value = data.nombre; nom.classList.add('bg-green-50'); }
+        } else { nom.classList.remove('bg-green-50'); }
+    };
 
-calendar.refetchEvents();
+    btnAgendar.onclick = async () => {
+        if(!tel.value || !nom.value || !hor.value) return alert("⚠️ Faltan datos críticos");
+        const paciente = await db.asegurarPaciente(tel.value, nom.value);
+        const serv = ser.selectedOptions[0];
+        
+        await db.registrarCita({
+            doctor_id: doc.value,
+            paciente_id: paciente.id,
+            servicio_id: ser.value,
+            fecha: calendar.getDate().toISOString().slice(0, 10),
+            hora_inicio: hor.value,
+            duracion_total: Number(serv.dataset.d),
+            monto: Number(serv.dataset.p),
+            estado: 'pendiente'
+        });
+        
+        calendar.refetchEvents();
+        alert("✅ CITA REGISTRADA");
+    };
 }
 
-function abrirPanel(e){
-panel.classList.remove('hidden');
-panelBtns.innerHTML=`
-<button onclick="setEstado('atendiendo')" class="w-full bg-indigo-600 text-white p-3 rounded-xl text-xs font-black">Llegó</button>
-<button onclick="setEstado('completado')" class="w-full bg-emerald-500 text-white p-3 rounded-xl text-xs font-black">Finalizar</button>
-`;
+async function cargarServicios(docId) {
+    const servs = await db.obtenerServicios(docId);
+    ser.innerHTML = servs.map(s => `<option value="${s.id}" data-d="${s.duracion_total}" data-p="${s.precio}">${s.nombre} ($${s.precio})</option>`).join('');
 }
 
-window.setEstado=async e=>{
-await db.estado(selectedId,e);
-calendar.refetchEvents();
-panel.classList.add('hidden');
+function mostrarPanelAcciones(c) {
+    panelAcciones.classList.remove('hidden');
+    btnsAccion.innerHTML = `
+        <button onclick="updateStatus('atendiendo')" class="bg-indigo-600 text-white p-4 rounded-2xl text-[10px] font-black uppercase hover:bg-indigo-700">Marcar Llegada ⚡</button>
+        <button onclick="abrirModalCobro()" class="bg-emerald-500 text-white p-4 rounded-2xl text-[10px] font-black uppercase hover:bg-emerald-600">Finalizar y Cobrar 💰</button>
+        <button onclick="abrirWA('${c.Pacientes.telefono}')" class="bg-green-500 text-white p-4 rounded-2xl text-[10px] font-black uppercase hover:bg-green-600">WhatsApp 📱</button>
+    `;
+}
+
+window.updateStatus = async (st) => {
+    await db.actualizarEstado(citaActiva.id, st);
+    calendar.refetchEvents();
+    panelAcciones.classList.add('hidden');
 };
 
-/* =======================
-   INIT
-======================= */
-const calendarEl=document.getElementById('calendar');
+/* ===========================
+    LÓGICA DE COBRO (MODAL)
+   =========================== */
+window.abrirModalCobro = () => {
+    modalCobro.classList.remove('hidden');
+    infoPago.innerText = `Paciente: ${citaActiva.Pacientes.nombre} | Servicio: ${citaActiva.Servicios.nombre}`;
+    montoPago.value = citaActiva.monto || 0;
+};
+
+window.cerrarModalCobro = () => modalCobro.classList.add('hidden');
+
+btnConfirmarPago.onclick = async () => {
+    btnConfirmarPago.disabled = true;
+    try {
+        await db.registrarPago({
+            cita_id: citaActiva.id,
+            monto: Number(montoPago.value),
+            metodo: metodoPago.value
+        });
+        alert("✅ PAGO REGISTRADO Y CITA FINALIZADA");
+        cerrarModalCobro();
+        panelAcciones.classList.add('hidden');
+        calendar.refetchEvents();
+    } catch (e) { alert(e.message); }
+    finally { btnConfirmarPago.disabled = false; }
+};
+
+window.abrirWA = (t) => window.open(`https://wa.me/52${t}?text=Hola, recordatorio de tu cita en K.B Tech Solution.`, '_blank');
+
+// INIT
 initCalendar();
 initUI();
 </script>
+
 </body>
 </html>
