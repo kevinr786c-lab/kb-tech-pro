@@ -101,38 +101,21 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    // ⚡ CARGA DE DOCTORES (CON TU LÓGICA MAESTRA)
     async function cargarDoctores() {
-        const { data, error } = await supabase
-            .from('Usuarios')
-            .select('id, nombre')
-            .eq('rol', 'doctor');
-
-        if (error) {
-            console.error("Falla en el búnker:", error);
-            return;
-        }
-
+        const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
+        if (error) return console.error("Error en búnker:", error);
         const select = document.getElementById('doctorSelect');
-
-        // 🛡️ Menú por defecto: Evita arranques accidentales
         select.innerHTML = '<option value="">SELECCIONA DOCTOR</option>' + 
             data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
 
-        // 🚥 Control de flujo reactivo
         select.onchange = () => {
             doctorActual = select.value;
-            if (doctorActual === "") return; // Protección absoluta
-
-            if (!calendar) {
-                initCalendar(); // Encendido inicial del radar
-            } else {
-                calendar.refetchEvents(); // Recalibración de datos
-            }
+            if (doctorActual === "") return;
+            if (!calendar) initCalendar();
+            else calendar.refetchEvents();
         };
     }
 
-    // ESCANEO DE CITAS
     async function cargarCitas(info, success, failure) {
         if (!doctorActual) return success([]);
         try {
@@ -154,18 +137,12 @@
         } catch (err) { failure(err); }
     }
 
-    // MOTOR DEL CALENDARIO
     function initCalendar() {
         const calendarEl = document.getElementById('calendar');
         if (calendar) calendar.destroy();
         calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'es', 
-            initialView: 'timeGridWeek', 
-            allDaySlot: false,
-            slotMinTime: '08:00', 
-            slotMaxTime: '20:00', 
-            editable: true, 
-            selectable: true,
+            locale: 'es', initialView: 'timeGridWeek', allDaySlot: false,
+            slotMinTime: '08:00', slotMaxTime: '20:00', editable: true, selectable: true,
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
             events: cargarCitas,
             eventContent: (arg) => ({
@@ -180,38 +157,47 @@
                     fecha: info.event.startStr.slice(0,10),
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
-                if(error) {
-                    console.error("Error al mover:", error);
-                    info.revert();
-                }
+                if(error) { console.error("Error al mover:", error); info.revert(); }
             }
         });
         calendar.render();
     }
 
-    // FUNCIONES OPERATIVAS
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
         document.getElementById('c-telefono').value = c.Pacientes?.telefono || '---';
         document.getElementById('c-fecha').value = c.fecha;
-        document.getElementById('c-hora').value = c.hora_inicio;
+        // Limpiamos la hora para el input time (asegura formato HH:mm)
+        document.getElementById('c-hora').value = c.hora_inicio.slice(0, 5);
         document.getElementById('c-estado').value = c.estado;
         document.getElementById('c-notas').value = c.notas || '';
         document.getElementById('modalCita').classList.remove('hidden');
     };
 
+    // ⚡ CIRUGÍA: Función de guardado con limpieza de datos
     window.guardarCita = async () => {
+        if (!citaActual || !citaActual.id) return;
+
         const data = {
             fecha: document.getElementById('c-fecha').value,
-            hora_inicio: document.getElementById('c-hora').value,
+            hora_inicio: document.getElementById('c-hora').value, // El input time ya da formato 24h
             estado: document.getElementById('c-estado').value,
             notas: document.getElementById('c-notas').value
         };
-        const { error } = await supabase.from('Citas').update(data).eq('id', citaActual.id);
+
+        const { error } = await supabase
+            .from('Citas')
+            .update(data)
+            .eq('id', citaActual.id);
+
         if (!error) {
+            console.log("✅ Radar Sincronizado");
             calendar.refetchEvents();
             cerrarModal();
+        } else {
+            console.error("❌ Error en cirugía:", error.message);
+            alert("Error al actualizar: " + error.message);
         }
     };
 
@@ -223,17 +209,13 @@
             hora_fin: document.getElementById('b-fin').value,
             motivo: document.getElementById('b-motivo').value.toUpperCase()
         });
-        if (!error) {
-            calendar.refetchEvents();
-            cerrarBloqueo();
-        }
+        if (!error) { calendar.refetchEvents(); cerrarBloqueo(); }
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
     window.abrirBloqueo = () => document.getElementById('modalBloqueo').classList.remove('hidden');
     window.cerrarBloqueo = () => document.getElementById('modalBloqueo').classList.add('hidden');
 
-    // 🏁 INICIO DE OPERACIONES
     cargarDoctores();
 </script>
 </body>
