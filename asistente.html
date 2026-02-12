@@ -101,7 +101,6 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    // 1. CARGA DE IDENTIDADES (DOCTORES)
     async function cargarDoctores() {
         const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
         if (error) return console.error("Error en búnker:", error);
@@ -110,20 +109,17 @@
         if (data && data.length > 0) {
             select.innerHTML = data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
             doctorActual = select.value;
-            initCalendar(); // Encendido secuencial
+            initCalendar();
+        } else {
+            select.innerHTML = '<option value="">SIN DOCTORES ACTIVOS</option>';
         }
     }
 
-    // 2. ESCANEO DE CITAS RELACIONALES
     async function cargarCitas(info, success, failure) {
-        if (!doctorActual) return success([]);
+        if (!doctorActual || doctorActual === "") return success([]);
         try {
             const { data, error } = await supabase.from('Citas')
-                .select(`
-                    *,
-                    Pacientes!fk_citas_pacientes_maestra(nombre, telefono),
-                    Servicios(nombre)
-                `)
+                .select('*, Pacientes!fk_citas_pacientes_maestra(nombre, telefono), Servicios(nombre)')
                 .eq('doctor_id', doctorActual)
                 .neq('estado', 'cancelado');
             
@@ -140,7 +136,6 @@
         } catch (err) { failure(err); }
     }
 
-    // 3. INICIALIZACIÓN DEL MAPA VISUAL
     function initCalendar() {
         const calendarEl = document.getElementById('calendar');
         if (calendar) calendar.destroy();
@@ -166,13 +161,15 @@
                     fecha: info.event.startStr.slice(0,10),
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
-                if(error) info.revert();
+                if(error) {
+                    console.error("Error al mover:", error);
+                    info.revert();
+                }
             }
         });
         calendar.render();
     }
 
-    // 4. GESTIÓN OPERATIVA
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
@@ -191,21 +188,25 @@
             estado: document.getElementById('c-estado').value,
             notas: document.getElementById('c-notas').value
         };
-        await supabase.from('Citas').update(data).eq('id', citaActual.id);
-        calendar.refetchEvents();
-        cerrarModal();
+        const { error } = await supabase.from('Citas').update(data).eq('id', citaActual.id);
+        if (!error) {
+            calendar.refetchEvents();
+            cerrarModal();
+        }
     };
 
     window.guardarBloqueo = async () => {
-        await supabase.from('Bloqueos').insert({
+        const { error } = await supabase.from('Bloqueos').insert({
             doctor_id: doctorActual,
             fecha: document.getElementById('b-fecha').value,
             hora_inicio: document.getElementById('b-inicio').value,
             hora_fin: document.getElementById('b-fin').value,
             motivo: document.getElementById('b-motivo').value.toUpperCase()
         });
-        calendar.refetchEvents();
-        cerrarBloqueo();
+        if (!error) {
+            calendar.refetchEvents();
+            cerrarBloqueo();
+        }
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
@@ -214,10 +215,9 @@
 
     document.getElementById('doctorSelect').onchange = (e) => {
         doctorActual = e.target.value;
-        calendar.refetchEvents();
+        if (calendar) calendar.refetchEvents();
     };
 
-    // 🚦 INICIO DE OPERACIONES
     cargarDoctores();
 </script>
 </body>
