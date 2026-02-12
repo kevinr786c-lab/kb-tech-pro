@@ -1,225 +1,223 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONFIGURACIÓN | K.B TECH PRO ✦</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-body { font-family: 'Plus Jakarta Sans', sans-serif; background:#020617; color:white; }
-.glass { background:rgba(255,255,255,0.02); backdrop-filter:blur(25px); border:1px solid rgba(255,255,255,0.08); border-radius:2rem; }
-.input-kb { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:1rem; padding:0.75rem; font-weight:700; color:white; width:100%; }
-.input-kb:focus { border-color:#6366f1; outline:none; background:rgba(255,255,255,0.1); }
-.btn-action { transition:0.3s; font-weight:800; border-radius:1.25rem; }
-.btn-action:hover { transform:translateY(-2px); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONFIGURACIÓN | K.B TECH PRO ✦</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background:#020617; color:white; overflow-x: hidden; }
+        .glass { background:rgba(255,255,255,0.02); backdrop-filter:blur(25px); border:1px solid rgba(255,255,255,0.08); border-radius:2.5rem; }
+        .input-kb { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:1rem; padding:0.75rem; font-weight:700; color:white; width:100%; transition: 0.3s; }
+        .input-kb:focus { border-color:#6366f1; outline:none; background:rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+        .btn-action { transition:0.3s; font-weight:800; border-radius:1.25rem; letter-spacing: 1px; }
+        .btn-action:hover { transform:translateY(-2px); filter: brightness(1.2); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
 </head>
 
-<body class="p-6 min-h-screen flex justify-center">
+<body class="p-6 min-h-screen flex flex-col items-center">
 
-<div class="max-w-6xl w-full glass p-10">
+    <div class="max-w-6xl w-full glass p-10 relative">
+        
+        <header class="flex justify-between items-center mb-12 border-b border-white/5 pb-8">
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-indigo-400 italic">
+                    Configuración <span class="text-white">Maestra</span>
+                </h1>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">Panel de Control de Disponibilidad</p>
+            </div>
+            <button onclick="window.location.href='app.html'" class="btn-action bg-white/5 border border-white/10 px-6 py-3 text-[10px] uppercase hover:bg-white/10">
+                ← Volver al Radar
+            </button>
+        </header>
 
-<h1 class="text-3xl font-black mb-10 uppercase tracking-widest text-indigo-400">
-Nodo de Configuración
-</h1>
+        <div id="toast" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[9999] bg-indigo-500 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase shadow-2xl animate-bounce"></div>
 
-<div id="toast" class="hidden fixed top-6 right-6 bg-white text-black px-6 py-3 rounded-xl font-bold text-xs"></div>
+        <div class="grid md:grid-cols-3 gap-12">
 
-<div class="grid md:grid-cols-3 gap-10">
+            <section class="space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-indigo-500 rounded-full"></div>
+                    <h3 class="text-[11px] uppercase font-black text-indigo-400 tracking-widest">Turnos Semanales</h3>
+                </div>
+                <div id="contenedor-semana" class="space-y-3 bg-white/5 p-6 rounded-[2rem] border border-white/5"></div>
+                <button id="btnGuardarSemana" class="btn-action bg-indigo-600 w-full py-4 text-[10px] uppercase shadow-lg shadow-indigo-900/20">
+                    Actualizar Horarios
+                </button>
+            </section>
 
-<!-- HORARIOS -->
-<section>
-<h3 class="text-xs uppercase font-black text-indigo-400 mb-4">Horario Semanal</h3>
-<div id="contenedor-semana" class="space-y-2"></div>
-<button id="btnGuardarSemana" class="btn-action bg-indigo-600 w-full py-3 mt-4 text-xs uppercase">
-Guardar Horarios
-</button>
-</section>
+            <section class="space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-rose-500 rounded-full"></div>
+                    <h3 class="text-[11px] uppercase font-black text-rose-400 tracking-widest">Bloqueos de Fecha</h3>
+                </div>
+                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5 space-y-4">
+                    <input type="date" id="fecha-bloqueo" class="input-kb text-xs">
+                    <input type="text" id="motivo-bloqueo" placeholder="MOTIVO (EJ. CONGRESO)" class="input-kb text-[10px] uppercase">
+                    <button id="btnBloquear" class="btn-action bg-rose-600 w-full py-4 text-[10px] uppercase">
+                        Confirmar Bloqueo
+                    </button>
+                </div>
 
-<!-- BLOQUEOS -->
-<section>
-<h3 class="text-xs uppercase font-black text-rose-400 mb-4">Bloqueos</h3>
-<input type="date" id="fecha-bloqueo" class="input-kb mb-2 text-xs">
-<input type="text" id="motivo-bloqueo" placeholder="Motivo" class="input-kb mb-2 text-xs">
-<button id="btnBloquear" class="btn-action bg-rose-600 w-full py-3 text-xs uppercase">
-Bloquear Día
-</button>
+                <div id="lista-bloqueos" class="space-y-2 max-h-52 overflow-y-auto pr-2"></div>
+            </section>
 
-<div id="lista-bloqueos" class="mt-6 space-y-2 max-h-52 overflow-y-auto"></div>
-</section>
+            <section class="space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-amber-500 rounded-full"></div>
+                    <h3 class="text-[11px] uppercase font-black text-amber-400 tracking-widest">Catálogo de Servicios</h3>
+                </div>
+                <div id="lista-servicios" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
+                <div class="flex flex-col gap-2 pt-2">
+                    <button id="btnAddSrv" class="btn-action bg-white/5 border border-amber-500/30 w-full py-3 text-[9px] uppercase hover:bg-amber-500/10">
+                        + Agregar Servicio
+                    </button>
+                    <button id="btnGuardarSrv" class="btn-action bg-amber-600 w-full py-4 text-[10px] uppercase shadow-lg shadow-amber-900/20">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </section>
 
-<!-- SERVICIOS -->
-<section>
-<h3 class="text-xs uppercase font-black text-amber-400 mb-4">Servicios</h3>
-<div id="lista-servicios" class="space-y-4 max-h-80 overflow-y-auto"></div>
-<button id="btnAddSrv" class="btn-action bg-amber-500 w-full py-2 text-xs uppercase mt-2">
-+ Nuevo Servicio
-</button>
-<button id="btnGuardarSrv" class="btn-action bg-amber-600 w-full py-3 text-xs uppercase mt-4">
-Guardar Servicios
-</button>
-</section>
-
-</div>
-</div>
+        </div>
+    </div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(
-'https://ctvqjnckxmqeejbfwmkj.supabase.co',
-'sb_publishable__TU_PUBLIC_KEY_AQUI'
-);
+    const supabase = createClient(
+        'https://ctvqjnckxmqeejbfwmkj.supabase.co',
+        'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w'
+    );
 
-const docId = localStorage.getItem('user_id');
+    // ID MAESTRO FIJO PARA LA MISIÓN
+    const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
-if(!docId){
-    window.location.href = 'index.html';
-}
+    function toast(msg){
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.classList.remove('hidden');
+        setTimeout(()=>t.classList.add('hidden'),3000);
+    }
 
-function toast(msg){
-    const t = document.getElementById('toast');
-    t.innerText = msg;
-    t.classList.remove('hidden');
-    setTimeout(()=>t.classList.add('hidden'),3000);
-}
+    // --- LOGICA DE HORARIOS ---
+    async function cargarSemana(){
+        const { data } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId);
+        const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+        
+        document.getElementById('contenedor-semana').innerHTML = dias.map((d,i)=>{
+            const conf = data?.find(h=>h.dia_semana===i+1) || {activo:false,hora_inicio:"09:00:00",hora_fin:"17:00:00"};
+            return `
+            <div class="flex items-center justify-between gap-2 text-[10px] font-bold">
+                <div class="flex items-center gap-2 w-24">
+                    <input type="checkbox" class="chk w-4 h-4 rounded border-white/10 bg-black text-indigo-500" ${conf.activo?'checked':''} data-dia="${i+1}">
+                    <span class="${conf.activo?'text-white':'text-slate-600'}">${d}</span>
+                </div>
+                <input type="time" value="${conf.hora_inicio.slice(0,5)}" class="ini bg-black/40 border border-white/5 rounded-lg px-2 py-1 outline-none focus:border-indigo-500">
+                <input type="time" value="${conf.hora_fin.slice(0,5)}" class="fin bg-black/40 border border-white/5 rounded-lg px-2 py-1 outline-none focus:border-indigo-500">
+            </div>`;
+        }).join('');
+    }
 
-//////////////////////////
-// HORARIOS
-//////////////////////////
+    document.getElementById('btnGuardarSemana').onclick = async ()=>{
+        const filas = document.querySelectorAll('#contenedor-semana > div');
+        for(const f of filas){
+            const chk = f.querySelector('.chk');
+            await supabase.from('Horarios_Doctor').upsert({
+                doctor_id: docId,
+                dia_semana: parseInt(chk.dataset.dia),
+                hora_inicio: f.querySelector('.ini').value + ":00",
+                hora_fin: f.querySelector('.fin').value + ":00",
+                activo: chk.checked
+            }, { onConflict: 'doctor_id,dia_semana' });
+        }
+        toast("SINCRO EXITOSA: HORARIOS");
+        cargarSemana();
+    };
 
-async function cargarSemana(){
-    const { data } = await supabase
-        .from('Horarios_Doctor')
-        .select('*')
-        .eq('doctor_id', docId);
+    // --- LOGICA DE BLOQUEOS ---
+    async function cargarBloqueos(){
+        const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id',docId).gte('fecha',new Date().toISOString().slice(0,10)).order('fecha');
+        document.getElementById('lista-bloqueos').innerHTML = data?.map(b=>`
+        <div class="flex justify-between items-center text-[9px] bg-white/5 p-3 rounded-xl border border-white/5 font-bold uppercase">
+            <span class="text-rose-400">${b.fecha}</span>
+            <span class="text-slate-500 italic">${b.motivo}</span>
+            <button onclick="borrarBloqueo('${b.id}')" class="text-white hover:text-rose-500 transition">✕</button>
+        </div>`).join('') || '';
+    }
 
-    const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-
-    document.getElementById('contenedor-semana').innerHTML =
-    dias.map((d,i)=>{
-        const conf = data?.find(h=>h.dia_semana===i+1) || {activo:false,hora_inicio:"09:00",hora_fin:"17:00"};
-        return `
-        <div class="flex items-center gap-3 text-xs">
-            <input type="checkbox" class="chk" ${conf.activo?'checked':''} data-dia="${i+1}">
-            <span class="w-20">${d}</span>
-            <input type="time" value="${conf.hora_inicio.slice(0,5)}" class="ini bg-black px-2">
-            <input type="time" value="${conf.hora_fin.slice(0,5)}" class="fin bg-black px-2">
-        </div>`;
-    }).join('');
-}
-
-document.getElementById('btnGuardarSemana').onclick = async ()=>{
-    const filas = document.querySelectorAll('#contenedor-semana > div');
-    for(const f of filas){
-        await supabase.from('Horarios_Doctor').upsert({
+    document.getElementById('btnBloquear').onclick = async ()=>{
+        const fecha = document.getElementById('fecha-bloqueo').value;
+        if(!fecha) return toast("ERROR: SELECCIONE FECHA");
+        await supabase.from('Bloqueos').insert({
             doctor_id: docId,
-            dia_semana: parseInt(f.querySelector('.chk').dataset.dia),
-            hora_inicio: f.querySelector('.ini').value+":00",
-            hora_fin: f.querySelector('.fin').value+":00",
-            activo: f.querySelector('.chk').checked
-        },{ onConflict:'doctor_id,dia_semana' });
-    }
-    toast("Horario actualizado");
-};
+            fecha,
+            motivo: document.getElementById('motivo-bloqueo').value.toUpperCase() || "BLOQUEO"
+        });
+        document.getElementById('fecha-bloqueo').value = '';
+        document.getElementById('motivo-bloqueo').value = '';
+        cargarBloqueos();
+        toast("BÚNKER CERRADO PARA ESA FECHA");
+    };
 
-//////////////////////////
-// BLOQUEOS
-//////////////////////////
+    window.borrarBloqueo = async (id)=>{
+        await supabase.from('Bloqueos').delete().eq('id',id);
+        cargarBloqueos();
+    };
 
-async function cargarBloqueos(){
-    const { data } = await supabase
-        .from('Bloqueos')
-        .select('*')
-        .eq('doctor_id',docId)
-        .gte('fecha',new Date().toISOString().slice(0,10))
-        .order('fecha');
-
-    document.getElementById('lista-bloqueos').innerHTML =
-    data?.map(b=>`
-    <div class="flex justify-between text-xs bg-white/5 p-2 rounded">
-        <span>${b.fecha}</span>
-        <button onclick="borrarBloqueo('${b.id}')">X</button>
-    </div>`).join('') || '';
-}
-
-document.getElementById('btnBloquear').onclick = async ()=>{
-    const fecha = document.getElementById('fecha-bloqueo').value;
-    if(!fecha) return toast("Seleccione fecha");
-
-    await supabase.from('Bloqueos').insert({
-        doctor_id: docId,
-        fecha,
-        motivo: document.getElementById('motivo-bloqueo').value || "BLOQUEO"
-    });
-
-    cargarBloqueos();
-    toast("Día bloqueado");
-};
-
-window.borrarBloqueo = async (id)=>{
-    await supabase.from('Bloqueos').delete().eq('id',id);
-    cargarBloqueos();
-};
-
-//////////////////////////
-// SERVICIOS
-//////////////////////////
-
-async function cargarServicios(){
-    const { data } = await supabase
-        .from('Servicios')
-        .select('*')
-        .eq('doctor_id',docId)
-        .eq('activo',true);
-
-    document.getElementById('lista-servicios').innerHTML = '';
-
-    data?.forEach(s=>crearServicio(s));
-}
-
-function crearServicio(s={}){
-    const div=document.createElement('div');
-    div.className="srv bg-white/5 p-4 rounded text-xs";
-    div.dataset.id=s.id||'';
-    div.innerHTML=`
-    <input type="text" placeholder="Nombre" class="nombre w-full mb-2 bg-black px-2" value="${s.nombre||''}">
-    <input type="number" placeholder="Precio" class="precio w-full mb-2 bg-black px-2" value="${s.precio||0}">
-    <input type="number" placeholder="Duración" class="dur w-full mb-2 bg-black px-2" value="${s.duracion_total||30}">
-    <input type="number" placeholder="Buffer" class="buf w-full bg-black px-2" value="${s.buffer_minutos||15}">
-    `;
-    document.getElementById('lista-servicios').appendChild(div);
-}
-
-document.getElementById('btnAddSrv').onclick=()=>crearServicio();
-
-document.getElementById('btnGuardarSrv').onclick=async ()=>{
-    const items=document.querySelectorAll('.srv');
-
-    for(const i of items){
-        const payload={
-            id:i.dataset.id||undefined,
-            doctor_id:docId,
-            nombre:i.querySelector('.nombre').value.toUpperCase(),
-            precio:parseFloat(i.querySelector('.precio').value)||0,
-            duracion_total:parseInt(i.querySelector('.dur').value)||30,
-            buffer_minutos:parseInt(i.querySelector('.buf').value)||15,
-            activo:true
-        };
-
-        await supabase.from('Servicios').upsert(payload);
+    // --- LOGICA DE SERVICIOS ---
+    async function cargarServicios(){
+        const { data } = await supabase.from('Servicios').select('*').eq('doctor_id',docId).eq('activo',true);
+        document.getElementById('lista-servicios').innerHTML = '';
+        data?.forEach(s=>crearServicio(s));
     }
 
-    toast("Servicios actualizados");
+    function crearServicio(s={}){
+        const div=document.createElement('div');
+        div.className="srv bg-white/5 p-5 rounded-[1.5rem] border border-white/5 space-y-3 relative";
+        div.dataset.id=s.id||'';
+        div.innerHTML=`
+            <input type="text" placeholder="NOMBRE SERVICIO" class="nombre w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase text-amber-400" value="${s.nombre||''}">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="text-[8px] text-slate-500 ml-2 font-bold">PRECIO ($)</label>
+                    <input type="number" class="precio w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-bold" value="${s.precio||0}">
+                </div>
+                <div>
+                    <label class="text-[8px] text-slate-500 ml-2 font-bold">MINUTOS</label>
+                    <input type="number" class="dur w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-bold" value="${s.duracion_total||30}">
+                </div>
+            </div>
+        `;
+        document.getElementById('lista-servicios').appendChild(div);
+    }
+
+    document.getElementById('btnAddSrv').onclick=()=>crearServicio();
+
+    document.getElementById('btnGuardarSrv').onclick=async ()=>{
+        const items=document.querySelectorAll('.srv');
+        for(const i of items){
+            const payload={
+                doctor_id:docId,
+                nombre:i.querySelector('.nombre').value.toUpperCase(),
+                precio:parseFloat(i.querySelector('.precio').value)||0,
+                duracion_total:parseInt(i.querySelector('.dur').value)||30,
+                buffer_minutos: 15, // Buffer por defecto
+                activo:true
+            };
+            const id = i.dataset.id;
+            if(id) payload.id = id;
+            await supabase.from('Servicios').upsert(payload);
+        }
+        toast("SERVICIOS SINCRONIZADOS");
+        cargarServicios();
+    };
+
+    cargarSemana();
+    cargarBloqueos();
     cargarServicios();
-};
-
-//////////////////////////
-
-cargarSemana();
-cargarBloqueos();
-cargarServicios();
 
 </script>
 </body>
