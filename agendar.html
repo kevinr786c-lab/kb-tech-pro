@@ -107,12 +107,12 @@ async function init() {
 }
 
 async function cargarServicios(id) {
-    // Sincronizado con Servicios_rows.sql: usamos duracion_total (que ya incluye el buffer)
-    const { data } = await supabase.from('Servicios').select('id, nombre, precio, duracion_total').eq('doctor_id', id).eq('activo', true);
+    // Sincronización Táctica: Obtenemos duracion_min para el motor de citas
+    const { data } = await supabase.from('Servicios').select('id, nombre, precio, duracion_min').eq('doctor_id', id).eq('activo', true);
     const sel = document.getElementById('select-servicios');
     if (data && data.length > 0) {
         sel.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>' + 
-            data.map(s => `<option value="${s.id}" data-duracion="${s.duracion_total}" data-precio="${s.precio}">${s.nombre.toUpperCase()} — $${s.precio}</option>`).join('');
+            data.map(s => `<option value="${s.id}" data-duracion="${s.duracion_min}" data-precio="${s.precio}">${s.nombre.toUpperCase()} — $${s.precio}</option>`).join('');
     }
 }
 
@@ -205,7 +205,7 @@ document.getElementById('form-cita').onsubmit = async (e) => {
 
         const servOpt = document.getElementById('select-servicios').selectedOptions[0];
         
-        // Sincronización de inserción: Usamos duracion_cita como se definió en el búnker
+        // Sincronización Final: Usamos duracion_cita como se definió en el búnker SQL
         const { error } = await supabase.from('Citas').insert({
             doctor_id: docId,
             paciente_id: paciente.id,
