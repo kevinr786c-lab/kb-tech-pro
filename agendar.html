@@ -14,7 +14,6 @@
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        /* Contenedor de scroll para los días */
         .scroll-calendar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .scroll-calendar::-webkit-scrollbar { display: none; }
 
@@ -106,7 +105,8 @@ async function init() {
 }
 
 async function cargarServicios(id) {
-    const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', id).eq('activo', true);
+    // Usamos la columna generada duracion_total de tu tabla
+    const { data } = await supabase.from('Servicios').select('id, nombre, precio, duracion_total').eq('doctor_id', id).eq('activo', true);
     const sel = document.getElementById('select-servicios');
     if (data && data.length > 0) {
         sel.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>' + 
@@ -120,10 +120,8 @@ function renderCalendar() {
     const container = document.getElementById('date-slider');
     container.innerHTML = "";
     const now = new Date();
-    
     document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long', year:'numeric'});
 
-    // Generamos 30 días (Mes completo de visibilidad)
     for(let i=0; i<30; i++) {
         const d = new Date();
         d.setDate(now.getDate() + i);
@@ -142,10 +140,7 @@ function renderCalendar() {
             document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             document.getElementById('fecha-sel').value = iso;
-            
-            // Actualizar encabezado de mes dinámicamente
             document.getElementById('current-month').innerText = d.toLocaleString('es-mx', {month:'long', year:'numeric'});
-            
             cargarHorasDisponibles(iso);
         };
         container.appendChild(card);
@@ -210,6 +205,7 @@ document.getElementById('form-cita').onsubmit = async (e) => {
 
         const servOpt = document.getElementById('select-servicios').selectedOptions[0];
         
+        // Cirugía en el Insert: Sincronizado con tabla Citas
         const { error } = await supabase.from('Citas').insert({
             doctor_id: docId,
             paciente_id: paciente.id,
@@ -227,7 +223,7 @@ document.getElementById('form-cita').onsubmit = async (e) => {
         } else { throw error; }
     } catch (err) {
         console.error(err);
-        eliteAviso("❌ ERROR EN EL BÚNKER");
+        eliteAviso("❌ ERROR EN EL BÚNKER: " + (err.message || 'FALLA COLUMNA'));
         btn.disabled = false;
         btn.innerText = "Confirmar Reservación ✦";
     }
