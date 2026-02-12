@@ -3,208 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RESERVACIÓN ÉLITE | K.B TECH PRO ✦</title>
+    <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;500;800&display=swap');
-        :root { --main: #c5a059; } 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; color: #0f172a; }
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.05); }
-        .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; }
-        .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
-        .scroll-calendar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
-        .scroll-calendar::-webkit-scrollbar { display: none; }
-        .date-card { min-width: 65px; aspect-ratio: 1/1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; cursor: pointer; transition: 0.3s; }
-        .date-card.selected { background: var(--main); color: white; transform: scale(1.05); }
-        .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
-        .time-pill.selected { background: var(--main); color: white; }
-        .btn-lujo { width: 100%; border-radius: 1.5rem; background: #0f172a; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
-        .btn-lujo:hover:not(:disabled) { background: var(--main); transform: translateY(-3px); }
-        #elite-toast { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%) translateY(-250%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-radius: 2rem; z-index: 10000; transition: 0.6s; border: 1px solid rgba(255,255,255,0.1); }
-        #elite-toast.active { transform: translateX(-50%) translateY(0); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
+        :root { --main: #c5a059; --dark: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: var(--dark); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; }
+        .input-elite { width: 100%; padding: 1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; }
+        .input-elite:focus { border-color: var(--main); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
+        .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
+        .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
+        .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
+        .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
+        .memoria-tag { background: #f0fdf4; color: #10b981; padding: 0.2rem 0.6rem; border-radius: 0.5rem; font-size: 0.6rem; font-weight: 900; display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="elite-toast"><p id="toast-msg" class="text-white font-black uppercase italic tracking-widest text-[10px] text-center"></p></div>
-
-    <div class="max-w-md w-full glass-card p-8 md:p-10 rounded-[3.5rem] relative overflow-hidden">
-        <header class="text-center mb-10">
-            <div class="text-5xl mb-4">🩺</div>
-            <h1 id="doc-name" class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Sincronizando...</h1>
-            <p id="doc-esp" class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic mt-2">Nodo K.B Operativo</p>
+    <div class="max-w-md w-full glass p-8 shadow-2xl">
+        <header class="text-center mb-8">
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter">Cargando Búnker...</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Agendamiento Inteligente</p>
         </header>
 
-        <form id="form-cita" class="space-y-6">
+        <form id="agendador-form" class="space-y-5">
             <div>
-                <p class="text-[9px] font-black uppercase text-[#c5a059] px-2 tracking-widest italic mb-2">1. Servicio solicitado</p>
-                <select id="select-servicios" class="input-premium text-xs uppercase italic tracking-wider cursor-pointer" required>
-                    <option value="" disabled selected>Cargando catálogo...</option>
-                </select>
-            </div>
-
-            <div class="space-y-3">
-                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic">2. Identidad del Paciente</p>
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-premium uppercase" required>
-                <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-premium" maxlength="10" required>
-            </div>
-
-            <div>
-                <div class="flex justify-between items-center px-2 text-[9px] font-black uppercase text-slate-400 mb-2">
-                    <p>3. Fecha de Misión</p>
-                    <span id="current-month" class="font-black italic text-[#c5a059]"></span>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Identificación (Teléfono)</p>
+                    <span id="memoria-status" class="memoria-tag italic tracking-tighter">✓ PACIENTE RECORDADO</span>
                 </div>
-                <div id="date-slider" class="scroll-calendar"></div>
-                <input type="hidden" id="fecha-sel" required>
+                <input type="tel" id="telefono" placeholder="10 DÍGITOS" class="input-elite" maxlength="10" required>
             </div>
 
-            <div>
-                <p class="text-[9px] font-black uppercase text-slate-400 px-2 tracking-widest italic mb-2">4. Horarios Disponibles</p>
-                <div id="time-grid" class="grid grid-cols-3 gap-3"></div>
-                <input type="hidden" id="hora-sel" required>
+            <div class="grid grid-cols-1 gap-4">
+                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="email" id="email" placeholder="EMAIL" class="input-elite text-xs">
+                    <input type="date" id="fecha_nacimiento" class="input-elite text-xs">
+                </div>
             </div>
 
-            <button type="submit" id="btn-submit" class="btn-lujo py-5 text-[11px]">Confirmar Reservación ✦</button>
+            <div class="space-y-4">
+                <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
+                    <option value="" disabled selected>Seleccione Servicio</option>
+                </select>
+                <input type="date" id="fecha" class="input-elite">
+            </div>
+
+            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2">
+                </div>
+
+            <input type="hidden" id="hora_seleccionada">
+            <button type="submit" id="confirmar-btn" class="btn-mision">Confirmar Cita ✦</button>
         </form>
     </div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
+    const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
-const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
-
-function eliteAviso(msg) {
-    const t = document.getElementById('elite-toast');
-    document.getElementById('toast-msg').innerText = msg;
-    t.classList.add('active');
-    setTimeout(() => t.classList.remove('active'), 4000);
-}
-
-async function init() {
-    try {
-        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-        if(doc) {
-            document.getElementById('doc-name').innerText = `DR. ${doc.nombre}`;
-            await cargarServicios();
-            renderCalendar();
+    // 🧠 LÓGICA DE MEMORIA: Detectar paciente al escribir el teléfono
+    document.getElementById('telefono').addEventListener('input', async (e) => {
+        const tel = e.target.value;
+        if (tel.length === 10) {
+            const { data, error } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
+            if (data) {
+                document.getElementById('nombre').value = data.nombre;
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('fecha_nacimiento').value = data.fecha_nacimiento || '';
+                document.getElementById('memoria-status').style.display = 'block';
+                console.log("✅ ADN Recuperado del búnker.");
+            }
+        } else {
+            document.getElementById('memoria-status').style.display = 'none';
         }
-    } catch (e) { console.error(e); }
-}
-
-async function cargarServicios() {
-    const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
-    const sel = document.getElementById('select-servicios');
-    if (data) {
-        sel.innerHTML = '<option value="" disabled selected>Seleccione un servicio</option>' + 
-            data.map(s => `<option value="${s.id}" data-d="${s.duracion_total}" data-p="${s.precio}">${s.nombre.toUpperCase()} — $${s.precio}</option>`).join('');
-    }
-}
-
-function renderCalendar() {
-    const slider = document.getElementById('date-slider');
-    const today = new Date();
-    for (let i = 0; i < 30; i++) {
-        const d = new Date(); d.setDate(today.getDate() + i);
-        if (d.getDay() === 0) continue; 
-        const card = document.createElement('div');
-        card.className = 'date-card';
-        card.innerHTML = `<span class="text-[8px] font-bold opacity-40 uppercase">${d.toLocaleDateString('es',{weekday:'short'})}</span><span class="text-lg font-black">${d.getDate()}</span>`;
-        card.onclick = () => {
-            document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            const fechaString = d.toISOString().split('T')[0];
-            document.getElementById('fecha-sel').value = fechaString;
-            cargarHorasDisponibles(fechaString);
-        };
-        slider.appendChild(card);
-    }
-}
-
-async function cargarHorasDisponibles(fecha) {
-    const grid = document.getElementById('time-grid');
-    const servSelect = document.getElementById('select-servicios');
-    const serv = servSelect.selectedOptions[0];
-    
-    if(!serv || !serv.value) {
-        eliteAviso("⚠️ ELIJA UN SERVICIO PRIMERO");
-        return;
-    }
-
-    grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase animate-pulse py-4'>Escaneando Radar...</p>";
-    
-    // 📡 Llamada al RPC que acabamos de inyectar por SQL
-    const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
-        p_doctor: docId, 
-        p_fecha: fecha, 
-        p_duracion: parseInt(serv.dataset.d) || 30
     });
 
-    if (error) {
-        console.error(error);
-        grid.innerHTML = "<p class='col-span-3 text-center text-[8px] font-black uppercase text-rose-500 py-4'>ERROR DE CONEXIÓN</p>";
-        return;
+    // 🛡️ REGLA DE BIOSEGURIDAD: Cargar horas respetando el buffer
+    async function actualizarRadar() {
+        const fecha = document.getElementById('fecha').value;
+        const servId = document.getElementById('servicio').value;
+        const radar = document.getElementById('radar-horas');
+        
+        if (!fecha || !servId) return;
+
+        radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black animate-pulse">Escaneando Radar...</p>';
+
+        const servSelect = document.getElementById('servicio');
+        const duracionTotal = parseInt(servSelect.selectedOptions[0].dataset.total);
+
+        const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
+            p_doctor: docId,
+            p_fecha: fecha,
+            p_duracion: duracionTotal
+        });
+
+        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[8px] font-black text-rose-500">BÚNKER OCUPADO</p>';
+
+        slots?.forEach(s => {
+            const pill = document.createElement('div');
+            pill.className = 'time-pill';
+            pill.innerText = s.hora.slice(0,5);
+            pill.onclick = () => {
+                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                document.getElementById('hora_seleccionada').value = s.hora;
+            };
+            radar.appendChild(pill);
+        });
     }
 
-    grid.innerHTML = slots?.length ? "" : "<p class='col-span-3 text-center text-[8px] font-black uppercase text-rose-500 py-4'>SIN ESPACIOS DISPONIBLES</p>";
-    
-    slots?.forEach(s => {
-        const pill = document.createElement('div');
-        pill.className = 'time-pill';
-        pill.innerText = s.hora.slice(0,5);
-        pill.onclick = () => {
-            document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-            pill.classList.add('selected');
-            document.getElementById('hora-sel').value = s.hora;
-        };
-        grid.appendChild(pill);
-    });
-}
+    document.getElementById('fecha').onchange = actualizarRadar;
+    document.getElementById('servicio').onchange = actualizarRadar;
 
-document.getElementById('form-cita').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('btn-submit');
-    const fecha = document.getElementById('fecha-sel').value;
-    const hora = document.getElementById('hora-sel').value;
-    if(!fecha || !hora) return eliteAviso("⚠️ ELIJA FECHA Y HORA");
+    // INICIO: Cargar catálogo y nombre del doctor
+    async function init() {
+        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
+        document.getElementById('doc-name').innerText = `DR. ${doc.nombre}`;
 
-    btn.disabled = true;
-    btn.innerText = "INYECTANDO DATOS...";
+        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
+        const select = document.getElementById('servicio');
+        servs?.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.dataset.total = s.duracion_total;
+            opt.dataset.monto = s.precio;
+            opt.innerText = `${s.nombre.toUpperCase()} ($${s.precio})`;
+            select.appendChild(opt);
+        });
+    }
 
-    try {
+    document.getElementById('agendador-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('confirmar-btn');
+        btn.disabled = true; btn.innerText = "Sincronizando...";
+
+        // 1. Asegurar Paciente (Memoria)
         const tel = document.getElementById('telefono').value;
         const nombre = document.getElementById('nombre').value.toUpperCase();
-        
+        const email = document.getElementById('email').value;
+        const fnac = document.getElementById('fecha_nacimiento').value;
+
         let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-        if(!pac) {
-            const { data } = await supabase.from('Pacientes').insert({ nombre, telefono: tel }).select().single();
+        if (!pac) {
+            const { data } = await supabase.from('Pacientes').insert({ nombre, telefono: tel, email, fecha_nacimiento: fnac }).select().single();
             pac = data;
         }
 
-        const serv = document.getElementById('select-servicios').selectedOptions[0];
-        
+        // 2. Inyectar Cita
+        const serv = document.getElementById('servicio').selectedOptions[0];
         const { error } = await supabase.from('Citas').insert({
-            doctor_id: docId, 
-            paciente_id: pac.id, 
-            servicio_id: document.getElementById('select-servicios').value,
-            fecha, 
-            hora_inicio: hora, 
-            duracion_cita: parseInt(serv.dataset.d), 
-            monto: Number(serv.dataset.p), 
+            doctor_id: docId,
+            paciente_id: pac.id,
+            servicio_id: serv.value,
+            fecha: document.getElementById('fecha').value,
+            hora_inicio: document.getElementById('hora_seleccionada').value,
+            duracion_cita: parseInt(serv.dataset.total),
+            monto: parseFloat(serv.dataset.monto),
             estado: 'pendiente'
         });
 
-        if(error) throw error;
-        eliteAviso("✅ RESERVACIÓN EXITOSA");
-        setTimeout(() => location.reload(), 3000);
-    } catch (err) {
-        console.error(err);
-        eliteAviso("❌ ERROR AL RESERVAR");
-        btn.disabled = false; btn.innerText = "Confirmar Reservación ✦";
-    }
-};
+        if (error) {
+            alert("Error: " + error.message);
+            btn.disabled = false; btn.innerText = "Reintentar";
+        } else {
+            alert("✅ Cita Confirmada. El radar ha sido actualizado.");
+            location.reload();
+        }
+    };
 
-init();
+    init();
 </script>
 </body>
 </html>
