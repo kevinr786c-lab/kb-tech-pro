@@ -12,11 +12,10 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --main: #6366f1; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; display: flex; min-height: 100 screen; overflow: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; display: flex; min-height: 100vh; overflow: hidden; }
         
-        /* 🏰 ESTILOS SIDEBAR ERP */
         .sidebar { width: 280px; background: #0f172a; color: white; transition: 0.3s; display: flex; flex-direction: column; }
-        .nav-item { padding: 1rem 2rem; display: flex; items-center: center; gap: 1rem; cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 0.85rem; color: #94a3b8; }
+        .nav-item { padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 0.85rem; color: #94a3b8; }
         .nav-item:hover, .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; border-right: 4px solid var(--main); }
         
         .glass { background: rgba(255,255,255,0.9); backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.5); }
@@ -25,12 +24,10 @@
         
         .modal-overlay { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); }
         .fc-event { cursor: pointer; border: none !important; padding: 4px; border-radius: 8px !important; }
-
-        /* 🔔 TOAST ADN */
-        #toast { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10000; }
     </style>
 </head>
-<body class="flex min-h-screen w-full">
+<body class="flex">
 
 <nav class="sidebar hidden md:flex h-screen sticky top-0">
     <div class="p-8">
@@ -39,31 +36,29 @@
     </div>
     
     <div class="mt-4 flex-1">
-        <div class="nav-item active"><span>📊</span> Dashboard</div>
+        <div class="nav-item active" onclick="location.reload()"><span>📊</span> Dashboard</div>
         <div class="nav-item"><span>📅</span> Agenda</div>
         <div class="nav-item"><span>👥</span> Pacientes</div>
         <div class="nav-item"><span>💰</span> Pagos</div>
-        <div class="nav-item"><span>📈</span> Reportes</div>
-        <div class="nav-item"><span>⚙️</span> Configuración</div>
+        <div id="btnConfig" class="nav-item"><span>⚙️</span> Configuración</div>
     </div>
 
     <div class="p-8 mt-auto border-t border-slate-800">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs">AK</div>
+            <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs" id="userInitial">AK</div>
             <div>
-                <p class="text-[10px] font-black uppercase">Amigo Kev</p>
-                <p class="text-[8px] text-slate-500 uppercase font-bold" id="labelRol">Cargando Rol...</p>
+                <p class="text-[10px] font-black uppercase" id="userName">Amigo Kev</p>
+                <p class="text-[8px] text-slate-500 uppercase font-bold" id="labelRol">Cargando...</p>
             </div>
         </div>
     </div>
 </nav>
 
 <main class="flex-1 overflow-y-auto h-screen p-4 md:p-8">
-
     <header class="max-w-[1600px] mx-auto mb-8 flex justify-between items-center bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl">
         <div>
             <h1 class="text-3xl font-black italic tracking-tighter uppercase">Torre de <span class="text-indigo-400">Control</span> ✦</h1>
-            <p class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50 italic">Logística de Citas Binacional</p>
+            <p class="text-[10px] uppercase tracking-[0.4em] font-bold opacity-50 italic">Logística Binacional Tijuana/EE.UU.</p>
         </div>
         <select id="filtroDoctor" class="bg-indigo-600 px-6 py-3 rounded-2xl font-bold text-xs outline-none cursor-pointer border-none uppercase">
             <option value="all">TODOS LOS DOCTORES</option>
@@ -71,7 +66,6 @@
     </header>
 
     <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-8">
-        
         <aside class="col-span-12 lg:col-span-3 space-y-6">
             <div class="glass p-8 shadow-xl">
                 <h3 class="text-[10px] font-black uppercase text-indigo-600 mb-6 tracking-widest italic">Inyectar Cita</h3>
@@ -97,28 +91,22 @@
     </div>
 </main>
 
-<div id="toast" class="fixed bottom-6 right-6 hidden bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl text-[10px] font-black uppercase tracking-widest z-[9999] border border-slate-700 animate-bounce"></div>
+<div id="toast" class="fixed bottom-6 right-6 hidden bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl text-[10px] font-black uppercase tracking-widest border border-slate-700 animate-bounce"></div>
 
 <div id="modalCobro" class="modal-overlay fixed inset-0 z-[999] hidden flex items-center justify-center p-4">
-    <div class="glass max-w-md w-full p-10 shadow-2xl bg-white">
+    <div class="glass max-w-md w-full p-10 bg-white shadow-2xl">
         <h2 class="text-2xl font-black italic mb-2 uppercase tracking-tighter">Cierre de <span class="text-indigo-600">Caja</span></h2>
         <p id="infoPago" class="text-xs font-bold text-slate-400 mb-8 uppercase"></p>
         <div class="space-y-6">
-            <div>
-                <label class="text-[10px] font-black uppercase ml-2">Monto a Cobrar</label>
-                <input id="montoPago" type="number" class="input-kb text-2xl font-black text-indigo-600" step="0.01">
-            </div>
-            <div>
-                <label class="text-[10px] font-black uppercase ml-2">Método de Pago</label>
-                <select id="metodoPago" class="input-kb font-bold">
-                    <option value="Efectivo">Efectivo 💵</option>
-                    <option value="Tarjeta">Tarjeta 💳</option>
-                    <option value="Transferencia">Transferencia 🏦</option>
-                </select>
-            </div>
-            <div class="flex gap-4 pt-4">
-                <button onclick="cerrarModalCobro()" class="flex-1 p-4 rounded-2xl font-bold text-xs uppercase bg-slate-100 text-slate-400">Cancelar</button>
-                <button id="btnConfirmarPago" class="flex-1 p-4 rounded-2xl font-black text-xs uppercase bg-emerald-500 text-white shadow-lg shadow-emerald-200">Registrar Pago 💰</button>
+            <input id="montoPago" type="number" class="input-kb text-2xl font-black text-indigo-600" step="0.01">
+            <select id="metodoPago" class="input-kb font-bold">
+                <option value="Efectivo">Efectivo 💵</option>
+                <option value="Tarjeta">Tarjeta 💳</option>
+                <option value="Transferencia">Transferencia 🏦</option>
+            </select>
+            <div class="flex gap-4">
+                <button onclick="cerrarModalCobro()" class="flex-1 p-4 rounded-2xl font-bold text-xs uppercase bg-slate-100">Cancelar</button>
+                <button id="btnConfirmarPago" class="flex-1 p-4 rounded-2xl font-black text-xs uppercase bg-emerald-500 text-white shadow-lg shadow-emerald-200">Registrar 💰</button>
             </div>
         </div>
     </div>
@@ -129,11 +117,18 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-/* ===========================
-    🔐 SESIÓN Y ROL ADN
-   =========================== */
 const rolUsuario = localStorage.getItem('rol') || 'asistente';
+const nombreUsuario = localStorage.getItem('nombre_usuario') || 'Amigo Kev';
+const currentUserId = localStorage.getItem('user_id');
+
 document.getElementById('labelRol').innerText = `Rango: ${rolUsuario}`;
+document.getElementById('userName').innerText = nombreUsuario;
+document.getElementById('userInitial').innerText = nombreUsuario.slice(0,2).toUpperCase();
+
+// ⚙️ ENLACE A CONFIGURACIÓN
+document.getElementById('btnConfig').onclick = () => {
+    window.location.href = `configurador_bestia_v4.html?id=${currentUserId}`;
+};
 
 function checkPermiso(accion) {
     const permisos = {
@@ -153,8 +148,8 @@ function toast(msg) {
 
 async function logAccion(citaId, accion) {
     try {
-        await supabase.from('Logs').insert({ cita_id: citaId, accion: accion, usuario: rolUsuario });
-    } catch(e) { console.error("Falla en Log:", e); }
+        await supabase.from('Logs').insert({ cita_id: citaId, accion: accion, usuario: nombreUsuario });
+    } catch(e) { console.error(e); }
 }
 
 let calendar, citaActiva = null;
@@ -170,44 +165,33 @@ const db = {
     async registrarCita(data) { return await supabase.from('Citas').insert(data); },
     async actualizarEstado(id, estado) { 
         const res = await supabase.from('Citas').update({ estado }).eq('id', id);
-        await logAccion(id, `Estado cambiado a ${estado}`);
+        await logAccion(id, `Estado: ${estado}`);
         return res;
     }
 };
 
 function initCalendar() {
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        locale: 'es',
-        initialView: 'timeGridDay',
-        slotMinTime: '07:00',
-        slotMaxTime: '21:00',
-        editable: true,
-        nowIndicator: true,
-        allDaySlot: false,
+        locale: 'es', initialView: 'timeGridDay', slotMinTime: '07:00', slotMaxTime: '21:00',
+        editable: true, nowIndicator: true, allDaySlot: false,
         events: async (info, success) => {
             let q = supabase.from('Citas').select('*, Pacientes(nombre, telefono), Servicios(nombre, precio)');
             if(filtroDoctor.value !== 'all') q = q.eq('doctor_id', filtroDoctor.value);
             const { data } = await q;
             success(data.map(c => ({
-                id: c.id,
-                title: `${c.Pacientes.nombre} — ${c.Servicios.nombre}`,
+                id: c.id, title: `${c.Pacientes.nombre} — ${c.Servicios.nombre}`,
                 start: `${c.fecha}T${c.hora_inicio}`,
                 end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + c.duracion_total * 60000),
-                backgroundColor: colorEstado(c.estado),
-                extendedProps: c
+                backgroundColor: colorEstado(c.estado), extendedProps: c
             })));
         },
         eventDrop: async (info) => {
-            if (!checkPermiso('confirmar')) {
-                info.revert();
-                toast('⛔ Acceso Denegado: Rol insuficiente');
-                return;
-            }
-            const nuevaHora = info.event.start.toTimeString().slice(0,5);
-            const nuevaFecha = info.event.startStr.slice(0,10);
-            await supabase.from('Citas').update({ fecha: nuevaFecha, hora_inicio: nuevaHora }).eq('id', info.event.id);
-            await logAccion(info.event.id, 'Reagendada vía Drag&Drop');
-            toast('📅 Radar Actualizado');
+            if (!checkPermiso('confirmar')) { info.revert(); return toast('⛔ SIN RANGO'); }
+            const nHora = info.event.start.toTimeString().slice(0,5);
+            const nFecha = info.event.startStr.slice(0,10);
+            await supabase.from('Citas').update({ fecha: nFecha, hora_inicio: nHora }).eq('id', info.event.id);
+            await logAccion(info.event.id, 'Reagendada Drag&Drop');
+            toast('📅 RADAR ACTUALIZADO');
         },
         eventClick: (info) => {
             citaActiva = info.event.extendedProps;
@@ -221,6 +205,14 @@ function colorEstado(e) {
     return { pendiente:'#f59e0b', confirmado:'#0ea5e9', atendiendo:'#6366f1', completado:'#10b981', cancelado:'#ef4444' }[e] || '#94a3b8';
 }
 
+// 📡 SINCRONIZACIÓN REALTIME
+function activarRealtime() {
+    supabase.channel('cambios-citas').on('postgres_changes', { event: '*', schema: 'public', table: 'Citas' }, () => {
+        calendar.refetchEvents();
+        toast('🔄 AGENDA SINCRONIZADA');
+    }).subscribe();
+}
+
 async function initUI() {
     const docs = await db.obtenerDoctores();
     doc.innerHTML = docs.map(d => `<option value="${d.id}">${d.Usuarios.nombre}</option>`).join('');
@@ -232,12 +224,12 @@ async function initUI() {
     tel.oninput = async () => {
         if (tel.value.length === 10) {
             const { data } = await supabase.from('Pacientes').select('nombre').eq('telefono', tel.value).maybeSingle();
-            if (data) { nom.value = data.nombre; nom.classList.add('bg-green-50'); toast('🎯 Paciente Reconocido'); }
+            if (data) { nom.value = data.nombre; nom.classList.add('bg-green-50'); toast('🎯 PACIENTE RECONOCIDO'); }
         }
     };
 
     btnAgendar.onclick = async () => {
-        if(!checkPermiso('crear')) return toast('⛔ No tienes rango para agendar');
+        if(!checkPermiso('crear')) return toast('⛔ SIN RANGO');
         const paciente = await db.asegurarPaciente(tel.value, nom.value);
         const serv = ser.selectedOptions[0];
         await db.registrarCita({
@@ -246,7 +238,7 @@ async function initUI() {
             duracion_total: Number(serv.dataset.d), monto: Number(serv.dataset.p), estado: 'pendiente'
         });
         calendar.refetchEvents();
-        toast('🚀 Cita en Radar');
+        toast('🚀 CITA EN RADAR');
     };
 }
 
@@ -268,7 +260,6 @@ window.updateStatus = async (st) => {
     await db.actualizarEstado(citaActiva.id, st);
     calendar.refetchEvents();
     panelAcciones.classList.add('hidden');
-    toast(`✅ Estado: ${st.toUpperCase()}`);
 };
 
 window.abrirModalCobro = () => {
@@ -282,7 +273,7 @@ btnConfirmarPago.onclick = async () => {
     await supabase.from('Pagos').insert({ cita_id: citaActiva.id, monto: Number(montoPago.value), metodo: metodoPago.value });
     await supabase.from('Citas').update({ pagado: true, estado: 'completado' }).eq('id', citaActiva.id);
     await logAccion(citaActiva.id, 'Pago Registrado');
-    toast('💰 Caja Cerrada con Éxito');
+    toast('💰 CAJA CERRADA');
     cerrarModalCobro();
     panelAcciones.classList.add('hidden');
     calendar.refetchEvents();
@@ -292,6 +283,7 @@ window.abrirWA = (t) => window.open(`https://wa.me/52${t}?text=K.B Tech Solution
 
 initCalendar();
 initUI();
+activarRealtime();
 </script>
 </body>
 </html>
