@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>configurar-perfil.html| K.B TECH</title>
+    <title>CONFIGURACIÓN | K.B TECH ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
@@ -19,7 +19,7 @@
 
     <div class="max-w-5xl mx-auto glass p-8 md:p-12 shadow-2xl border-t-[8px] border-indigo-500">
         <header class="mb-10 text-center md:text-left">
-            <h1 class="text-3xl font-black italic uppercase italic">Control de <span class="text-indigo-400">Parámetros</span> ✦</h1>
+            <h1 class="text-3xl font-black italic uppercase">Control de <span class="text-indigo-400">Parámetros</span> ✦</h1>
             <p class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.5em] mt-2">K.B Tech Solution — Engine Nivel 4</p>
         </header>
 
@@ -27,8 +27,7 @@
             
             <section class="space-y-6">
                 <h3 class="text-[10px] font-black uppercase text-indigo-400 tracking-widest italic">🛡️ Patrón de Disponibilidad</h3>
-                <div id="contenedor-semana" class="space-y-3">
-                    </div>
+                <div id="contenedor-semana" class="space-y-3"></div>
                 <button id="btnGuardarSemana" class="w-full btn-save p-4 rounded-2xl text-[10px] uppercase">Sincronizar Patrón Semanal ⚡</button>
             </section>
 
@@ -37,7 +36,7 @@
                     <h3 class="text-[10px] font-black uppercase text-rose-400 mb-4 tracking-widest italic">🏖️ Zonas de Exclusión</h3>
                     <div class="flex gap-2 mb-4">
                         <input type="date" id="fecha-bloqueo" class="input-kb flex-1 text-xs">
-                        <button id="btnBloquear" class="bg-rose-500 px-6 rounded-xl font-black text-[9px] uppercase tracking-tighter">Bloquear</button>
+                        <button id="btnBloquear" class="bg-rose-500 px-6 rounded-xl font-black text-[9px] uppercase tracking-tighter hover:bg-rose-600">Bloquear</button>
                     </div>
                     <div id="lista-bloqueos" class="space-y-2 max-h-40 overflow-y-auto pr-2"></div>
                 </section>
@@ -58,103 +57,136 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-const docId = localStorage.getItem('user_id') || '3a5f9882-628d-4e94-811c-2c9769396e62';
+
+// PRIORIDAD: Obtener ID del URL o del LocalStorage
+const urlParams = new URLSearchParams(window.location.search);
+const docId = urlParams.get('id') || localStorage.getItem('user_id');
+
+if (!docId) {
+    alert("⛔ ERROR CRÍTICO: No se detectó ID de Doctor. Regresando al búnker.");
+    window.location.href = 'asistente.html';
+}
 
 /* ===========================
-    🧬 LÓGICA DE HORARIOS (N4)
+    🧬 LÓGICA DE HORARIOS
    =========================== */
 async function cargarSemana() {
     const { data } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).order('dia_semana');
-    const diasStr = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const diasStr = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
     const container = document.getElementById('contenedor-semana');
+    
     container.innerHTML = diasStr.map((nombre, i) => {
         const config = data?.find(h => h.dia_semana === i+1) || { activo: false, hora_inicio: '09:00', hora_fin: '17:00', duracion_slot: 30 };
         return `
             <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 dia-row" data-dia="${i+1}">
-                <input type="checkbox" class="chk-activo" ${config.activo ? 'checked' : ''}>
+                <input type="checkbox" class="chk-activo w-4 h-4" ${config.activo ? 'checked' : ''}>
                 <p class="text-[9px] font-black uppercase w-16 text-slate-400">${nombre.slice(0,3)}</p>
-                <input type="time" class="bg-transparent text-[10px] font-bold h-ini" value="${config.hora_inicio.slice(0,5)}">
-                <input type="time" class="bg-transparent text-[10px] font-bold h-fin" value="${config.hora_fin.slice(0,5)}">
-                <input type="number" class="bg-transparent text-[10px] font-bold w-10 slot" value="${config.duracion_slot}">
+                <input type="time" class="bg-transparent text-[10px] font-bold h-ini outline-none" value="${config.hora_inicio.slice(0,5)}">
+                <input type="time" class="bg-transparent text-[10px] font-bold h-fin outline-none" value="${config.hora_fin.slice(0,5)}">
+                <input type="number" class="bg-transparent text-[10px] font-bold w-10 slot outline-none text-indigo-400" value="${config.duracion_slot}">
             </div>
         `;
     }).join('');
 }
 
-btnGuardarSemana.onclick = async () => {
-    btnGuardarSemana.innerText = "SINCRONIZANDO...";
+document.getElementById('btnGuardarSemana').onclick = async () => {
+    const btn = document.getElementById('btnGuardarSemana');
+    btn.innerText = "SINCRONIZANDO...";
     const filas = document.querySelectorAll('.dia-row');
-    const batch = Array.from(filas).map(f => ({
-        doctor_id: docId,
-        dia_semana: parseInt(f.dataset.dia),
-        hora_inicio: f.querySelector('.h-ini').value + ":00",
-        hora_fin: f.querySelector('.h-fin').value + ":00",
-        duracion_slot: parseInt(f.querySelector('.slot').value),
-        activo: f.querySelector('.chk-activo').checked
-    }));
-
-    for (let h of batch) {
-        await supabase.from('Horarios_Doctor').upsert(h, { onConflict: 'doctor_id, dia_semana' });
+    
+    for (let f of filas) {
+        const rowData = {
+            doctor_id: docId,
+            dia_semana: parseInt(f.dataset.dia),
+            hora_inicio: f.querySelector('.h-ini').value,
+            hora_fin: f.querySelector('.h-fin').value,
+            duracion_slot: parseInt(f.querySelector('.slot').value),
+            activo: f.querySelector('.chk-activo').checked
+        };
+        await supabase.from('Horarios_Doctor').upsert(rowData, { onConflict: 'doctor_id, dia_semana' });
     }
-    btnGuardarSemana.innerText = "SINCRONIZADO ✅";
-    setTimeout(() => btnGuardarSemana.innerText = "Sincronizar Patrón Semanal ⚡", 2000);
+    btn.innerText = "SINCRONIZADO ✅";
+    setTimeout(() => btn.innerText = "Sincronizar Patrón Semanal ⚡", 2000);
 };
 
 /* ===========================
-    🏖️ LÓGICA DE BLOQUEOS (N4)
+    🏖️ LÓGICA DE BLOQUEOS (Sincronizado con tabla Bloqueos)
    =========================== */
 async function cargarBloqueos() {
-    const { data } = await supabase.from('Bloqueos_Doctor').select('*').eq('doctor_id', docId).gte('fecha', new Date().toISOString().slice(0,10));
-    document.getElementById('lista-bloqueos').innerHTML = data.map(b => `
+    const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id', docId).gte('fecha', new Date().toISOString().slice(0,10));
+    document.getElementById('lista-bloqueos').innerHTML = data ? data.map(b => `
         <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-rose-500/20">
             <span class="text-[10px] font-black text-rose-400 italic">${b.fecha}</span>
-            <button onclick="borrarBloqueo('${b.id}')" class="text-rose-500 text-xs">✕</button>
+            <button onclick="window.borrarBloqueo('${b.id}')" class="text-rose-500 text-xs font-bold hover:scale-125 transition">✕</button>
         </div>
-    `).join('');
+    `).join('') : '<p class="text-[8px] opacity-30 text-center">Sin bloqueos activos</p>';
 }
 
-btnBloquear.onclick = async () => {
+document.getElementById('btnBloquear').onclick = async () => {
     const f = document.getElementById('fecha-bloqueo').value;
-    if(!f) return;
-    await supabase.from('Bloqueos_Doctor').insert({ doctor_id: docId, fecha: f, motivo: 'Bloqueo Manual' });
+    if(!f) return alert("Selecciona una fecha, Comandante.");
+    
+    await supabase.from('Bloqueos').insert({ 
+        doctor_id: docId, 
+        fecha: f, 
+        motivo: 'Bloqueo Manual' 
+    });
+    document.getElementById('fecha-bloqueo').value = '';
     cargarBloqueos();
 };
 
 window.borrarBloqueo = async (id) => {
-    await supabase.from('Bloqueos_Doctor').delete().eq('id', id);
+    await supabase.from('Bloqueos').delete().eq('id', id);
     cargarBloqueos();
 };
 
 /* ===========================
     💰 LÓGICA DE SERVICIOS
    =========================== */
-btnAddSrv.onclick = () => {
+async function cargarServicios() {
+    const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', docId);
+    if(data) {
+        document.getElementById('lista-servicios').innerHTML = '';
+        data.forEach(s => agregarFilaServicio(s.nombre, s.precio, s.duracion_min));
+    }
+}
+
+function agregarFilaServicio(nombre = '', precio = '', duracion = 30) {
     const div = document.createElement('div');
     div.className = "flex gap-2 items-center bg-white/5 p-3 rounded-xl srv-item";
     div.innerHTML = `
-        <input type="text" placeholder="Servicio" class="bg-transparent flex-1 text-[9px] font-bold srv-n">
-        <input type="number" placeholder="$" class="bg-transparent w-12 text-[9px] font-bold srv-p">
-        <button onclick="this.parentElement.remove()" class="text-rose-500 text-xs">✕</button>
+        <input type="text" placeholder="Servicio" class="bg-transparent flex-1 text-[9px] font-bold srv-n outline-none" value="${nombre}">
+        <input type="number" placeholder="$" class="bg-transparent w-12 text-[9px] font-bold srv-p outline-none text-amber-400" value="${precio}">
+        <input type="number" placeholder="Min" class="bg-transparent w-10 text-[8px] font-bold srv-d outline-none text-slate-500" value="${duracion}">
+        <button onclick="this.parentElement.remove()" class="text-rose-500 text-xs hover:scale-125 transition">✕</button>
     `;
     document.getElementById('lista-servicios').appendChild(div);
-};
+}
 
-btnGuardarSrv.onclick = async () => {
+document.getElementById('btnAddSrv').onclick = () => agregarFilaServicio();
+
+document.getElementById('btnGuardarSrv').onclick = async () => {
     const items = document.querySelectorAll('.srv-item');
     const batch = Array.from(items).map(i => ({
         doctor_id: docId,
         nombre: i.querySelector('.srv-n').value,
-        precio: parseFloat(i.querySelector('.srv-p').value),
+        precio: parseFloat(i.querySelector('.srv-p').value) || 0,
+        duracion_min: parseInt(i.querySelector('.srv-d').value) || 30,
         activo: true
     }));
+    
+    // Limpieza y carga de nuevos servicios
     await supabase.from('Servicios').delete().eq('doctor_id', docId);
-    await supabase.from('Servicios').insert(batch);
-    alert("CATÁLOGO ACTUALIZADO");
+    if(batch.length > 0) {
+        await supabase.from('Servicios').insert(batch);
+    }
+    alert("CATÁLOGO ACTUALIZADO EN EL BÚNKER 💎");
 };
 
-// INIT
+// INICIALIZACIÓN DE LA MISIÓN
 cargarSemana();
 cargarBloqueos();
+cargarServicios();
 </script>
 </body>
 </html>
