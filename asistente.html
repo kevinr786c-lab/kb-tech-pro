@@ -12,7 +12,7 @@
         :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); }
-        .fc { background: transparent; border: none !important; }
+        .fc { background: transparent; border: none !important; height: 100%; }
         .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1rem !important; }
         .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 1rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; }
         .fc-button-active { background: var(--luxe-gold) !important; }
@@ -29,7 +29,9 @@
                 <div class="w-10 h-10 bg-[#0f172a] rounded-xl flex items-center justify-center shadow-lg text-white font-bold text-lg">A</div>
                 <div>
                     <h1 class="text-lg font-black italic uppercase tracking-tighter text-[#0f172a]">Panel <span class="text-[#c5a059]">Asistente</span></h1>
-                    <select id="doctorSelect" class="bg-transparent text-[9px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0"></select>
+                    <select id="doctorSelect" class="bg-transparent text-[9px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0">
+                        <option value="">INICIALIZANDO...</option>
+                    </select>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -37,6 +39,7 @@
                 <button onclick="window.location.href='configurar-perfil.html'" class="text-[9px] font-black uppercase px-4 py-2 bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">⚙️ Ajustes</button>
             </div>
         </header>
+
         <div class="flex-1 overflow-hidden">
             <div id="calendar" class="h-full"></div>
         </div>
@@ -46,6 +49,7 @@
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-3">
+                <div class="text-[10px] font-bold text-slate-400 px-1 uppercase italic tracking-widest">Paciente</div>
                 <input id="c-paciente" class="input-luxe bg-slate-50" readonly>
                 <input id="c-telefono" class="input-luxe bg-slate-50" readonly>
                 <div class="grid grid-cols-2 gap-2">
@@ -59,7 +63,7 @@
                     <option value="completado">Completado</option>
                     <option value="cancelado">CANCELAR CITA</option>
                 </select>
-                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS..."></textarea>
+                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS OPERATIVAS..."></textarea>
             </div>
             <div class="flex justify-between mt-6 gap-2">
                 <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-emerald-600 hover:text-white transition">Actualizar Radar</button>
@@ -98,7 +102,9 @@
     };
 
     async function cargarDoctores() {
-        const { data } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
+        const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
+        if (error) return;
+        
         const select = document.getElementById('doctorSelect');
         if (data && data.length > 0) {
             select.innerHTML = data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
@@ -113,7 +119,8 @@
             const { data, error } = await supabase.from('Citas')
                 .select('*, Pacientes!fk_citas_pacientes_maestra(nombre, telefono), Servicios(nombre)')
                 .eq('doctor_id', doctorActual)
-                .neq('estado', 'cancelado'); // Soft cancel: no muestra las canceladas
+                .neq('estado', 'cancelado');
+            
             if (error) throw error;
             success((data || []).map(c => ({
                 id: c.id,
