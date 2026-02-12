@@ -6,9 +6,13 @@
     <title>K.B SYSTEM | ACCESO TOTAL ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
         
-        :root { --accent: #6366f1; }
+        :root { 
+            --kb-gold: #c5a059; 
+            --kb-dark: #0f172a; 
+            --kb-accent: #6366f1;
+        }
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -21,7 +25,7 @@
             min-height: 100vh;
         }
 
-        /* Fondo Animado de Búnker */
+        /* 🌌 Fondo Espacial de Búnker */
         .bunker-bg {
             position: absolute;
             inset: 0;
@@ -31,33 +35,33 @@
 
         .glow {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: var(--accent);
-            filter: blur(120px);
-            opacity: 0.15;
+            width: 500px;
+            height: 500px;
+            background: var(--kb-gold);
+            filter: blur(150px);
+            opacity: 0.1;
             border-radius: 50%;
             animation: pulse 8s infinite alternate;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.1; }
-            100% { transform: scale(1.2); opacity: 0.2; }
+            0% { transform: scale(1); opacity: 0.05; }
+            100% { transform: scale(1.3); opacity: 0.15; }
         }
 
-        /* Estética Glassmorphism Pro */
+        /* 💎 Estética Glassmorphism K.B Tech */
         .glass { 
-            background: rgba(255, 255, 255, 0.01); 
-            backdrop-filter: blur(25px); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            border-radius: 3.5rem; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(40px); 
+            border: 1px solid rgba(197, 160, 89, 0.2); 
+            border-radius: 4rem; 
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.8);
         }
 
         .input-kb { 
             width: 100%; 
             padding: 1.25rem; 
-            border-radius: 1.5rem; 
+            border-radius: 1.8rem; 
             background: rgba(255,255,255,0.03); 
             border: 1px solid rgba(255,255,255,0.1); 
             color: white; 
@@ -66,42 +70,52 @@
         }
 
         .input-kb:focus { 
-            border-color: var(--accent); 
+            border-color: var(--kb-gold); 
             background: rgba(255,255,255,0.07); 
             outline: none; 
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.2);
             transform: translateY(-2px);
         }
 
         .btn-access { 
-            background: var(--accent); 
+            background: var(--kb-gold); 
+            color: var(--kb-dark);
             transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); 
-            font-weight: 800; 
+            font-weight: 900; 
             letter-spacing: 0.2em; 
             position: relative;
             overflow: hidden;
+            border-radius: 1.8rem;
         }
 
-        .btn-access:hover { 
+        .btn-access:hover:not(:disabled) { 
             transform: translateY(-3px); 
-            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4); 
+            box-shadow: 0 20px 40px -10px rgba(197, 160, 89, 0.5); 
             filter: brightness(1.1);
         }
 
-        .btn-access:active { transform: translateY(0); }
+        /* ✨ ESTRELLA DE MANDO K.B */
+        @keyframes star-spin {
+            0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
+            50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
+            100% { transform: rotate(360deg) scale(1); opacity: 0.7; }
+        }
+        .kb-star { 
+            color: var(--kb-gold); 
+            display: inline-block;
+            animation: star-spin 4s infinite linear;
+            font-size: 2.5rem;
+        }
 
         .scan-line {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            animation: scan 3s linear infinite;
-            opacity: 0.3;
+            background: linear-gradient(90deg, transparent, var(--kb-gold), transparent);
+            animation: scan 4s linear infinite;
+            opacity: 0.2;
         }
 
-        @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
-        }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
     </style>
 </head>
 <body>
@@ -109,39 +123,46 @@
     <div class="bunker-bg"></div>
     <div class="glow"></div>
 
-    <div class="max-w-md w-full glass p-10 md:p-14 relative overflow-hidden">
+    <div class="max-w-md w-full glass p-12 md:p-16 relative overflow-hidden">
         <div class="scan-line"></div>
         
         <header class="mb-12 text-center">
-            <h1 class="text-5xl font-black italic tracking-tighter uppercase leading-none">
-                K.B <span class="text-indigo-500">TECH</span>
+            <div class="mb-6">
+                <span class="kb-star">✦</span>
+            </div>
+            <h1 class="text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
+                K.B <span style="color: var(--kb-gold)">SYSTEM</span>
             </h1>
-            <div class="flex items-center justify-center gap-2 mt-4">
-                <div class="h-[1px] w-8 bg-slate-700"></div>
-                <p class="text-[8px] font-bold text-slate-500 uppercase tracking-[0.4em]">Auth Protocol Nivel 4</p>
-                <div class="h-[1px] w-8 bg-slate-700"></div>
+            <div class="flex items-center justify-center gap-3 mt-6">
+                <div class="h-[1px] w-10 bg-slate-800"></div>
+                <p class="text-[9px] font-black text-[#c5a059] uppercase tracking-[0.5em] italic">Auth Protocol v4.0</p>
+                <div class="h-[1px] w-10 bg-slate-800"></div>
             </div>
         </header>
 
-        <div class="space-y-5">
+        <form id="loginForm" class="space-y-6">
             <div class="group">
-                <input type="email" id="email" class="input-kb" placeholder="CORREO DE OPERACIONES">
+                <label class="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-4 mb-2 block">Identificador de Operaciones</label>
+                <input type="email" id="email" class="input-kb uppercase text-xs" placeholder="CORREO@KBTECH.PRO" required>
             </div>
             <div>
-                <input type="password" id="password" class="input-kb" placeholder="CÓDIGO SECRETO">
+                <label class="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-4 mb-2 block">Código de Encriptación</label>
+                <input type="password" id="password" class="input-kb" placeholder="••••••••" required>
             </div>
             
-            <button id="btnLogin" class="w-full btn-access p-5 rounded-2xl text-[11px] uppercase mt-6 shadow-xl">
-                Iniciar Operación 🚀
+            <button type="submit" id="btnLogin" class="w-full btn-access p-6 text-[11px] uppercase mt-4 shadow-2xl">
+                Sincronizar ADN 🚀
             </button>
-        </div>
+        </form>
 
-        <div id="error-msg" class="hidden mt-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
-            <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest">⚠️ Acceso Denegado: ADN No Reconocido</p>
+        <div id="error-msg" class="hidden mt-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-center">
+            <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest italic">⚠️ Acceso Denegado: Registro No Encontrado</p>
         </div>
         
-        <footer class="mt-12 opacity-20">
-            <p class="text-[7px] font-bold uppercase tracking-[0.5em]">Tijuana Hub / Binational Infrastructure</p>
+        <footer class="mt-16 text-center">
+            <p class="text-[7px] font-bold uppercase tracking-[0.6em] text-slate-600 italic leading-loose">
+                TIJUANA INFRASTRUCTURE / K.B TECH SOLUTIONS ✦ 2026
+            </p>
         </footer>
     </div>
 
@@ -150,57 +171,62 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-document.getElementById('btnLogin').onclick = async () => {
+document.getElementById('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
     const emailVal = document.getElementById('email').value;
     const passVal = document.getElementById('password').value;
     const btn = document.getElementById('btnLogin');
     const msg = document.getElementById('error-msg');
 
-    if(!emailVal || !passVal) return;
-
     btn.innerText = "VERIFICANDO ADN...";
     btn.disabled = true;
     msg.classList.add('hidden');
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: emailVal,
-        password: passVal
-    });
+    try {
+        // 🔐 1. Verificación de Credenciales en Auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: emailVal,
+            password: passVal
+        });
 
-    if (error) {
+        if (error) throw error;
+
+        // 🧬 2. Recuperación de Perfil de Búnker
+        const { data: usuario, error: userError } = await supabase
+            .from('Usuarios')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+        if (userError || !usuario) throw new Error("Nodo no reconocido");
+
+        // 🧠 3. Memoria Local Temporal
+        localStorage.setItem('user_id', data.user.id);
+        localStorage.setItem('rol', usuario.rol);
+        localStorage.setItem('nombre', usuario.nombre);
+
+        btn.innerText = "ACCESO CONCEDIDO ✦";
+        btn.style.background = "#10b981";
+        btn.style.color = "white";
+
+        // 🛰️ 4. Redirección por Rango
+        setTimeout(() => {
+            if (usuario.rol === 'doctor') {
+                window.location.href = 'nodo-maestro.html';
+            } else if (usuario.rol === 'asistente') {
+                window.location.href = 'asistente.html';
+            } else {
+                alert("Rango Administrativo no configurado");
+                btn.disabled = false;
+            }
+        }, 1000);
+
+    } catch (err) {
+        console.error(err);
         btn.innerText = "REINTENTAR";
         btn.disabled = false;
         msg.classList.remove('hidden');
-        return;
     }
-
-    const { data: usuario } = await supabase
-        .from('Usuarios')
-        .select('*')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-    if (!usuario) {
-        btn.innerText = "ERROR DE NODO";
-        alert("Autenticado pero sin perfil en tabla Usuarios.");
-        btn.disabled = false;
-        return;
-    }
-
-    localStorage.setItem('user_id', data.user.id);
-    localStorage.setItem('rol', usuario.rol);
-    localStorage.setItem('nombre_usuario', usuario.nombre);
-
-    btn.innerText = "ACCESO CONCEDIDO ✅";
-    btn.style.background = "#10b981";
-
-    setTimeout(() => {
-        if (usuario.rol === 'doctor') {
-            window.location.href = `configurar-perfil.html?id=${data.user.id}`;
-        } else {
-            window.location.href = 'asistente.html';
-        }
-    }, 800);
 };
 </script>
 </body>
