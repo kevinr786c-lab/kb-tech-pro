@@ -118,7 +118,7 @@
 
     async function cargarCitas(info, success, failure) {
         try {
-            // 📡 Sincronización Élite: Traemos datos de 3 tablas de un golpe
+            // Sincronización oficial con el búnker
             const { data, error } = await supabase.from('Citas')
                 .select('*, Pacientes(nombre, telefono), Servicios(nombre)')
                 .eq('doctor_id', doctorActual)
