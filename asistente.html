@@ -20,7 +20,7 @@
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
         
-        /* 🧬 ESTATUS DE PACIENTES EN CALENDARIO */
+        /* 🧬 ESTATUS DE PACIENTES */
         .event-nuevo { border-left: 4px solid #3b82f6 !important; }
         .event-recurrente { border-left: 4px solid #10b981 !important; }
         .event-oro { border-left: 4px solid var(--luxe-gold) !important; box-shadow: 0 0 15px rgba(197, 160, 89, 0.3) !important; }
@@ -28,7 +28,6 @@
         .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; }
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         
-        /* ✨ ESTRELLA K.B ANIMADA */
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
     </style>
@@ -45,7 +44,7 @@
                     <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
                     <div class="flex items-center gap-2">
                         <select id="doctorSelect" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0 p-0">
-                            <option value="">SINCRONIZANDO RADAR...</option>
+                            <option value="">ESCANEANDO JURISDICCIÓN...</option>
                         </select>
                     </div>
                 </div>
@@ -123,17 +122,44 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    // 🧠 SELECTOR DE MESES SINCRONIZADO
     document.getElementById('mesSelector').onchange = (e) => {
         if(calendar) calendar.gotoDate(e.target.value + "-01");
     };
 
+    // 🛡️ LÓGICA DE JURISDICCIÓN: CARGAR SOLO DOCTORES ASIGNADOS
     async function cargarDoctores() {
-        const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        if (error) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        // Buscamos en la tabla de relaciones Asistentes_Doctor
+        const { data: asignaciones, error } = await supabase
+            .from('Asistentes_Doctor')
+            .select(`
+                turno,
+                Usuarios!doctor_id (id, nombre)
+            `)
+            .eq('asistente_id', session.user.id)
+            .eq('activo', true);
+
+        if (error) {
+            console.error("Falla de radar:", error);
+            return;
+        }
+
         const select = document.getElementById('doctorSelect');
+        
+        if (!asignaciones || asignaciones.length === 0) {
+            select.innerHTML = '<option value="">SIN DOCTORES ASIGNADOS</option>';
+            return;
+        }
+
+        // El radar solo muestra al Dr. Mañana y Dr. Tarde asignados
         select.innerHTML = '<option value="">ELIJA DOCTOR OPERATIVO</option>' + 
-            data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
+            asignaciones.map(a => `
+                <option value="${a.Usuarios.id}">
+                    DR. ${a.Usuarios.nombre.toUpperCase()} (${a.turno.toUpperCase()})
+                </option>
+            `).join('');
 
         select.onchange = () => {
             doctorActual = select.value;
@@ -153,7 +179,6 @@
             
             if (error) throw error;
 
-            // 🧬 LÓGICA DE ESTATUS POR PACIENTE
             const eventos = await Promise.all(data.map(async (c) => {
                 const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', c.paciente_id).eq('estado', 'completado');
                 
@@ -200,7 +225,6 @@
         calendar.render();
     }
 
-    // MANTENEMOS FUNCIONES DE CIRUGÍA (guardarCita, abrirEditar, etc.) IGUALES PARA NO PERDER PROGRESO
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
