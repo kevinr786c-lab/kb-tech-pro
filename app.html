@@ -10,11 +10,12 @@
         :root { --main: #6366f1; --glow: rgba(99, 102, 241, 0.2); }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; }
         
+        /* 💎 ESTILO K.B TECH SOLUTION */
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
         .card-cita { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2rem; border: 1px solid rgba(0,0,0,0.02); }
-        .card-cita:hover { transform: scale(1.01) translateY(-4px); box-shadow: 0 20px 40px var(--glow); }
+        .card-cita:hover { transform: scale(1.02) translateY(-4px); box-shadow: 0 20px 40px var(--glow); }
 
-        /* 🚥 TRIAGE ADN K.B SYSTEM */
+        /* 🚥 TRIAGE DE COLOR (ADN COMANDANTE) */
         .u-rojo { border-left: 12px solid #ef4444 !important; background: linear-gradient(90deg, #fef2f2 0%, white 100%); }
         .u-amarillo { border-left: 12px solid #f59e0b !important; background: linear-gradient(90deg, #fffbeb 0%, white 100%); }
         .u-verde { border-left: 12px solid #10b981 !important; background: linear-gradient(90deg, #f0fdf4 0%, white 100%); }
@@ -22,13 +23,16 @@
 
         .btn-maestro { padding: 1rem; background: var(--main); color: white; border-radius: 1.25rem; font-weight: 800; transition: 0.3s; }
         .btn-maestro:active { transform: scale(0.9); }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.3s; }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; transform: scale(1.2); }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-10">
 
     <nav class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
         <div class="text-center md:text-left">
-            <h1 class="text-5xl font-black italic uppercase tracking-tighter">K.B <span style="color: var(--main)">Doctor</span> ✦</h1>
+            <h1 class="text-5xl font-black italic uppercase tracking-tighter">K.B <span id="logo-tech" style="color: var(--main)">Doctor</span> ✦</h1>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic">Sincronización de Nodo Maestro Activa</p>
         </div>
         
@@ -40,87 +44,109 @@
 
     <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        <aside class="lg:col-span-4 space-y-6">
+        <div class="lg:col-span-4 space-y-6">
             <div class="glass-panel p-8 shadow-sm border border-slate-100">
                 <h3 class="text-[10px] font-black uppercase tracking-widest mb-6 text-indigo-600 italic">Identidad de Nodo</h3>
                 <div id="doctor-info" class="space-y-2">
                     <p class="text-2xl font-black uppercase italic tracking-tighter" id="display-nombre-doc">Cargando...</p>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase" id="display-especialidad">Escaneando Búnker...</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase" id="display-especialidad">Sincronizando con Búnker...</p>
                     </div>
                 </div>
                 <hr class="my-8 border-slate-100">
                 <div class="space-y-4">
-                    <button onclick="window.location.href='admin.html'" class="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 transition shadow-xl">
+                    <button onclick="window.location.href='asistente.html'" class="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 transition shadow-xl">
                         Abrir Radar Recepción 👩‍💼
                     </button>
-                    <button id="btn-logout" class="w-full py-3 border-2 border-slate-100 text-slate-400 rounded-[1.5rem] font-black text-[9px] uppercase hover:bg-rose-50 hover:text-rose-500 transition">
+                    <button id="btn-logout" class="w-full py-3 border-2 border-slate-100 text-slate-400 rounded-[1.5rem] font-black text-[9px] uppercase hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition">
                         Cerrar Sesión 🔐
                     </button>
                 </div>
             </div>
-        </aside>
+        </div>
 
-        <section class="lg:col-span-8">
+        <div class="lg:col-span-8">
             <div id="contenedor-citas" class="space-y-4">
                 </div>
-        </section>
+        </div>
 
     </main>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-
-// ID FIJO DEL DOCTOR PARA LA PRUEBA ACTUAL
-const doctorId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
+// CONFIGURACIÓN DE CONEXIÓN (MANTENIDA SEGÚN TU SOLICITUD)
+const supabase = createClient(
+    "https://dgatsbnqgplalxwewpvs.supabase.co", 
+    "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"
+);
 
 const maestroUI = {
+    user: null,
+
     async init() {
-        // Cargar Perfil del Doctor
-        const { data: docData } = await supabase.from('Perfiles_Medicos').select('*, Usuarios(nombre)').eq('id', doctorId).single();
-        if(docData) {
-            document.getElementById('display-nombre-doc').innerText = `Dr. ${docData.Usuarios.nombre}`;
-            document.getElementById('display-especialidad').innerText = docData.especialidad;
+        // 1. Verificar Sesión Real
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) {
+            window.location.href = 'index.html';
+            return;
+        }
+        this.user = data.session.user;
+
+        // 2. Cargar Perfil (Cruzando con Usuarios_rows.sql)
+        const { data: p } = await supabase.from('Usuarios').select('*').eq('id', this.user.id).single();
+        if(p) {
+            document.getElementById('display-nombre-doc').innerText = `Dr. ${p.nombre}`;
+            document.getElementById('display-especialidad').innerText = p.especialidad || 'Especialista Registrado';
         }
 
-        // Configurar Fecha Inicial (Hoy)
-        const inputFecha = document.getElementById('fechaAgenda');
-        inputFecha.value = new Date().toISOString().split('T')[0];
-        
-        inputFecha.onchange = () => this.cargarCitasDelDia();
-        
+        // 3. Configurar Calendario y Cargar Datos
+        this.configurarCalendario();
         await this.cargarCitasDelDia();
+
+        // 4. Logout
+        document.getElementById('btn-logout').onclick = async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        };
     },
 
     async cargarCitasDelDia() {
         const contenedor = document.getElementById('contenedor-citas');
-        const fecha = document.getElementById('fechaAgenda').value;
+        const fecha = this.obtenerFechaSeleccionada();
 
-        contenedor.innerHTML = `<div class="p-20 text-center animate-pulse italic text-slate-400 uppercase text-[9px] tracking-[0.5em]">Escaneando actividad en el radar...</div>`;
+        contenedor.innerHTML = `
+            <div class="p-20 text-center animate-pulse italic text-slate-400 uppercase text-[9px] tracking-[0.5em]">
+                Escaneando actividad en el radar...
+            </div>`;
 
         try {
             const { data: citas, error } = await supabase
                 .from('Citas')
-                .select(`*, Pacientes(nombre, telefono), Servicios(nombre)`)
-                .eq('doctor_id', doctorId)
+                .select(\`
+                    *,
+                    Pacientes (nombre, telefono),
+                    Servicios (nombre)
+                \`)
+                .eq('doctor_id', this.user.id)
                 .eq('fecha', fecha)
                 .neq('estado', 'cancelado')
                 .order('hora_inicio', { ascending: true });
 
             if (error) throw error;
 
-            if (!citas || citas.length === 0) {
-                contenedor.innerHTML = `<div class="p-20 text-center opacity-30 font-black italic uppercase tracking-widest text-xs">Radar despejado: Sin actividad</div>`;
+            if (citas.length === 0) {
+                contenedor.innerHTML = \`
+                    <div class="p-20 text-center opacity-30 font-black italic uppercase tracking-widest text-xs">
+                        Radar despejado: Sin actividad para este ciclo
+                    </div>\`;
                 return;
             }
 
             contenedor.innerHTML = citas.map(c => this.renderCita(c)).join('');
         } catch (error) {
-            console.error(error);
-            contenedor.innerHTML = `<div class="p-10 text-center text-rose-500 font-bold text-xs">Falla de Vínculo: ${error.message}</div>`;
+            contenedor.innerHTML = \`<div class="p-10 text-center text-rose-500 font-bold text-xs uppercase">Falla de Vínculo: \${error.message}</div>\`;
         }
     },
 
@@ -128,36 +154,49 @@ const maestroUI = {
         const prioridad = this.calcularTriage(cita.estado);
         const hora = cita.hora_inicio.slice(0, 5);
         
-        return `
-            <div class="card-cita ${prioridad} glass-panel p-8 mb-4 flex justify-between items-center shadow-sm bg-white">
+        return \`
+            <div class="card-cita \${prioridad} glass-panel p-8 mb-4 flex justify-between items-center shadow-sm bg-white">
                 <div class="flex items-center gap-10">
-                    <span class="text-4xl font-black italic text-indigo-600">${hora}</span>
+                    <span class="text-4xl font-black italic text-indigo-600">\${hora}</span>
                     <div>
                         <h3 class="font-black text-slate-800 uppercase text-lg tracking-tighter">
-                            ${cita.Pacientes?.nombre || 'PACIENTE EXTERNO'}
+                            \${cita.Pacientes?.nombre || 'PACIENTE EXTERNO'}
                         </h3>
                         <p class="text-[10px] font-bold text-slate-400 uppercase italic">
-                            ${cita.Servicios?.nombre || 'PROCEDIMIENTO'}
+                            \${cita.Servicios?.nombre || 'PROCEDIMIENTO GENERAL'}
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-6">
                     <span class="text-[8px] font-black uppercase px-4 py-2 rounded-full bg-slate-50 tracking-widest text-slate-500 border border-slate-100">
-                        ${cita.estado.toUpperCase()}
+                        \${cita.estado.toUpperCase()}
                     </span>
-                    <button class="btn-maestro shadow-lg shadow-indigo-100" onclick="window.location.href='admin.html'">
+                    <button class="btn-maestro shadow-lg shadow-indigo-100" onclick="window.location.href='asistente.html'">
                         🩺
                     </button>
                 </div>
-            </div>`;
+            </div>\`;
     },
 
     calcularTriage(estado) {
         const e = estado.toLowerCase();
-        if (e === 'confirmado') return 'u-azul';
-        if (e === 'atendiendo') return 'u-rojo';
+        if (['urgente', 'dolor'].includes(e)) return 'u-rojo';
+        if (['pendiente', 'confirmado'].includes(e)) return 'u-amarillo';
+        if (['atendiendo', 'en_consulta'].includes(e)) return 'u-azul';
         if (e === 'completado') return 'u-verde';
-        return 'u-amarillo';
+        return '';
+    },
+
+    obtenerFechaSeleccionada() {
+        const input = document.getElementById('fechaAgenda');
+        if (!input.value) {
+            input.value = new Date().toISOString().slice(0, 10);
+        }
+        return input.value;
+    },
+
+    configurarCalendario() {
+        document.getElementById('fechaAgenda').onchange = () => this.cargarCitasDelDia();
     }
 };
 
