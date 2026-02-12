@@ -3,44 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | ACCESO</title>
+    <title>K.B SYSTEM | ACCESO TOTAL ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 2.5rem; }
-        .input-kb { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: rgba(255,255,255,0.05); border: 2px solid transparent; color: white; font-weight: 700; transition: 0.3s; }
-        .input-kb:focus { border-color: #6366f1; outline: none; background: rgba(255,255,255,0.1); }
-        .btn-access { background: #6366f1; transition: 0.4s; font-weight: 800; letter-spacing: 0.1em; }
-        .btn-access:hover { transform: scale(1.02); box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.5); }
+        
+        :root { --accent: #6366f1; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #020617; 
+            color: white; 
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Fondo Animado de Búnker */
+        .bunker-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #020617 100%);
+            z-index: -1;
+        }
+
+        .glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            filter: blur(120px);
+            opacity: 0.15;
+            border-radius: 50%;
+            animation: pulse 8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.1; }
+            100% { transform: scale(1.2); opacity: 0.2; }
+        }
+
+        /* Estética Glassmorphism Pro */
+        .glass { 
+            background: rgba(255, 255, 255, 0.01); 
+            backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            border-radius: 3.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-kb { 
+            width: 100%; 
+            padding: 1.25rem; 
+            border-radius: 1.5rem; 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: white; 
+            font-weight: 600; 
+            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1); 
+        }
+
+        .input-kb:focus { 
+            border-color: var(--accent); 
+            background: rgba(255,255,255,0.07); 
+            outline: none; 
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-access { 
+            background: var(--accent); 
+            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); 
+            font-weight: 800; 
+            letter-spacing: 0.2em; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-access:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4); 
+            filter: brightness(1.1);
+        }
+
+        .btn-access:active { transform: translateY(0); }
+
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: scan 3s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6">
+<body>
 
-    <div class="max-w-md w-full glass p-10 md:p-14 shadow-2xl border-t-[8px] border-indigo-500 text-center">
-        <header class="mb-10 text-center">
-            <h1 class="text-4xl font-black italic tracking-tighter uppercase leading-none">K.B <span class="text-indigo-400">SYSTEM</span></h1>
-            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.5em] mt-3">Auth Protocol Nivel 4</p>
+    <div class="bunker-bg"></div>
+    <div class="glow"></div>
+
+    <div class="max-w-md w-full glass p-10 md:p-14 relative overflow-hidden">
+        <div class="scan-line"></div>
+        
+        <header class="mb-12 text-center">
+            <h1 class="text-5xl font-black italic tracking-tighter uppercase leading-none">
+                K.B <span class="text-indigo-500">TECH</span>
+            </h1>
+            <div class="flex items-center justify-center gap-2 mt-4">
+                <div class="h-[1px] w-8 bg-slate-700"></div>
+                <p class="text-[8px] font-bold text-slate-500 uppercase tracking-[0.4em]">Auth Protocol Nivel 4</p>
+                <div class="h-[1px] w-8 bg-slate-700"></div>
+            </div>
         </header>
 
-        <div class="space-y-6">
-            <div class="text-left">
-                <input type="email" id="email" class="input-kb" placeholder="Email de Operaciones">
+        <div class="space-y-5">
+            <div class="group">
+                <input type="email" id="email" class="input-kb" placeholder="CORREO DE OPERACIONES">
             </div>
-            <div class="text-left">
-                <input type="password" id="password" class="input-kb" placeholder="••••••••">
+            <div>
+                <input type="password" id="password" class="input-kb" placeholder="CÓDIGO SECRETO">
             </div>
             
-            <button id="btnLogin" class="w-full btn-access p-5 rounded-2xl text-[12px] uppercase mt-4 active:scale-95 transition">Ingresar al Búnker 🚀</button>
+            <button id="btnLogin" class="w-full btn-access p-5 rounded-2xl text-[11px] uppercase mt-6 shadow-xl">
+                Iniciar Operación 🚀
+            </button>
         </div>
 
-        <p id="error-msg" class="text-[10px] font-black text-rose-500 mt-6 uppercase hidden">⚠️ Credenciales Inválidas</p>
+        <div id="error-msg" class="hidden mt-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
+            <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest">⚠️ Acceso Denegado: ADN No Reconocido</p>
+        </div>
+        
+        <footer class="mt-12 opacity-20">
+            <p class="text-[7px] font-bold uppercase tracking-[0.5em]">Tijuana Hub / Binational Infrastructure</p>
+        </footer>
     </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// 🛰️ CONEXIÓN AL PROYECTO
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
 document.getElementById('btnLogin').onclick = async () => {
@@ -52,9 +159,9 @@ document.getElementById('btnLogin').onclick = async () => {
     if(!emailVal || !passVal) return;
 
     btn.innerText = "VERIFICANDO ADN...";
+    btn.disabled = true;
     msg.classList.add('hidden');
 
-    // 🔐 LOGIN REAL CON SUPABASE AUTH
     const { data, error } = await supabase.auth.signInWithPassword({
         email: emailVal,
         password: passVal
@@ -62,39 +169,35 @@ document.getElementById('btnLogin').onclick = async () => {
 
     if (error) {
         btn.innerText = "REINTENTAR";
+        btn.disabled = false;
         msg.classList.remove('hidden');
         return;
     }
 
-    const user = data.user;
-
-    // 🔎 OBTENER ROL DESDE TABLA USUARIOS (Sincronizado con su esquema SQL)
-    const { data: usuario, error: errorTabla } = await supabase
+    const { data: usuario } = await supabase
         .from('Usuarios')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', data.user.id)
         .maybeSingle();
 
     if (!usuario) {
-        btn.innerText = "FALLA DE PERFIL";
-        alert("Autenticado pero sin perfil en tabla Usuarios. Contacte al Comandante.");
+        btn.innerText = "ERROR DE NODO";
+        alert("Autenticado pero sin perfil en tabla Usuarios.");
+        btn.disabled = false;
         return;
     }
 
-    // 🎒 GUARDAR IDENTIDAD EN LA MOCHILA
-    localStorage.setItem('user_id', user.id);
+    localStorage.setItem('user_id', data.user.id);
     localStorage.setItem('rol', usuario.rol);
     localStorage.setItem('nombre_usuario', usuario.nombre);
 
-    // 🔁 REDIRECCIÓN INTELIGENTE (Su lógica maestra)
     btn.innerText = "ACCESO CONCEDIDO ✅";
     btn.style.background = "#10b981";
 
     setTimeout(() => {
         if (usuario.rol === 'doctor') {
-            window.location.href = `configurar-perfil.html?id=${user.id}`;
-        }
-        else if (usuario.rol === 'admin' || usuario.rol === 'asistente') {
+            window.location.href = `configurar-perfil.html?id=${data.user.id}`;
+        } else {
             window.location.href = 'asistente.html';
         }
     }, 800);
