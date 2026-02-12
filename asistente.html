@@ -3,87 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | RADAR PRO ✦</title>
+    <title>K.B SYSTEM | RADAR PRO LUXE ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: white; overflow: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.08); border-radius: 2rem; }
-        .input-kb { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 0.75rem; color: white; width: 100%; margin-bottom: 0.5rem; outline: none; }
-        .fc-event { border: none !important; padding: 5px; border-radius: 10px !important; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        #toast { transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform: translateY(100px); opacity: 0; }
+        
+        :root {
+            --luxe-gold: #c5a059;
+            --luxe-white: #ffffff;
+            --luxe-bg: #f8f9fa;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--luxe-bg); 
+            color: #1e293b; 
+            overflow: hidden; 
+        }
+
+        /* 💎 ESTILO LUXE WHITE */
+        .glass { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(197, 160, 89, 0.2); 
+            border-radius: 2.5rem; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.03);
+        }
+
+        .input-kb { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 1rem; 
+            padding: 1rem; 
+            color: #1e293b; 
+            width: 100%; 
+            margin-bottom: 0.75rem; 
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-kb:focus { border-color: var(--luxe-gold); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
+
+        /* 📅 CALENDARIO LUXE */
+        .fc { background: white; border-radius: 2rem; padding: 1.5rem; border: none !important; }
+        .fc-header-toolbar { margin-bottom: 2rem !important; }
+        .fc-toolbar-title { font-weight: 800; text-transform: uppercase; letter-spacing: -1px; color: #0f172a; }
+        .fc-button { background: #0f172a !important; border: none !important; border-radius: 1rem !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: 10px !important; padding: 0.8rem 1.5rem !important; }
+        .fc-button-active { background: var(--luxe-gold) !important; }
+
+        /* 💊 BLOQUES DE CITA */
+        .fc-event { 
+            border: none !important; 
+            padding: 8px !important; 
+            border-radius: 12px !important; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05) !important;
+            transition: 0.3s !important;
+        }
+        .fc-event:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1) !important; }
+        .fc-event-title { font-weight: 800 !important; font-size: 10px !important; }
+
+        #toast { transition: 0.5s; transform: translateY(100px); opacity: 0; }
         #toast.show { transform: translateY(0); opacity: 1; }
-        .modal-blur { backdrop-filter: blur(15px); background: rgba(2, 6, 23, 0.85); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+        
+        .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--luxe-gold); border-radius: 10px; }
     </style>
 </head>
 <body class="p-4 h-screen">
 
-    <div id="toast" class="fixed bottom-10 right-10 z-[9999] glass px-8 py-4 border-l-4 border-indigo-500 flex items-center gap-4">
-        <p id="toast-msg" class="text-[10px] font-black uppercase tracking-widest"></p>
+    <div id="toast" class="fixed bottom-10 right-10 z-[9999] glass px-8 py-4 border-l-4 border-[#c5a059] flex items-center gap-4">
+        <p id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-[#0f172a]"></p>
     </div>
 
     <div id="modalCita" class="fixed inset-0 z-[1000] hidden modal-blur flex items-center justify-center p-4">
-        <div class="glass max-w-2xl w-full p-8 shadow-2xl border-indigo-500/20 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start mb-6">
+        <div class="glass max-w-2xl w-full p-10 shadow-2xl overflow-y-auto">
+            <div class="flex justify-between items-start mb-8">
                 <div>
-                    <h2 id="m-paciente" class="text-2xl font-black italic uppercase tracking-tighter text-indigo-400">---</h2>
-                    <p id="m-servicio" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">---</p>
+                    <h2 id="m-paciente" class="text-3xl font-black italic uppercase tracking-tighter text-[#0f172a]">---</h2>
+                    <p id="m-servicio" class="text-[11px] font-bold text-[#c5a059] uppercase tracking-[0.3em] mt-1">---</p>
                 </div>
-                <button onclick="cerrarModal()" class="text-slate-500 hover:text-white transition">✕</button>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-black transition text-2xl">✕</button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div class="space-y-4">
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
-                        <div id="m-status-pill" class="text-[10px] font-black uppercase px-3 py-1 rounded-full">---</div>
-                        <a id="m-whatsapp" href="#" target="_blank" class="text-emerald-400 text-xl hover:scale-110 transition">📱</a>
+                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex justify-between items-center">
+                        <div id="m-status-pill" class="text-[10px] font-black uppercase px-4 py-2 rounded-full">---</div>
+                        <a id="m-whatsapp" href="#" target="_blank" class="text-emerald-500 text-2xl hover:scale-110 transition">📱</a>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="cambiarEstado('confirmado')" class="bg-sky-500/10 hover:bg-sky-500 text-sky-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-sky-500/20">Confirmar</button>
-                        <button onclick="cambiarEstado('atendiendo')" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-indigo-500/20">Atender</button>
-                        <button onclick="cambiarEstado('completado')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-emerald-500/20">Cobrar</button>
-                        <button onclick="cambiarEstado('no_asistio')" class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-amber-500/20">Faltó</button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="cambiarEstado('confirmado')" class="bg-sky-50 text-sky-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-sky-100 hover:bg-sky-600 hover:text-white">Confirmar</button>
+                        <button onclick="cambiarEstado('atendiendo')" class="bg-indigo-50 text-indigo-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-indigo-100 hover:bg-indigo-600 hover:text-white">Atender</button>
+                        <button onclick="cambiarEstado('completado')" class="bg-emerald-50 text-emerald-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-emerald-100 hover:bg-emerald-600 hover:text-white">Cobrar</button>
+                        <button onclick="cambiarEstado('no_asistio')" class="bg-amber-50 text-amber-600 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-amber-100 hover:bg-amber-600 hover:text-white">Faltó</button>
                     </div>
-                    <button onclick="cambiarEstado('cancelado')" class="w-full bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white p-3 rounded-xl text-[9px] font-black uppercase transition border border-rose-500/20 italic">Cancelar Cita</button>
+                    <button onclick="cambiarEstado('cancelado')" class="w-full bg-rose-50 text-rose-500 p-4 rounded-2xl text-[9px] font-black uppercase transition border border-rose-100 italic hover:bg-rose-500 hover:text-white">Cancelar Cita</button>
                 </div>
-
                 <div class="flex flex-col">
-                    <p class="text-[9px] font-black uppercase text-indigo-400 tracking-widest mb-2">Notas del Doctor</p>
-                    <textarea id="m-notas" class="w-full h-32 bg-black/30 border border-white/10 rounded-xl p-3 text-[10px] outline-none focus:border-indigo-500 transition" placeholder="Observaciones rápidas..."></textarea>
+                    <p class="text-[10px] font-black uppercase text-[#c5a059] tracking-widest mb-3">Notas Médicas</p>
+                    <textarea id="m-notas" class="w-full h-full bg-slate-50 border border-slate-100 rounded-3xl p-5 text-sm outline-none focus:border-[#c5a059] transition" placeholder="Escribir notas..."></textarea>
                 </div>
-            </div>
-
-            <div class="mt-6 border-t border-white/5 pt-6">
-                <p class="text-[9px] font-black uppercase text-indigo-400 tracking-widest mb-4">Historial Reciente (Últimas 5)</p>
-                <ul id="m-historial" class="space-y-2 text-[9px] text-slate-400 italic"></ul>
             </div>
         </div>
     </div>
 
     <div id="app" class="h-full flex flex-col">
-        <header class="flex justify-between items-center mb-6 px-4">
-            <h1 class="text-3xl font-black italic uppercase tracking-tighter">Torre de <span class="text-indigo-400">Control</span> ✦</h1>
-            <p id="nombreDoc" class="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic"></p>
+        <header class="flex justify-between items-center mb-8 px-6">
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">LUXE</span> ✦</h1>
+            <p id="nombreDoc" class="text-[11px] font-black text-[#c5a059] uppercase tracking-widest italic"></p>
         </header>
 
-        <div class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
-            <aside class="col-span-12 lg:col-span-3 glass p-6 overflow-y-auto">
-                <h3 class="text-[10px] font-black uppercase mb-6 text-indigo-400 tracking-widest italic">Inyectar Misión</h3>
-                <input id="tel" class="input-kb" placeholder="TELÉFONO" maxlength="10">
-                <input id="nom" class="input-kb" placeholder="PACIENTE">
+        <div class="grid grid-cols-12 gap-8 flex-1 overflow-hidden">
+            <aside class="col-span-12 lg:col-span-3 glass p-8 overflow-y-auto bg-white/80">
+                <h3 class="text-[11px] font-black uppercase mb-8 text-[#c5a059] tracking-widest italic border-b pb-4">Inyectar Misión</h3>
+                <input id="tel" class="input-kb" placeholder="TELÉFONO">
+                <input id="nom" class="input-kb" placeholder="NOMBRE DEL PACIENTE">
                 <select id="servicio" class="input-kb">
                     <option value="" disabled selected>SELECCIONE SERVICIO</option>
                 </select>
                 <input type="time" id="hora" class="input-kb">
-                <button id="btnAgendar" class="w-full bg-indigo-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-500/20">Agendar en Radar</button>
+                <button id="btnAgendar" class="w-full bg-[#0f172a] text-[#c5a059] p-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl hover:bg-[#c5a059] hover:text-white transition">Agendar en Radar</button>
             </aside>
 
-            <section class="col-span-12 lg:col-span-9 glass p-4 overflow-hidden relative">
+            <section class="col-span-12 lg:col-span-9 glass p-6 overflow-hidden bg-white/50">
                 <div id="calendar"></div>
             </section>
         </div>
@@ -98,8 +142,8 @@ const doctorId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 let calendar, citaSeleccionada = null;
 
 const ESTADOS = {
-    pendiente: { color: '#64748b', txt: 'Pendiente' },
-    confirmado: { color: '#0ea5e9', txt: 'Confirmado ✅' },
+    pendiente: { color: '#94a3b8', txt: 'Pendiente' },
+    confirmado: { color: '#c5a059', txt: 'Confirmado ✅' },
     atendiendo: { color: '#6366f1', txt: 'En Consulta 🩺' },
     completado: { color: '#10b981', txt: 'Completado 💰' },
     cancelado: { color: '#ef4444', txt: 'Cancelado ✕' },
@@ -118,7 +162,7 @@ async function cargarEventos(info, success) {
     if(data) {
         success(data.map(c => ({
             id: c.id, 
-            title: `${c.Pacientes.nombre} | ${c.Servicios.nombre}`,
+            title: `👤 ${c.Pacientes.nombre} \n 🩺 ${c.Servicios.nombre}`,
             start: `${c.fecha}T${c.hora_inicio}`,
             end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita) * 60000),
             backgroundColor: ESTADOS[c.estado]?.color || '#ccc',
@@ -133,11 +177,9 @@ window.abrirModal = async (cita) => {
     document.getElementById('m-servicio').innerText = cita.Servicios.nombre;
     const st = ESTADOS[cita.estado] || ESTADOS.pendiente;
     const pill = document.getElementById('m-status-pill');
-    pill.innerText = st.txt; pill.style.backgroundColor = st.color + '20'; pill.style.color = st.color;
+    pill.innerText = st.txt; pill.style.backgroundColor = st.color + '15'; pill.style.color = st.color;
     document.getElementById('m-whatsapp').href = `https://wa.me/52${cita.Pacientes.telefono}`;
     document.getElementById('m-notas').value = cita.notas || '';
-    const { data: hist } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', cita.paciente_id).order('fecha', { ascending: false }).limit(5);
-    document.getElementById('m-historial').innerHTML = hist.map(h => `<li>📅 ${h.fecha} — ${ESTADOS[h.estado]?.txt || h.estado}</li>`).join('');
     document.getElementById('modalCita').classList.remove('hidden');
 };
 
@@ -171,9 +213,20 @@ document.getElementById('btnAgendar').onclick = async () => {
             estado: 'pendiente'
         });
         if(error) throw error;
-        showToast('✅ CITA REGISTRADA');
+        showToast('✅ CITA REGISTRADA EN EL BÚNKER');
         calendar.refetchEvents();
     } catch(e) { showToast(`❌ ${e.message}`); }
+};
+
+window.cambiarEstado = async (nuevoEstado) => {
+    let payload = { estado: nuevoEstado };
+    if (nuevoEstado === 'completado') {
+        const monto = prompt('💰 Monto cobrado (MXN):', citaSeleccionada.monto || 0);
+        if (monto === null) return;
+        payload.monto = Number(monto); payload.pagado = true;
+    }
+    const { error } = await supabase.from('Citas').update(payload).eq('id', citaSeleccionada.id);
+    if (!error) { showToast(`ESTADO ACTUALIZADO`); cerrarModal(); calendar.refetchEvents(); }
 };
 
 (async () => {
@@ -186,9 +239,22 @@ document.getElementById('btnAgendar').onclick = async () => {
     }
     
     calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        locale: 'es', initialView: 'timeGridDay', slotMinTime: '08:00', slotMaxTime: '20:00',
-        allDaySlot: false, nowIndicator: true, events: cargarEventos,
-        eventClick: (info) => abrirModal(info.event.extendedProps)
+        locale: 'es', 
+        initialView: 'timeGridDay', 
+        slotMinTime: '08:00', 
+        slotMaxTime: '20:00',
+        allDaySlot: false, 
+        nowIndicator: true, 
+        events: cargarEventos,
+        eventClick: (info) => abrirModal(info.event.extendedProps),
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'timeGridDay,timeGridWeek'
+        },
+        eventDidMount: (info) => {
+            info.el.style.border = 'none';
+        }
     });
     calendar.render();
 })();
