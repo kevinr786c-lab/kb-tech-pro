@@ -7,106 +7,108 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
-        :root { --main: #6366f1; --glow: rgba(99, 102, 241, 0.2); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdff; color: #1e293b; overflow-x: hidden; }
+        :root { --main: #c5a059; --dark: #0f172a; --glow: rgba(197, 160, 89, 0.2); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
         
-        /* 💎 ESTILO K.B TECH SOLUTION */
-        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3); border-radius: 2.5rem; }
-        .card-cita { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2.5rem; border: 1px solid rgba(0,0,0,0.02); }
-        .card-cita:hover { transform: scale(1.02) translateY(-4px); box-shadow: 0 20px 40px var(--glow); }
+        /* 💎 ESTILO K.B TECH SOLUTION (GOLD & DARK) */
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(25px); border: 1px solid rgba(197, 160, 89, 0.1); border-radius: 2.5rem; }
+        .card-cita { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2.2rem; border: 1px solid rgba(197, 160, 89, 0.05); }
+        .card-cita:hover { transform: scale(1.01) translateY(-5px); box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.1); }
 
-        /* 🚥 TRIAGE DE COLOR (ADN COMANDANTE) */
-        .u-rojo { border-left: 14px solid #ef4444 !important; background: linear-gradient(90deg, #fef2f2 0%, white 100%); }
-        .u-amarillo { border-left: 14px solid #f59e0b !important; background: linear-gradient(90deg, #fffbeb 0%, white 100%); }
-        .u-verde { border-left: 14px solid #10b981 !important; background: linear-gradient(90deg, #f0fdf4 0%, white 100%); }
-        .u-azul { border-left: 14px solid #6366f1 !important; background: linear-gradient(90deg, #eef2ff 0%, white 100%); }
+        /* 🚥 TRIAGE DE RANGO (ADN K.B) */
+        .r-nuevo { border-left: 10px solid #6366f1 !important; } /* Azul: Sangre nueva */
+        .r-recurrente { border-left: 10px solid #10b981 !important; } /* Verde: Fiel */
+        .r-oro { border-left: 10px solid var(--main) !important; box-shadow: 0 0 20px var(--glow); } /* Dorado: VIP */
 
-        .btn-maestro { padding: 1.25rem; background: var(--main); color: white; border-radius: 1.5rem; font-weight: 800; transition: 0.3s; }
-        .btn-maestro:active { transform: scale(0.9); }
+        .btn-action { padding: 1.25rem; background: var(--dark); color: white; border-radius: 1.5rem; font-weight: 800; transition: 0.3s; }
+        .btn-action:hover { background: var(--main); color: white; transform: translateY(-2px); }
         
-        /* SCROLL ESTILIZADO */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        /* ✨ ESTRELLA DE MANDO */
+        .kb-star { color: var(--main); text-shadow: 0 0 10px var(--glow); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-10">
+<body class="min-h-screen p-4 md:p-8">
 
-    <nav class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-        <div class="text-center md:text-left">
-            <h1 class="text-5xl font-black italic uppercase tracking-tighter">K.B <span id="logo-tech" style="color: var(--main)">Doctor</span> ✦</h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-2 italic">Sincronización de Nodo Maestro Activa</p>
+    <nav class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-2xl">
+                <span class="kb-star text-3xl font-black">✦</span>
+            </div>
+            <div>
+                <h1 class="text-4xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span style="color: var(--main)">Doctor</span></h1>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] italic">Nodo Maestro Operativo</p>
+            </div>
         </div>
         
-        <div class="flex items-center gap-3 bg-white shadow-2xl p-4 rounded-[2.5rem] border border-slate-100">
-            <span class="text-[10px] font-black uppercase text-indigo-600 pl-4 italic">Radar Temporal:</span>
-            <input type="date" id="fechaAgenda" class="bg-transparent border-none text-xs font-black uppercase outline-none px-2 cursor-pointer">
+        <div class="flex items-center gap-4 bg-white shadow-xl p-3 px-6 rounded-[2rem] border border-slate-50">
+            <span class="text-[9px] font-black uppercase text-slate-400 italic">Ciclo Temporal</span>
+            <input type="date" id="fechaAgenda" class="bg-transparent border-none text-sm font-black uppercase outline-none cursor-pointer text-[#c5a059]">
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         <div class="lg:col-span-4 space-y-6">
-            <div class="glass-panel p-10 shadow-xl border border-white">
-                <h3 class="text-[10px] font-black uppercase tracking-widest mb-8 text-indigo-600 italic">Identidad de Nodo</h3>
-                <div id="doctor-info" class="space-y-3">
-                    <p class="text-3xl font-black uppercase italic tracking-tighter" id="display-nombre-doc">...</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest" id="display-especialidad">Sincronizando...</p>
+            <div class="glass-panel p-8 shadow-xl border border-white">
+                <div class="text-center mb-8">
+                    <div class="w-24 h-24 bg-slate-50 rounded-full mx-auto mb-4 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                        <span class="text-4xl">🩺</span>
                     </div>
+                    <h3 class="text-2xl font-black uppercase italic tracking-tighter" id="display-nombre-doc">...</h3>
+                    <p class="text-[10px] font-bold text-[#c5a059] uppercase tracking-widest mt-1" id="display-especialidad">Sincronizando ADN...</p>
                 </div>
-                <hr class="my-10 border-slate-100">
-                <div class="space-y-4">
-                    <button onclick="window.location.href='asistente.html'" class="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black text-[11px] uppercase tracking-widest hover:bg-indigo-600 transition shadow-2xl">
+                
+                <hr class="my-6 border-slate-100">
+                
+                <div class="space-y-3">
+                    <button onclick="window.location.href='asistente.html'" class="w-full py-5 bg-[#0f172a] text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:bg-[#c5a059] transition shadow-lg">
                         Radar Recepción 👩‍💼
                     </button>
-                    <button id="btn-logout" class="w-full py-4 border-2 border-slate-100 text-slate-400 rounded-[2rem] font-black text-[10px] uppercase hover:bg-rose-50 hover:text-rose-500 transition">
-                        Cerrar Sesión 🔐
+                    <button id="btn-logout" class="w-full py-4 border border-slate-100 text-slate-400 rounded-[1.5rem] font-black text-[9px] uppercase hover:bg-rose-50 hover:text-rose-500 transition">
+                        Cerrar Búnker 🔐
                     </button>
                 </div>
             </div>
         </div>
 
         <div class="lg:col-span-8">
-            <div id="contenedor-citas" class="space-y-6">
+            <div id="contenedor-citas" class="space-y-4">
                 </div>
         </div>
-
     </main>
+
+    <footer class="max-w-6xl mx-auto mt-12 mb-6 text-center">
+        <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300 italic">
+            POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026
+        </p>
+    </footer>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(
-    "https://ctvqjnckxmqeejbfwmkj.supabase.co", 
-    "sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w"
-);
+const supabase = createClient("https://ctvqjnckxmqeejbfwmkj.supabase.co", "sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w");
 
 const maestroUI = {
     user: null,
 
     async init() {
-        // 1. Verificación de Seguridad
         const { data } = await supabase.auth.getSession();
-        if (!data.session) {
-            window.location.href = 'index.html';
-            return;
-        }
+        if (!data.session) { window.location.href = 'index.html'; return; }
         this.user = data.session.user;
 
-        // 2. Carga Perfil de Usuario
         const { data: p } = await supabase.from('Usuarios').select('*').eq('id', this.user.id).single();
         if(p) {
-            document.getElementById('display-nombre-doc').innerText = `Dr. ${p.nombre}`;
-            document.getElementById('display-especialidad').innerText = p.especialidad || 'Especialista Registrado';
+            document.getElementById('display-nombre-doc').innerText = `DR. ${p.nombre.toUpperCase()}`;
+            document.getElementById('display-especialidad').innerText = p.especialidad || 'ESPECIALISTA ELITE';
         }
 
-        // 3. Encendido del Radar
         this.configurarCalendario();
         await this.cargarCitasDelDia();
 
-        // 4. Logout
         document.getElementById('btn-logout').onclick = async () => {
             await supabase.auth.signOut();
             window.location.href = 'index.html';
@@ -117,20 +119,12 @@ const maestroUI = {
         const contenedor = document.getElementById('contenedor-citas');
         const fecha = this.obtenerFechaSeleccionada();
 
-        contenedor.innerHTML = `
-            <div class="p-20 text-center animate-pulse italic text-slate-400 uppercase text-[10px] tracking-[0.5em]">
-                Escaneando actividad en el radar...
-            </div>`;
+        contenedor.innerHTML = `<div class="p-20 text-center animate-pulse italic text-slate-300 uppercase text-[9px] tracking-[0.4em]">Escaneando actividad en el radar...</div>`;
 
         try {
-            // Consulta Relacional para traer nombres de Pacientes y Servicios
             const { data: citas, error } = await supabase
                 .from('Citas')
-                .select(`
-                    *,
-                    Pacientes!fk_citas_pacientes_maestra(nombre, telefono),
-                    Servicios(nombre)
-                `)
+                .select('*, Pacientes!fk_citas_pacientes_maestra(*), Servicios(nombre)')
                 .eq('doctor_id', this.user.id)
                 .eq('fecha', fecha)
                 .neq('estado', 'cancelado')
@@ -139,66 +133,63 @@ const maestroUI = {
             if (error) throw error;
 
             if (citas.length === 0) {
-                contenedor.innerHTML = `
-                    <div class="glass-panel p-24 text-center opacity-40 font-black italic uppercase tracking-widest text-xs border-dashed border-2 border-slate-200">
-                        Radar despejado: Sin actividad para este ciclo
-                    </div>`;
+                contenedor.innerHTML = `<div class="glass-panel p-20 text-center opacity-30 font-black italic uppercase tracking-widest text-[10px] border-dashed border-2 border-slate-200">Radar Despejado: Sin actividad</div>`;
                 return;
             }
 
-            contenedor.innerHTML = citas.map(c => this.renderCita(c)).join('');
+            // Procesar citas con rango de paciente
+            const htmlCitas = await Promise.all(citas.map(async (c) => {
+                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', c.paciente_id).eq('estado', 'completado');
+                let rango = 'r-nuevo';
+                let tag = 'Paciente Nuevo';
+                if(count >= 3) { rango = 'r-oro'; tag = 'Paciente ORO ✦'; }
+                else if(count >= 1) { rango = 'r-recurrente'; tag = 'Recurrente'; }
+                
+                return this.renderCita(c, rango, tag);
+            }));
+            
+            contenedor.innerHTML = htmlCitas.join('');
         } catch (error) {
-            contenedor.innerHTML = `<div class="p-10 text-center text-rose-500 font-bold text-xs uppercase">Error de Enlace: ${error.message}</div>`;
+            contenedor.innerHTML = `<div class="p-10 text-center text-rose-500 font-bold text-xs">Error de Enlace: ${error.message}</div>`;
         }
     },
 
-    renderCita(cita) {
-        const prioridad = this.calcularTriage(cita.estado);
+    renderCita(cita, rangoClase, tag) {
         const hora = cita.hora_inicio.slice(0, 5);
-        
         return `
-            <div class="card-cita ${prioridad} glass-panel p-10 flex justify-between items-center shadow-lg bg-white overflow-hidden relative">
-                <div class="flex items-center gap-12 relative z-10">
-                    <span class="text-5xl font-black italic text-indigo-600 tracking-tighter">${hora}</span>
+            <div class="card-cita ${rangoClase} glass-panel p-6 px-8 flex justify-between items-center shadow-sm bg-white border-none">
+                <div class="flex items-center gap-10">
+                    <span class="text-4xl font-black italic text-[#0f172a] tracking-tighter">${hora}</span>
                     <div>
-                        <h3 class="font-black text-slate-800 uppercase text-xl tracking-tighter">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[7px] font-black uppercase px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">${tag}</span>
+                        </div>
+                        <h3 class="font-black text-slate-800 uppercase text-lg tracking-tighter">
                             ${cita.Pacientes?.nombre || 'PACIENTE EXTERNO'}
                         </h3>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase italic mt-1">
-                            ${cita.Servicios?.nombre || 'PROCEDIMIENTO GENERAL'}
+                        <p class="text-[10px] font-bold text-slate-400 uppercase italic">
+                            ${cita.Servicios?.nombre || 'CONSULTA GENERAL'}
                         </p>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-6 relative z-10">
-                    <div class="text-right mr-4">
-                        <span class="block text-[8px] font-black text-slate-300 uppercase mb-1">Status Radar</span>
-                        <span class="text-[9px] font-black uppercase px-5 py-2 rounded-full bg-slate-900 text-white tracking-[0.2em]">
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <span class="block text-[7px] font-black text-slate-300 uppercase mb-1 tracking-widest">Estado</span>
+                        <span class="text-[9px] font-black uppercase px-4 py-1.5 rounded-xl bg-[#0f172a] text-[#c5a059]">
                             ${cita.estado}
                         </span>
                     </div>
-                    <button class="btn-maestro shadow-2xl shadow-indigo-200 text-2xl" onclick="window.location.href='asistente.html'">
-                        🩺
+                    <button class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center hover:bg-[#c5a059] hover:text-white transition shadow-sm text-xl" onclick="window.location.href='asistente.html'">
+                        🔍
                     </button>
                 </div>
             </div>`;
     },
 
-    calcularTriage(estado) {
-        const e = estado.toLowerCase();
-        if (['urgente', 'dolor', 'cancelado'].includes(e)) return 'u-rojo';
-        if (['pendiente', 'confirmado'].includes(e)) return 'u-amarillo';
-        if (['atendiendo', 'en consulta'].includes(e)) return 'u-azul';
-        if (e === 'completado') return 'u-verde';
-        return 'u-amarillo'; // Por defecto pendiente
-    },
-
     obtenerFechaSeleccionada() {
         const input = document.getElementById('fechaAgenda');
-        if (!input.value) {
-            const hoy = new Date();
-            input.value = hoy.toLocaleDateString('en-CA'); // Formato YYYY-MM-DD
-        }
+        if (!input.value) input.value = new Date().toLocaleDateString('en-CA');
         return input.value;
     },
 
