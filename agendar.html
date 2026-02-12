@@ -14,11 +14,12 @@
         .input-premium { width: 100%; padding: 1.25rem; border-radius: 1.5rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 600; transition: 0.4s; outline: none; }
         .input-premium:focus { border-color: var(--main); box-shadow: 0 10px 25px -10px var(--main); }
         
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
-        .day-header { font-size: 7px; font-weight: 800; text-transform: uppercase; color: #94a3b8; text-align: center; }
-        .date-card { aspect-ratio: 1/1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; cursor: pointer; transition: 0.3s; }
+        /* Contenedor de scroll para los días */
+        .scroll-calendar { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .scroll-calendar::-webkit-scrollbar { display: none; }
+
+        .date-card { min-width: 65px; aspect-ratio: 1/1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 1.2rem; border: 1px solid #f1f5f9; cursor: pointer; transition: 0.3s; scroll-snap-align: start; }
         .date-card.selected { background: var(--main); color: white; transform: scale(1.05); box-shadow: 0 10px 20px -5px var(--main); }
-        .date-card.disabled { opacity: 0.15; cursor: not-allowed; filter: grayscale(1); }
         
         .time-pill { padding: 12px; border-radius: 1.25rem; background: #fff; border: 1px solid #f1f5f9; font-weight: 800; font-size: 0.75rem; text-align: center; cursor: pointer; transition: 0.3s; }
         .time-pill.selected { background: var(--main); color: white; }
@@ -60,12 +61,7 @@
                     <p>3. Fecha de Misión</p>
                     <span id="current-month" class="font-black italic uppercase text-indigo-600"></span>
                 </div>
-                <div class="calendar-grid">
-                    <div class="day-header">D</div><div class="day-header">L</div><div class="day-header">M</div>
-                    <div class="day-header">M</div><div class="day-header">J</div><div class="day-header">V</div>
-                    <div class="day-header">S</div>
-                </div>
-                <div id="date-slider" class="calendar-grid"></div>
+                <div id="date-slider" class="scroll-calendar"></div>
                 <input type="hidden" id="fecha-sel" required>
             </div>
 
@@ -88,7 +84,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-// ID DEL ESTRATEGA MAESTRO
 const docId = new URLSearchParams(window.location.search).get('id') || '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
 function eliteAviso(msg) {
@@ -100,17 +95,14 @@ function eliteAviso(msg) {
 
 async function init() {
     try {
-        const { data: doc, error } = await supabase.from('Perfiles_Medicos').select('*, Usuarios(nombre)').eq('id', docId).single();
+        const { data: doc } = await supabase.from('Perfiles_Medicos').select('*, Usuarios(nombre)').eq('id', docId).single();
         if(doc) {
             document.getElementById('doc-name').innerText = `DR. ${doc.Usuarios.nombre}`;
             document.getElementById('doc-esp').innerText = doc.especialidad;
             await cargarServicios(docId);
             renderCalendar();
-        } else { throw error; }
-    } catch (e) { 
-        console.error(e);
-        eliteAviso("ERROR: NODO NO ENCONTRADO"); 
-    }
+        }
+    } catch (e) { eliteAviso("ERROR: NODO NO ENCONTRADO"); }
 }
 
 async function cargarServicios(id) {
@@ -126,10 +118,13 @@ async function cargarServicios(id) {
 
 function renderCalendar() {
     const container = document.getElementById('date-slider');
+    container.innerHTML = "";
     const now = new Date();
+    
     document.getElementById('current-month').innerText = now.toLocaleString('es-mx', {month:'long', year:'numeric'});
 
-    for(let i=0; i<14; i++) {
+    // Generamos 30 días (Mes completo de visibilidad)
+    for(let i=0; i<30; i++) {
         const d = new Date();
         d.setDate(now.getDate() + i);
         if(d.getDay() === 0) continue; 
@@ -137,11 +132,20 @@ function renderCalendar() {
         const iso = d.toISOString().slice(0,10);
         const card = document.createElement('div');
         card.className = "date-card";
-        card.innerHTML = `<span class="text-xs font-black">${d.getDate()}</span><span class="text-[7px] uppercase font-bold">${d.toLocaleString('es-mx', {weekday:'short'})}</span>`;
+        card.innerHTML = `
+            <span class="text-[7px] uppercase font-bold text-indigo-400 mb-1">${d.toLocaleString('es-mx', {month:'short'})}</span>
+            <span class="text-xs font-black">${d.getDate()}</span>
+            <span class="text-[7px] uppercase font-bold text-slate-400 mt-1">${d.toLocaleString('es-mx', {weekday:'short'})}</span>
+        `;
+        
         card.onclick = () => {
             document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             document.getElementById('fecha-sel').value = iso;
+            
+            // Actualizar encabezado de mes dinámicamente
+            document.getElementById('current-month').innerText = d.toLocaleString('es-mx', {month:'long', year:'numeric'});
+            
             cargarHorasDisponibles(iso);
         };
         container.appendChild(card);
@@ -198,7 +202,6 @@ document.getElementById('form-cita').onsubmit = async (e) => {
         const tel = document.getElementById('telefono').value;
         const nombreP = document.getElementById('nombre').value.toUpperCase();
         
-        // Sincronización de Paciente
         let { data: paciente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
         if(!paciente) {
             const { data } = await supabase.from('Pacientes').insert({ nombre: nombreP, telefono: tel }).select().single();
@@ -207,7 +210,6 @@ document.getElementById('form-cita').onsubmit = async (e) => {
 
         const servOpt = document.getElementById('select-servicios').selectedOptions[0];
         
-        // Inserción de Cita
         const { error } = await supabase.from('Citas').insert({
             doctor_id: docId,
             paciente_id: paciente.id,
