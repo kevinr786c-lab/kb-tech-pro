@@ -51,11 +51,12 @@
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-3">
-                <div class="text-[10px] font-bold text-slate-400 px-1 uppercase italic tracking-widest">Paciente</div>
-                <input id="c-paciente" class="input-luxe" placeholder="NOMBRE COMPLETO" readonly>
-                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO" readonly>
+                <div class="text-[10px] font-bold text-slate-400 px-1 uppercase italic tracking-widest">Identidad</div>
+                <input id="c-paciente" class="input-luxe" placeholder="PACIENTE" readonly>
+                <input id="c-telefono" class="input-luxe" placeholder="TELEFONO" readonly>
+                <input id="c-servicio" class="input-luxe text-[#c5a059] font-bold" placeholder="SERVICIO" readonly>
                 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2 mt-4">
                     <input type="date" id="c-fecha" class="input-luxe">
                     <input type="time" id="c-hora" class="input-luxe">
                 </div>
@@ -67,7 +68,7 @@
                     <option value="completado">Completado</option>
                     <option value="cancelado">Cancelado</option>
                 </select>
-                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS OPERATIVAS..."></textarea>
+                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS DE LA CONSULTA..."></textarea>
             </div>
             <div class="flex justify-between mt-6 gap-2">
                 <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-emerald-600 hover:text-white transition">Actualizar Radar</button>
@@ -108,8 +109,7 @@
 
     async function cargarDoctores() {
         const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        if (error) return console.error("Error cargando doctores", error);
-        
+        if (error) return;
         const select = document.getElementById('doctorSelect');
         select.innerHTML = (data || []).map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
         doctorActual = select.value;
@@ -118,9 +118,13 @@
 
     async function cargarCitas(info, success, failure) {
         try {
-            // Sincronización oficial con el búnker
+            // 📡 SINCRONIZACIÓN MAESTRA: Usamos la relación explícita para evitar error PGRST201
             const { data, error } = await supabase.from('Citas')
-                .select('*, Pacientes(nombre, telefono), Servicios(nombre)')
+                .select(`
+                    *,
+                    Pacientes!fk_citas_pacientes_maestra(nombre, telefono),
+                    Servicios(nombre)
+                `)
                 .eq('doctor_id', doctorActual)
                 .neq('estado', 'cancelado');
 
@@ -128,7 +132,7 @@
 
             success((data || []).map(c => ({
                 id: c.id,
-                title: c.Pacientes?.nombre || 'Paciente',
+                title: c.Pacientes?.nombre || 'PACIENTE',
                 start: `${c.fecha}T${c.hora_inicio}`,
                 end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
                 backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
@@ -136,7 +140,7 @@
                 extendedProps: c
             })));
         } catch (err) {
-            console.error("Falla de Radar:", err);
+            console.error("Radar fuera de rango:", err);
             failure(err);
         }
     }
@@ -144,7 +148,6 @@
     function initCalendar() {
         const calendarEl = document.getElementById('calendar');
         if (calendar) calendar.destroy();
-        
         calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'es', initialView: 'timeGridWeek', allDaySlot: false,
             slotMinTime: '08:00', slotMaxTime: '20:00', editable: true, selectable: true,
@@ -158,11 +161,10 @@
             }),
             eventClick: (info) => abrirEditar(info.event.extendedProps),
             eventDrop: async (info) => {
-                const { error } = await supabase.from('Citas').update({
+                await supabase.from('Citas').update({
                     fecha: info.event.startStr.slice(0,10),
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
-                if(error) info.revert();
             }
         });
         calendar.render();
@@ -172,6 +174,7 @@
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'EXTERNO';
         document.getElementById('c-telefono').value = c.Pacientes?.telefono || '---';
+        document.getElementById('c-servicio').value = c.Servicios?.nombre || 'SERVICIO NO DEFINIDO';
         document.getElementById('c-fecha').value = c.fecha;
         document.getElementById('c-hora').value = c.hora_inicio;
         document.getElementById('c-estado').value = c.estado;
@@ -186,7 +189,6 @@
             estado: document.getElementById('c-estado').value,
             notas: document.getElementById('c-notas').value
         };
-
         if(citaActual) {
             const { error } = await supabase.from('Citas').update(data).eq('id', citaActual.id);
             if(!error) {
@@ -197,17 +199,15 @@
     };
 
     window.guardarBloqueo = async () => {
-        const { error } = await supabase.from('Bloqueos').insert({
+        await supabase.from('Bloqueos').insert({
             doctor_id: doctorActual,
             fecha: document.getElementById('b-fecha').value,
             hora_inicio: document.getElementById('b-inicio').value,
             hora_fin: document.getElementById('b-fin').value,
             motivo: document.getElementById('b-motivo').value.toUpperCase()
         });
-        if(!error) {
-            calendar.refetchEvents();
-            cerrarBloqueo();
-        }
+        calendar.refetchEvents();
+        cerrarBloqueo();
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
