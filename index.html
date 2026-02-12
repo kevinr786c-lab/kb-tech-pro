@@ -25,7 +25,6 @@
             min-height: 100vh;
         }
 
-        /* 🌌 Fondo Espacial de Búnker */
         .bunker-bg {
             position: absolute;
             inset: 0;
@@ -49,7 +48,6 @@
             100% { transform: scale(1.3); opacity: 0.15; }
         }
 
-        /* 💎 Estética Glassmorphism K.B Tech */
         .glass { 
             background: rgba(15, 23, 42, 0.6); 
             backdrop-filter: blur(40px); 
@@ -94,7 +92,6 @@
             filter: brightness(1.1);
         }
 
-        /* ✨ ESTRELLA DE MANDO K.B */
         @keyframes star-spin {
             0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
             50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
@@ -105,7 +102,10 @@
             display: inline-block;
             animation: star-spin 4s infinite linear;
             font-size: 2.5rem;
+            cursor: pointer;
+            transition: 0.3s;
         }
+        .kb-star:active { transform: scale(0.8); }
 
         .scan-line {
             position: absolute;
@@ -128,7 +128,7 @@
         
         <header class="mb-12 text-center">
             <div class="mb-6">
-                <span class="kb-star">✦</span>
+                <span class="kb-star" id="secret-trigger">✦</span>
             </div>
             <h1 class="text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
                 K.B <span style="color: var(--kb-gold)">SYSTEM</span>
@@ -171,6 +171,27 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
+// --- 🕵️ PROTOCOLO SECRETO DE COMANDANTE ---
+let starClicks = 0;
+let lastClickTime = 0;
+
+document.getElementById('secret-trigger').onclick = () => {
+    const currentTime = new Date().getTime();
+    
+    // Si pasa más de 1 segundo entre clics, se reinicia el contador
+    if (currentTime - lastClickTime > 1000) {
+        starClicks = 0;
+    }
+    
+    starClicks++;
+    lastClickTime = currentTime;
+
+    if (starClicks === 3) {
+        console.log("🔓 ESCOTILLA DE MANDO ABIERTA");
+        window.location.href = 'central-intelligence.html'; // Cambie al nombre de su archivo secreto
+    }
+};
+
 document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
     const emailVal = document.getElementById('email').value;
@@ -183,7 +204,6 @@ document.getElementById('loginForm').onsubmit = async (e) => {
     msg.classList.add('hidden');
 
     try {
-        // 🔐 1. Verificación de Credenciales en Auth
         const { data, error } = await supabase.auth.signInWithPassword({
             email: emailVal,
             password: passVal
@@ -191,7 +211,6 @@ document.getElementById('loginForm').onsubmit = async (e) => {
 
         if (error) throw error;
 
-        // 🧬 2. Recuperación de Perfil de Búnker
         const { data: usuario, error: userError } = await supabase
             .from('Usuarios')
             .select('*')
@@ -200,7 +219,6 @@ document.getElementById('loginForm').onsubmit = async (e) => {
 
         if (userError || !usuario) throw new Error("Nodo no reconocido");
 
-        // 🧠 3. Memoria Local Temporal
         localStorage.setItem('user_id', data.user.id);
         localStorage.setItem('rol', usuario.rol);
         localStorage.setItem('nombre', usuario.nombre);
@@ -209,7 +227,6 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         btn.style.background = "#10b981";
         btn.style.color = "white";
 
-        // 🛰️ 4. Redirección por Rango
         setTimeout(() => {
             if (usuario.rol === 'doctor') {
                 window.location.href = 'nodo-maestro.html';
@@ -222,7 +239,6 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         }, 1000);
 
     } catch (err) {
-        console.error(err);
         btn.innerText = "REINTENTAR";
         btn.disabled = false;
         msg.classList.remove('hidden');
