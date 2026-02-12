@@ -101,30 +101,33 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    // ⚡ CARGA DE DOCTORES (CON TU NUEVA LÓGICA DE CONTROL)
+    // ⚡ CARGA DE DOCTORES (CON TU LÓGICA MAESTRA)
     async function cargarDoctores() {
-        const { data, error } = await supabase.from('Usuarios').select('id, nombre').eq('rol', 'doctor');
-        
+        const { data, error } = await supabase
+            .from('Usuarios')
+            .select('id, nombre')
+            .eq('rol', 'doctor');
+
         if (error) {
-            console.error("Error en búnker:", error);
+            console.error("Falla en el búnker:", error);
             return;
         }
 
         const select = document.getElementById('doctorSelect');
 
-        // 🛡️ Menú por defecto obligatorio
+        // 🛡️ Menú por defecto: Evita arranques accidentales
         select.innerHTML = '<option value="">SELECCIONA DOCTOR</option>' + 
             data.map(d => `<option value="${d.id}">Dr. ${d.nombre}</option>`).join('');
 
-        // 🚥 Control de flujo: Solo arranca cuando hay selección real
+        // 🚥 Control de flujo reactivo
         select.onchange = () => {
             doctorActual = select.value;
-            if (doctorActual === "") return; // Protección contra selección nula
+            if (doctorActual === "") return; // Protección absoluta
 
             if (!calendar) {
-                initCalendar(); // Arranca el radar por primera vez
+                initCalendar(); // Encendido inicial del radar
             } else {
-                calendar.refetchEvents(); // Recalibra el radar existente
+                calendar.refetchEvents(); // Recalibración de datos
             }
         };
     }
@@ -151,7 +154,7 @@
         } catch (err) { failure(err); }
     }
 
-    // INICIALIZACIÓN DEL RADAR
+    // MOTOR DEL CALENDARIO
     function initCalendar() {
         const calendarEl = document.getElementById('calendar');
         if (calendar) calendar.destroy();
@@ -178,7 +181,7 @@
                     hora_inicio: info.event.startStr.slice(11,16)
                 }).eq('id', info.event.id);
                 if(error) {
-                    console.error("Falla en reprogramación:", error);
+                    console.error("Error al mover:", error);
                     info.revert();
                 }
             }
@@ -186,7 +189,7 @@
         calendar.render();
     }
 
-    // MODALES Y GESTIÓN
+    // FUNCIONES OPERATIVAS
     window.abrirEditar = (c) => {
         citaActual = c;
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
@@ -230,7 +233,7 @@
     window.abrirBloqueo = () => document.getElementById('modalBloqueo').classList.remove('hidden');
     window.cerrarBloqueo = () => document.getElementById('modalBloqueo').classList.add('hidden');
 
-    // 🚦 INICIO DE OPERACIONES
+    // 🏁 INICIO DE OPERACIONES
     cargarDoctores();
 </script>
 </body>
