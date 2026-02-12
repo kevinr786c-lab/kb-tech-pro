@@ -76,7 +76,7 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// CONFIGURACIÓN DE CONEXIÓN (MANTENIDA SEGÚN TU SOLICITUD)
+// CONFIGURACIÓN DE CONEXIÓN
 const supabase = createClient(
     "https://dgatsbnqgplalxwewpvs.supabase.co", 
     "sb_publishable_qXj4L3x_s2sP3-FFQpIOhA_GXP0qX8i"
@@ -86,7 +86,6 @@ const maestroUI = {
     user: null,
 
     async init() {
-        // 1. Verificar Sesión Real
         const { data } = await supabase.auth.getSession();
         if (!data.session) {
             window.location.href = 'index.html';
@@ -94,18 +93,15 @@ const maestroUI = {
         }
         this.user = data.session.user;
 
-        // 2. Cargar Perfil (Cruzando con Usuarios_rows.sql)
         const { data: p } = await supabase.from('Usuarios').select('*').eq('id', this.user.id).single();
         if(p) {
             document.getElementById('display-nombre-doc').innerText = `Dr. ${p.nombre}`;
             document.getElementById('display-especialidad').innerText = p.especialidad || 'Especialista Registrado';
         }
 
-        // 3. Configurar Calendario y Cargar Datos
         this.configurarCalendario();
         await this.cargarCitasDelDia();
 
-        // 4. Logout
         document.getElementById('btn-logout').onclick = async () => {
             await supabase.auth.signOut();
             window.location.href = 'index.html';
