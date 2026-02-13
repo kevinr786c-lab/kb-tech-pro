@@ -3,151 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | PANEL ASISTENTE ✦</title>
+    <title>K.B SYSTEM | PANEL ASISTENTE ELITE ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        :root { --gold: #c5a059; --dark: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; height: 100vh; }
-        .glass { background: white; border-radius: 2rem; border: 1px solid rgba(197, 160, 89,.25); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
+        :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); transition: all 0.5s ease; }
+        
+        .fc { background: transparent; border: none !important; height: 100%; }
+        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1.1rem !important; font-style: italic; }
+        .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 1rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; padding: 10px 15px !important; transition: 0.3s !important; }
+        .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
+        .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
+        
+        .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; }
+        .fc-event:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
+        
+        .event-primera { border-left: 4px solid #3b82f6 !important; }
+        .event-recurrente { border-left: 4px solid #10b981 !important; }
 
-        /* ===== 🎨 ADN VISUAL DE EVENTOS ===== */
-        .fc-event { border: none !important; border-radius: 10px !important; padding: 4px 6px !important; font-size: 11px; font-weight: 700; cursor: pointer; transition: .25s; }
-        .fc-event:hover { transform: scale(1.02); }
-
-        /* Tipo visita (Fondos) */
-        .event-primera { background: #e0f2fe !important; color: #0369a1 !important; border-left: 5px solid #0284c7 !important; }
-        .event-recurrente { background: #ecfdf5 !important; color: #065f46 !important; border-left: 5px solid #10b981 !important; }
-
-        /* Estado (Bordes) */
-        .estado-confirmado { border-left: 5px solid var(--gold) !important; }
-        .estado-atendiendo { border-left: 5px solid #22c55e !important; animation: pulse 2s infinite; }
-        .estado-completado { background: var(--dark) !important; color: var(--gold) !important; }
-        .estado-cancelado { opacity: .4; filter: grayscale(1); }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, .4); }
-            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 600; }
+        .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
+        
+        @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
+        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
+        
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+        .sync-active { animation: pulse-green 2s infinite; }
     </style>
 </head>
 <body class="p-4">
-<div class="glass h-full p-6 flex flex-col">
-    <header class="flex justify-between items-center mb-4">
-        <div>
-            <h1 class="font-black italic text-xl">K.B <span class="text-[var(--gold)]">SYSTEM</span></h1>
-            <select id="doctorSelect" class="text-xs font-bold uppercase text-slate-500 bg-transparent outline-none"></select>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="window.location.href='agendar.html?docId='+doctorActual" class="px-4 py-2 bg-[var(--gold)] text-white text-[10px] font-black rounded-xl">✚ Agendar</button>
-            <button onclick="location.reload()" class="px-4 py-2 bg-[var(--dark)] text-white rounded-xl">🔄</button>
-        </div>
-    </header>
-    <div id="calendar" class="flex-1"></div>
-</div>
 
-<div id="modalCita" class="fixed inset-0 hidden bg-black/40 backdrop-blur flex items-center justify-center z-50">
-    <div class="glass bg-white p-6 w-full max-w-md shadow-2xl">
-        <h2 class="font-black uppercase mb-4 border-b pb-2">Editar Cita <span id="badge-tipo" class="text-[9px] lowercase px-2"></span></h2>
-        <div class="space-y-3">
-            <input id="c-paciente" class="w-full p-2 rounded bg-slate-100 text-sm font-bold" readonly>
-            <input id="c-telefono" class="w-full p-2 rounded bg-slate-50 text-xs italic" readonly placeholder="Teléfono">
-            
-            <div class="grid grid-cols-2 gap-2">
-                <input type="date" id="c-fecha" class="w-full p-2 rounded border text-xs">
-                <input type="time" id="c-hora" class="w-full p-2 rounded border text-xs">
+    <div class="flex-1 glass p-6 flex flex-col overflow-hidden relative">
+        <header class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-xl">
+                    <span class="kb-star text-2xl">✦</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
+                    <select id="doctorSelect" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0 p-0">
+                        <option value="">ESCANEANDO JURISDICCIÓN...</option>
+                    </select>
+                </div>
             </div>
-
-            <select id="c-estado" class="w-full p-2 rounded font-bold text-xs uppercase border">
-                <option value="pendiente">Pendiente</option>
-                <option value="confirmado">Confirmado</option>
-                <option value="atendiendo">En consulta</option>
-                <option value="completado">Completado</option>
-                <option value="cancelado">Cancelado</option>
-            </select>
-            <textarea id="c-notas" class="w-full p-2 rounded text-sm h-20 border" placeholder="Notas..."></textarea>
             
-            <button onclick="lanzarWhatsApp()" class="w-full py-3 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-emerald-600 transition">
-                <span>WhatsApp Semi-Auto</span>
-            </button>
+            <div class="flex items-center gap-3">
+                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
+                <div class="hidden md:flex bg-slate-100 rounded-xl p-1 gap-1">
+                    <input type="month" id="mesSelector" class="bg-transparent text-[9px] font-black uppercase px-2 outline-none border-none">
+                </div>
+                <button onclick="window.location.reload()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">🔄</button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-hidden relative">
+            <div id="calendar" class="h-full"></div>
         </div>
-        <div class="flex gap-2 mt-6">
-            <button onclick="guardarCita()" class="flex-1 bg-[var(--dark)] text-[var(--gold)] py-3 rounded-xl font-black text-xs uppercase">Guardar Cambios</button>
-            <button onclick="cerrarModal()" class="text-xs uppercase text-slate-400 px-2">Cerrar</button>
+
+        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full sync-active"></div>
+                <p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">Sincronización Activa</p>
+            </div>
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300 italic">POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026</p>
+        </footer>
+    </div>
+
+    <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
+        <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
+            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
+            <div class="space-y-4">
+                <input id="c-paciente" class="input-luxe bg-slate-50 border-none" readonly>
+                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO">
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="date" id="c-fecha" class="input-luxe">
+                    <input type="time" id="c-hora" class="input-luxe">
+                </div>
+                
+                <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="confirmado">✓ Confirmado</option>
+                    <option value="atendiendo">🔥 En Consulta</option>
+                    <option value="completado">✦ Completado</option>
+                    <option value="cancelado">🚫 CANCELAR CITA</option>
+                </select>
+                
+                <textarea id="c-notas" class="input-luxe h-20" placeholder="NOTAS DE LA CONSULTA..."></textarea>
+
+                <button onclick="lanzarWhatsApp()" class="w-full py-3 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-emerald-600 transition shadow-lg shadow-emerald-100">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.888 11.888-11.888 3.176 0 6.161 1.237 8.404 3.48s3.481 5.229 3.481 8.406c0 6.555-5.333 11.888-11.888 11.888-2.01 0-3.988-.511-5.741-1.483l-6.243 1.606zm7.447-21.829c-3.175 0-6.161 1.237-8.404 3.48s-3.481 5.229-3.481 8.406c0 6.555 5.332 11.888 11.888 11.888 3.176 0 6.161-1.237 8.404-3.48s3.481-5.229 3.481-8.406c0-6.556-5.333-11.888-11.888-11.888z"/></svg>
+                    Enviar WhatsApp
+                </button>
+            </div>
+            
+            <div class="flex justify-between mt-6 gap-2">
+                <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-[#c5a059] hover:text-white transition">Actualizar Radar</button>
+                <button onclick="cerrarModal()" class="px-6 py-3 text-[9px] font-black uppercase text-slate-400">Cerrar</button>
+            </div>
         </div>
     </div>
-</div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-let calendar, doctorActual=null, citaActual=null;
+    let calendar, citaActual = null, doctorActual = null;
+    const ESTADOS = {
+        pendiente: { bg:'#f8fafc', txt:'#94a3b8' },
+        confirmado: { bg:'#fff7ed', txt:'#c5a059' },
+        atendiendo: { bg:'#f0fdf4', txt:'#10b981' },
+        completado: { bg:'#0f172a', txt:'#c5a059' },
+        cancelado: { bg:'#fef2f2', txt:'#ef4444' }
+    };
 
-async function cargarDoctores(){
-    const {data:{session}} = await supabase.auth.getSession();
-    const {data:asig} = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session?.user.id);
-    const {data:docs} = await supabase.from('Usuarios').select('id,nombre').in('id', asig?.map(a=>a.doctor_id) || []);
-    
-    const sel = document.getElementById('doctorSelect');
-    sel.innerHTML='<option value="">Elegir doctor</option>' + docs.map(d=>`<option value="${d.id}">DR. ${d.nombre}</option>`).join('');
-    sel.onchange=()=>{ doctorActual=sel.value; if(!calendar) initCalendar(); else calendar.refetchEvents(); };
-}
+    window.irAAgendar = () => {
+        if (!doctorActual) return alert("ALERTA: SELECCIONE UN DOCTOR EN JURISDICCIÓN");
+        window.location.href = `agendar.html?docId=${doctorActual}`;
+    };
 
-async function cargarCitas(info, success){
-    if(!doctorActual) return success([]);
-    const {data} = await supabase.from('Citas').select('*,Pacientes(*)').eq('doctor_id',doctorActual);
-    success(data.map(c=>{
-        const clases=[];
-        clases.push(c.Pacientes?.primera_visita ? 'event-primera':'event-recurrente');
-        clases.push(`estado-${c.estado}`);
-        return { id:c.id, title:c.Pacientes?.nombre||'Paciente', start:`${c.fecha}T${c.hora_inicio}`, classNames:clases, extendedProps:c };
-    }));
-}
+    document.getElementById('mesSelector').onchange = (e) => {
+        if(calendar) calendar.gotoDate(e.target.value + "-01");
+    };
 
-function initCalendar(){
-    calendar=new FullCalendar.Calendar(document.getElementById('calendar'),{
-        locale:'es', initialView:'timeGridDay', allDaySlot:false,
-        slotMinTime:'08:00', slotMaxTime:'20:00',
-        events:cargarCitas,
-        eventClick:(info)=>{
-            citaActual=info.event.extendedProps;
-            document.getElementById('c-paciente').value=info.event.title;
-            document.getElementById('c-telefono').value=citaActual.Pacientes?.telefono || '';
-            document.getElementById('c-fecha').value=citaActual.fecha;
-            document.getElementById('c-hora').value=citaActual.hora_inicio.slice(0,5);
-            document.getElementById('c-estado').value=citaActual.estado;
-            document.getElementById('c-notas').value=citaActual.notas||'';
-            document.getElementById('badge-tipo').innerText = citaActual.Pacientes?.primera_visita ? '✦ primera vez' : '✓ recurrente';
-            document.getElementById('modalCita').classList.remove('hidden');
-        }
-    });
-    calendar.render();
-}
+    async function cargarDoctores() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session.user.id);
+        if (!asig?.length) return;
+        const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asig.map(a => a.doctor_id));
+        const select = document.getElementById('doctorSelect');
+        select.innerHTML = '<option value="">ELIJA DOCTOR</option>' + 
+            docs.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('');
 
-window.guardarCita=async()=>{
-    await supabase.from('Citas').update({
-        fecha: document.getElementById('c-fecha').value,
-        hora_inicio: document.getElementById('c-hora').value,
-        estado: document.getElementById('c-estado').value,
-        notas: document.getElementById('c-notas').value
-    }).eq('id',citaActual.id);
-    calendar.refetchEvents();
-    cerrarModal();
-};
+        select.onchange = () => {
+            doctorActual = select.value;
+            if (doctorActual) {
+                if (!calendar) initCalendar();
+                else calendar.refetchEvents();
+            }
+        };
+    }
 
-window.lanzarWhatsApp=()=>{
-    const tel = document.getElementById('c-telefono').value;
-    if(!tel) return alert("Sin número");
-    const msg = encodeURIComponent(`Hola *${document.getElementById('c-paciente').value}*, te confirmamos tu cita el día *${document.getElementById('c-fecha').value}* a las *${document.getElementById('c-hora').value}* hrs. ✦`);
-    window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
-};
+    async function cargarCitas(info, success, failure) {
+        if (!doctorActual) return success([]);
+        const { data, error } = await supabase.from('Citas').select('*, Pacientes!fk_citas_pacientes_maestra(*)').eq('doctor_id', doctorActual);
+        if (error) return failure(error);
 
-window.cerrarModal=()=>document.getElementById('modalCita').classList.add('hidden');
-cargarDoctores();
+        success(data.map(c => {
+            const clases = [];
+            clases.push(c.Pacientes?.primera_visita ? 'event-primera' : 'event-recurrente');
+            clases.push(`estado-${c.estado}`);
+            return {
+                id: c.id,
+                title: c.Pacientes?.nombre || 'PACIENTE',
+                start: `${c.fecha}T${c.hora_inicio}`,
+                backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
+                textColor: ESTADOS[c.estado]?.txt || '#1e293b',
+                classNames: clases,
+                extendedProps: c
+            };
+        }));
+    }
+
+    function initCalendar() {
+        calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            locale: 'es', initialView: 'timeGridDay', allDaySlot: false,
+            slotMinTime: '08:00', slotMaxTime: '20:00',
+            headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
+            events: cargarCitas,
+            eventClick: (info) => {
+                citaActual = info.event.extendedProps;
+                document.getElementById('c-paciente').value = info.event.title;
+                document.getElementById('c-telefono').value = citaActual.Pacientes?.telefono || '';
+                document.getElementById('c-fecha').value = citaActual.fecha;
+                document.getElementById('c-hora').value = citaActual.hora_inicio.slice(0,5);
+                document.getElementById('c-estado').value = citaActual.estado;
+                document.getElementById('c-notas').value = citaActual.notas || '';
+                document.getElementById('modalCita').classList.remove('hidden');
+            }
+        });
+        calendar.render();
+    }
+
+    window.guardarCita = async () => {
+        const payload = {
+            fecha: document.getElementById('c-fecha').value,
+            hora_inicio: document.getElementById('c-hora').value,
+            estado: document.getElementById('c-estado').value,
+            notas: document.getElementById('c-notas').value
+        };
+        await supabase.from('Citas').update(payload).eq('id', citaActual.id);
+        calendar.refetchEvents();
+        cerrarModal();
+    };
+
+    window.lanzarWhatsApp = () => {
+        const tel = document.getElementById('c-telefono').value;
+        const nom = document.getElementById('c-paciente').value;
+        const fec = document.getElementById('c-fecha').value;
+        const hor = document.getElementById('c-hora').value;
+        const est = document.getElementById('c-estado').value;
+
+        if(!tel) return alert("Sin número");
+        
+        let msg = `Hola *${nom}*, te recordamos tu cita para el día *${fec}* a las *${hor}* hrs. ✦`;
+        if(est === 'confirmado') msg = `Hola *${nom}*, tu cita ha sido confirmada para el *${fec}* a las *${hor}* hrs. ¡Te esperamos!`;
+        
+        window.open(`https://wa.me/52${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
+    cargarDoctores();
 </script>
 </body>
 </html>
