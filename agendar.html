@@ -14,7 +14,6 @@
         .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
-        .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -58,7 +57,8 @@
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">ESCANEANDO DISPONIBILIDAD...</p>';
         
         const servOpt = selectServ.selectedOptions[0];
-        const duracionTotal = parseInt(servOpt.dataset.total) || 30;
+        // 🛰️ RECUPERACIÓN TÁCTICA DE DURACIÓN (Incluye Buffer)
+        const duracionTotal = parseInt(servOpt.getAttribute('data-total')) || 30;
 
         const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
             p_doctor: docId, 
@@ -66,21 +66,15 @@
             p_duracion: duracionTotal
         });
 
-        if (error) { radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 font-black">ERROR</p>`; return; }
+        if (error) { radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 font-black italic">FALLA EN RADAR</p>`; return; }
 
         radar.innerHTML = '';
-        
-        // 🛡️ FILTRO DE SEGURIDAD FRONTAL (REGLA DE LAS 12:30 PM)
         const fechaObj = new Date(fechaInput + 'T00:00:00');
-        const esSabado = fechaObj.getDay() === 5; // 0=Dom, 5=Sab en JS si sumamos offset
 
         slots?.forEach(s => {
-            const horaActual = s.hora; // Formato "HH:MM:SS"
-            
-            // Si NO es sábado y la hora es mayor o igual a 12:30, la bloqueamos
-            if (fechaObj.getDay() !== 5 && horaActual >= '12:30:00') {
-                return; // Salta este horario
-            }
+            const horaActual = s.hora;
+            // 🛡️ FILTRO FRONTAL: Cierre estricto 12:30 PM (L-V)
+            if (fechaObj.getDay() !== 5 && horaActual >= '12:30:00') return;
 
             const pill = document.createElement('div');
             pill.className = `time-pill`;
@@ -93,21 +87,22 @@
             radar.appendChild(pill);
         });
 
-        if (radar.innerHTML === '') {
-            radar.innerHTML = '<p class="col-span-3 text-center text-[10px] font-black text-rose-500 uppercase italic">⚠️ BÚNKER CERRADO</p>';
-        }
+        if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-[10px] font-black text-rose-500 uppercase italic">⚠️ BÚNKER CERRADO</p>';
     }
 
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
     async function init() {
-        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
+        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true).order('precio', {ascending: false});
         const select = document.getElementById('servicio');
+        
         servs?.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.dataset.total = s.duracion_min + (s.buffer_min || 0);
+            // 🛡️ INYECCIÓN DE METADATOS: Duración real + Buffer
+            opt.setAttribute('data-total', s.duracion_min + (s.buffer_min || 0));
+            opt.setAttribute('data-monto', s.precio);
             opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
             select.appendChild(opt);
         });
@@ -118,25 +113,36 @@
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
         const hora = document.getElementById('hora_seleccionada').value;
-        if(!hora) return alert("✦ SELECCIONE HORARIO");
+        const selectServ = document.getElementById('servicio');
+        const servOpt = selectServ.selectedOptions[0];
+
+        if(!hora) return alert("✦ SELECCIONE UN HORARIO DISPONIBLE");
         
         btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
         
-        // Lógica de inserción simplificada para cerrar el trato
-        const { error } = await supabase.from('Citas').insert({
-            doctor_id: docId,
-            paciente_id: '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985', // Asignamos al usuario de la dra por ahora para probar
-            fecha: document.getElementById('fecha').value,
-            hora_inicio: hora,
-            estado: 'pendiente'
-        });
+        try {
+            // 🛰️ RECUPERACIÓN DE DATOS DINÁMICOS PARA EL INSERT
+            const duracion = parseInt(servOpt.getAttribute('data-total'));
+            const monto = parseFloat(servOpt.getAttribute('data-monto'));
 
-        if (!error) {
-            alert("✅ CITA AGENDADA CON ÉXITO");
+            const { error } = await supabase.from('Citas').insert({
+                doctor_id: docId,
+                paciente_id: '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985', // Vinculado al búnker de la Dra.
+                fecha: document.getElementById('fecha').value,
+                hora_inicio: hora,
+                duracion_cita: duracion, // 🛡️ SOLUCIONADO: Ya no llega null
+                monto: monto,
+                estado: 'pendiente'
+            });
+
+            if (error) throw error;
+            alert("✅ CITA AGENDADA CON ÉXITO. EL BÚNKER HA SIDO ACTUALIZADO.");
             location.reload();
-        } else {
-            alert("ERROR: " + error.message);
+
+        } catch (err) {
+            alert("FALLA EN LA MISIÓN: " + err.message);
             btn.disabled = false;
+            btn.innerText = "Reintentar ✦";
         }
     };
 
