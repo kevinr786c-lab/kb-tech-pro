@@ -11,28 +11,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; }
-        
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; transition: all 0.5s ease; }
         
         /* 🧥 SIDEBAR RETRÁCTIL */
-        #sidebar { width: 280px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); margin-right: -280px; position: fixed; right: 0; height: 100vh; z-index: 100; }
+        #sidebar { width: 280px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); margin-right: -280px; position: fixed; right: 0; height: 100vh; z-index: 100; background: white; border-left: 1px solid rgba(197,160,89,0.2); }
         #sidebar.open { margin-right: 0; }
         
-        /* 🎨 ADN VISUAL DE EVENTOS */
         .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; font-weight: 700; }
         .event-primera { border-left: 5px solid #3b82f6 !important; }
         .event-recurrente { border-left: 5px solid #10b981 !important; }
-        
-        /* SEMÁFORO DE SERVICIOS (COLORES POR BORDE DERECHO) */
-        .serv-botox { border-right: 5px solid #a855f7 !important; }
-        .serv-facial { border-right: 5px solid #ec4899 !important; }
-        .serv-valoracion { border-right: 5px solid #64748b !important; }
 
         .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 600; }
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
-        
-        @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
+        @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
     </style>
 </head>
 <body class="p-4 gap-4">
@@ -40,21 +32,19 @@
     <div class="flex-1 flex flex-col gap-4 overflow-hidden">
         <header class="glass p-6 flex justify-between items-center shadow-xl">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center">
-                    <span class="kb-star text-2xl">✦</span>
-                </div>
+                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-xl"><span class="kb-star text-2xl">✦</span></div>
                 <div>
-                    <h1 class="text-xl font-black italic uppercase text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
-                    <select id="doctorSelect" class="text-[10px] font-black uppercase text-slate-400 bg-transparent outline-none cursor-pointer border-none p-0"></select>
+                    <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
+                    <select id="doctorSelect" class="text-[10px] font-black uppercase text-slate-400 bg-transparent border-none p-0 outline-none"></select>
                 </div>
             </div>
 
             <div class="flex-1 max-w-md mx-4">
-                <input type="text" id="buscadorLocal" oninput="filtrarRadar()" placeholder="ESCANEANDO PACIENTE..." class="input-luxe text-center uppercase tracking-widest border-none bg-slate-100 focus:bg-white focus:ring-2 focus:ring-[#c5a059]">
+                <input type="text" id="buscadorLocal" oninput="filtrarRadar()" placeholder="ESCANEANDO PACIENTE..." class="input-luxe text-center uppercase tracking-widest border-none bg-slate-100">
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg">✚ Agendar</button>
+                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
                 <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">☰</button>
             </div>
         </header>
@@ -64,34 +54,24 @@
         </div>
     </div>
 
-    <aside id="sidebar" class="glass p-8 flex flex-col shadow-2xl bg-white/95">
+    <aside id="sidebar" class="p-8 flex flex-col shadow-2xl">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-sm font-black uppercase italic text-[#0f172a]">Comandos <span class="text-[#c5a059]">Élite</span></h2>
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-rose-500">✕</button>
         </div>
-
-        <div class="space-y-6 flex-1 overflow-y-auto pr-2">
-            <div id="paciente-info" class="hidden">
-                <p class="text-[8px] font-black text-slate-400 uppercase mb-2">Historial del Sujeto</p>
-                <div id="historial-lista" class="space-y-2 mb-6">
-                    </div>
-            </div>
-
-            <div class="space-y-3 pt-4 border-t">
-                <p class="text-[8px] font-black text-slate-400 uppercase">Administración</p>
-                <button onclick="location.reload()" class="w-full text-left p-3 rounded-xl bg-slate-100 text-[10px] font-bold hover:bg-[#c5a059] hover:text-white transition">🔄 REFRESCAR SISTEMA</button>
-                <button onclick="window.location.href='perfil.html'" class="w-full text-left p-3 rounded-xl bg-slate-100 text-[10px] font-bold hover:bg-[#0f172a] hover:text-white transition">⚙️ PERFIL DEL BÚNKER</button>
-            </div>
+        <div id="paciente-info" class="hidden flex-1 overflow-y-auto pr-2">
+            <p class="text-[8px] font-black text-slate-400 uppercase mb-2">Historial Reciente</p>
+            <div id="historial-lista" class="space-y-2"></div>
         </div>
-
-        <footer class="mt-auto pt-6 text-[8px] font-black text-slate-300 text-center uppercase tracking-widest">
-            K.B TECH SOLUTIONS 2026
-        </footer>
+        <div class="pt-4 border-t space-y-2">
+            <button onclick="location.reload()" class="w-full text-left p-3 rounded-xl bg-slate-100 text-[10px] font-bold hover:bg-[#c5a059] transition">🔄 REFRESCAR</button>
+            <p class="text-[8px] font-black text-slate-300 text-center uppercase mt-4">K.B TECH 2026</p>
+        </div>
     </aside>
 
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
-            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Táctica</span></h2>
+            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-4">
                 <input id="c-paciente" class="input-luxe bg-slate-50 border-none" readonly>
                 <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO">
@@ -103,11 +83,11 @@
                     <option value="completado">✦ Completado</option>
                     <option value="cancelado">🚫 Cancelar</option>
                 </select>
-                <button onclick="lanzarWhatsApp('confirmacion')" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 hover:bg-emerald-600 transition">📱 Enviar Recordatorio</button>
+                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2">📱 WhatsApp</button>
                 <textarea id="c-notas" class="input-luxe h-20" placeholder="NOTAS..."></textarea>
             </div>
             <div class="flex gap-2 mt-6">
-                <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] hover:bg-[#c5a059] hover:text-white transition">Actualizar Radar</button>
+                <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px]">Actualizar</button>
                 <button onclick="cerrarModal()" class="px-6 py-3 text-[9px] font-black uppercase text-slate-400">Cerrar</button>
             </div>
         </div>
@@ -119,71 +99,57 @@
 
     let calendar, citaActual = null, doctorActual = null, todasLasCitas = [];
 
-    // 🚀 INICIO DEL SISTEMA
-    async function init() {
-        await cargarDoctores();
-    }
-
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
 
-    // 🔍 BUSCADOR LOCAL DEEP SCAN
+    // 🔍 BUSCADOR (FIXED)
     window.filtrarRadar = () => {
         const query = document.getElementById('buscadorLocal').value.toUpperCase();
-        const eventosFiltrados = todasLasCitas.filter(c => 
-            c.Pacientes?.nombre.toUpperCase().includes(query)
-        ).map(c => procesarCitaParaCalendario(c));
-        
+        const filtradas = todasLasCitas.filter(c => (c.Pacientes?.nombre || '').toUpperCase().includes(query));
         calendar.removeAllEvents();
-        calendar.addEventSource(eventosFiltrados);
+        calendar.addEventSource(filtradas.map(c => procesarCitaParaCalendario(c)));
     };
 
     function procesarCitaParaCalendario(c) {
         const ESTADOS = { pendiente: '#f8fafc', confirmado: '#fff7ed', atendiendo: '#f0fdf4', completado: '#0f172a', cancelado: '#fef2f2' };
         const TXT = { pendiente: '#94a3b8', confirmado: '#c5a059', atendiendo: '#10b981', completado: '#c5a059', cancelado: '#ef4444' };
-        
         return {
             id: c.id,
             title: c.Pacientes?.nombre || 'PACIENTE',
             start: `${c.fecha}T${c.hora_inicio}`,
-            backgroundColor: ESTADOS[c.estado],
-            textColor: TXT[c.estado],
-            classNames: [
-                c.Pacientes?.primera_visita ? 'event-primera' : 'event-recurrente',
-                c.servicios?.nombre.toLowerCase().includes('botox') ? 'serv-botox' : ''
-            ],
+            backgroundColor: ESTADOS[c.estado] || '#f8fafc',
+            textColor: TXT[c.estado] || '#1e293b',
+            classNames: [c.Pacientes?.primera_visita ? 'event-primera' : 'event-recurrente'],
             extendedProps: c
         };
     }
 
+    // 🧠 CARGA REPARADA (Blindada contra nulos)
     async function cargarCitas() {
-        if (!doctorActual) return;
-        const { data } = await supabase.from('Citas').select('*, Pacientes!fk_citas_pacientes_maestra(*), servicios(*)').eq('doctor_id', doctorActual);
+        if (!doctorActual) return [];
+        const { data, error } = await supabase.from('Citas').select('*, Pacientes!fk_citas_pacientes_maestra(*)').eq('doctor_id', doctorActual);
+        if (error) return [];
         todasLasCitas = data || [];
         return todasLasCitas.map(c => procesarCitaParaCalendario(c));
     }
 
     async function verHistorial(pacienteId) {
-        const { data } = await supabase.from('Citas').select('fecha, estado, servicios(nombre)').eq('paciente_id', pacienteId).order('fecha', { ascending: false }).limit(5);
+        if(!pacienteId) return;
+        const { data } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', pacienteId).order('fecha', { ascending: false }).limit(5);
         const lista = document.getElementById('historial-lista');
-        const contenedor = document.getElementById('paciente-info');
-        
-        lista.innerHTML = data.map(c => `
-            <div class="p-2 bg-slate-50 rounded-lg border">
-                <p class="text-[9px] font-black uppercase">${c.servicios?.nombre || 'SERVICIO'}</p>
-                <div class="flex justify-between text-[7px] font-bold text-slate-400">
+        lista.innerHTML = (data || []).map(c => `
+            <div class="p-2 bg-slate-50 rounded-lg border mb-2">
+                <div class="flex justify-between text-[8px] font-black">
                     <span>${c.fecha}</span>
-                    <span class="uppercase">${c.estado}</span>
+                    <span class="uppercase text-[#c5a059]">${c.estado}</span>
                 </div>
-            </div>
-        `).join('');
-        contenedor.classList.remove('hidden');
+            </div>`).join('');
+        document.getElementById('paciente-info').classList.remove('hidden');
         if(!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
     }
 
     function initCalendar() {
         calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             locale: 'es', initialView: 'timeGridDay', allDaySlot: false,
-            headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
             events: (info, success) => cargarCitas().then(success),
             eventClick: (info) => {
                 citaActual = info.event.extendedProps;
@@ -199,15 +165,6 @@
         calendar.render();
     }
 
-    window.lanzarWhatsApp = (tipo) => {
-        const tel = document.getElementById('c-telefono').value;
-        const nom = document.getElementById('c-paciente').value;
-        if(!tel) return alert("Sin número");
-        let msg = `Hola *${nom}*, te recordamos tu cita el día *${document.getElementById('c-fecha').value}* a las *${document.getElementById('c-hora').value}* hrs. ✦`;
-        window.open(`https://wa.me/52${tel}?text=${encodeURIComponent(msg)}`, '_blank');
-    };
-
-    // ... (CargarDoctores y funciones base se mantienen igual para no fallar)
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
         const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session?.user.id);
@@ -218,15 +175,22 @@
     }
 
     window.guardarCita = async () => {
-        const payload = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
-        await supabase.from('Citas').update(payload).eq('id', citaActual.id);
+        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
+        await supabase.from('Citas').update(p).eq('id', citaActual.id);
         calendar.refetchEvents(); cerrarModal();
+    };
+
+    window.lanzarWhatsApp = () => {
+        const tel = document.getElementById('c-telefono').value;
+        if(!tel) return alert("Sin número");
+        const msg = encodeURIComponent(`Hola *${document.getElementById('c-paciente').value}*, te recordamos tu cita el día *${document.getElementById('c-fecha').value}* a las *${document.getElementById('c-hora').value}* hrs. ✦`);
+        window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
     window.irAAgendar = () => { if (!doctorActual) return alert("ELIJA DOCTOR"); window.location.href = `agendar.html?docId=${doctorActual}`; };
 
-    init();
+    cargarDoctores();
 </script>
 </body>
 </html>
