@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); transition: all 0.5s ease; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); }
         
         /* 🎨 ESTILO CALENDARIO K.B */
         .fc { background: transparent; border: none !important; height: 100%; }
@@ -21,26 +21,21 @@
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
         
         /* 🧬 ESTATUS DE EVENTOS */
-        .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; }
-        .fc-event:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
+        .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; font-weight: 700; font-size: 10px; }
         
-        .event-nuevo { border-left: 4px solid #3b82f6 !important; }
-        .event-recurrente { border-left: 4px solid #10b981 !important; }
-        .event-oro { border-left: 4px solid var(--luxe-gold) !important; box-shadow: 0 0 15px rgba(197, 160, 89, 0.3) !important; }
-
-        .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; }
+        .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 600; }
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
-        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; transition: color 0.5s ease; }
-        
-        /* Pulso de Sincronización */
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
+
+        /* Pulso para Citas en Consulta */
+        @keyframes pulse-live {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
-        .sync-active { animation: pulse-green 2s infinite; }
+        .event-atendiendo { animation: pulse-live 2s infinite; }
     </style>
 </head>
 <body class="p-4">
@@ -53,76 +48,64 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
-                    <div class="flex items-center gap-2">
-                        <select id="doctorSelect" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none focus:ring-0 p-0">
-                            <option value="">ESCANEANDO JURISDICCIÓN...</option>
-                        </select>
-                    </div>
+                    <select id="doctorSelect" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none p-0">
+                        <option value="">ESCANEANDO JURISDICCIÓN...</option>
+                    </select>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
-                <button onclick="irAPerfil()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#0f172a] text-[#c5a059] border border-[#c5a059]/30 rounded-xl hover:bg-[#c5a059] hover:text-white transition">⚙ Perfil</button>
-                
-                <div class="hidden md:flex bg-slate-100 rounded-xl p-1 gap-1">
-                    <input type="month" id="mesSelector" class="bg-transparent text-[9px] font-black uppercase px-2 outline-none border-none">
-                </div>
-                <button onclick="abrirBloqueo()" class="text-[9px] font-black uppercase px-4 py-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-rose-400 transition">🚫 Bloquear</button>
+                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Nueva Cita</button>
                 <button onclick="window.location.reload()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">🔄</button>
             </div>
         </header>
 
-        <div class="flex-1 overflow-hidden relative">
+        <div class="flex-1 overflow-hidden">
             <div id="calendar" class="h-full"></div>
         </div>
 
-        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-300">
             <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-emerald-500 rounded-full sync-active"></div>
-                <p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">Sincronización Activa</p>
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <p class="text-emerald-500">Radar Operativo</p>
             </div>
-            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300 italic">
-                POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026
-            </p>
+            <p>POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026</p>
         </footer>
     </div>
 
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
-            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
-            <div class="space-y-3">
-                <input id="c-paciente" class="input-luxe" placeholder="NOMBRE DEL PACIENTE">
-                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO">
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                    <input type="date" id="c-fecha" class="input-luxe">
-                    <input type="time" id="c-hora" class="input-luxe">
-                </div>
-                <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
-                    <option value="pendiente">Pendiente</option>
-                    <option value="confirmado">Confirmado</option>
-                    <option value="atendiendo">En Consulta</option>
-                    <option value="completado">Completado</option>
-                    <option value="cancelado">CANCELAR CITA</option>
-                </select>
-                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS DE LA CONSULTA..."></textarea>
-            </div>
-            <div class="flex justify-between mt-6 gap-2">
-                <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-emerald-600 hover:text-white transition">Actualizar Radar</button>
-                <button onclick="cerrarModal()" class="px-6 py-3 text-[9px] font-black uppercase text-slate-400">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalBloqueo" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
-        <div class="glass max-w-sm w-full p-8 bg-white">
-            <h2 class="text-lg font-black uppercase italic text-rose-500 mb-6 border-b pb-2">Inyectar <span class="text-slate-800">Bloqueo</span></h2>
+            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Estatus de <span class="text-[#c5a059]">Misión</span></h2>
             <div class="space-y-4">
-                <input type="date" id="b-fecha" class="input-luxe">
-                <div class="grid grid-cols-2 gap-2"><input type="time" id="b-inicio" class="input-luxe" value="08:00"><input type="time" id="b-fin" class="input-luxe" value="14:00"></div>
-                <input id="b-motivo" class="input-luxe" placeholder="MOTIVO">
-                <button onclick="guardarBloqueo()" class="w-full py-4 bg-rose-500 text-white rounded-xl font-black uppercase text-[9px] tracking-widest">Bloquear Radar</button>
-                <button onclick="cerrarBloqueo()" class="w-full text-[9px] font-black uppercase text-slate-400 mt-2 text-center">Cancelar</button>
+                <div>
+                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Paciente & Rango</p>
+                    <input id="c-paciente" class="input-luxe bg-slate-50" readonly>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Fecha</p>
+                        <input type="date" id="c-fecha" class="input-luxe" readonly>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Hora</p>
+                        <input type="time" id="c-hora" class="input-luxe" readonly>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Semáforo de Estado</p>
+                    <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
+                        <option value="pendiente">⏳ PENDIENTE (ESPERA)</option>
+                        <option value="confirmado">✓ CONFIRMADO (EN CAMINO)</option>
+                        <option value="atendiendo">🔥 EN CONSULTA (ACTIVO)</option>
+                        <option value="completado">✦ COMPLETADO (FINALIZADO)</option>
+                        <option value="cancelado">🚫 CANCELAR CITA</option>
+                    </select>
+                </div>
+                <textarea id="c-notas" class="input-luxe h-20" placeholder="OBSERVACIONES MÉDICAS..."></textarea>
+            </div>
+            <div class="flex justify-between mt-8 gap-3">
+                <button onclick="guardarCita()" class="flex-1 py-4 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-[#c5a059] hover:text-white transition">Actualizar Radar</button>
+                <button onclick="cerrarModal()" class="px-4 py-4 text-[9px] font-black uppercase text-slate-400">Cerrar</button>
             </div>
         </div>
     </div>
@@ -132,74 +115,53 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     let calendar, citaActual = null, doctorActual = null;
+
+    // 🎨 SEMÁFORO TÁCTICO: COLORES POR ESTADO
     const ESTADOS = {
-        pendiente: { bg:'#f8fafc', txt:'#94a3b8' },
-        confirmado: { bg:'#fffdf5', txt:'#c5a059' },
-        atendiendo: { bg:'#f0fdf4', txt:'#10b981' },
-        completado: { bg:'#0f172a', txt:'#c5a059' },
-        cancelado: { bg:'#fef2f2', txt:'#ef4444' }
+        pendiente: { bg:'#fef3c7', txt:'#b45309', class:'' },     // Ámbar
+        confirmado: { bg:'#dbeafe', txt:'#1d4ed8', class:'' },    // Azul
+        atendiendo: { bg:'#dcfce7', txt:'#10b981', class:'event-atendiendo' }, // Verde Pulse
+        completado: { bg:'#0f172a', txt:'#c5a059', class:'' },    // Dark/Gold
+        cancelado: { bg:'#fef2f2', txt:'#ef4444', class:'' }      // Rojo
     };
 
-    // --- 🛰️ FUNCIONES DE NAVEGACIÓN INTELIGENTE ---
+    // 🛰️ NAVEGACIÓN
     window.irAAgendar = () => {
-        if (!doctorActual) return alert("ALERTA: SELECCIONE UN DOCTOR EN JURISDICCIÓN");
+        if (!doctorActual) return alert("ERROR: SELECCIONE DOCTOR");
         window.location.href = `agendar.html?docId=${doctorActual}`;
     };
 
-    window.irAPerfil = () => {
-        if (!doctorActual) return alert("ALERTA: SELECCIONE UN DOCTOR EN JURISDICCIÓN");
-        window.location.href = `configurar-perfil.html?docId=${doctorActual}`;
-    };
-
-    document.getElementById('mesSelector').onchange = (e) => {
-        if(calendar) calendar.gotoDate(e.target.value + "-01");
-    };
+    // 🧠 INTELIGENCIA DE RANGO (PRIMERA VISITA VS SECUENCIA)
+    async function obtenerRango(pacienteId, citaId) {
+        const { count } = await supabase.from('Citas')
+            .select('*', { count: 'exact', head: true })
+            .eq('paciente_id', pacienteId)
+            .eq('estado', 'completado')
+            .lt('created_at', (await supabase.from('Citas').select('created_at').eq('id', citaId).single()).data.created_at);
+        
+        return count === 0 ? "✦ PRIMERA VISITA" : `✓ SECUENCIA (#${count + 1})`;
+    }
 
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        const { data: asignaciones, error } = await supabase
-            .from('Asistentes_Doctor')
-            .select('doctor_id, turno')
-            .eq('asistente_id', session.user.id);
+        const { data: asignaciones } = await supabase.from('Asistentes_Doctor').select('doctor_id, turno').eq('asistente_id', session.user.id);
+        
+        if (!asignaciones?.length) return;
 
-        if (error || !asignaciones || asignaciones.length === 0) {
-            document.getElementById('doctorSelect').innerHTML = '<option value="">SIN DOCTORES ASIGNADOS</option>';
-            return;
-        }
-
-        const idsDoctores = asignaciones.map(a => a.doctor_id);
-        const { data: doctoresReales } = await supabase
-            .from('Usuarios')
-            .select('id, nombre')
-            .in('id', idsDoctores);
+        const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asignaciones.map(a => a.doctor_id));
 
         const select = document.getElementById('doctorSelect');
-        select.innerHTML = '<option value="">ELIJA DOCTOR OPERATIVO</option>' + 
-            asignaciones.map(a => {
-                const docInfo = doctoresReales?.find(d => d.id === a.doctor_id);
-                const nombre = docInfo?.nombre ? docInfo.nombre.toUpperCase() : "DOCTOR NO IDENTIFICADO";
-                const turno = a.turno ? a.turno.toUpperCase() : "TURNO GENERAL";
-                return `<option value="${a.doctor_id}">DR. ${nombre} (${turno})</option>`;
-            }).join('');
+        select.innerHTML = '<option value="">SELECCIONE JURISDICCIÓN</option>' + 
+            docs.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('');
 
         select.onchange = () => {
             doctorActual = select.value;
-            if (doctorActual === "") return;
-
-            const star = document.querySelector('.kb-star');
-            const glass = document.querySelector('.glass');
-            if(select.options[select.selectedIndex].text.includes("ELENA")) {
-                star.style.color = "#f472b6"; 
-                glass.style.borderColor = "rgba(244, 114, 182, 0.4)";
-            } else {
-                star.style.color = "#c5a059"; 
-                glass.style.borderColor = "rgba(197, 160, 89, 0.4)";
+            if (doctorActual) {
+                if (!calendar) initCalendar();
+                else calendar.refetchEvents();
             }
-            
-            if (!calendar) initCalendar();
-            else calendar.refetchEvents();
         };
     }
 
@@ -208,8 +170,8 @@
         try {
             const { data, error } = await supabase.from('Citas')
                 .select('*, Pacientes!fk_citas_pacientes_maestra(*)')
-                .eq('doctor_id', doctorActual)
-                .neq('estado', 'cancelado');
+                .eq('doctor_id', doctorActual);
+            
             if (error) throw error;
 
             const eventos = data.map(c => ({
@@ -218,6 +180,7 @@
                 start: `${c.fecha}T${c.hora_inicio}`,
                 backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
                 textColor: ESTADOS[c.estado]?.txt || '#1e293b',
+                className: ESTADOS[c.estado]?.class || '',
                 extendedProps: c
             }));
             success(eventos);
@@ -226,57 +189,36 @@
 
     function initCalendar() {
         calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-            locale: 'es', initialView: 'timeGridWeek', allDaySlot: false,
-            slotMinTime: '08:00', slotMaxTime: '20:00', editable: true, selectable: true,
+            locale: 'es', initialView: 'timeGridDay', allDaySlot: false,
+            slotMinTime: '08:00', slotMaxTime: '20:00', height: '100%',
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
             events: cargarCitas,
-            select: (info) => {
-                citaActual = null;
-                document.getElementById('c-fecha').value = info.startStr.slice(0,10);
-                document.getElementById('c-hora').value = info.startStr.slice(11,16);
+            eventClick: async (info) => {
+                const c = info.event.extendedProps;
+                citaActual = c;
+                const rango = await obtenerRango(c.paciente_id, c.id);
+                
+                document.getElementById('c-paciente').value = `${c.Pacientes?.nombre} (${rango})`;
+                document.getElementById('c-fecha').value = c.fecha;
+                document.getElementById('c-hora').value = c.hora_inicio.slice(0,5);
+                document.getElementById('c-estado').value = c.estado;
+                document.getElementById('c-notas').value = c.notas || '';
                 document.getElementById('modalCita').classList.remove('hidden');
-            },
-            eventClick: (info) => abrirEditar(info.event.extendedProps)
+            }
         });
         calendar.render();
     }
 
-    window.nuevaMision = () => {
-        // Redirigir directamente al agendador externo
-        irAAgendar();
-    };
-
-    window.abrirEditar = (c) => {
-        citaActual = c;
-        document.getElementById('c-paciente').value = c.Pacientes?.nombre || '';
-        document.getElementById('c-telefono').value = c.Pacientes?.telefono || '';
-        document.getElementById('c-fecha').value = c.fecha;
-        document.getElementById('c-hora').value = c.hora_inicio.slice(0,5);
-        document.getElementById('c-estado').value = c.estado;
-        document.getElementById('c-notas').value = c.notas || '';
-        document.getElementById('modalCita').classList.remove('hidden');
-    };
-
     window.guardarCita = async () => {
-        if(!doctorActual) return;
         const payload = {
-            fecha: document.getElementById('c-fecha').value,
-            hora_inicio: document.getElementById('c-hora').value,
             estado: document.getElementById('c-estado').value,
-            notas: document.getElementById('c-notas').value,
-            doctor_id: doctorActual
+            notas: document.getElementById('c-notas').value
         };
-        
-        let res;
-        if(citaActual) res = await supabase.from('Citas').update(payload).eq('id', citaActual.id);
-        else res = await supabase.from('Citas').insert(payload);
-        
-        if(!res.error) { calendar.refetchEvents(); cerrarModal(); }
+        const { error } = await supabase.from('Citas').update(payload).eq('id', citaActual.id);
+        if(!error) { calendar.refetchEvents(); cerrarModal(); }
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
-    window.abrirBloqueo = () => document.getElementById('modalBloqueo').classList.remove('hidden');
-    window.cerrarBloqueo = () => document.getElementById('modalBloqueo').classList.add('hidden');
 
     cargarDoctores();
 </script>
