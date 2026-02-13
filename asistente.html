@@ -16,7 +16,6 @@
         #sidebar { width: 280px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); margin-right: -280px; position: fixed; right: 0; height: 100vh; z-index: 100; background: white; border-left: 1px solid rgba(197,160,89,0.2); }
         #sidebar.open { margin-right: 0; }
         
-        /* 🎨 PERSONALIZACIÓN DE BOTONES DE NAVEGACIÓN */
         .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 0.8rem !important; font-weight: 800; text-transform: uppercase; font-size: 8px !important; padding: 8px 10px !important; transition: 0.3s !important; color: white !important; }
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-1px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3) !important; }
@@ -40,7 +39,9 @@
                 <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-xl"><span class="kb-star text-2xl">✦</span></div>
                 <div>
                     <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
-                    <select id="doctorSelect" class="text-[10px] font-black uppercase text-slate-400 bg-transparent border-none p-0 outline-none cursor-pointer hover:text-[#c5a059] transition"></select>
+                    <select id="doctorSelect" class="text-[10px] font-black uppercase text-slate-400 bg-transparent border-none p-0 outline-none cursor-pointer hover:text-[#c5a059] transition">
+                        <option value="">ESCANEANDO DOCTORES...</option>
+                    </select>
                 </div>
             </div>
 
@@ -129,7 +130,7 @@
 
     async function cargarCitas() {
         if (!doctorActual) return [];
-        const { data, error } = await supabase.from('Citas').select('*, Pacientes!fk_citas_pacientes_maestra(*)').eq('doctor_id', doctorActual);
+        const { data, error } = await supabase.from('Citas').select('*, Pacientes(*)').eq('doctor_id', doctorActual);
         if (error) return [];
         todasLasCitas = data || [];
         return todasLasCitas.map(c => procesarCitaParaCalendario(c));
@@ -155,7 +156,6 @@
             locale: 'es',
             initialView: 'timeGridDay',
             allDaySlot: false,
-            // 🛰️ NAVEGACIÓN ANUAL (12 MESES) ACTIVADA
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -176,6 +176,7 @@
                 document.getElementById('c-fecha').value = citaActual.fecha;
                 document.getElementById('c-hora').value = citaActual.hora_inicio.slice(0,5);
                 document.getElementById('c-estado').value = citaActual.estado;
+                document.getElementById('c-notas').value = citaActual.notas || '';
                 document.getElementById('modalCita').classList.remove('hidden');
                 verHistorial(citaActual.paciente_id);
             }
@@ -185,10 +186,14 @@
 
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
-        const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session?.user.id);
+        if (!session) {
+            document.getElementById('doctorSelect').innerHTML = '<option value="">ERROR DE SESIÓN</option>';
+            return;
+        }
+        const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session.user.id);
         const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asig?.map(a => a.doctor_id) || []);
         const select = document.getElementById('doctorSelect');
-        select.innerHTML = '<option value="">ELEGIR DOCTOR</option>' + docs.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('');
+        select.innerHTML = '<option value="">ELEGIR DOCTOR</option>' + (docs?.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('') || '');
         select.onchange = () => { doctorActual = select.value; if (!calendar) initCalendar(); else calendar.refetchEvents(); };
     }
 
@@ -200,13 +205,24 @@
 
     window.lanzarWhatsApp = () => {
         const tel = document.getElementById('c-telefono').value;
+        const nombre = document.getElementById('c-paciente').value;
+        const fecha = document.getElementById('c-fecha').value;
+        const hora = document.getElementById('c-hora').value;
+        
         if(!tel) return alert("Sin número");
-        const msg = encodeURIComponent(`Hola *${document.getElementById('c-paciente').value}*, te recordamos tu cita el día *${document.getElementById('c-fecha').value}* a las *${document.getElementById('c-hora').value}* hrs. ✦`);
+
+        // 🔗 LINK SUGERIDO POR ELENA PARA AUTOGESTIÓN
+        const linkAgenda = window.location.origin + "/agendar.html?docId=" + doctorActual;
+        
+        const msg = encodeURIComponent(`Hola *${nombre}*, te recordamos tu cita el día *${fecha}* a las *${hora}* hrs. ✦\n\nSi necesitas agendar otra fecha o ver disponibilidad, entra aquí: ${linkAgenda}`);
         window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
-    window.irAAgendar = () => { if (!doctorActual) return alert("ELIJA DOCTOR"); window.location.href = `agendar.html?docId=${doctorActual}`; };
+    window.irAAgendar = () => { 
+        if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO"); 
+        window.location.href = `agendar.html?docId=${doctorActual}`; 
+    };
 
     cargarDoctores();
 </script>
