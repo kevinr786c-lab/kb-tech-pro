@@ -3,56 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONFIGURACIÓN ELITE | K.B SYSTEM ✦</title>
+    <title>CONFIGURACIÓN | K.B SYSTEM ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        :root { --main: #111827; --gold: #c5a059; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f9fafb; color: var(--main); }
-        .card-pro { background: white; border-radius: 1.5rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .input-pro { width: 100%; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #d1d5db; font-size: 14px; outline: none; transition: 0.2s; }
-        .input-pro:focus { border-color: var(--main); ring: 2px; ring-color: #e5e7eb; }
-        .btn-black { background: var(--main); color: white; padding: 1rem; border-radius: 1rem; font-weight: 800; text-transform: uppercase; width: 100%; transition: 0.3s; }
-        .btn-black:hover { background: #374151; transform: translateY(-2px); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; }
+        .card-kb { background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .input-kb { width: 100%; padding: 0.6rem; border-radius: 0.75rem; border: 1px solid #cbd5e1; outline: none; font-size: 13px; }
+        .btn-mision { background: #0f172a; color: white; padding: 0.8rem; border-radius: 1rem; font-weight: 800; text-transform: uppercase; width: 100%; transition: 0.3s; font-size: 11px; }
+        .btn-mision:hover { background: #334155; transform: translateY(-2px); }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto space-y-6">
-        <header class="card-pro p-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-extrabold uppercase italic">Configuración <span class="text-gray-400">Maestra</span></h1>
-                <p id="doc-status" class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-widest">Sincronizando Jurisdicción...</p>
-            </div>
-            <button onclick="window.history.back()" class="text-[10px] font-black uppercase text-gray-400 hover:text-black">← Volver</button>
+        <header class="card-kb p-6 flex justify-between items-center">
+            <h1 class="text-xl font-black uppercase tracking-tighter italic">Configuración <span class="text-[#c5a059]">Maestra</span></h1>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronizando Búnker ✦</span>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <section class="card-pro p-6 space-y-6">
-                <h3 class="text-xs font-black uppercase border-l-4 border-black pl-3 tracking-tighter">Horarios Base</h3>
-                <div id="contenedor-semana" class="space-y-3"></div>
-                <button id="btnGuardarHorarios" class="btn-black text-[10px]">Actualizar Turnos ✦</button>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <section class="card-kb p-6 space-y-4">
+                <h3 class="text-[11px] font-black uppercase border-l-4 border-slate-900 pl-3">Turnos Semanales</h3>
+                <div id="contenedor-semana" class="space-y-2"></div>
+                <button id="btnGuardarSemana" class="btn-mision">Sincronizar Turnos</button>
             </section>
 
-            <section class="card-pro p-6 space-y-6">
-                <h3 class="text-xs font-black uppercase border-l-4 border-red-600 pl-3 tracking-tighter">Bloqueos Tácticos</h3>
-                <div class="space-y-4">
-                    <input type="date" id="b-fecha" class="input-pro">
+            <section class="card-kb p-6 space-y-4">
+                <h3 class="text-[11px] font-black uppercase border-l-4 border-red-600 pl-3 text-red-600">Bloqueos</h3>
+                <div class="space-y-3">
+                    <input type="date" id="b-fecha" class="input-kb uppercase">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="time" id="b-inicio" class="input-pro" value="09:00">
-                        <input type="time" id="b-fin" class="input-pro" value="17:00">
+                        <input type="time" id="b-inicio" class="input-kb" value="00:00">
+                        <input type="time" id="b-fin" class="input-kb" value="23:59">
                     </div>
-                    <button id="btnBloquear" class="btn-black !bg-red-600 text-[10px]">Inyectar Bloqueo</button>
+                    <button id="btnBloquear" class="btn-mision !bg-red-600">Inyectar Bloqueo</button>
                 </div>
-                <div id="lista-bloqueos" class="space-y-2 max-h-40 overflow-y-auto pr-2"></div>
+                <div id="lista-bloqueos" class="space-y-2 max-h-40 overflow-y-auto"></div>
             </section>
 
-            <section class="card-pro p-6 space-y-6">
-                <h3 class="text-xs font-black uppercase border-l-4 border-black pl-3 tracking-tighter">Servicios y Buffer</h3>
-                <div id="lista-servicios" class="space-y-4 max-h-80 overflow-y-auto pr-2"></div>
-                <button id="btnAddSrv" class="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-[10px] font-bold text-gray-400 hover:bg-gray-50">+ Nuevo Servicio</button>
-                <button id="btnGuardarServicios" class="btn-black text-[10px]">Sincronizar Catálogo</button>
+            <section class="card-kb p-6 space-y-4">
+                <h3 class="text-[11px] font-black uppercase border-l-4 border-[#c5a059] pl-3">Catálogo</h3>
+                <div id="lista-servicios" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+                <button id="btnAddSrv" class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-bold text-slate-400 hover:bg-slate-50 transition">+ Nuevo</button>
+                <button id="btnGuardarSrv" class="btn-mision">Guardar Catálogo</button>
             </section>
+
         </div>
     </div>
 
@@ -60,67 +57,67 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId') || '196c57b5-68d5-4825-8607-36b5d3bc3e15';
+    // ID fijo del doctor Marcus Stark para la demo
+    const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
     async function init() {
-        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-        if(doc) document.getElementById('doc-status').innerText = `IDENTIDAD: DR. ${doc.nombre.toUpperCase()}`;
-        cargarHorarios(); cargarBloqueos(); cargarServicios();
+        cargarSemana(); cargarBloqueos(); cargarServicios();
     }
 
-    // --- 🧬 HORARIOS (CORRECCIÓN DE FORMATO 24H) ---
-    async function cargarHorarios() {
+    // --- 🧬 HORARIOS: ELIMINA EL ERROR 400 ---
+    async function cargarSemana() {
         const { data } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId);
         const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-        document.getElementById('contenedor-semana').innerHTML = dias.map((d, i) => {
-            const h = data?.find(x => x.dia_semana === i + 1) || { activo: false, hora_inicio: "09:00:00", hora_fin: "17:00:00" };
-            return `
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+        document.getElementById('contenedor-semana').innerHTML = dias.map((d,i)=>{
+            const c = data?.find(h=>h.dia_semana===i+1) || {activo:false, hora_inicio:"09:00:00", hora_fin:"17:00:00"};
+            return `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" class="chk-dia" ${h.activo ? 'checked' : ''} data-dia="${i + 1}">
+                    <input type="checkbox" class="chk" ${c.activo?'checked':''} data-dia="${i+1}">
                     <span class="text-[10px] font-bold uppercase">${d}</span>
                 </div>
-                <div class="flex gap-2 text-[10px] font-bold">
-                    <input type="time" value="${h.hora_inicio.slice(0,5)}" class="h-ini bg-transparent outline-none">
-                    <input type="time" value="${h.hora_fin.slice(0,5)}" class="h-fin bg-transparent outline-none">
+                <div class="flex gap-1 text-[10px] font-black">
+                    <input type="time" value="${c.hora_inicio.slice(0,5)}" class="ini bg-transparent border-none outline-none">
+                    <input type="time" value="${c.hora_fin.slice(0,5)}" class="fin bg-transparent border-none outline-none">
                 </div>
             </div>`;
         }).join('');
     }
 
-    document.getElementById('btnGuardarHorarios').onclick = async () => {
+    document.getElementById('btnGuardarSemana').onclick = async () => {
         const filas = document.querySelectorAll('#contenedor-semana > div');
-        for (const f of filas) {
-            const chk = f.querySelector('.chk-dia');
-            // BLINDAJE: Enviamos formato HH:mm:ss para evitar Error 400
-            await supabase.from('Horarios_Doctor').upsert({
-                doctor_id: docId, dia_semana: parseInt(chk.dataset.dia),
-                hora_inicio: f.querySelector('.h-ini').value + ":00",
-                hora_fin: f.querySelector('.h-fin').value + ":00", activo: chk.checked
-            }, { onConflict: 'doctor_id,dia_semana' });
+        // ESTRATEGIA: Borramos y re-insertamos para evitar conflictos de UPSERT
+        await supabase.from('Horarios_Doctor').delete().eq('doctor_id', docId);
+        
+        for(const f of filas){
+            const chk = f.querySelector('.chk');
+            if(chk.checked) {
+                await supabase.from('Horarios_Doctor').insert({
+                    doctor_id: docId, dia_semana: parseInt(chk.dataset.dia),
+                    hora_inicio: f.querySelector('.ini').value + ":00",
+                    hora_fin: f.querySelector('.fin').value + ":00", activo: true
+                });
+            }
         }
-        alert("✦ HORARIOS SINCRONIZADOS");
-        cargarHorarios();
+        alert("✦ HORARIOS ACTUALIZADOS");
+        cargarSemana();
     };
 
-    // --- 🚫 BLOQUEOS (FIX ERROR 409) ---
+    // --- 🚫 BLOQUEOS: ELIMINA EL ERROR 409 ---
     async function cargarBloqueos() {
-        const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id', docId).gte('fecha', new Date().toISOString().split('T')[0]);
+        const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id', docId).gte('fecha', new Date().toISOString().slice(0,10));
         document.getElementById('lista-bloqueos').innerHTML = data?.map(b => `
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
-                <span class="text-[10px] font-bold">${b.fecha}</span>
-                <button onclick="borrarB('${b.id}')" class="text-red-500 font-bold text-xs">✕</button>
-            </div>`).join('') || '';
+            <div class="flex justify-between items-center bg-red-50 p-2 rounded-lg border border-red-100 text-[9px] font-bold uppercase">
+                <span>${b.fecha}</span>
+                <button onclick="borrarB('${b.id}')" class="text-red-500 font-black">✕</button>
+            </div>
+        `).join('') || '';
     }
 
     document.getElementById('btnBloquear').onclick = async () => {
-        const fecha = document.getElementById('b-fecha').value;
-        if(!fecha) return;
-        // FIX 409: Limpiar conflictos antes de insertar
-        await supabase.from('Bloqueos').delete().eq('doctor_id', docId).eq('fecha', fecha);
+        const f = document.getElementById('b-fecha').value;
+        if(!f) return;
         await supabase.from('Bloqueos').insert({
-            doctor_id: docId, fecha: fecha,
+            doctor_id: docId, fecha: f,
             hora_inicio: document.getElementById('b-inicio').value + ":00",
             hora_fin: document.getElementById('b-fin').value + ":00"
         });
@@ -130,42 +127,43 @@
     window.borrarB = async (id) => { await supabase.from('Bloqueos').delete().eq('id', id); cargarBloqueos(); };
 
     // --- 💎 SERVICIOS ---
-    async function cargarServicios() {
-        const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
-        document.getElementById('lista-servicios').innerHTML = '';
-        data?.forEach(s => renderServicio(s));
-    }
-
     function renderServicio(s = {}) {
         const div = document.createElement('div');
-        div.className = "srv-item bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3";
+        div.className = "srv bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2";
         div.dataset.id = s.id || '';
         div.innerHTML = `
-            <input type="text" class="nombre input-pro !p-2 text-[10px] font-bold uppercase" value="${s.nombre || ''}" placeholder="SERVICIO">
-            <div class="grid grid-cols-3 gap-2">
-                <div><label class="text-[7px] font-bold text-gray-400 ml-2">PRECIO</label><input type="number" class="precio input-pro !p-2 text-xs" value="${s.precio || 0}"></div>
-                <div><label class="text-[7px] font-bold text-gray-400 ml-2">CITA</label><input type="number" class="dur input-pro !p-2 text-xs" value="${s.duracion_min || 30}"></div>
-                <div><label class="text-[7px] font-bold text-gray-400 ml-2">BUFFER</label><input type="number" class="buf input-pro !p-2 text-xs" value="${s.buffer_min || 0}"></div>
-            </div>`;
+            <input type="text" class="nombre input-kb !p-1 text-[10px] font-bold uppercase" value="${s.nombre || ''}" placeholder="SERVICIO">
+            <div class="grid grid-cols-3 gap-1">
+                <input type="number" class="precio input-kb !p-1 text-[10px]" value="${s.precio || 0}" placeholder="$">
+                <input type="number" class="dur input-kb !p-1 text-[10px]" value="${s.duracion_min || 30}" placeholder="MIN">
+                <input type="number" class="buf input-kb !p-1 text-[10px]" value="${s.buffer_min || 0}" placeholder="BUF">
+            </div>
+        `;
         document.getElementById('lista-servicios').appendChild(div);
     }
 
-    document.getElementById('btnGuardarServicios').onclick = async () => {
-        const items = document.querySelectorAll('.srv-item');
+    document.getElementById('btnGuardarSrv').onclick = async () => {
+        const items = document.querySelectorAll('.srv');
         for (const i of items) {
-            const n = i.querySelector('.nombre').value.trim();
-            if(!n) continue;
+            const nombre = i.querySelector('.nombre').value.trim();
+            if(!nombre) continue;
             await supabase.from('Servicios').upsert({
-                doctor_id: docId, nombre: n.toUpperCase(),
+                doctor_id: docId, nombre: nombre.toUpperCase(),
                 precio: parseFloat(i.querySelector('.precio').value) || 0,
                 duracion_min: parseInt(i.querySelector('.dur').value) || 0,
                 buffer_min: parseInt(i.querySelector('.buf').value) || 0,
                 activo: true
             });
         }
-        alert("✦ CATÁLOGO SINCRONIZADO");
+        alert("✦ CATÁLOGO ACTUALIZADO");
+        document.getElementById('lista-servicios').innerHTML = '';
         cargarServicios();
     };
+
+    async function cargarServicios() {
+        const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
+        data?.forEach(s => renderServicio(s));
+    }
 
     document.getElementById('btnAddSrv').onclick = () => renderServicio();
     init();
