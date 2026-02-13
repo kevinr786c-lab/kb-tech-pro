@@ -187,7 +187,6 @@ document.getElementById('secret-trigger').onclick = () => {
     lastClickTime = currentTime;
 
     if (starClicks === 3) {
-        // 🔒 SEGUNDO NIVEL: PIN DE SEGURIDAD
         const masterPin = prompt("SISTEMA DE MANDO ✦ INGRESE CÓDIGO DE ACCESO:");
         
         if (masterPin === "1437") {
@@ -195,14 +194,14 @@ document.getElementById('secret-trigger').onclick = () => {
             window.location.href = 'secreto.html';
         } else {
             alert("PIN INCORRECTO. REGISTRANDO INTENTO DE INTRUSIÓN.");
-            starClicks = 0; // Reiniciamos por seguridad
+            starClicks = 0;
         }
     }
 };
 
 document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
-    const emailVal = document.getElementById('email').value;
+    const emailVal = document.getElementById('email').value.toLowerCase(); // Normalización preventiva
     const passVal = document.getElementById('password').value;
     const btn = document.getElementById('btnLogin');
     const msg = document.getElementById('error-msg');
@@ -227,6 +226,7 @@ document.getElementById('loginForm').onsubmit = async (e) => {
 
         if (userError || !usuario) throw new Error("Nodo no reconocido");
 
+        // Almacenar datos de sesión en el búnker local
         localStorage.setItem('user_id', data.user.id);
         localStorage.setItem('rol', usuario.rol);
         localStorage.setItem('nombre', usuario.nombre);
@@ -236,17 +236,21 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         btn.style.color = "white";
 
         setTimeout(() => {
+            // --- CORRECCIÓN DE RUTAS DE MANDO ---
             if (usuario.rol === 'doctor') {
-                window.location.href = 'nodo-maestro.html';
+                // Redirección al búnker real (app.html) inyectando el ID
+                window.location.href = `app.html?id=${data.user.id}`;
             } else if (usuario.rol === 'asistente') {
                 window.location.href = 'asistente.html';
             } else {
-                alert("Rango Administrativo no configurado");
+                alert("RANGO ADMINISTRATIVO NO CONFIGURADO");
                 btn.disabled = false;
+                btn.innerText = "REINTENTAR";
             }
         }, 1000);
 
     } catch (err) {
+        console.error("Falla de acceso:", err.message);
         btn.innerText = "REINTENTAR";
         btn.disabled = false;
         msg.classList.remove('hidden');
