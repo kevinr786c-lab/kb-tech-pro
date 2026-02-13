@@ -1,187 +1,189 @@
-<!DOCTYPE html>
+que le parece <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA MÉDICO | AGENDADOR UNIVERSAL ✦</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #111827; -webkit-tap-highlight-color: transparent; }
-        
-        /* 📱 AJUSTES TÁCTICOS PARA MÓVIL */
-        .card-responsive { background: #ffffff; border-radius: 1.5rem; border: 1px solid #e5e7eb; transition: all 0.3s; }
-        @media (max-width: 640px) {
-            .card-responsive { border-radius: 0; border: none; box-shadow: none; min-height: 100vh; }
-            body { background-color: #ffffff; padding: 0 !important; }
-        }
-
-        .input-clean { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #d1d5db; outline: none; transition: 0.2s; background: #fff; font-size: 16px; /* Evita zoom automático en iPhone */ }
-        .input-clean:focus { border-color: #111827; ring: 1px; ring-color: #111827; }
-        
-        .time-pill { padding: 0.75rem 0.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; text-align: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; background: #f9fafb; transition: 0.2s; }
-        .time-pill.selected { background: #111827; color: white; border-color: #111827; transform: scale(0.95); }
-        
-        /* Animación de carga sutil */
-        .kb-star { color: #d1d5db; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
+        :root { --main: #c5a059; --dark: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: var(--dark); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; }
+        .input-elite { width: 100%; padding: 1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; }
+        .input-elite:focus { border-color: var(--main); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
+        .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
+        .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
+        .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
+        .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
+        
+        /* ESTILOS DE ESTATUS */
+        .badge-estatus { display: none; padding: 0.3rem 0.8rem; border-radius: 0.7rem; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.3s; }
+        .estatus-nuevo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .estatus-recurrente { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .estatus-oro { background: #fefce8; color: #a16207; border: 1px solid #fef08a; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); }
+    </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-2xl w-full card-responsive p-6 md:p-10 shadow-xl">
-        <header class="mb-8 flex justify-between items-center">
-            <div>
-                <h1 id="doc-name" class="text-xl md:text-2xl font-extrabold tracking-tight text-gray-900 uppercase">SINCRONIZANDO...</h1>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-1 italic">Módulo de Agendado Universal ✦</p>
-            </div>
-            <button onclick="window.history.back()" class="p-2 text-gray-300 hover:text-gray-900 transition">✕</button>
-        </header>
+    <div class="max-w-md w-full glass p-8 shadow-2xl">
+        <header class="text-center mb-8">
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">Cargando Búnker...</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Inteligencia Médica</p>
+        </header>
 
-        <form id="form-agendar" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Nombre Completo</label>
-                    <input type="text" id="p-nombre" placeholder="Nombre del paciente" class="input-clean" required>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">WhatsApp</label>
-                    <input type="tel" id="p-telefono" placeholder="10 dígitos" class="input-clean" required>
-                </div>
-            </div>
+        <form id="agendador-form" class="space-y-5">
+            <div>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Identificación (Teléfono)</p>
+                    <span id="badge-paciente" class="badge-estatus italic"></span>
+                </div>
+                <input type="tel" id="telefono" placeholder="10 DÍGITOS" class="input-elite" maxlength="10" required>
+            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Email</label>
-                    <input type="email" id="p-email" placeholder="Opcional" class="input-clean">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Cumpleaños 🎂</label>
-                    <input type="date" id="p-cumple" class="input-clean" required>
-                </div>
-            </div>
+            <div class="grid grid-cols-1 gap-4">
+                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="email" id="email" placeholder="EMAIL" class="input-elite text-xs">
+                    <input type="date" id="fecha_nacimiento" class="input-elite text-xs">
+                </div>
+            </div>
 
-            <div class="pt-4 border-t border-gray-100">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Servicio</label>
-                        <select id="servicio-select" class="input-clean appearance-none" required>
-                            <option value="" disabled selected>Seleccione servicio</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Fecha de Consulta</label>
-                        <input type="date" id="c-fecha" class="input-clean" required>
-                    </div>
-                </div>
-            </div>
+            <div class="space-y-4">
+                <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
+                    <option value="" disabled selected>Seleccione Servicio</option>
+                </select>
+                <input type="date" id="fecha" class="input-elite">
+            </div>
 
-            <div class="space-y-3">
-                <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Horarios Disponibles</label>
-                <div id="radar-horas" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                    <p class="col-span-full text-center text-[10px] text-gray-300 font-bold uppercase py-4">Esperando selección...</p>
-                </div>
-            </div>
+            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2"></div>
 
-            <input type="hidden" id="hora-seleccionada">
-            
-            <button type="submit" id="btn-confirmar" class="w-full py-4 md:py-5 bg-gray-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-lg active:scale-95">
-                Confirmar Reservación ✦
-            </button>
-        </form>
-    </div>
+            <input type="hidden" id="hora_seleccionada">
+            <button type="submit" id="confirmar-btn" class="btn-mision">Confirmar Reservación ✦</button>
+        </form>
+    </div>
 
 <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-    const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
+    const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId') || '196c57b5-68d5-4825-8607-36b5d3bc3e15';
+    // 🧠 LÓGICA DE INTELIGENCIA: Reconocimiento y Clasificación
+    document.getElementById('telefono').addEventListener('input', async (e) => {
+        const tel = e.target.value;
+        const badge = document.getElementById('badge-paciente');
 
-    async function init() {
-        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-        if(doc) document.getElementById('doc-name').innerText = `DR. ${doc.nombre.toUpperCase()}`;
+        if (tel.length === 10) {
+            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
+            
+            if (pac) {
+                // Autocompletar datos
+                document.getElementById('nombre').value = pac.nombre;
+                document.getElementById('email').value = pac.email || '';
+                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
 
-        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
-        const select = document.getElementById('servicio-select');
-        servs?.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.dataset.total = s.duracion_total;
-            opt.innerText = `${s.nombre.toUpperCase()} ($${s.precio})`;
-            select.appendChild(opt);
-        });
-    }
+                // Escaneo de historial para asignar Rango
+                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id);
+                
+                badge.style.display = 'block';
+                if (count >= 3) {
+                    badge.innerText = "✦ PACIENTE ORO";
+                    badge.className = "badge-estatus estatus-oro italic";
+                } else if (count >= 1) {
+                    badge.innerText = "✓ RECURRENTE";
+                    badge.className = "badge-estatus estatus-recurrente italic";
+                }
+            } else {
+                // Es un paciente nuevo
+                badge.style.display = 'block';
+                badge.innerText = "+ PACIENTE NUEVO";
+                badge.className = "badge-estatus estatus-nuevo italic";
+            }
+        } else {
+            badge.style.display = 'none';
+        }
+    });
 
-    async function actualizarRadar() {
-        const fecha = document.getElementById('c-fecha').value;
-        const servId = document.getElementById('servicio-select').value;
-        const radar = document.getElementById('radar-horas');
-        if (!fecha || !servId) return;
+    // 🛡️ RADAR DE DISPONIBILIDAD
+    async function actualizarRadar() {
+        const fecha = document.getElementById('fecha').value;
+        const servId = document.getElementById('servicio').value;
+        const radar = document.getElementById('radar-horas');
+        if (!fecha || !servId) return;
 
-        radar.innerHTML = '<p class="col-span-full text-center text-[10px] text-gray-400 animate-pulse font-bold uppercase">Escaneando...</p>';
-        const duracion = document.getElementById('servicio-select').selectedOptions[0].dataset.total;
+        radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black animate-pulse">Analizando Radar...</p>';
+        const serv = document.getElementById('servicio').selectedOptions[0];
+        const { data: slots } = await supabase.rpc('obtener_horarios_disponibles', {
+            p_doctor: docId, p_fecha: fecha, p_duracion: parseInt(serv.dataset.total)
+        });
 
-        const { data: slots } = await supabase.rpc('obtener_horarios_disponibles', {
-            p_doctor: docId, p_fecha: fecha, p_duracion: parseInt(duracion)
-        });
+        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[8px] font-black text-rose-500">BÚNKER TOTALMENTE OCUPADO</p>';
+        slots?.forEach(s => {
+            const pill = document.createElement('div');
+            pill.className = 'time-pill';
+            pill.innerText = s.hora.slice(0,5);
+            pill.onclick = () => {
+                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                document.getElementById('hora_seleccionada').value = s.hora;
+            };
+            radar.appendChild(pill);
+        });
+    }
 
-        radar.innerHTML = slots?.length ? '' : '<p class="col-span-full text-center text-[10px] text-red-500 font-bold uppercase">Sin espacios libres</p>';
-        slots?.forEach(s => {
-            const pill = document.createElement('div');
-            pill.className = 'time-pill';
-            pill.innerText = s.hora.slice(0,5);
-            pill.onclick = () => {
-                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                pill.classList.add('selected');
-                document.getElementById('hora-seleccionada').value = s.hora;
-            };
-            radar.appendChild(pill);
-        });
-    }
+    document.getElementById('fecha').onchange = actualizarRadar;
+    document.getElementById('servicio').onchange = actualizarRadar;
 
-    document.getElementById('c-fecha').onchange = actualizarRadar;
-    document.getElementById('servicio-select').onchange = actualizarRadar;
+    // INICIALIZACIÓN
+    async function init() {
+        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
+        document.getElementById('doc-name').innerText = `DR. ${doc.nombre}`;
 
-    document.getElementById('form-agendar').onsubmit = async (e) => {
-        e.preventDefault();
-        const hora = document.getElementById('hora-seleccionada').value;
-        if(!hora) return alert("Por favor seleccione un horario.");
+        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
+        const select = document.getElementById('servicio');
+        servs?.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.dataset.total = s.duracion_total;
+            opt.dataset.monto = s.precio;
+            opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
+            select.appendChild(opt);
+        });
+    }
 
-        const btn = document.getElementById('btn-confirmar');
-        btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
+    document.getElementById('agendador-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('confirmar-btn');
+        const tel = document.getElementById('telefono').value;
+        const hora = document.getElementById('hora_seleccionada').value;
+        
+        if(!hora) return alert("Seleccione una hora en el radar.");
+        
+        btn.disabled = true; btn.innerText = "Sincronizando con Búnker...";
 
-        try {
-            const { data: pac } = await supabase.from('Usuarios').upsert({
-                nombre: document.getElementById('p-nombre').value.toUpperCase(),
-                telefono: document.getElementById('p-telefono').value,
-                email: document.getElementById('p-email').value,
-                fecha_nacimiento: document.getElementById('p-cumple').value,
-                rol: 'paciente'
-            }, { onConflict: 'telefono' }).select().single();
+        let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+        if (!pac) {
+            const { data } = await supabase.from('Pacientes').insert({ 
+                nombre: document.getElementById('nombre').value.toUpperCase(), 
+                telefono: tel, 
+                email: document.getElementById('email').value,
+                fecha_nacimiento: document.getElementById('fecha_nacimiento').value
+            }).select().single();
+            pac = data;
+        }
 
-            const { error } = await supabase.from('Citas').insert({
-                doctor_id: docId,
-                paciente_id: pac.id,
-                servicio_id: document.getElementById('servicio-select').value,
-                fecha: document.getElementById('c-fecha').value,
-                hora_inicio: hora,
-                duracion_cita: parseInt(document.getElementById('servicio-select').selectedOptions[0].dataset.total),
-                estado: 'confirmada'
-            });
+        const serv = document.getElementById('servicio').selectedOptions[0];
+        const { error } = await supabase.from('Citas').insert({
+            doctor_id: docId, paciente_id: pac.id, servicio_id: serv.value,
+            fecha: document.getElementById('fecha').value, hora_inicio: hora,
+            duracion_cita: parseInt(serv.dataset.total), monto: parseFloat(serv.dataset.monto), estado: 'pendiente'
+        });
 
-            if (!error) {
-                alert("✅ MISIÓN CUMPLIDA: CITA AGENDADA.");
-                const msj = `Hola ${pac.nombre}, su cita con el Dr. ha sido confirmada para el ${document.getElementById('c-fecha').value} a las ${hora}. ✦`;
-                window.location.href = `https://wa.me/${pac.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(msj)}`;
-            }
-        } catch (e) {
-            alert("Error");
-            btn.disabled = false;
-        }
-    };
+        if (error) { alert("Error: " + error.message); btn.disabled = false; btn.innerText = "Reintentar"; }
+        else { alert("✅ MISIÓN CONFIRMADA."); location.reload(); }
+    };
 
-    init();
+    init();
 </script>
 </body>
 </html>
