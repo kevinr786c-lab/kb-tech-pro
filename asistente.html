@@ -3,224 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | PANEL ASISTENTE ELITE ✦</title>
+    <title>K.B SYSTEM | PANEL ASISTENTE</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); }
-        
-        /* 🎨 ESTILO CALENDARIO K.B */
-        .fc { background: transparent; border: none !important; height: 100%; }
-        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--luxe-dark); font-size: 1.1rem !important; font-style: italic; }
-        .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 1rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; padding: 10px 15px !important; transition: 0.3s !important; }
-        .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
-        .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
-        
-        /* 🧬 ESTATUS DE EVENTOS */
-        .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; font-weight: 700; font-size: 10px; }
-        
-        .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 600; }
-        .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
-        
-        @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
-        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
 
-        /* Pulso para Citas en Consulta */
-        @keyframes pulse-live {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        :root { --gold: #c5a059; --dark: #0f172a; }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; height: 100vh; overflow: hidden; }
+        .glass { background: white; border-radius: 2rem; border: 1px solid rgba(197, 160, 89, .25); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+
+        /* ===== 🎨 ADN VISUAL DE EVENTOS ===== */
+        .fc-event { border: none !important; border-radius: 10px !important; padding: 4px 6px !important; font-size: 11px; font-weight: 700; cursor: pointer; transition: .25s; }
+        .fc-event:hover { transform: scale(1.02); z-index: 999; }
+
+        /* Tipo visita */
+        .event-primera { background: #e0f2fe !important; color: #0369a1 !important; border-left: 5px solid #0284c7 !important; }
+        .event-recurrente { background: #ecfdf5 !important; color: #065f46 !important; border-left: 5px solid #10b981 !important; }
+
+        /* Estado (Inyección de Borde) */
+        .estado-confirmado { border-left: 5px solid var(--gold) !important; }
+        .estado-atendiendo { border-left: 5px solid #22c55e !important; animation: pulse 2s infinite; }
+        .estado-completado { background: var(--dark) !important; color: var(--gold) !important; }
+        .estado-cancelado { opacity: .4; filter: grayscale(1); }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, .4); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
-        .event-atendiendo { animation: pulse-live 2s infinite; }
+
+        .fc-toolbar-title { font-weight: 800 !important; text-transform: uppercase; font-style: italic; font-size: 1.1rem !important; }
+        .fc-button { background: var(--dark) !important; border: none !important; border-radius: 0.8rem !important; font-weight: 700; text-transform: uppercase; font-size: 10px !important; }
+        .fc-button-active { background: var(--gold) !important; }
+        
+        .input-asistente { width: 100%; padding: 0.75rem; border-radius: 0.8rem; border: 1px solid #e2e8f0; font-size: 0.85rem; font-weight: 600; outline: none; transition: 0.3s; }
+        .input-asistente:focus { border-color: var(--gold); background: #fff; }
     </style>
 </head>
-<body class="p-4">
 
-    <div class="flex-1 glass p-6 flex flex-col overflow-hidden relative">
-        <header class="flex justify-between items-center mb-6">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-xl">
-                    <span class="kb-star text-2xl">✦</span>
-                </div>
-                <div>
-                    <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
-                    <select id="doctorSelect" class="bg-transparent text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none cursor-pointer hover:text-[#c5a059] transition border-none p-0">
-                        <option value="">ESCANEANDO JURISDICCIÓN...</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Nueva Cita</button>
-                <button onclick="window.location.reload()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">🔄</button>
-            </div>
-        </header>
+<body class="p-4 flex flex-col h-screen">
 
-        <div class="flex-1 overflow-hidden">
-            <div id="calendar" class="h-full"></div>
-        </div>
-
-        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-300">
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                <p class="text-emerald-500">Radar Operativo</p>
-            </div>
-            <p>POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026</p>
-        </footer>
-    </div>
-
-    <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
-        <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
-            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Estatus de <span class="text-[#c5a059]">Misión</span></h2>
-            <div class="space-y-4">
-                <div>
-                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Paciente & Rango</p>
-                    <input id="c-paciente" class="input-luxe bg-slate-50" readonly>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Fecha</p>
-                        <input type="date" id="c-fecha" class="input-luxe" readonly>
-                    </div>
-                    <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Hora</p>
-                        <input type="time" id="c-hora" class="input-luxe" readonly>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Semáforo de Estado</p>
-                    <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
-                        <option value="pendiente">⏳ PENDIENTE (ESPERA)</option>
-                        <option value="confirmado">✓ CONFIRMADO (EN CAMINO)</option>
-                        <option value="atendiendo">🔥 EN CONSULTA (ACTIVO)</option>
-                        <option value="completado">✦ COMPLETADO (FINALIZADO)</option>
-                        <option value="cancelado">🚫 CANCELAR CITA</option>
-                    </select>
-                </div>
-                <textarea id="c-notas" class="input-luxe h-20" placeholder="OBSERVACIONES MÉDICAS..."></textarea>
-            </div>
-            <div class="flex justify-between mt-8 gap-3">
-                <button onclick="guardarCita()" class="flex-1 py-4 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-[#c5a059] hover:text-white transition">Actualizar Radar</button>
-                <button onclick="cerrarModal()" class="px-4 py-4 text-[9px] font-black uppercase text-slate-400">Cerrar</button>
+<div class="glass flex-1 p-6 flex flex-col overflow-hidden">
+    <header class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-[var(--dark)] rounded-xl flex items-center justify-center text-[var(--gold)] font-bold">✦</div>
+            <div>
+                <h1 class="font-black italic text-xl tracking-tighter">K.B <span class="text-[var(--gold)]">SYSTEM</span></h1>
+                <select id="doctorSelect" class="text-[10px] font-black uppercase text-slate-400 bg-transparent outline-none cursor-pointer hover:text-[var(--gold)] transition"></select>
             </div>
         </div>
+        <div class="flex items-center gap-2">
+            <button onclick="irAAgendar()" class="px-4 py-2 bg-[var(--gold)] text-white text-[10px] font-black uppercase rounded-xl hover:scale-105 transition">✚ Nueva Cita</button>
+            <button onclick="location.reload()" class="w-10 h-10 flex items-center justify-center bg-[var(--dark)] text-white rounded-xl hover:bg-[var(--gold)] transition">🔄</button>
+        </div>
+    </header>
+
+    <div id="calendar" class="flex-1 overflow-auto"></div>
+</div>
+
+<div id="modalCita" class="fixed inset-0 hidden bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="glass bg-white p-8 w-full max-w-md shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-black uppercase italic text-lg tracking-tight">Editar <span class="text-[var(--gold)]">Radar</span></h2>
+            <span id="badge-visita" class="text-[9px] font-black px-2 py-1 rounded bg-slate-100 italic"></span>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase mb-1 px-1">Paciente Identificado</p>
+                <input id="c-paciente" class="input-asistente bg-slate-50 border-none" readonly>
+            </div>
+
+            <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase mb-1 px-1">Teléfono</p>
+                <input id="c-telefono" class="input-asistente bg-slate-50 border-none" readonly>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1 px-1">Fecha</p>
+                    <input type="date" id="c-fecha" class="input-asistente">
+                </div>
+                <div>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1 px-1">Hora Inicio</p>
+                    <input type="time" id="c-hora" class="input-asistente">
+                </div>
+            </div>
+
+            <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase mb-1 px-1">Estado de la Misión</p>
+                <select id="c-estado" class="input-asistente font-bold text-xs uppercase cursor-pointer">
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="confirmado">✓ Confirmado</option>
+                    <option value="atendiendo">🔥 En consulta</option>
+                    <option value="completado">✦ Completado</option>
+                    <option value="cancelado">🚫 Cancelado</option>
+                </select>
+            </div>
+
+            <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase mb-1 px-1">Notas de Inteligencia</p>
+                <textarea id="c-notas" class="input-asistente h-24 resize-none" placeholder="Escribir observaciones..."></textarea>
+            </div>
+        </div>
+
+        <div class="flex gap-3 mt-8">
+            <button onclick="guardarCita()" class="flex-1 bg-[var(--dark)] text-[var(--gold)] py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[var(--gold)] hover:text-white transition shadow-lg">Actualizar Búnker</button>
+            <button onclick="cerrarModal()" class="px-4 py-4 text-[9px] font-black uppercase text-slate-400 hover:text-rose-500 transition">Cerrar</button>
+        </div>
     </div>
+</div>
 
 <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-    const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    let calendar, citaActual = null, doctorActual = null;
+const supabase = createClient(
+    'https://ctvqjnckxmqeejbfwmkj.supabase.co',
+    'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w'
+);
 
-    // 🎨 SEMÁFORO TÁCTICO: COLORES POR ESTADO
-    const ESTADOS = {
-        pendiente: { bg:'#fef3c7', txt:'#b45309', class:'' },     // Ámbar
-        confirmado: { bg:'#dbeafe', txt:'#1d4ed8', class:'' },    // Azul
-        atendiendo: { bg:'#dcfce7', txt:'#10b981', class:'event-atendiendo' }, // Verde Pulse
-        completado: { bg:'#0f172a', txt:'#c5a059', class:'' },    // Dark/Gold
-        cancelado: { bg:'#fef2f2', txt:'#ef4444', class:'' }      // Rojo
-    };
+let calendar, doctorActual = null, citaActual = null;
 
-    // 🛰️ NAVEGACIÓN
-    window.irAAgendar = () => {
-        if (!doctorActual) return alert("ERROR: SELECCIONE DOCTOR");
-        window.location.href = `agendar.html?docId=${doctorActual}`;
-    };
+// --- 🛰️ CARGAR DOCTORES ---
+async function cargarDoctores(){
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-    // 🧠 INTELIGENCIA DE RANGO (PRIMERA VISITA VS SECUENCIA)
-    async function obtenerRango(pacienteId, citaId) {
-        const { count } = await supabase.from('Citas')
-            .select('*', { count: 'exact', head: true })
-            .eq('paciente_id', pacienteId)
-            .eq('estado', 'completado')
-            .lt('created_at', (await supabase.from('Citas').select('created_at').eq('id', citaId).single()).data.created_at);
-        
-        return count === 0 ? "✦ PRIMERA VISITA" : `✓ SECUENCIA (#${count + 1})`;
+    const { data: asig } = await supabase
+        .from('Asistentes_Doctor')
+        .select('doctor_id')
+        .eq('asistente_id', session.user.id);
+
+    if (!asig?.length) {
+        document.getElementById('doctorSelect').innerHTML = '<option>SIN ASIGNACIÓN</option>';
+        return;
     }
 
-    async function cargarDoctores() {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
+    const { data: docs } = await supabase
+        .from('Usuarios')
+        .select('id, nombre')
+        .in('id', asig.map(a => a.doctor_id));
 
-        const { data: asignaciones } = await supabase.from('Asistentes_Doctor').select('doctor_id, turno').eq('asistente_id', session.user.id);
-        
-        if (!asignaciones?.length) return;
+    const sel = document.getElementById('doctorSelect');
+    sel.innerHTML = '<option value="">ELEGIR JURISDICCIÓN</option>' +
+        docs.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('');
 
-        const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asignaciones.map(a => a.doctor_id));
+    sel.onchange = () => {
+        doctorActual = sel.value;
+        if (!calendar) initCalendar();
+        else calendar.refetchEvents();
+    };
+}
 
-        const select = document.getElementById('doctorSelect');
-        select.innerHTML = '<option value="">SELECCIONE JURISDICCIÓN</option>' + 
-            docs.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('');
+// --- 🧠 CARGAR CITAS CON ADN VISUAL ---
+async function cargarCitas(info, success, failure){
+    if (!doctorActual) return success([]);
 
-        select.onchange = () => {
-            doctorActual = select.value;
-            if (doctorActual) {
-                if (!calendar) initCalendar();
-                else calendar.refetchEvents();
-            }
-        };
-    }
+    try {
+        const { data, error } = await supabase
+            .from('Citas')
+            .select('*, Pacientes!fk_citas_pacientes_maestra(*)')
+            .eq('doctor_id', doctorActual);
 
-    async function cargarCitas(info, success, failure) {
-        if (!doctorActual) return success([]);
-        try {
-            const { data, error } = await supabase.from('Citas')
-                .select('*, Pacientes!fk_citas_pacientes_maestra(*)')
-                .eq('doctor_id', doctorActual);
+        if (error) throw error;
+
+        success(data.map(c => {
+            const clases = [];
+            clases.push(c.Pacientes?.primera_visita ? 'event-primera' : 'event-recurrente');
+            clases.push(`estado-${c.estado}`);
             
-            if (error) throw error;
-
-            const eventos = data.map(c => ({
+            return {
                 id: c.id,
                 title: c.Pacientes?.nombre || 'PACIENTE',
                 start: `${c.fecha}T${c.hora_inicio}`,
-                backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
-                textColor: ESTADOS[c.estado]?.txt || '#1e293b',
-                className: ESTADOS[c.estado]?.class || '',
+                classNames: clases,
                 extendedProps: c
-            }));
-            success(eventos);
-        } catch (err) { failure(err); }
-    }
+            };
+        }));
+    } catch (e) { failure(e); }
+}
 
-    function initCalendar() {
-        calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-            locale: 'es', initialView: 'timeGridDay', allDaySlot: false,
-            slotMinTime: '08:00', slotMaxTime: '20:00', height: '100%',
-            headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
-            events: cargarCitas,
-            eventClick: async (info) => {
-                const c = info.event.extendedProps;
-                citaActual = c;
-                const rango = await obtenerRango(c.paciente_id, c.id);
-                
-                document.getElementById('c-paciente').value = `${c.Pacientes?.nombre} (${rango})`;
-                document.getElementById('c-fecha').value = c.fecha;
-                document.getElementById('c-hora').value = c.hora_inicio.slice(0,5);
-                document.getElementById('c-estado').value = c.estado;
-                document.getElementById('c-notas').value = c.notas || '';
-                document.getElementById('modalCita').classList.remove('hidden');
-            }
-        });
-        calendar.render();
-    }
+// --- 📅 INICIALIZAR RADAR ---
+function initCalendar(){
+    const calendarEl = document.getElementById('calendar');
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: 'timeGridDay',
+        allDaySlot: false,
+        slotMinTime: '08:00',
+        slotMaxTime: '20:00',
+        expandRows: true,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'timeGridDay,timeGridWeek'
+        },
+        events: cargarCitas,
+        eventClick: (info) => {
+            citaActual = info.event.extendedProps;
+            
+            // Llenado de Modal con todas las funciones
+            document.getElementById('c-paciente').value = info.event.title;
+            document.getElementById('c-telefono').value = citaActual.Pacientes?.telefono || 'SIN TEL';
+            document.getElementById('c-fecha').value = citaActual.fecha;
+            document.getElementById('c-hora').value = citaActual.hora_inicio.slice(0,5);
+            document.getElementById('c-estado').value = citaActual.estado;
+            document.getElementById('c-notas').value = citaActual.notas || '';
+            
+            // Badge de rango
+            const badge = document.getElementById('badge-visita');
+            badge.innerText = citaActual.Pacientes?.primera_visita ? "✦ PRIMERA VEZ" : "✓ RECURRENTE";
+            badge.className = `text-[9px] font-black px-2 py-1 rounded italic ${citaActual.Pacientes?.primera_visita ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'}`;
 
-    window.guardarCita = async () => {
-        const payload = {
+            document.getElementById('modalCita').classList.remove('hidden');
+        }
+    });
+    calendar.render();
+}
+
+// --- 🛠️ GUARDAR CAMBIOS ---
+window.guardarCita = async () => {
+    const { error } = await supabase.from('Citas')
+        .update({
+            fecha: document.getElementById('c-fecha').value,
+            hora_inicio: document.getElementById('c-hora').value,
             estado: document.getElementById('c-estado').value,
             notas: document.getElementById('c-notas').value
-        };
-        const { error } = await supabase.from('Citas').update(payload).eq('id', citaActual.id);
-        if(!error) { calendar.refetchEvents(); cerrarModal(); }
-    };
+        })
+        .eq('id', citaActual.id);
 
-    window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
+    if (error) {
+        alert("FALLA EN LA SINCRONIZACIÓN: " + error.message);
+    } else {
+        calendar.refetchEvents();
+        cerrarModal();
+    }
+};
 
-    cargarDoctores();
+window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
+
+window.irAAgendar = () => {
+    if (!doctorActual) return alert("ELIJA UN DOCTOR PRIMERO");
+    window.location.href = `agendar.html?docId=${doctorActual}`;
+};
+
+cargarDoctores();
 </script>
 </body>
 </html>
