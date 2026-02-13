@@ -75,12 +75,12 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     const urlParams = new URLSearchParams(window.location.search);
-    // 🔗 ID VINCULADO A LA DRA. ALBA PATRICIA ROJAS FLORES
+    // 🔗 ID DRA. ALBA PATRICIA ROJAS FLORES
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     const fechaPrevia = urlParams.get('fecha');
     const horaPrevia = urlParams.get('hora');
 
-    // RECONOCIMIENTO DE PACIENTE
+    // 🛰️ RECONOCIMIENTO DE PACIENTE Y RECOMPENSA ORO
     document.getElementById('telefono').addEventListener('input', async (e) => {
         const tel = e.target.value;
         const badge = document.getElementById('badge-paciente');
@@ -107,16 +107,17 @@
         } else { badge.style.display = 'none'; }
     });
 
-    // RADAR DE DISPONIBILIDAD
+    // 🛰️ RADAR DE DISPONIBILIDAD CON FILTRO DE SALIDA ESTRICTO
     async function actualizarRadar() {
         const fecha = document.getElementById('fecha').value;
         const selectServ = document.getElementById('servicio');
         const radar = document.getElementById('radar-horas');
         if (!fecha || !selectServ.value) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO RADAR...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">ESCANEANDO DISPONIBILIDAD...</p>';
         
         const servOpt = selectServ.selectedOptions[0];
+        // Calculamos duración + buffer para el servidor
         const duracionTotal = parseInt(servOpt.dataset.total) || 30;
 
         const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
@@ -126,7 +127,7 @@
         });
 
         if (error) {
-            radar.innerHTML = `<p class="col-span-3 text-center text-[8px] text-rose-500 font-black">ERROR: ${error.message}</p>`;
+            radar.innerHTML = `<p class="col-span-3 text-center text-[8px] text-rose-500 font-black">FALLA DE RADAR: ${error.message}</p>`;
             return;
         }
 
@@ -148,7 +149,7 @@
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
-    // INICIALIZACIÓN
+    // 🛰️ INICIALIZACIÓN DEL SISTEMA
     async function init() {
         const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
         if(doc) {
@@ -156,12 +157,12 @@
             document.getElementById('doc-especialidad').innerText = "CLÍNICA DE COLPOSCOPÍA";
         }
 
-        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
+        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true).order('precio', {ascending: false});
         const select = document.getElementById('servicio');
         servs?.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            // Cálculo dinámico de duración + buffer para el radar
+            // Guardamos la duración total (Servicio + Buffer) para el radar
             opt.dataset.total = s.duracion_min + (s.buffer_min || 0);
             opt.dataset.monto = s.precio;
             opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
@@ -174,30 +175,33 @@
         }
     }
 
-    // CONFIRMACIÓN DE CITA
+    // 🛰️ CONFIRMACIÓN DE CITA Y PERSISTENCIA EN BÚNKER
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
         const tel = document.getElementById('telefono').value;
         const hora = document.getElementById('hora_seleccionada').value;
         
-        if(!hora) return alert("✦ SELECCIONE UNA HORA DISPONIBLE EN EL RADAR");
+        if(!hora) return alert("✦ SELECCIONE UN HORARIO EN EL RADAR");
         
         btn.disabled = true; 
         btn.innerText = "SINCRONIZANDO...";
 
         try {
+            // 1. Verificar o crear paciente
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
             if (!pac) {
-                const { data } = await supabase.from('Pacientes').insert({ 
+                const { data, error: pacErr } = await supabase.from('Pacientes').insert({ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
                     telefono: tel, 
                     email: document.getElementById('email').value,
                     fecha_nacimiento: document.getElementById('fecha_nacimiento').value
                 }).select().single();
+                if(pacErr) throw pacErr;
                 pac = data;
             }
 
+            // 2. Inyectar cita
             const serv = document.getElementById('servicio').selectedOptions[0];
             const { error: citaErr } = await supabase.from('Citas').insert({
                 doctor_id: docId, 
@@ -212,8 +216,9 @@
 
             if (citaErr) throw citaErr;
 
-            alert("✅ RESERVACIÓN EXITOSA. EL BÚNKER HA SIDO ACTUALIZADO.");
+            alert("✅ RESERVACIÓN EXITOSA. EL BÚNKER DE LA DRA. ALBA HA SIDO ACTUALIZADO.");
             
+            // 3. Limpieza de interfaz
             document.getElementById('agendador-form').reset();
             document.getElementById('radar-horas').innerHTML = '';
             document.getElementById('badge-paciente').style.display = 'none';
