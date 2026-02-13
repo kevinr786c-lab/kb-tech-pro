@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.05); transition: all 0.5s ease; }
         
         /* 🎨 ESTILO CALENDARIO K.B */
         .fc { background: transparent; border: none !important; height: 100%; }
@@ -19,6 +19,10 @@
         .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 1rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; padding: 10px 15px !important; transition: 0.3s !important; }
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
+        
+        /* 🧬 ESTATUS DE EVENTOS */
+        .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; }
+        .fc-event:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
         
         .event-nuevo { border-left: 4px solid #3b82f6 !important; }
         .event-recurrente { border-left: 4px solid #10b981 !important; }
@@ -28,7 +32,15 @@
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
-        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
+        .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; transition: color 0.5s ease; }
+        
+        /* Pulso de Sincronización */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .sync-active { animation: pulse-green 2s infinite; }
     </style>
 </head>
 <body class="p-4">
@@ -50,6 +62,7 @@
             </div>
             
             <div class="flex items-center gap-3">
+                <button onclick="nuevaMision()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
                 <div class="hidden md:flex bg-slate-100 rounded-xl p-1 gap-1">
                     <input type="month" id="mesSelector" class="bg-transparent text-[9px] font-black uppercase px-2 outline-none border-none">
                 </div>
@@ -62,7 +75,11 @@
             <div id="calendar" class="h-full"></div>
         </div>
 
-        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-center items-center">
+        <footer class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full sync-active"></div>
+                <p class="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">Sincronización Activa</p>
+            </div>
             <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300 italic">
                 POWERED BY <span class="text-[#c5a059]">K.B TECH SOLUTIONS</span> ✦ 2026
             </p>
@@ -73,8 +90,8 @@
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2">Gestionar <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-3">
-                <input id="c-paciente" class="input-luxe bg-slate-50" readonly>
-                <input id="c-telefono" class="input-luxe bg-slate-50" readonly>
+                <input id="c-paciente" class="input-luxe" placeholder="NOMBRE DEL PACIENTE">
+                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO">
                 <div class="grid grid-cols-2 gap-2 mt-4">
                     <input type="date" id="c-fecha" class="input-luxe">
                     <input type="time" id="c-hora" class="input-luxe">
@@ -121,12 +138,14 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    // --- LÓGICA DE JURISDICCIÓN BLINDADA ---
+    document.getElementById('mesSelector').onchange = (e) => {
+        if(calendar) calendar.gotoDate(e.target.value + "-01");
+    };
+
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        // 1. Obtener IDs de doctores asignados
         const { data: asignaciones, error } = await supabase
             .from('Asistentes_Doctor')
             .select('doctor_id, turno')
@@ -138,16 +157,12 @@
         }
 
         const idsDoctores = asignaciones.map(a => a.doctor_id);
-
-        // 2. Obtener nombres de esos doctores
         const { data: doctoresReales } = await supabase
             .from('Usuarios')
             .select('id, nombre')
             .in('id', idsDoctores);
 
         const select = document.getElementById('doctorSelect');
-        
-        // 3. Llenar el menú con validación de nulos
         select.innerHTML = '<option value="">ELIJA DOCTOR OPERATIVO</option>' + 
             asignaciones.map(a => {
                 const docInfo = doctoresReales?.find(d => d.id === a.doctor_id);
@@ -159,6 +174,18 @@
         select.onchange = () => {
             doctorActual = select.value;
             if (doctorActual === "") return;
+
+            // --- BRILLO DINÁMICO ---
+            const star = document.querySelector('.kb-star');
+            const glass = document.querySelector('.glass');
+            if(select.options[select.selectedIndex].text.includes("ELENA")) {
+                star.style.color = "#f472b6"; // Rosa/Oro
+                glass.style.borderColor = "rgba(244, 114, 182, 0.4)";
+            } else {
+                star.style.color = "#c5a059"; // Oro K.B
+                glass.style.borderColor = "rgba(197, 160, 89, 0.4)";
+            }
+            
             if (!calendar) initCalendar();
             else calendar.refetchEvents();
         };
@@ -168,29 +195,18 @@
         if (!doctorActual) return success([]);
         try {
             const { data, error } = await supabase.from('Citas')
-                .select('*, Pacientes!fk_citas_pacientes_maestra(*), Servicios(nombre)')
+                .select('*, Pacientes!fk_citas_pacientes_maestra(*)')
                 .eq('doctor_id', doctorActual)
                 .neq('estado', 'cancelado');
-            
             if (error) throw error;
 
-            const eventos = await Promise.all(data.map(async (c) => {
-                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', c.paciente_id).eq('estado', 'completado');
-                
-                let claseEstatus = 'event-nuevo';
-                if(count >= 3) claseEstatus = 'event-oro';
-                else if(count >= 1) claseEstatus = 'event-recurrente';
-
-                return {
-                    id: c.id,
-                    title: c.Pacientes?.nombre || 'PACIENTE',
-                    start: `${c.fecha}T${c.hora_inicio}`,
-                    end: new Date(new Date(`${c.fecha}T${c.hora_inicio}`).getTime() + (c.duracion_cita || 30) * 60000),
-                    backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
-                    textColor: ESTADOS[c.estado]?.txt || '#1e293b',
-                    className: claseEstatus,
-                    extendedProps: c
-                };
+            const eventos = data.map(c => ({
+                id: c.id,
+                title: c.Pacientes?.nombre || 'PACIENTE',
+                start: `${c.fecha}T${c.hora_inicio}`,
+                backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
+                textColor: ESTADOS[c.estado]?.txt || '#1e293b',
+                extendedProps: c
             }));
             success(eventos);
         } catch (err) { failure(err); }
@@ -202,38 +218,51 @@
             slotMinTime: '08:00', slotMaxTime: '20:00', editable: true, selectable: true,
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek' },
             events: cargarCitas,
-            eventContent: (arg) => ({
-                html: `<div class="p-1 h-full overflow-hidden">
-                        <div class="text-[9px] font-black uppercase truncate">${arg.event.title}</div>
-                        <div class="text-[7px] italic opacity-60 truncate">${arg.event.extendedProps.Servicios?.nombre || 'Consulta'}</div>
-                      </div>`
-            }),
+            select: (info) => {
+                citaActual = null;
+                document.getElementById('c-fecha').value = info.startStr.slice(0,10);
+                document.getElementById('c-hora').value = info.startStr.slice(11,16);
+                document.getElementById('modalCita').classList.remove('hidden');
+            },
             eventClick: (info) => abrirEditar(info.event.extendedProps)
         });
         calendar.render();
     }
 
+    window.nuevaMision = () => {
+        if (!doctorActual) return alert("SELECCIONE JURISDICCIÓN");
+        citaActual = null;
+        document.getElementById('c-paciente').value = "";
+        document.getElementById('c-telefono').value = "";
+        document.getElementById('modalCita').classList.remove('hidden');
+    };
+
     window.abrirEditar = (c) => {
         citaActual = c;
-        document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
-        document.getElementById('c-telefono').value = c.Pacientes?.telefono || '---';
+        document.getElementById('c-paciente').value = c.Pacientes?.nombre || '';
+        document.getElementById('c-telefono').value = c.Pacientes?.telefono || '';
         document.getElementById('c-fecha').value = c.fecha;
-        document.getElementById('c-hora').value = (c.hora_inicio) ? c.hora_inicio.slice(0, 5) : "";
+        document.getElementById('c-hora').value = c.hora_inicio.slice(0,5);
         document.getElementById('c-estado').value = c.estado;
         document.getElementById('c-notas').value = c.notas || '';
         document.getElementById('modalCita').classList.remove('hidden');
     };
 
     window.guardarCita = async () => {
-        if (!citaActual) return;
-        const data = {
+        if(!doctorActual) return;
+        const payload = {
             fecha: document.getElementById('c-fecha').value,
             hora_inicio: document.getElementById('c-hora').value,
             estado: document.getElementById('c-estado').value,
-            notas: document.getElementById('c-notas').value
+            notas: document.getElementById('c-notas').value,
+            doctor_id: doctorActual
         };
-        const { error } = await supabase.from('Citas').update(data).eq('id', citaActual.id);
-        if (!error) { calendar.refetchEvents(); cerrarModal(); }
+        
+        let res;
+        if(citaActual) res = await supabase.from('Citas').update(payload).eq('id', citaActual.id);
+        else res = await supabase.from('Citas').insert(payload);
+        
+        if(!res.error) { calendar.refetchEvents(); cerrarModal(); }
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
