@@ -2,32 +2,57 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --main: #c5a059; --dark: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #f8fafc, #e2e8f0); color: var(--dark); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top, #f8fafc, #e2e8f0); 
+            color: var(--dark); 
+        }
         .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; }
         .input-elite { width: 100%; padding: 1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; }
+        .input-elite:focus { border-color: var(--main); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
         .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
+        .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
+        
+        .badge-estatus { display: none; padding: 0.3rem 0.8rem; border-radius: 0.7rem; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.3s; }
+        .estatus-nuevo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .estatus-recurrente { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .estatus-oro { background: #fefce8; color: #a16207; border: 1px solid #fef08a; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative overflow-hidden">
         <header class="text-center mb-8">
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">DRA. ALBA PATRICIA ROJAS FLORES</h1>
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Inteligencia Médica</p>
+            <button onclick="history.back()" class="absolute left-6 top-8 text-slate-300 hover:text-slate-900 transition text-sm">←</button>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">ESCANEANDO BÚNKER...</h1>
+            <p id="doc-especialidad" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Inteligencia Médica</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
-            <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-elite" maxlength="10" required>
-            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
-            
+            <div>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Identificación (Teléfono)</p>
+                    <span id="badge-paciente" class="badge-estatus italic"></span>
+                </div>
+                <input type="tel" id="telefono" placeholder="10 DÍGITOS" class="input-elite" maxlength="10" required>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="email" id="email" placeholder="EMAIL" class="input-elite text-xs">
+                    <input type="date" id="fecha_nacimiento" class="input-elite text-xs">
+                </div>
+            </div>
+
             <div class="space-y-4">
                 <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
                     <option value="" disabled selected>Seleccione Servicio</option>
@@ -44,44 +69,69 @@
 
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985';
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('docId') || 'fbe4a553-a1c3-4150-9852-2b0484963aee'; 
+    const fechaPrevia = urlParams.get('fecha');
+    const horaPrevia = urlParams.get('hora');
 
+    // RECONOCIMIENTO DE PACIENTE
+    document.getElementById('telefono').addEventListener('input', async (e) => {
+        const tel = e.target.value;
+        const badge = document.getElementById('badge-paciente');
+        if (tel.length === 10) {
+            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
+            if (pac) {
+                document.getElementById('nombre').value = pac.nombre;
+                document.getElementById('email').value = pac.email || '';
+                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
+                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id).eq('estado','completado');
+                badge.style.display = 'block';
+                if (count >= 3) {
+                    badge.innerText = "✦ PACIENTE ORO";
+                    badge.className = "badge-estatus estatus-oro italic";
+                } else {
+                    badge.innerText = "✓ RECURRENTE";
+                    badge.className = "badge-estatus estatus-recurrente italic";
+                }
+            } else {
+                badge.style.display = 'block';
+                badge.innerText = "+ PACIENTE NUEVO";
+                badge.className = "badge-estatus estatus-nuevo italic";
+            }
+        } else { badge.style.display = 'none'; }
+    });
+
+    // RADAR DE DISPONIBILIDAD
     async function actualizarRadar() {
-        const fechaInput = document.getElementById('fecha').value;
+        const fecha = document.getElementById('fecha').value;
         const selectServ = document.getElementById('servicio');
         const radar = document.getElementById('radar-horas');
-        if (!fechaInput || !selectServ.value) return;
+        if (!fecha || !selectServ.value) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">ESCANEANDO DISPONIBILIDAD...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO RADAR...</p>';
         
         const servOpt = selectServ.selectedOptions[0];
-        const duracionTotal = parseInt(servOpt.getAttribute('data-total')) || 30;
+        const duracionTotal = parseInt(servOpt.dataset.total) || 30;
 
         const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
             p_doctor: docId, 
-            p_fecha: fechaInput, 
+            p_fecha: fecha, 
             p_duracion: duracionTotal
         });
 
-        if (error) { radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 font-black">FALLA DE RADAR</p>`; return; }
+        if (error) {
+            radar.innerHTML = `<p class="col-span-3 text-center text-[8px] text-rose-500 font-black">ERROR: ${error.message}</p>`;
+            return;
+        }
 
-        radar.innerHTML = '';
+        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[10px] font-black text-rose-500 uppercase italic">⚠️ BÚNKER CERRADO O SIN ESPACIO</p>';
         
-        // 🛰️ LÓGICA DE DÍA PARA EL MURO DE FUEGO
-        const diaSemana = new Date(fechaInput + 'T00:00:00').getDay(); // 0=Dom, 6=Sab, 1-5=L-V
-
         slots?.forEach(s => {
-            const horaActual = s.hora;
-
-            // 🛡️ MURO DE FUEGO: Si es Lunes a Viernes (1-5), bloqueamos todo después de las 12:30
-            if (diaSemana >= 1 && diaSemana <= 5 && horaActual >= '12:30:00') {
-                return; // Eliminar del radar
-            }
-
             const pill = document.createElement('div');
-            pill.className = `time-pill`;
+            pill.className = `time-pill ${horaPrevia && s.hora.startsWith(horaPrevia) ? 'selected' : ''}`;
             pill.innerText = s.hora.slice(0,5);
             pill.onclick = () => {
                 document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
@@ -90,59 +140,84 @@
             };
             radar.appendChild(pill);
         });
-
-        if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-[10px] font-black text-rose-500 uppercase italic">⚠️ BÚNKER CERRADO</p>';
     }
 
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
+    // INICIALIZACIÓN
     async function init() {
-        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true).order('precio', {ascending: false});
+        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
+        if(doc) document.getElementById('doc-name').innerText = `DR. ${doc.nombre.toUpperCase()}`;
+
+        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
         const select = document.getElementById('servicio');
-        
         servs?.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.setAttribute('data-total', s.duracion_min + (s.buffer_min || 0));
-            opt.setAttribute('data-monto', s.precio);
+            opt.dataset.total = s.duracion_min + (s.buffer_min || 0);
+            opt.dataset.monto = s.precio;
             opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
             select.appendChild(opt);
         });
+
+        if(fechaPrevia) {
+            document.getElementById('fecha').value = fechaPrevia;
+            if(servs?.length > 0) actualizarRadar();
+        }
     }
 
+    // CONFIRMACIÓN DE CITA (MODIFICADO PARA NO RE-DIRIGIR)
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
+        const tel = document.getElementById('telefono').value;
         const hora = document.getElementById('hora_seleccionada').value;
-        const selectServ = document.getElementById('servicio');
-        const servOpt = selectServ.selectedOptions[0];
+        
+        if(!hora) return alert("✦ SELECCIONE UNA HORA DISPONIBLE");
+        
+        btn.disabled = true; 
+        btn.innerText = "SINCRONIZANDO...";
 
-        if(!hora) return alert("✦ SELECCIONE HORARIO");
-        
-        btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
-        
         try {
-            const duracion = parseInt(servOpt.getAttribute('data-total'));
-            const monto = parseFloat(servOpt.getAttribute('data-monto'));
+            let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+            if (!pac) {
+                const { data } = await supabase.from('Pacientes').insert({ 
+                    nombre: document.getElementById('nombre').value.toUpperCase(), 
+                    telefono: tel, 
+                    email: document.getElementById('email').value,
+                    fecha_nacimiento: document.getElementById('fecha_nacimiento').value
+                }).select().single();
+                pac = data;
+            }
 
-            const { error } = await supabase.from('Citas').insert({
-                doctor_id: docId,
-                paciente_id: '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985',
-                servicio_id: servOpt.value,
-                fecha: document.getElementById('fecha').value,
+            const serv = document.getElementById('servicio').selectedOptions[0];
+            const { error: citaErr } = await supabase.from('Citas').insert({
+                doctor_id: docId, 
+                paciente_id: pac.id, 
+                servicio_id: serv.value,
+                fecha: document.getElementById('fecha').value, 
                 hora_inicio: hora,
-                duracion_cita: duracion,
-                monto: monto,
+                duracion_cita: parseInt(serv.dataset.total), 
+                monto: parseFloat(serv.dataset.monto), 
                 estado: 'pendiente'
             });
 
-            if (error) throw error;
-            alert("✅ CITA REGISTRADA");
-            location.reload();
-        } catch (err) {
-            alert("FALLA: " + err.message);
+            if (citaErr) throw citaErr;
+
+            alert("✅ RESERVACIÓN EXITOSA. EL BÚNKER HA SIDO ACTUALIZADO.");
+            
+            // LIMPIEZA TÁCTICA PARA NUEVA CITA SIN RECARGAR
+            document.getElementById('agendador-form').reset();
+            document.getElementById('radar-horas').innerHTML = '';
+            document.getElementById('badge-paciente').style.display = 'none';
             btn.disabled = false;
+            btn.innerText = "Confirmar Reservación ✦";
+
+        } catch (err) {
+            alert("FALLA EN LA MISIÓN: " + err.message);
+            btn.disabled = false;
+            btn.innerText = "Reintentar ✦";
         }
     };
 
