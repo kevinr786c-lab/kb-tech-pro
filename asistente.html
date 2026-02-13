@@ -17,10 +17,10 @@
         #sidebar.open { margin-right: 0; }
         
         /* 🎨 PERSONALIZACIÓN DE BOTONES DE NAVEGACIÓN */
-        .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 0.8rem !important; font-weight: 800; text-transform: uppercase; font-size: 9px !important; padding: 8px 12px !important; transition: 0.3s !important; color: white !important; opacity: 1 !important; }
+        .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 0.8rem !important; font-weight: 800; text-transform: uppercase; font-size: 8px !important; padding: 8px 10px !important; transition: 0.3s !important; color: white !important; }
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-1px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3) !important; }
-        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; font-style: italic; color: var(--luxe-dark); font-size: 1.1rem !important; }
+        .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; font-style: italic; color: var(--luxe-dark); font-size: 1rem !important; }
 
         .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; font-weight: 700; }
         .event-primera { border-left: 5px solid #3b82f6 !important; }
@@ -75,7 +75,7 @@
     </aside>
 
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
-        <div class="glass max-w-md w-full p-8 bg-white shadow-2xl">
+        <div class="glass max-w-md w-full p-8 bg-white shadow-2xl border border-[var(--luxe-gold)]">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-4">
                 <input id="c-paciente" class="input-luxe bg-slate-50 border-none" readonly>
@@ -155,14 +155,15 @@
             locale: 'es',
             initialView: 'timeGridDay',
             allDaySlot: false,
-            // 🛰️ NAVEGACIÓN TOTAL HABILITADA
+            // 🛰️ NAVEGACIÓN ANUAL (12 MESES) ACTIVADA
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay'
             },
             buttonText: {
                 today: 'Hoy',
+                year: 'Año',
                 month: 'Mes',
                 week: 'Semana',
                 day: 'Día'
