@@ -12,19 +12,13 @@
         :root { --luxe-gold: #c5a059; --luxe-dark: #0f172a; --luxe-bg: #f8f9fa; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--luxe-bg); color: #1e293b; overflow: hidden; height: 100vh; display: flex; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; transition: all 0.5s ease; }
-        
         #sidebar { width: 280px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); margin-right: -280px; position: fixed; right: 0; height: 100vh; z-index: 100; background: white; border-left: 1px solid rgba(197,160,89,0.2); }
         #sidebar.open { margin-right: 0; }
-        
         .fc-button { background: var(--luxe-dark) !important; border: none !important; border-radius: 0.8rem !important; font-weight: 800; text-transform: uppercase; font-size: 8px !important; padding: 8px 10px !important; transition: 0.3s !important; color: white !important; }
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-1px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3) !important; }
         .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; font-style: italic; color: var(--luxe-dark); font-size: 1rem !important; }
-
         .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; font-weight: 700; }
-        .event-primera { border-left: 5px solid #3b82f6 !important; }
-        .event-recurrente { border-left: 5px solid #10b981 !important; }
-
         .input-luxe { width: 100%; padding: 0.75rem; border-radius: 1rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-size: 0.8rem; font-weight: 600; }
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
@@ -32,7 +26,6 @@
     </style>
 </head>
 <body class="p-4 gap-4">
-
     <div class="flex-1 flex flex-col gap-4 overflow-hidden">
         <header class="glass p-6 flex justify-between items-center shadow-xl">
             <div class="flex items-center gap-4">
@@ -44,22 +37,18 @@
                     </select>
                 </div>
             </div>
-
             <div class="flex-1 max-w-md mx-4">
                 <input type="text" id="buscadorLocal" oninput="filtrarRadar()" placeholder="ESCANEANDO PACIENTE..." class="input-luxe text-center uppercase tracking-widest border-none bg-slate-100 focus:bg-white focus:ring-2 focus:ring-[#c5a059]">
             </div>
-            
             <div class="flex items-center gap-3">
                 <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
                 <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">☰</button>
             </div>
         </header>
-
         <div class="flex-1 glass p-6 overflow-hidden relative shadow-2xl">
             <div id="calendar" class="h-full"></div>
         </div>
     </div>
-
     <aside id="sidebar" class="p-8 flex flex-col shadow-2xl">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-sm font-black uppercase italic text-[#0f172a]">Comandos <span class="text-[#c5a059]">Élite</span></h2>
@@ -74,7 +63,6 @@
             <p class="text-[8px] font-black text-slate-300 text-center uppercase mt-4">K.B TECH 2026</p>
         </div>
     </aside>
-
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl border border-[var(--luxe-gold)]">
             <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
@@ -98,22 +86,17 @@
             </div>
         </div>
     </div>
-
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-
     let calendar, citaActual = null, doctorActual = null, todasLasCitas = [];
-
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
-
     window.filtrarRadar = () => {
         const query = document.getElementById('buscadorLocal').value.toUpperCase();
         const filtradas = todasLasCitas.filter(c => (c.Pacientes?.nombre || '').toUpperCase().includes(query));
         calendar.removeAllEvents();
         calendar.addEventSource(filtradas.map(c => procesarCitaParaCalendario(c)));
     };
-
     function procesarCitaParaCalendario(c) {
         const ESTADOS = { pendiente: '#f8fafc', confirmado: '#fff7ed', atendiendo: '#f0fdf4', completado: '#0f172a', cancelado: '#fef2f2' };
         const TXT = { pendiente: '#94a3b8', confirmado: '#c5a059', atendiendo: '#10b981', completado: '#c5a059', cancelado: '#ef4444' };
@@ -127,7 +110,6 @@
             extendedProps: c
         };
     }
-
     async function cargarCitas() {
         if (!doctorActual) return [];
         const { data, error } = await supabase.from('Citas').select('*, Pacientes(*)').eq('doctor_id', doctorActual);
@@ -135,39 +117,21 @@
         todasLasCitas = data || [];
         return todasLasCitas.map(c => procesarCitaParaCalendario(c));
     }
-
     async function verHistorial(pacienteId) {
         if(!pacienteId) return;
         const { data } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', pacienteId).order('fecha', { ascending: false }).limit(5);
         const lista = document.getElementById('historial-lista');
-        lista.innerHTML = (data || []).map(c => `
-            <div class="p-2 bg-slate-50 rounded-lg border mb-2">
-                <div class="flex justify-between text-[8px] font-black">
-                    <span>${c.fecha}</span>
-                    <span class="uppercase text-[#c5a059]">${c.estado}</span>
-                </div>
-            </div>`).join('');
+        lista.innerHTML = (data || []).map(c => `<div class="p-2 bg-slate-50 rounded-lg border mb-2"><div class="flex justify-between text-[8px] font-black"><span>${c.fecha}</span><span class="uppercase text-[#c5a059]">${c.estado}</span></div></div>`).join('');
         document.getElementById('paciente-info').classList.remove('hidden');
         if(!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
     }
-
     function initCalendar() {
         calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             locale: 'es',
             initialView: 'timeGridDay',
             allDaySlot: false,
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            buttonText: {
-                today: 'Hoy',
-                year: 'Año',
-                month: 'Mes',
-                week: 'Semana',
-                day: 'Día'
-            },
+            headerToolbar: { left: 'prev,next today', center: 'title', right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay' },
+            buttonText: { today: 'Hoy', year: 'Año', month: 'Mes', week: 'Semana', day: 'Día' },
             events: (info, success) => cargarCitas().then(success),
             eventClick: (info) => {
                 citaActual = info.event.extendedProps;
@@ -183,47 +147,32 @@
         });
         calendar.render();
     }
-
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            document.getElementById('doctorSelect').innerHTML = '<option value="">ERROR DE SESIÓN</option>';
-            return;
-        }
+        if (!session) { document.getElementById('doctorSelect').innerHTML = '<option value="">ERROR DE SESIÓN</option>'; return; }
         const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session.user.id);
         const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asig?.map(a => a.doctor_id) || []);
         const select = document.getElementById('doctorSelect');
         select.innerHTML = '<option value="">ELEGIR DOCTOR</option>' + (docs?.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('') || '');
         select.onchange = () => { doctorActual = select.value; if (!calendar) initCalendar(); else calendar.refetchEvents(); };
     }
-
     window.guardarCita = async () => {
         const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
         await supabase.from('Citas').update(p).eq('id', citaActual.id);
         calendar.refetchEvents(); cerrarModal();
     };
-
     window.lanzarWhatsApp = () => {
         const tel = document.getElementById('c-telefono').value;
         const nombre = document.getElementById('c-paciente').value;
         const fecha = document.getElementById('c-fecha').value;
         const hora = document.getElementById('c-hora').value;
-        
         if(!tel) return alert("Sin número");
-
-        // 🔗 LINK SUGERIDO POR ELENA PARA AUTOGESTIÓN
         const linkAgenda = window.location.origin + "/agendar.html?docId=" + doctorActual;
-        
         const msg = encodeURIComponent(`Hola *${nombre}*, te recordamos tu cita el día *${fecha}* a las *${hora}* hrs. ✦\n\nSi necesitas agendar otra fecha o ver disponibilidad, entra aquí: ${linkAgenda}`);
         window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
-
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
-    window.irAAgendar = () => { 
-        if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO"); 
-        window.location.href = `agendar.html?docId=${doctorActual}`; 
-    };
-
+    window.irAAgendar = () => { if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO"); window.location.href = `agendar.html?docId=${doctorActual}`; };
     cargarDoctores();
 </script>
 </body>
