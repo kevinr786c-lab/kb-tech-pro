@@ -20,10 +20,9 @@
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
         
-        /* 🧬 ESTATUS DE EVENTOS */
         .fc-event { border: none !important; border-radius: 8px !important; padding: 2px 5px !important; transition: all 0.3s ease; cursor: pointer; }
         .fc-event:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
-        
+
         .event-nuevo { border-left: 4px solid #3b82f6 !important; }
         .event-recurrente { border-left: 4px solid #10b981 !important; }
         .event-oro { border-left: 4px solid var(--luxe-gold) !important; box-shadow: 0 0 15px rgba(197, 160, 89, 0.3) !important; }
@@ -33,7 +32,7 @@
         
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; transition: color 0.5s ease; }
-        
+
         /* Pulso de Sincronización */
         @keyframes pulse-green {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
@@ -63,9 +62,7 @@
             
             <div class="flex items-center gap-3">
                 <button onclick="nuevaMision()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
-                <div class="hidden md:flex bg-slate-100 rounded-xl p-1 gap-1">
-                    <input type="month" id="mesSelector" class="bg-transparent text-[9px] font-black uppercase px-2 outline-none border-none">
-                </div>
+                <button onclick="window.location.href='configurar-perfil.html'" class="text-[9px] font-black uppercase px-4 py-2 bg-[#0f172a] text-[#c5a059] border border-[#c5a059]/30 rounded-xl hover:bg-[#c5a059] hover:text-white transition">⚙ Perfil</button>
                 <button onclick="abrirBloqueo()" class="text-[9px] font-black uppercase px-4 py-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-rose-400 transition">🚫 Bloquear</button>
                 <button onclick="window.location.reload()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">🔄</button>
             </div>
@@ -103,7 +100,7 @@
                     <option value="completado">Completado</option>
                     <option value="cancelado">CANCELAR CITA</option>
                 </select>
-                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS DE LA CONSULTA..."></textarea>
+                <textarea id="c-notas" class="input-luxe h-24" placeholder="NOTAS..."></textarea>
             </div>
             <div class="flex justify-between mt-6 gap-2">
                 <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-emerald-600 hover:text-white transition">Actualizar Radar</button>
@@ -138,21 +135,17 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    document.getElementById('mesSelector').onchange = (e) => {
-        if(calendar) calendar.gotoDate(e.target.value + "-01");
-    };
-
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        const { data: asignaciones, error } = await supabase
+        const { data: asignaciones } = await supabase
             .from('Asistentes_Doctor')
             .select('doctor_id, turno')
             .eq('asistente_id', session.user.id);
 
-        if (error || !asignaciones || asignaciones.length === 0) {
-            document.getElementById('doctorSelect').innerHTML = '<option value="">SIN DOCTORES ASIGNADOS</option>';
+        if (!asignaciones || asignaciones.length === 0) {
+            document.getElementById('doctorSelect').innerHTML = '<option value="">SIN JURISDICCIÓN</option>';
             return;
         }
 
@@ -166,8 +159,8 @@
         select.innerHTML = '<option value="">ELIJA DOCTOR OPERATIVO</option>' + 
             asignaciones.map(a => {
                 const docInfo = doctoresReales?.find(d => d.id === a.doctor_id);
-                const nombre = docInfo?.nombre ? docInfo.nombre.toUpperCase() : "DOCTOR NO IDENTIFICADO";
-                const turno = a.turno ? a.turno.toUpperCase() : "TURNO GENERAL";
+                const nombre = docInfo?.nombre ? docInfo.nombre.toUpperCase() : "NO IDENTIFICADO";
+                const turno = a.turno ? a.turno.toUpperCase() : "GENERAL";
                 return `<option value="${a.doctor_id}">DR. ${nombre} (${turno})</option>`;
             }).join('');
 
@@ -179,10 +172,10 @@
             const star = document.querySelector('.kb-star');
             const glass = document.querySelector('.glass');
             if(select.options[select.selectedIndex].text.includes("ELENA")) {
-                star.style.color = "#f472b6"; // Rosa/Oro
+                star.style.color = "#f472b6"; 
                 glass.style.borderColor = "rgba(244, 114, 182, 0.4)";
             } else {
-                star.style.color = "#c5a059"; // Oro K.B
+                star.style.color = "#c5a059"; 
                 glass.style.borderColor = "rgba(197, 160, 89, 0.4)";
             }
             
@@ -200,15 +193,14 @@
                 .neq('estado', 'cancelado');
             if (error) throw error;
 
-            const eventos = data.map(c => ({
+            success(data.map(c => ({
                 id: c.id,
                 title: c.Pacientes?.nombre || 'PACIENTE',
                 start: `${c.fecha}T${c.hora_inicio}`,
                 backgroundColor: ESTADOS[c.estado]?.bg || '#f8fafc',
                 textColor: ESTADOS[c.estado]?.txt || '#1e293b',
                 extendedProps: c
-            }));
-            success(eventos);
+            })));
         } catch (err) { failure(err); }
     }
 
@@ -233,7 +225,6 @@
         if (!doctorActual) return alert("SELECCIONE JURISDICCIÓN");
         citaActual = null;
         document.getElementById('c-paciente').value = "";
-        document.getElementById('c-telefono').value = "";
         document.getElementById('modalCita').classList.remove('hidden');
     };
 
@@ -257,11 +248,7 @@
             notas: document.getElementById('c-notas').value,
             doctor_id: doctorActual
         };
-        
-        let res;
-        if(citaActual) res = await supabase.from('Citas').update(payload).eq('id', citaActual.id);
-        else res = await supabase.from('Citas').insert(payload);
-        
+        const res = citaActual ? await supabase.from('Citas').update(payload).eq('id', citaActual.id) : await supabase.from('Citas').insert(payload);
         if(!res.error) { calendar.refetchEvents(); cerrarModal(); }
     };
 
