@@ -69,11 +69,13 @@
 
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    
+    // CONFIGURACIÓN DE ACCESO AL BÚNKER
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    // 🛡️ DETECCIÓN DE JURISDICCIÓN DINÁMICA
+    // 🛡️ DETECCIÓN DE JURISDICCIÓN (Doctor ID desde URL)
     const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId') || '196c57b5-68d5-4825-8607-36b5d3bc3e15'; // Fallback Marcus
+    const docId = urlParams.get('docId') || 'fbe4a553-a1c3-4150-9852-2b0484963aee'; // Default a Dr. Stark
     const fechaPrevia = urlParams.get('fecha');
     const horaPrevia = urlParams.get('hora');
 
@@ -87,12 +89,14 @@
                 document.getElementById('nombre').value = pac.nombre;
                 document.getElementById('email').value = pac.email || '';
                 document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
+                
                 const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id).eq('estado','completado');
+                
                 badge.style.display = 'block';
                 if (count >= 3) {
                     badge.innerText = "✦ PACIENTE ORO";
                     badge.className = "badge-estatus estatus-oro italic";
-                } else if (count >= 1) {
+                } else {
                     badge.innerText = "✓ RECURRENTE";
                     badge.className = "badge-estatus estatus-recurrente italic";
                 }
@@ -104,25 +108,41 @@
         } else { badge.style.display = 'none'; }
     });
 
-    // 🛡️ RADAR DE DISPONIBILIDAD
+    // 🛡️ RADAR DE DISPONIBILIDAD (FILTRA CONTRA BLOQUEOS)
     async function actualizarRadar() {
         const fecha = document.getElementById('fecha').value;
-        const servId = document.getElementById('servicio').value;
+        const selectServ = document.getElementById('servicio');
+        const servId = selectServ.value;
         const radar = document.getElementById('radar-horas');
+        
         if (!fecha || !servId) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black animate-pulse">Analizando Disponibilidad...</p>';
-        const serv = document.getElementById('servicio').selectedOptions[0];
+        radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black animate-pulse text-amber-500">ESCANEANDO DISPONIBILIDAD...</p>';
         
-        const { data: slots } = await supabase.rpc('obtener_horarios_disponibles', {
-            p_doctor: docId, p_fecha: fecha, p_duracion: parseInt(serv.dataset.total)
+        const servOpt = selectServ.selectedOptions[0];
+        const duracionTotal = parseInt(servOpt.dataset.total) || 30;
+
+        // EJECUCIÓN DE LA FUNCIÓN RPC MAESTRA
+        const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
+            p_doctor: docId, 
+            p_fecha: fecha, 
+            p_duracion: duracionTotal
         });
 
-        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[8px] font-black text-rose-500 uppercase">Doctor sin slots para esta fecha</p>';
+        if (error) {
+            console.error("Error en Radar:", error);
+            radar.innerHTML = '<p class="col-span-3 text-center text-[8px] font-black text-rose-500 uppercase">FALLA EN EL RADAR</p>';
+            return;
+        }
+
+        radar.innerHTML = slots?.length ? '' : '<p class="col-span-3 text-center text-[10px] font-black text-rose-500 uppercase italic">⚠️ Búnker Bloqueado / Sin Espacio</p>';
+        
         slots?.forEach(s => {
             const pill = document.createElement('div');
+            // s.hora viene de la DB como string
             pill.className = `time-pill ${horaPrevia && s.hora.startsWith(horaPrevia) ? 'selected' : ''}`;
             pill.innerText = s.hora.slice(0,5);
+            
             if(horaPrevia && s.hora.startsWith(horaPrevia)) document.getElementById('hora_seleccionada').value = s.hora;
             
             pill.onclick = () => {
@@ -137,45 +157,49 @@
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
-    // INICIALIZACIÓN DINÁMICA
+    // INICIALIZACIÓN DE TERMINAL
     async function init() {
-        // 1. Cargar Nombre del Doctor
+        // 1. Cargar Identidad del Doctor
         const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
         if(doc) document.getElementById('doc-name').innerText = `DR. ${doc.nombre.toUpperCase()}`;
 
-        // 2. Cargar Servicios del Doctor Específico
+        // 2. Cargar Catálogo de Servicios
         const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
         const select = document.getElementById('servicio');
         servs?.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.dataset.total = s.duracion_total;
+            opt.dataset.total = s.duracion_min + (s.buffer_min || 0);
             opt.dataset.monto = s.precio;
             opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
             select.appendChild(opt);
         });
 
-        // 3. Pre-cargar fecha si viene del calendario
+        // 3. Sincronizar fecha previa si existe
         if(fechaPrevia) {
             document.getElementById('fecha').value = fechaPrevia;
             if(servs?.length > 0) actualizarRadar();
         }
     }
 
+    // CONFIRMACIÓN DE MISIÓN
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
         const tel = document.getElementById('telefono').value;
         const hora = document.getElementById('hora_seleccionada').value;
-        if(!hora) return alert("Seleccione una hora.");
         
-        btn.disabled = true; btn.innerText = "Sincronizando Misión...";
+        if(!hora) return alert("✦ SELECCIONE UNA HORA EN EL RADAR");
+        
+        btn.disabled = true; 
+        btn.innerText = "SINCRONIZANDO RESERVACIÓN...";
 
         let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
         if (!pac) {
             const { data } = await supabase.from('Pacientes').insert({ 
                 nombre: document.getElementById('nombre').value.toUpperCase(), 
-                telefono: tel, email: document.getElementById('email').value,
+                telefono: tel, 
+                email: document.getElementById('email').value,
                 fecha_nacimiento: document.getElementById('fecha_nacimiento').value
             }).select().single();
             pac = data;
@@ -183,13 +207,24 @@
 
         const serv = document.getElementById('servicio').selectedOptions[0];
         const { error } = await supabase.from('Citas').insert({
-            doctor_id: docId, paciente_id: pac.id, servicio_id: serv.value,
-            fecha: document.getElementById('fecha').value, hora_inicio: hora,
-            duracion_cita: parseInt(serv.dataset.total), monto: parseFloat(serv.dataset.monto), estado: 'pendiente'
+            doctor_id: docId, 
+            paciente_id: pac.id, 
+            servicio_id: serv.value,
+            fecha: document.getElementById('fecha').value, 
+            hora_inicio: hora,
+            duracion_cita: parseInt(serv.dataset.total), 
+            monto: parseFloat(serv.dataset.monto), 
+            estado: 'pendiente'
         });
 
-        if (error) { alert("Falla: " + error.message); btn.disabled = false; btn.innerText = "Reintentar"; }
-        else { alert("✅ RESERVACIÓN SINCRONIZADA."); window.location.href='app.html'; }
+        if (error) { 
+            alert("FALLA EN SISTEMA: " + error.message); 
+            btn.disabled = false; 
+            btn.innerText = "REINTENTAR"; 
+        } else { 
+            alert("✅ RESERVACIÓN SINCRONIZADA EXITOSAMENTE."); 
+            window.location.href='app.html'; 
+        }
     };
 
     init();
