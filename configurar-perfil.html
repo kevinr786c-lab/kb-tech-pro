@@ -11,26 +11,29 @@
         :root {
             --neon-indigo: #6366f1;
             --neon-rose: #f43f5e;
-            --neon-amber: #f59e0b;
+            --neon-amber: #c5a059; /* Unificado con el Oro K.B */
+            --dark-bunker: #0f172a;
+            --deep-space: #020617;
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #0f172a, #020617); 
+            background: radial-gradient(circle at top right, var(--dark-bunker), var(--deep-space)); 
             color:white; 
             overflow-x: hidden; 
+            min-height: 100vh;
         }
 
         .glass { 
-            background: rgba(15, 23, 42, 0.6); 
+            background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(30px); 
             border: 1px solid rgba(255,255,255,0.08); 
             border-radius: 3rem; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
         }
 
         .input-kb { 
-            background: rgba(0, 0, 0, 0.3); 
+            background: rgba(255, 255, 255, 0.05); 
             border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 1.25rem; 
             padding: 0.85rem; 
@@ -57,11 +60,10 @@
 
         .btn-action:hover { 
             transform: translateY(-3px) scale(1.02); 
-            filter: brightness(1.3);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            filter: brightness(1.2);
         }
 
-        /* Barra de progreso de carga estética */
+        /* Barra de carga */
         .loading-bar {
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--neon-indigo), transparent);
@@ -77,14 +79,14 @@
             100% { transform: translateX(100%); }
         }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-indigo); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--neon-indigo); border-radius: 10px; }
     </style>
 </head>
 
-<body class="p-4 md:p-10 min-h-screen flex flex-col items-center">
+<body class="p-4 md:p-10">
 
-    <div class="max-w-7xl w-full glass p-8 md:p-12 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto glass p-8 md:p-12 relative overflow-hidden">
         <div class="loading-bar"></div>
         
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
@@ -94,7 +96,7 @@
                 </h1>
                 <div class="flex items-center gap-3 mt-2">
                     <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">System Status: Online / Encrypted</p>
+                    <p id="status-text" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">System Status: Online</p>
                 </div>
             </div>
             <button onclick="window.location.href='app.html'" class="btn-action bg-white/5 border border-white/10 px-8 py-4 text-[10px] hover:bg-white/10 backdrop-blur-md">
@@ -113,11 +115,8 @@
                     </div>
                     <h3 class="text-[12px] uppercase font-black text-indigo-400 tracking-[0.3em]">Turnos Semanales</h3>
                 </div>
-                
-                <div id="contenedor-semana" class="space-y-4">
-                    </div>
-                
-                <button id="btnGuardarSemana" class="btn-action bg-indigo-600 w-full py-5 text-[11px] shadow-2xl shadow-indigo-900/40 border border-indigo-400/30">
+                <div id="contenedor-semana" class="space-y-4"></div>
+                <button id="btnGuardarSemana" class="btn-action bg-indigo-600 w-full py-5 text-[11px] shadow-2xl border border-indigo-400/30">
                     Sincronizar Horarios
                 </button>
             </section>
@@ -129,39 +128,29 @@
                     </div>
                     <h3 class="text-[12px] uppercase font-black text-rose-400 tracking-[0.3em]">Bloqueos Tácticos</h3>
                 </div>
-                
                 <div class="space-y-4">
-                    <div class="group">
-                        <label class="text-[9px] font-bold text-slate-500 ml-4 mb-2 block">FECHA DE BLOQUEO</label>
-                        <input type="date" id="fecha-bloqueo" class="input-kb">
-                    </div>
-                    <div class="group">
-                        <label class="text-[9px] font-bold text-slate-500 ml-4 mb-2 block">MOTIVO OPERATIVO</label>
-                        <input type="text" id="motivo-bloqueo" placeholder="EJ. VACACIONES / CONGRESO" class="input-kb uppercase placeholder:text-white/20">
-                    </div>
+                    <input type="date" id="fecha-bloqueo" class="input-kb text-xs uppercase">
+                    <input type="text" id="motivo-bloqueo" placeholder="MOTIVO (EJ. CONGRESO)" class="input-kb uppercase text-[10px]">
                     <button id="btnBloquear" class="btn-action bg-rose-600 w-full py-5 text-[11px] border border-rose-400/30">
                         Inyectar Bloqueo
                     </button>
                 </div>
-
                 <div id="lista-bloqueos" class="space-y-3 max-h-60 overflow-y-auto pr-3 custom-scroll"></div>
             </section>
 
             <section class="space-y-8 bg-white/[0.02] p-8 rounded-[3rem] border border-white/5">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-amber-500/10 rounded-2xl border border-amber-500/20">
-                        <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
+                        <div class="w-2 h-6 bg-[#c5a059] rounded-full"></div>
                     </div>
-                    <h3 class="text-[12px] uppercase font-black text-amber-400 tracking-[0.3em]">Catálogo Elite</h3>
+                    <h3 class="text-[12px] uppercase font-black text-[#c5a059] tracking-[0.3em]">Catálogo Elite</h3>
                 </div>
-                
-                <div id="lista-servicios" class="space-y-5 max-h-[450px] overflow-y-auto pr-3"></div>
-                
+                <div id="lista-servicios" class="space-y-5 max-h-[450px] overflow-y-auto pr-3 custom-scroll"></div>
                 <div class="grid grid-cols-1 gap-3 pt-4">
-                    <button id="btnAddSrv" class="btn-action bg-white/5 border border-amber-500/40 w-full py-4 text-[10px] hover:bg-amber-500/20">
+                    <button id="btnAddSrv" class="btn-action bg-white/5 border border-[#c5a059]/40 w-full py-4 text-[10px] hover:bg-[#c5a059]/20">
                         + Nuevo Servicio
                     </button>
-                    <button id="btnGuardarSrv" class="btn-action bg-amber-600 w-full py-5 text-[11px] shadow-2xl shadow-amber-900/40 border border-amber-400/30">
+                    <button id="btnGuardarSrv" class="btn-action bg-[#c5a059] w-full py-5 text-[11px] text-slate-900 shadow-2xl border border-white/20">
                         Guardar Catálogo
                     </button>
                 </div>
@@ -172,45 +161,46 @@
 
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const supabase = createClient(
-        'https://ctvqjnckxmqeejbfwmkj.supabase.co',
-        'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w'
-    );
+    // 🛡️ REPARACIÓN: DETECCIÓN DINÁMICA DE DOCTOR (EVITA ERROR 400)
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('docId');
 
-    // ID MAESTRO: Detecta al doctor actual o usa el de Marcus por defecto
-    const docId = '196c57b5-68d5-4825-8607-36b5d3bc3e15';
+    if (!docId) {
+        alert("⚠️ MISIÓN ABORTADA: No se detectó ID de doctor. Regresando al radar.");
+        window.location.href = 'app.html';
+    }
 
     function toast(msg){
         const t = document.getElementById('toast');
         t.innerText = msg;
         t.classList.remove('hidden');
         t.classList.add('flex');
-        setTimeout(()=>{
-            t.classList.add('hidden');
-            t.classList.remove('flex');
-        },3000);
+        setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 3000);
     }
 
     // --- LOGICA DE HORARIOS ---
     async function cargarSemana(){
-        const { data } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId);
-        const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+        const { data, error } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId);
+        if (error) console.error("Error cargando horarios:", error);
         
+        const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
         document.getElementById('contenedor-semana').innerHTML = dias.map((d,i)=>{
-            const conf = data?.find(h=>h.dia_semana===i+1) || {activo:false,hora_inicio:"09:00:00",hora_fin:"17:00:00"};
+            const conf = data?.find(h=>h.dia_semana===i+1) || {activo:false,hora_inicio:"09:00",hora_fin:"17:00"};
             return `
-            <div class="flex items-center justify-between gap-4 bg-black/20 p-4 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition-all">
+            <div class="flex items-center justify-between gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition-all">
                 <div class="flex items-center gap-3">
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" class="chk sr-only peer" ${conf.activo?'checked':''} data-dia="${i+1}">
-                        <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        <div class="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
                     </label>
-                    <span class="text-[11px] font-black uppercase ${conf.activo?'text-white':'text-slate-600'}">${d}</span>
+                    <span class="text-[10px] font-black uppercase ${conf.activo?'text-white':'text-slate-600'}">${d}</span>
                 </div>
                 <div class="flex gap-2">
-                    <input type="time" value="${conf.hora_inicio.slice(0,5)}" class="ini bg-black/40 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold outline-none focus:border-indigo-500 text-indigo-400">
-                    <input type="time" value="${conf.hora_fin.slice(0,5)}" class="fin bg-black/40 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold outline-none focus:border-indigo-500 text-indigo-400">
+                    <input type="time" value="${conf.hora_inicio.slice(0,5)}" class="ini bg-transparent border-none text-[10px] font-bold outline-none text-indigo-400">
+                    <span class="text-white/20 text-[8px]">|</span>
+                    <input type="time" value="${conf.hora_fin.slice(0,5)}" class="fin bg-transparent border-none text-[10px] font-bold outline-none text-indigo-400">
                 </div>
             </div>`;
         }).join('');
@@ -220,13 +210,14 @@
         const filas = document.querySelectorAll('#contenedor-semana > div');
         for(const f of filas){
             const chk = f.querySelector('.chk');
-            await supabase.from('Horarios_Doctor').upsert({
+            const { error } = await supabase.from('Horarios_Doctor').upsert({
                 doctor_id: docId,
                 dia_semana: parseInt(chk.dataset.dia),
                 hora_inicio: f.querySelector('.ini').value + ":00",
                 hora_fin: f.querySelector('.fin').value + ":00",
                 activo: chk.checked
             }, { onConflict: 'doctor_id,dia_semana' });
+            if(error) console.error("Error al guardar:", error);
         }
         toast("✦ SINCRO EXITOSA: JURISDICCIÓN");
         cargarSemana();
@@ -236,27 +227,29 @@
     async function cargarBloqueos(){
         const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id',docId).gte('fecha',new Date().toISOString().slice(0,10)).order('fecha');
         document.getElementById('lista-bloqueos').innerHTML = data?.map(b=>`
-        <div class="flex justify-between items-center bg-rose-500/5 p-4 rounded-2xl border border-rose-500/20 group hover:bg-rose-500/10 transition-all">
+        <div class="flex justify-between items-center bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20 group">
             <div class="flex flex-col">
                 <span class="text-[10px] font-black text-rose-400 uppercase tracking-tighter">${b.fecha}</span>
-                <span class="text-[9px] text-slate-500 font-bold uppercase">${b.motivo}</span>
+                <span class="text-[8px] text-slate-500 font-bold uppercase">${b.motivo}</span>
             </div>
-            <button onclick="borrarBloqueo('${b.id}')" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all">✕</button>
-        </div>`).join('') || '';
+            <button onclick="borrarBloqueo('${b.id}')" class="text-white hover:text-rose-500 transition">✕</button>
+        </div>`).join('') || '<p class="text-center text-[8px] text-white/20 uppercase py-4">Sin bloqueos activos</p>';
     }
 
     document.getElementById('btnBloquear').onclick = async ()=>{
         const fecha = document.getElementById('fecha-bloqueo').value;
-        if(!fecha) return toast("ERROR: FECHA NO DEFINIDA");
-        await supabase.from('Bloqueos').insert({
+        if(!fecha) return toast("ERROR: FECHA VACÍA");
+        const { error } = await supabase.from('Bloqueos').insert({
             doctor_id: docId,
             fecha,
             motivo: document.getElementById('motivo-bloqueo').value.toUpperCase() || "BLOQUEO DE SEGURIDAD"
         });
-        document.getElementById('fecha-bloqueo').value = '';
-        document.getElementById('motivo-bloqueo').value = '';
-        cargarBloqueos();
-        toast("✦ BÚNKER CERRADO EXITOSAMENTE");
+        if(!error) { 
+            document.getElementById('fecha-bloqueo').value = ''; 
+            document.getElementById('motivo-bloqueo').value = '';
+            cargarBloqueos(); 
+            toast("✦ BÚNKER CERRADO EXITOSAMENTE");
+        }
     };
 
     window.borrarBloqueo = async (id)=>{
@@ -277,16 +270,15 @@
         div.dataset.id=s.id||'';
         div.innerHTML=`
             <div class="flex flex-col gap-1">
-                <label class="text-[8px] font-black text-amber-500 ml-4 tracking-widest uppercase">Nombre del Servicio</label>
-                <input type="text" class="nombre input-kb text-[10px] font-black uppercase text-white" value="${s.nombre||''}">
+                <input type="text" class="nombre input-kb text-[10px] font-black uppercase text-white" value="${s.nombre||''}" placeholder="NOMBRE DEL SERVICIO">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[8px] font-black text-slate-500 ml-4 tracking-widest uppercase">Costo ($)</label>
+                    <label class="text-[8px] font-black text-slate-500 ml-4 uppercase">Costo ($)</label>
                     <input type="number" class="precio input-kb text-[11px] font-bold text-emerald-400" value="${s.precio||0}">
                 </div>
                 <div>
-                    <label class="text-[8px] font-black text-slate-500 ml-4 tracking-widest uppercase">Tiempo (Min)</label>
+                    <label class="text-[8px] font-black text-slate-500 ml-4 uppercase">Tiempo (Min)</label>
                     <input type="number" class="dur input-kb text-[11px] font-bold text-amber-400" value="${s.duracion_total||30}">
                 </div>
             </div>
@@ -315,6 +307,12 @@
         cargarServicios();
     };
 
+    async function setDoctorName() {
+        const { data } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
+        if(data) document.getElementById('status-text').innerText = `JURISDICCIÓN: DR. ${data.nombre.toUpperCase()}`;
+    }
+
+    setDoctorName();
     cargarSemana();
     cargarBloqueos();
     cargarServicios();
