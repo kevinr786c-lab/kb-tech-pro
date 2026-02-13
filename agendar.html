@@ -2,62 +2,92 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGENDADOR ELITE | K.B SYSTEM ✦</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SISTEMA MÉDICO | AGENDADOR UNIVERSAL ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        :root { --gold: #c5a059; --dark: #0f172a; --deep: #020617; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top right, var(--dark), var(--deep)); color: white; min-height: 100vh; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2.5rem; }
-        .input-kb { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 1rem; color: white; width: 100%; font-weight: 600; outline: none; transition: 0.3s; }
-        .input-kb:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
-        .btn-gold { background: var(--gold); color: var(--deep); font-weight: 800; border-radius: 1.5rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .btn-gold:hover { transform: translateY(-2px); filter: brightness(1.2); box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3); }
-        .kb-star { color: var(--gold); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #111827; -webkit-tap-highlight-color: transparent; }
+        
+        /* 📱 AJUSTES TÁCTICOS PARA MÓVIL */
+        .card-responsive { background: #ffffff; border-radius: 1.5rem; border: 1px solid #e5e7eb; transition: all 0.3s; }
+        @media (max-width: 640px) {
+            .card-responsive { border-radius: 0; border: none; box-shadow: none; min-height: 100vh; }
+            body { background-color: #ffffff; padding: 0 !important; }
+        }
+
+        .input-clean { width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid #d1d5db; outline: none; transition: 0.2s; background: #fff; font-size: 16px; /* Evita zoom automático en iPhone */ }
+        .input-clean:focus { border-color: #111827; ring: 1px; ring-color: #111827; }
+        
+        .time-pill { padding: 0.75rem 0.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; text-align: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; background: #f9fafb; transition: 0.2s; }
+        .time-pill.selected { background: #111827; color: white; border-color: #111827; transform: scale(0.95); }
+        
+        /* Animación de carga sutil */
+        .kb-star { color: #d1d5db; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-4xl mx-auto glass p-8 md:p-12 relative overflow-hidden">
-        <header class="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
-            <div class="flex items-center gap-4">
-                <span class="kb-star text-3xl">✦</span>
-                <h1 class="text-2xl font-black uppercase italic tracking-tighter">Nueva <span class="text-[#c5a059]">Reservación</span></h1>
+    <div class="max-w-2xl w-full card-responsive p-6 md:p-10 shadow-xl">
+        <header class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 id="doc-name" class="text-xl md:text-2xl font-extrabold tracking-tight text-gray-900 uppercase">SINCRONIZANDO...</h1>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-1 italic">Módulo de Agendado Universal ✦</p>
             </div>
-            <button onclick="window.history.back()" class="text-[10px] font-bold text-slate-500 hover:text-white transition">CANCELAR X</button>
+            <button onclick="window.history.back()" class="p-2 text-gray-300 hover:text-gray-900 transition">✕</button>
         </header>
 
-        <form id="form-agendar" class="grid md:grid-cols-2 gap-8">
-            <div class="space-y-6">
-                <h3 class="text-[10px] font-black text-[#c5a059] uppercase tracking-widest border-l-4 border-[#c5a059] pl-3">Datos del Paciente</h3>
-                <input type="text" id="p-nombre" placeholder="NOMBRE COMPLETO" class="input-kb uppercase text-xs" required>
-                <input type="tel" id="p-telefono" placeholder="TELÉFONO (WHATSAPP)" class="input-kb text-xs" required>
-                <input type="email" id="p-email" placeholder="EMAIL (OPCIONAL)" class="input-kb text-xs">
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="text-[10px] font-black text-[#c5a059] uppercase tracking-widest border-l-4 border-[#c5a059] pl-3">Detalles de la Cita</h3>
-                
-                <select id="servicio-select" class="input-kb text-xs appearance-none" required>
-                    <option value="" disabled selected>CARGANDO SERVICIOS...</option>
-                </select>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="date" id="c-fecha" class="input-kb text-xs uppercase" required>
-                    <input type="time" id="c-hora" class="input-kb text-xs" required>
+        <form id="form-agendar" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Nombre Completo</label>
+                    <input type="text" id="p-nombre" placeholder="Nombre del paciente" class="input-clean" required>
                 </div>
-
-                <div id="info-tiempo" class="bg-white/5 p-4 rounded-2xl border border-white/5 hidden">
-                    <p class="text-[9px] font-bold text-slate-500 uppercase">Tiempo en Agenda (Incluye Espacio):</p>
-                    <span id="label-total" class="text-white font-black text-sm">-- MINUTOS</span>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">WhatsApp</label>
+                    <input type="tel" id="p-telefono" placeholder="10 dígitos" class="input-clean" required>
                 </div>
             </div>
 
-            <div class="md:col-span-2 pt-6">
-                <button type="submit" id="btn-confirmar" class="btn-gold w-full py-5 shadow-2xl">Confirmar Reservación ✦</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Email</label>
+                    <input type="email" id="p-email" placeholder="Opcional" class="input-clean">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Cumpleaños 🎂</label>
+                    <input type="date" id="p-cumple" class="input-clean" required>
+                </div>
             </div>
+
+            <div class="pt-4 border-t border-gray-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Servicio</label>
+                        <select id="servicio-select" class="input-clean appearance-none" required>
+                            <option value="" disabled selected>Seleccione servicio</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Fecha de Consulta</label>
+                        <input type="date" id="c-fecha" class="input-clean" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <label class="text-[10px] font-black text-gray-400 uppercase ml-1">Horarios Disponibles</label>
+                <div id="radar-horas" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                    <p class="col-span-full text-center text-[10px] text-gray-300 font-bold uppercase py-4">Esperando selección...</p>
+                </div>
+            </div>
+
+            <input type="hidden" id="hora-seleccionada">
+            
+            <button type="submit" id="btn-confirmar" class="w-full py-4 md:py-5 bg-gray-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-lg active:scale-95">
+                Confirmar Reservación ✦
+            </button>
         </form>
     </div>
 
@@ -66,100 +96,88 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId'); // El radar detecta al doctor de la URL
+    const docId = urlParams.get('docId') || '196c57b5-68d5-4825-8607-36b5d3bc3e15';
 
-    if (!docId) {
-        alert("ERROR: No se detectó ID del Doctor.");
-        window.location.href = 'index.html';
-    }
-
-    // --- CARGAR SERVICIOS DESDE SUPABASE (Basado en el Croquis) ---
     async function init() {
-        const { data: servicios, error } = await supabase
-            .from('Servicios')
-            .select('*')
-            .eq('doctor_id', docId)
-            .eq('activo', true);
+        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
+        if(doc) document.getElementById('doc-name').innerText = `DR. ${doc.nombre.toUpperCase()}`;
 
+        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
         const select = document.getElementById('servicio-select');
-        
-        if (error || !servicios || servicios.length === 0) {
-            select.innerHTML = '<option value="">NO HAY SERVICIOS CONFIGURADOS</option>';
-            return;
-        }
-
-        select.innerHTML = '<option value="" disabled selected>SELECCIONE UN SERVICIO ✦</option>';
-        servicios.forEach(s => {
+        servs?.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.dataset.total = s.duracion_total; // Suma de duracion + buffer
-            opt.innerText = `${s.nombre.toUpperCase()} ($${s.precio}) - ${s.duracion_total} MIN`;
+            opt.dataset.total = s.duracion_total;
+            opt.innerText = `${s.nombre.toUpperCase()} ($${s.precio})`;
             select.appendChild(opt);
         });
     }
 
-    // Mostrar tiempo total al seleccionar servicio
-    document.getElementById('servicio-select').onchange = (e) => {
-        const opt = e.target.options[e.target.selectedIndex];
-        document.getElementById('info-tiempo').classList.remove('hidden');
-        document.getElementById('label-total').innerText = `${opt.dataset.total} MINUTOS`;
-    };
+    async function actualizarRadar() {
+        const fecha = document.getElementById('c-fecha').value;
+        const servId = document.getElementById('servicio-select').value;
+        const radar = document.getElementById('radar-horas');
+        if (!fecha || !servId) return;
 
-    // --- GUARDAR CITA (Protocolo Final) ---
+        radar.innerHTML = '<p class="col-span-full text-center text-[10px] text-gray-400 animate-pulse font-bold uppercase">Escaneando...</p>';
+        const duracion = document.getElementById('servicio-select').selectedOptions[0].dataset.total;
+
+        const { data: slots } = await supabase.rpc('obtener_horarios_disponibles', {
+            p_doctor: docId, p_fecha: fecha, p_duracion: parseInt(duracion)
+        });
+
+        radar.innerHTML = slots?.length ? '' : '<p class="col-span-full text-center text-[10px] text-red-500 font-bold uppercase">Sin espacios libres</p>';
+        slots?.forEach(s => {
+            const pill = document.createElement('div');
+            pill.className = 'time-pill';
+            pill.innerText = s.hora.slice(0,5);
+            pill.onclick = () => {
+                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                document.getElementById('hora-seleccionada').value = s.hora;
+            };
+            radar.appendChild(pill);
+        });
+    }
+
+    document.getElementById('c-fecha').onchange = actualizarRadar;
+    document.getElementById('servicio-select').onchange = actualizarRadar;
+
     document.getElementById('form-agendar').onsubmit = async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('btn-confirmar');
-        btn.disabled = true;
-        btn.innerText = "PROCESANDO...";
+        const hora = document.getElementById('hora-seleccionada').value;
+        if(!hora) return alert("Por favor seleccione un horario.");
 
-        const nombreP = document.getElementById('p-nombre').value.toUpperCase();
-        const telefonoP = document.getElementById('p-telefono').value;
-        const servicioId = document.getElementById('servicio-select').value;
-        const fechaC = document.getElementById('c-fecha').value;
-        const horaC = document.getElementById('c-hora').value;
-        const duracionTotal = document.getElementById('servicio-select').options[document.getElementById('servicio-select').selectedIndex].dataset.total;
+        const btn = document.getElementById('btn-confirmar');
+        btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
 
         try {
-            // 1. Registrar/Actualizar Paciente (Tabla Usuarios según Croquis)
-            const { data: pac, error: errP } = await supabase
-                .from('Usuarios')
-                .upsert({ 
-                    nombre: nombreP, 
-                    telefono: telefonoP, 
-                    email: document.getElementById('p-email').value,
-                    rol: 'paciente' 
-                }, { onConflict: 'telefono' })
-                .select()
-                .single();
+            const { data: pac } = await supabase.from('Usuarios').upsert({
+                nombre: document.getElementById('p-nombre').value.toUpperCase(),
+                telefono: document.getElementById('p-telefono').value,
+                email: document.getElementById('p-email').value,
+                fecha_nacimiento: document.getElementById('p-cumple').value,
+                rol: 'paciente'
+            }, { onConflict: 'telefono' }).select().single();
 
-            if (errP) throw errP;
+            const { error } = await supabase.from('Citas').insert({
+                doctor_id: docId,
+                paciente_id: pac.id,
+                servicio_id: document.getElementById('servicio-select').value,
+                fecha: document.getElementById('c-fecha').value,
+                hora_inicio: hora,
+                duracion_cita: parseInt(document.getElementById('servicio-select').selectedOptions[0].dataset.total),
+                estado: 'confirmada'
+            });
 
-            // 2. Crear la Cita (Tabla Citas según Croquis)
-            const { error: errC } = await supabase
-                .from('Citas')
-                .insert({
-                    doctor_id: docId,
-                    paciente_id: pac.id,
-                    servicio_id: servicioId,
-                    fecha: fechaC,
-                    hora_inicio: horaC,
-                    duracion_cita: parseInt(duracionTotal),
-                    estado: 'confirmada'
-                });
-
-            if (errC) throw errC;
-
-            // 3. Éxito y Salto a WhatsApp
-            alert("✦ CITA AGENDADA CON ÉXITO");
-            
-            // Preparar mensaje de WhatsApp
-            const msj = `Hola ${nombreP}, su cita ha sido confirmada para el día ${fechaC} a las ${horaC}. ¡Lo esperamos! ✦`;
-            window.location.href = `https://wa.me/${telefonoP.replace(/\D/g,'')}?text=${encodeURIComponent(msj)}`;
-
-        } catch (err) {
-            alert("Error: " + err.message);
+            if (!error) {
+                alert("✅ MISIÓN CUMPLIDA: CITA AGENDADA.");
+                const msj = `Hola ${pac.nombre}, su cita con el Dr. ha sido confirmada para el ${document.getElementById('c-fecha').value} a las ${hora}. ✦`;
+                window.location.href = `https://wa.me/${pac.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(msj)}`;
+            }
+        } catch (e) {
+            alert("Error");
             btn.disabled = false;
-            btn.innerText = "Confirmar Reservación ✦";
         }
     };
 
