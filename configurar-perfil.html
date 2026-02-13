@@ -1,190 +1,146 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.B SYSTEM | CONFIGURACIÓN PRO ✦</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<title>Configuración Maestra</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 p-4 md:p-10 font-sans">
-    <div class="max-w-4xl mx-auto space-y-6">
 
-        <header class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm">
-            <h1 class="text-xl font-black uppercase italic tracking-tighter">Terminal de <span class="text-amber-600">Control</span></h1>
-            <p id="docNombre" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronizando...</p>
-        </header>
+<body class="bg-slate-100 p-6">
+<div class="max-w-5xl mx-auto space-y-6">
 
-        <section class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-            <h3 class="font-bold text-sm uppercase tracking-wider border-l-4 border-black pl-3">Horarios Base</h3>
-            <div id="semana" class="space-y-2"></div>
-            <button id="guardarHorarios" class="w-full bg-black text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-slate-800 transition">Guardar Turnos ✦</button>
-        </section>
+<h1 class="text-2xl font-black">Configuración Maestra</h1>
 
-        <section class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-            <h3 class="font-bold text-sm uppercase tracking-wider border-l-4 border-red-600 pl-3 text-red-600">Bloqueos / Cierres</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input type="date" id="bFecha" class="border p-3 rounded-xl text-sm">
-                <input type="time" id="bIni" value="09:00" class="border p-3 rounded-xl text-sm">
-                <input type="time" id="bFin" value="17:00" class="border p-3 rounded-xl text-sm">
-            </div>
-            <button id="addBloqueo" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-700 transition">Inyectar Bloqueo</button>
-            <div id="listaBloqueos" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4"></div>
-        </section>
+<!-- HORARIOS -->
+<section class="bg-white p-4 rounded-xl space-y-3">
+<h3 class="font-bold">Horarios</h3>
+<div id="semana" class="space-y-2"></div>
+<button id="guardarHorarios" class="bg-black text-white px-4 py-2 rounded">Guardar</button>
+</section>
 
-        <section class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-            <h3 class="font-bold text-sm uppercase tracking-wider border-l-4 border-amber-600 pl-3">Catálogo de Servicios</h3>
-            <div id="serviciosCont" class="space-y-3"></div>
-            <div class="flex gap-2">
-                <button id="addServicio" class="flex-1 border-2 border-dashed border-slate-200 py-3 rounded-xl font-bold text-[10px] text-slate-400 hover:bg-slate-50 transition">+ NUEVO SERVICIO</button>
-                <button id="guardarServicios" class="flex-1 bg-black text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-slate-800 transition">Guardar Catálogo</button>
-            </div>
-        </section>
-    </div>
+<!-- BLOQUEOS -->
+<section class="bg-white p-4 rounded-xl space-y-3">
+<h3 class="font-bold text-red-600">Bloqueos</h3>
+<input type="date" id="bFecha" class="border p-2 rounded w-full">
+<div class="flex gap-2">
+<input type="time" id="bIni" class="border p-2 rounded w-full">
+<input type="time" id="bFin" class="border p-2 rounded w-full">
+</div>
+<button id="addBloqueo" class="bg-red-600 text-white px-4 py-2 rounded">Bloquear</button>
+<div id="listaBloqueos" class="space-y-2"></div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="bg-white p-4 rounded-xl space-y-3">
+<h3 class="font-bold">Servicios</h3>
+<div id="servicios" class="space-y-2"></div>
+<button id="addServicio" class="border px-4 py-2 rounded">+ Servicio</button>
+<button id="guardarServicios" class="bg-black text-white px-4 py-2 rounded">Guardar</button>
+</section>
+
+</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabase = createClient(
-    'https://ctvqjnckxmqeejbfwmkj.supabase.co',
-    'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w'
+  'https://TU_PROYECTO.supabase.co',
+  'TU_PUBLIC_ANON_KEY'
 )
 
-let doctorId = null;
+// 🔑 ESTE DEBE SER Usuarios.id
+const doctorId = 'UUID_DEL_DOCTOR'
 
-// 🔑 DETECTAR DOCTOR (Multiplataforma)
-async function init() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        alert("Sesión no detectada");
-        return;
-    }
-    doctorId = user.id;
-    
-    // Cargar Nombre
-    const { data: prof } = await supabase.from('Usuarios').select('nombre').eq('id', doctorId).single();
-    if(prof) docNombre.innerText = `ID: DR. ${prof.nombre.toUpperCase()}`;
+const dias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
 
-    cargarHorarios();
-    cargarBloqueos();
-    cargarServicios();
-}
-
-const diasNom = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
-
-// ---------------- HORARIOS (BLINDADOS) ----------------
+// ---------------- HORARIOS ----------------
 async function cargarHorarios(){
-    const { data } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', doctorId);
-    
-    semana.innerHTML = diasNom.map((d,i)=>{
-        const h = data?.find(x=>x.dia_semana===i+1) || {activo: false, hora_inicio: '09:00', hora_fin: '17:00'};
-        return `
-        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <div class="flex items-center gap-3">
-                <input type="checkbox" class="act-chk w-4 h-4" ${h.activo ? 'checked' : ''} data-dia="${i+1}">
-                <label class="text-xs font-bold uppercase w-20">${d}</label>
-            </div>
-            <div class="flex gap-2">
-                <input type="time" value="${h.hora_inicio.slice(0,5)}" class="ini border p-1 text-xs rounded-lg">
-                <input type="time" value="${h.hora_fin.slice(0,5)}" class="fin border p-1 text-xs rounded-lg">
-            </div>
-        </div>`
-    }).join('')
+  const { data } = await supabase
+    .from('Horarios_Doctor')
+    .select('*')
+    .eq('doctor_id', doctorId)
+
+  semana.innerHTML = dias.map((d,i)=>{
+    const h = data?.find(x=>x.dia_semana===i+1) || {}
+    return `
+    <div class="flex gap-2">
+      <label class="w-24">${d}</label>
+      <input type="time" value="${h.hora_inicio||'09:00'}" data-dia="${i+1}" class="ini border p-1">
+      <input type="time" value="${h.hora_fin||'17:00'}" class="fin border p-1">
+    </div>`
+  }).join('')
 }
 
 guardarHorarios.onclick = async ()=>{
-    // Limpiamos previos para evitar el error 409 (Conflict)
-    await supabase.from('Horarios_Doctor').delete().eq('doctor_id', doctorId);
+  await supabase.from('Horarios_Doctor').delete().eq('doctor_id', doctorId)
 
-    const registros = [];
-    document.querySelectorAll('.act-chk').forEach(chk => {
-        if(chk.checked) {
-            const padre = chk.closest('div.flex');
-            const row = chk.closest('div.bg-slate-50');
-            registros.push({
-                doctor_id: doctorId,
-                dia_semana: parseInt(chk.dataset.dia),
-                hora_inicio: row.querySelector('.ini').value + ":00", // FIX: Segundos para evitar Error 400
-                hora_fin: row.querySelector('.fin').value + ":00",   // FIX: Segundos para evitar Error 400
-                activo: true
-            });
-        }
-    });
-
-    if(registros.length > 0) {
-        await supabase.from('Horarios_Doctor').insert(registros);
-        alert('✦ Turnos sincronizados');
-    }
+  document.querySelectorAll('.ini').forEach(async (i)=>{
+    await supabase.from('Horarios_Doctor').insert({
+      doctor_id: doctorId,
+      dia_semana: i.dataset.dia,
+      hora_inicio: i.value,
+      hora_fin: i.parentNode.querySelector('.fin').value
+    })
+  })
+  alert('Horarios guardados')
 }
 
 // ---------------- BLOQUEOS ----------------
 async function cargarBloqueos(){
-    const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id', doctorId).gte('fecha', new Date().toISOString().split('T')[0]);
-    listaBloqueos.innerHTML = data?.map(b=>`
-        <div class="flex justify-between items-center bg-red-50 p-3 rounded-xl border border-red-100">
-            <span class="text-[10px] font-bold text-red-800 uppercase">${b.fecha} (${b.hora_inicio.slice(0,5)})</span>
-            <button onclick="delBloqueo('${b.id}')" class="text-red-400 font-bold px-2">✕</button>
-        </div>`).join('')
+  const { data } = await supabase
+    .from('Bloqueos')
+    .select('*')
+    .eq('doctor_id', doctorId)
+
+  listaBloqueos.innerHTML = data?.map(b=>`
+    <div class="flex justify-between bg-red-50 p-2 rounded">
+      <span>${b.fecha}</span>
+      <button onclick="delBloqueo('${b.id}')">✕</button>
+    </div>`).join('')
 }
 
 addBloqueo.onclick = async ()=>{
-    if(!bFecha.value) return;
-    await supabase.from('Bloqueos').insert({
-        doctor_id: doctorId,
-        fecha: bFecha.value,
-        hora_inicio: bIni.value + ":00",
-        hora_fin: bFin.value + ":00"
-    });
-    cargarBloqueos();
+  await supabase.from('Bloqueos').insert({
+    doctor_id: doctorId,
+    fecha: bFecha.value,
+    hora_inicio: bIni.value,
+    hora_fin: bFin.value
+  })
+  cargarBloqueos()
 }
 
 window.delBloqueo = async id =>{
-    await supabase.from('Bloqueos').delete().eq('id', id);
-    cargarBloqueos();
+  await supabase.from('Bloqueos').delete().eq('id', id)
+  cargarBloqueos()
 }
 
 // ---------------- SERVICIOS ----------------
-async function cargarServicios() {
-    const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', doctorId).eq('activo', true);
-    serviciosCont.innerHTML = '';
-    if(data?.length > 0) data.forEach(s => renderServicio(s));
-}
-
 function renderServicio(s={}){
-    const div = document.createElement('div');
-    div.className = "flex gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 items-center s-row";
-    div.dataset.id = s.id || '';
-    div.innerHTML = `
-        <input placeholder="Nombre" value="${s.nombre||''}" class="n border p-2 rounded-lg text-xs flex-1 uppercase font-bold">
-        <input type="number" placeholder="Min" value="${s.duracion_min||30}" class="d border p-2 rounded-lg text-xs w-16">
-        <input type="number" placeholder="$" value="${s.precio||0}" class="p border p-2 rounded-lg text-xs w-16">
-    `;
-    serviciosCont.appendChild(div);
+  servicios.innerHTML += `
+  <div class="flex gap-2">
+    <input placeholder="Nombre" value="${s.nombre||''}" class="n border p-1">
+    <input type="number" value="${s.duracion_min||30}" class="d border p-1 w-20">
+    <input type="number" value="${s.precio||0}" class="p border p-1 w-20">
+  </div>`
 }
 
-addServicio.onclick = ()=>renderServicio();
+addServicio.onclick = ()=>renderServicio()
 
 guardarServicios.onclick = async ()=>{
-    const rows = document.querySelectorAll('.s-row');
-    for(const r of rows) {
-        const nombre = r.querySelector('.n').value;
-        if(!nombre) continue;
-        
-        const payload = {
-            doctor_id: doctorId,
-            nombre: nombre.toUpperCase(),
-            duracion_min: parseInt(r.querySelector('.d').value),
-            precio: parseFloat(r.querySelector('.p').value),
-            activo: true
-        };
-        
-        if(r.dataset.id) payload.id = r.dataset.id;
-        await supabase.from('Servicios').upsert(payload);
-    }
-    alert('✦ Catálogo actualizado');
-    cargarServicios();
+  document.querySelectorAll('#servicios > div').forEach(async s=>{
+    await supabase.from('Servicios').insert({
+      doctor_id: doctorId,
+      nombre: s.querySelector('.n').value,
+      duracion_min: s.querySelector('.d').value,
+      precio: s.querySelector('.p').value
+    })
+  })
+  alert('Servicios guardados')
 }
 
-init();
+// INIT
+cargarHorarios()
+cargarBloqueos()
 </script>
 </body>
 </html>
