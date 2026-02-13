@@ -20,7 +20,6 @@
         .fc-button:hover { background: var(--luxe-gold) !important; transform: translateY(-2px); }
         .fc-button-active { background: var(--luxe-gold) !important; box-shadow: 0 10px 20px -5px var(--luxe-gold) !important; }
         
-        /* 🧬 ESTATUS DE PACIENTES */
         .event-nuevo { border-left: 4px solid #3b82f6 !important; }
         .event-recurrente { border-left: 4px solid #10b981 !important; }
         .event-oro { border-left: 4px solid var(--luxe-gold) !important; box-shadow: 0 0 15px rgba(197, 160, 89, 0.3) !important; }
@@ -122,44 +121,40 @@
         cancelado: { bg:'#fef2f2', txt:'#ef4444' }
     };
 
-    document.getElementById('mesSelector').onchange = (e) => {
-        if(calendar) calendar.gotoDate(e.target.value + "-01");
-    };
-
-    // 🛡️ LÓGICA DE JURISDICCIÓN: CARGAR SOLO DOCTORES ASIGNADOS
+    // --- LÓGICA DE JURISDICCIÓN BLINDADA ---
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        // Buscamos en la tabla de relaciones Asistentes_Doctor
+        // 1. Obtener IDs de doctores asignados
         const { data: asignaciones, error } = await supabase
             .from('Asistentes_Doctor')
-            .select(`
-                turno,
-                Usuarios!doctor_id (id, nombre)
-            `)
-            .eq('asistente_id', session.user.id)
-            .eq('activo', true);
+            .select('doctor_id, turno')
+            .eq('asistente_id', session.user.id);
 
-        if (error) {
-            console.error("Falla de radar:", error);
+        if (error || !asignaciones || asignaciones.length === 0) {
+            document.getElementById('doctorSelect').innerHTML = '<option value="">SIN DOCTORES ASIGNADOS</option>';
             return;
         }
+
+        const idsDoctores = asignaciones.map(a => a.doctor_id);
+
+        // 2. Obtener nombres de esos doctores
+        const { data: doctoresReales } = await supabase
+            .from('Usuarios')
+            .select('id, nombre')
+            .in('id', idsDoctores);
 
         const select = document.getElementById('doctorSelect');
         
-        if (!asignaciones || asignaciones.length === 0) {
-            select.innerHTML = '<option value="">SIN DOCTORES ASIGNADOS</option>';
-            return;
-        }
-
-        // El radar solo muestra al Dr. Mañana y Dr. Tarde asignados
+        // 3. Llenar el menú con validación de nulos
         select.innerHTML = '<option value="">ELIJA DOCTOR OPERATIVO</option>' + 
-            asignaciones.map(a => `
-                <option value="${a.Usuarios.id}">
-                    DR. ${a.Usuarios.nombre.toUpperCase()} (${a.turno.toUpperCase()})
-                </option>
-            `).join('');
+            asignaciones.map(a => {
+                const docInfo = doctoresReales?.find(d => d.id === a.doctor_id);
+                const nombre = docInfo?.nombre ? docInfo.nombre.toUpperCase() : "DOCTOR NO IDENTIFICADO";
+                const turno = a.turno ? a.turno.toUpperCase() : "TURNO GENERAL";
+                return `<option value="${a.doctor_id}">DR. ${nombre} (${turno})</option>`;
+            }).join('');
 
         select.onchange = () => {
             doctorActual = select.value;
@@ -213,14 +208,7 @@
                         <div class="text-[7px] italic opacity-60 truncate">${arg.event.extendedProps.Servicios?.nombre || 'Consulta'}</div>
                       </div>`
             }),
-            eventClick: (info) => abrirEditar(info.event.extendedProps),
-            eventDrop: async (info) => {
-                const { error } = await supabase.from('Citas').update({
-                    fecha: info.event.startStr.slice(0,10),
-                    hora_inicio: info.event.startStr.slice(11,16)
-                }).eq('id', info.event.id);
-                if(error) info.revert();
-            }
+            eventClick: (info) => abrirEditar(info.event.extendedProps)
         });
         calendar.render();
     }
@@ -230,7 +218,7 @@
         document.getElementById('c-paciente').value = c.Pacientes?.nombre || 'PACIENTE';
         document.getElementById('c-telefono').value = c.Pacientes?.telefono || '---';
         document.getElementById('c-fecha').value = c.fecha;
-        document.getElementById('c-hora').value = c.hora_inicio.slice(0, 5);
+        document.getElementById('c-hora').value = (c.hora_inicio) ? c.hora_inicio.slice(0, 5) : "";
         document.getElementById('c-estado').value = c.estado;
         document.getElementById('c-notas').value = c.notas || '';
         document.getElementById('modalCita').classList.remove('hidden');
@@ -246,17 +234,6 @@
         };
         const { error } = await supabase.from('Citas').update(data).eq('id', citaActual.id);
         if (!error) { calendar.refetchEvents(); cerrarModal(); }
-    };
-
-    window.guardarBloqueo = async () => {
-        const { error } = await supabase.from('Bloqueos').insert({
-            doctor_id: doctorActual,
-            fecha: document.getElementById('b-fecha').value,
-            hora_inicio: document.getElementById('b-inicio').value,
-            hora_fin: document.getElementById('b-fin').value,
-            motivo: document.getElementById('b-motivo').value.toUpperCase()
-        });
-        if (!error) { calendar.refetchEvents(); cerrarBloqueo(); }
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
