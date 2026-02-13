@@ -7,53 +7,71 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
-        :root { --gold: #c5a059; --indigo: #6366f1; --dark: #0f172a; --deep: #020617; }
+        :root { --gold: #c5a059; --dark: #0f172a; --deep: #020617; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top right, var(--dark), var(--deep)); color: white; min-height: 100vh; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2.5rem; }
         .input-kb { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 0.75rem; color: white; width: 100%; font-weight: 600; font-size: 0.8rem; outline: none; transition: 0.3s; }
         .input-kb:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
         .btn-action { transition: 0.3s; font-weight: 800; border-radius: 1.25rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
         .btn-action:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .kb-star { color: var(--gold); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.6; transform: scale(1); } }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
     </style>
 </head>
 <body class="p-6">
 
-    <div class="max-w-6xl mx-auto glass p-10 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto glass p-8 md:p-12 relative overflow-hidden">
         <header class="flex justify-between items-center mb-12 border-b border-white/5 pb-8">
-            <div>
-                <h1 class="text-3xl font-black uppercase italic tracking-tighter text-indigo-400">Panel <span class="text-white">Maestro</span></h1>
-                <p id="doc-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-1">Cargando Jurisdicción...</p>
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 shadow-2xl">
+                    <span class="kb-star text-3xl">✦</span>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black uppercase italic tracking-tighter text-white">Configuración <span class="text-[#c5a059]">Elite</span></h1>
+                    <p id="doc-label" class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-1">Sincronizando Jurisdicción...</p>
+                </div>
             </div>
-            <button onclick="window.location.href='app.html'" class="btn-action bg-white/5 border border-white/10 px-6 py-3 text-[9px]">← Regresar</button>
+            <button onclick="window.location.href='app.html'" class="btn-action bg-white/5 border border-white/10 px-8 py-4 text-[10px] text-[#c5a059] hover:bg-white/10">← Volver al Radar</button>
         </header>
 
-        <div class="grid lg:grid-cols-3 gap-8">
-            <section class="space-y-6">
-                <h3 class="text-[11px] font-black text-indigo-400 uppercase tracking-widest border-l-4 border-indigo-500 pl-3">Turnos Semanales</h3>
-                <div id="contenedor-semana" class="space-y-3 bg-white/5 p-6 rounded-[2rem] border border-white/5"></div>
-                <button id="btnGuardarSemana" class="btn-action bg-indigo-600 w-full py-4 text-[10px] shadow-lg">Sincronizar Turnos</button>
+        <div class="grid lg:grid-cols-3 gap-10">
+
+            <section class="space-y-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-[#c5a059] rounded-full"></div>
+                    <h3 class="text-[12px] uppercase font-black text-[#c5a059] tracking-widest">Horarios Base</h3>
+                </div>
+                <div id="contenedor-semana" class="space-y-3 bg-white/5 p-6 rounded-[2.5rem] border border-white/5"></div>
+                <button id="btnGuardarSemana" class="btn-action bg-[#c5a059] text-slate-900 w-full py-5 text-[11px] shadow-xl">Actualizar Horarios</button>
             </section>
 
-            <section class="space-y-6">
-                <h3 class="text-[11px] font-black text-rose-400 uppercase tracking-widest border-l-4 border-rose-500 pl-3">Bloqueos Tácticos</h3>
-                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/5 space-y-4">
+            <section class="space-y-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-rose-500 rounded-full"></div>
+                    <h3 class="text-[12px] uppercase font-black text-rose-400 tracking-widest">Bloqueo de Radar</h3>
+                </div>
+                <div class="bg-white/5 p-8 rounded-[2.5rem] border border-white/5 space-y-4">
                     <input type="date" id="b-fecha" class="input-kb uppercase">
-                    <input type="text" id="b-motivo" placeholder="MOTIVO" class="input-kb uppercase">
-                    <button id="btnBloquear" class="btn-action bg-rose-600 w-full py-4 text-[10px]">Inyectar Bloqueo</button>
+                    <input type="text" id="b-motivo" placeholder="MOTIVO (VACACIONES/CONGRESO)" class="input-kb uppercase text-[10px]">
+                    <button id="btnBloquear" class="btn-action bg-rose-600 w-full py-5 text-[11px] border border-rose-400/30">Inyectar Bloqueo</button>
                 </div>
-                <div id="lista-bloqueos" class="space-y-2 max-h-48 overflow-y-auto custom-scroll"></div>
+                <div id="lista-bloqueos" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-2"></div>
             </section>
 
-            <section class="space-y-6">
-                <h3 class="text-[11px] font-black text-amber-500 uppercase tracking-widest border-l-4 border-amber-500 pl-3">Catálogo & Tiempos</h3>
-                <div id="lista-servicios" class="space-y-4 max-h-[400px] overflow-y-auto custom-scroll pr-2"></div>
-                <div class="flex flex-col gap-2">
-                    <button id="btnAddSrv" class="btn-action bg-white/5 border border-amber-500/30 w-full py-3 text-[9px] hover:bg-amber-500/10">+ Agregar Nodo</button>
-                    <button id="btnGuardarSrv" class="btn-action bg-amber-600 w-full py-4 text-[10px] text-slate-900 shadow-xl">Guardar Cambios</button>
+            <section class="space-y-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-[#c5a059] rounded-full"></div>
+                    <h3 class="text-[12px] uppercase font-black text-[#c5a059] tracking-widest">Servicios & Espacios</h3>
+                </div>
+                <div id="lista-servicios" class="space-y-4 max-h-[450px] overflow-y-auto custom-scroll pr-2"></div>
+                <div class="grid grid-cols-1 gap-3 pt-2">
+                    <button id="btnAddSrv" class="btn-action bg-white/5 border border-[#c5a059]/30 w-full py-4 text-[10px] text-[#c5a059] hover:bg-[#c5a059]/10">+ Nuevo Nodo</button>
+                    <button id="btnGuardarSrv" class="btn-action bg-[#c5a059] text-slate-900 w-full py-5 text-[11px] shadow-2xl">Guardar Catálogo</button>
                 </div>
             </section>
+
         </div>
     </div>
 
@@ -61,15 +79,19 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
+    // 🛡️ DETECCIÓN DINÁMICA: SOLUCIONA EL BLOQUEO
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get('docId');
 
-    if (!docId) { alert("ERROR: NO SE DETECTÓ ID DE DOCTOR."); window.location.href='app.html'; }
+    if (!docId) {
+        alert("ALERTA: Acceso no autorizado. Seleccione un Doctor en el Radar.");
+        window.location.href = 'app.html';
+    }
 
-    // --- CARGAR DATOS ---
+    // --- CARGA INICIAL ---
     async function init() {
         const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-        document.getElementById('doc-label').innerText = `JURISDICCIÓN: DR. ${doc.nombre.toUpperCase()}`;
+        if(doc) document.getElementById('doc-label').innerText = `JURISDICCIÓN ACTIVA: DR. ${doc.nombre.toUpperCase()}`;
         
         cargarSemana();
         cargarBloqueos();
@@ -82,20 +104,67 @@
         document.getElementById('contenedor-semana').innerHTML = dias.map((d,i)=>{
             const c = data?.find(h=>h.dia_semana===i+1) || {activo:false, hora_inicio:"09:00", hora_fin:"17:00"};
             return `
-            <div class="flex items-center justify-between gap-2 bg-black/30 p-3 rounded-xl border border-white/5">
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" class="chk w-4 h-4 rounded peer" ${c.activo?'checked':''} data-dia="${i+1}">
-                    <span class="text-[9px] font-bold uppercase ${c.activo?'text-white':'text-slate-600'}">${d}</span>
+            <div class="flex items-center justify-between gap-2 bg-black/40 p-4 rounded-2xl border border-white/5 transition hover:border-[#c5a059]/30">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" class="chk w-5 h-5 rounded accent-[#c5a059]" ${c.activo?'checked':''} data-dia="${i+1}">
+                    <span class="text-[10px] font-black uppercase ${c.activo?'text-white':'text-slate-600'}">${d}</span>
                 </div>
-                <div class="flex gap-1">
-                    <input type="time" value="${c.hora_inicio.slice(0,5)}" class="ini bg-transparent text-[10px] font-bold text-indigo-400 outline-none">
-                    <input type="time" value="${c.hora_fin.slice(0,5)}" class="fin bg-transparent text-[10px] font-bold text-indigo-400 outline-none">
+                <div class="flex gap-2">
+                    <input type="time" value="${c.hora_inicio.slice(0,5)}" class="ini bg-transparent text-[11px] font-bold text-[#c5a059] outline-none">
+                    <input type="time" value="${c.hora_fin.slice(0,5)}" class="fin bg-transparent text-[11px] font-bold text-[#c5a059] outline-none">
                 </div>
             </div>`;
         }).join('');
     }
 
-    // --- LÓGICA DE SERVICIOS CON TIEMPO DE ESPACIO (BUFFER) ---
+    document.getElementById('btnGuardarSemana').onclick = async () => {
+        const filas = document.querySelectorAll('#contenedor-semana > div');
+        for(const f of filas){
+            const chk = f.querySelector('.chk');
+            await supabase.from('Horarios_Doctor').upsert({
+                doctor_id: docId,
+                dia_semana: parseInt(chk.dataset.dia),
+                hora_inicio: f.querySelector('.ini').value + ":00",
+                hora_fin: f.querySelector('.fin').value + ":00",
+                activo: chk.checked
+            }, { onConflict: 'doctor_id,dia_semana' });
+        }
+        alert("✦ HORARIOS SINCRONIZADOS");
+        cargarSemana();
+    };
+
+    // --- BLOQUEOS ---
+    async function cargarBloqueos() {
+        const { data } = await supabase.from('Bloqueos').select('*').eq('doctor_id',docId).gte('fecha',new Date().toISOString().slice(0,10)).order('fecha');
+        document.getElementById('lista-bloqueos').innerHTML = data?.map(b=>`
+        <div class="flex justify-between items-center bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20">
+            <div class="flex flex-col">
+                <span class="text-[11px] font-black text-rose-400 uppercase tracking-tighter">${b.fecha}</span>
+                <span class="text-[9px] text-slate-500 font-bold uppercase">${b.motivo}</span>
+            </div>
+            <button onclick="borrarBloqueo('${b.id}')" class="text-white hover:text-rose-500 transition-all">✕</button>
+        </div>`).join('') || '';
+    }
+
+    document.getElementById('btnBloquear').onclick = async () => {
+        const f = document.getElementById('b-fecha').value;
+        if(!f) return alert("Seleccione fecha.");
+        await supabase.from('Bloqueos').insert({
+            doctor_id: docId, fecha: f,
+            motivo: document.getElementById('b-motivo').value.toUpperCase() || "BLOQUEO"
+        });
+        document.getElementById('b-fecha').value = '';
+        document.getElementById('b-motivo').value = '';
+        cargarBloqueos();
+        alert("✦ BÚNKER CERRADO");
+    };
+
+    window.borrarBloqueo = async (id) => {
+        await supabase.from('Bloqueos').delete().eq('id',id);
+        cargarBloqueos();
+    };
+
+    // --- SERVICIOS CON TIEMPO DE ESPACIO (BUFFER) ---
     async function cargarServicios() {
         const { data } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
         document.getElementById('lista-servicios').innerHTML = '';
@@ -104,10 +173,10 @@
 
     function crearServicio(s={}) {
         const div = document.createElement('div');
-        div.className = "srv bg-white/[0.03] p-5 rounded-[1.5rem] border border-white/5 space-y-4 relative";
+        div.className = "srv bg-white/[0.03] p-6 rounded-[2rem] border border-white/5 space-y-4 hover:border-[#c5a059]/30 transition-all";
         div.dataset.id = s.id || '';
         div.innerHTML = `
-            <input type="text" class="nombre input-kb text-[10px] font-black uppercase text-amber-500" value="${s.nombre||''}" placeholder="NOMBRE DEL SERVICIO">
+            <input type="text" class="nombre input-kb text-[11px] font-black uppercase text-[#c5a059]" value="${s.nombre||''}" placeholder="NOMBRE DEL SERVICIO">
             <div class="grid grid-cols-3 gap-2">
                 <div>
                     <label class="text-[8px] text-slate-500 font-bold ml-2">PRECIO ($)</label>
@@ -122,10 +191,9 @@
                     <input type="number" class="buf input-kb text-xs" value="${s.buffer_min||15}">
                 </div>
             </div>
-            <p class="text-[7px] text-slate-600 font-black italic text-right uppercase">Total en Agenda: <span class="text-white dur-total">${s.duracion_total || 45}</span> MIN</p>
+            <p class="text-[7px] text-slate-500 font-black italic text-right uppercase">Total Agenda: <span class="text-white dur-total">${(s.duracion_min||0) + (s.buffer_min||0)}</span> MIN</p>
         `;
         
-        // Calcular total en tiempo real para mostrar a la asistente
         const inputs = div.querySelectorAll('input[type="number"]');
         inputs.forEach(i => i.oninput = () => {
             const d = parseInt(div.querySelector('.dur').value) || 0;
@@ -135,6 +203,8 @@
 
         document.getElementById('lista-servicios').appendChild(div);
     }
+
+    document.getElementById('btnAddSrv').onclick = () => crearServicio();
 
     document.getElementById('btnGuardarSrv').onclick = async () => {
         const items = document.querySelectorAll('.srv');
@@ -147,20 +217,17 @@
                 precio: parseFloat(i.querySelector('.precio').value) || 0,
                 duracion_min: d,
                 buffer_min: b,
-                duracion_total: d + b, // 🛡️ AQUÍ SE SUMA EL TIEMPO DE ESPACIO
+                duracion_total: d + b,
                 activo: true
             };
             const id = i.dataset.id;
             if (id) payload.id = id;
             await supabase.from('Servicios').upsert(payload);
         }
-        alert("✦ SERVICIOS SINCRONIZADOS");
+        alert("✦ CATÁLOGO SINCRONIZADO");
         cargarServicios();
     };
 
-    // (Lógica de horarios y bloqueos se mantiene similar pero usando docId dinámico)
-    // ... [Resto de funciones: btnGuardarSemana, btnBloquear, cargarBloqueos]
-    
     init();
 </script>
 </body>
