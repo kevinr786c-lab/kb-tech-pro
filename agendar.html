@@ -99,32 +99,24 @@ async function actualizarRadar() {
     radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
     
     try {
-        // 1. 🔍 BUSCAR HORARIOS REALES DEL DOCTOR (ADAPTABILIDAD)
+        // 1. 📡 LEER HORARIO REAL DESDE SU TABLA "Horarios_Doctor"
         const diaSemana = new Date(fechaInput + 'T00:00:00').getDay();
         
-        // Intentamos traer la configuración del Dr. para ese día
-        const { data: config } = await supabase
-            .from('Configuracion_Horarios') // Asegúrese de crear esta tabla después
+        const { data: config, error: errConf } = await supabase
+            .from('Horarios_Doctor') 
             .select('hora_inicio, hora_fin')
             .eq('doctor_id', docId)
             .eq('dia_semana', diaSemana)
-            .single();
+            .eq('activo', 'true')
+            .maybeSingle();
 
-        // 2. 🕒 RANGOS DINÁMICOS (Si no hay tabla, usa sus reglas actuales)
-        let apertura = config?.hora_inicio || "09:00:00";
-        let cierre = config?.hora_fin;
-
-        if (!cierre) {
-            // Reglas por defecto si no hay configuración en DB
-            if (diaSemana === 6) cierre = "14:31:00"; // Sábado
-            else if (diaSemana >= 1 && diaSemana <= 5) cierre = "12:31:00"; // Entre semana
-            else { // Domingo
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ DOMINGO CERRADO</p>';
-                return;
-            }
+        // Si no hay horario para ese día (ej. Domingo), bloqueamos
+        if (!config) {
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ DÍA NO DISPONIBLE</p>';
+            return;
         }
 
-        // 3. 🛡️ OBTENER CITAS OCUPADAS
+        // 2. 🛡️ OBTENER CITAS OCUPADAS
         const { data: ocupadas } = await supabase.from('Citas')
             .select('hora_inicio')
             .eq('doctor_id', docId)
@@ -133,9 +125,9 @@ async function actualizarRadar() {
 
         const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-        // 4. 🧬 GENERADOR DE SLOTS (Groove Adaptativo)
-        let actual = new Date(`2026-01-01T${apertura}`);
-        let limite = new Date(`2026-01-01T${cierre}`);
+        // 3. 🧬 GENERADOR DINÁMICO (Usa apertura y cierre de la tabla)
+        let actual = new Date(`2026-01-01T${config.hora_inicio}`);
+        let limite = new Date(`2026-01-01T${config.hora_fin}`);
         
         radar.innerHTML = '';
         while (actual < limite) {
