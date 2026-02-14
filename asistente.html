@@ -108,8 +108,6 @@
     function procesarCitaParaCalendario(c) {
         const ESTADOS = { pendiente: '#f8fafc', confirmado: '#fff7ed', atendiendo: '#f0fdf4', completado: '#0f172a', cancelado: '#fef2f2' };
         const TXT = { pendiente: '#94a3b8', confirmado: '#c5a059', atendiendo: '#10b981', completado: '#c5a059', cancelado: '#ef4444' };
-        
-        // Semáforo Visual de Pago
         const clasePago = c.pagado ? 'event-pagado' : 'event-deuda';
         const iconoPago = c.pagado ? '✅' : '💰';
 
@@ -150,7 +148,6 @@
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay' },
             buttonText: { today: 'Hoy', year: 'Año', month: 'Mes', week: 'Semana', day: 'Día' },
             events: (info, success) => cargarCitas().then(success),
-            // ⚡ HABILITADO: AGENDAR CON UN CLIC
             dateClick: (info) => {
                 citaActual = { id: null };
                 document.getElementById('modal-titulo').innerHTML = 'Agendar <span class="text-[#c5a059]">Nueva</span>';
@@ -189,50 +186,25 @@
         select.onchange = () => { doctorActual = select.value; if (!calendar) initCalendar(); else calendar.refetchEvents(); };
     }
 
-    // ⚡ FUNCIÓN MAESTRA: GUARDA O CREA SIN SALIR DE PANTALLA
     window.guardarCita = async () => {
         const nombre = document.getElementById('c-paciente').value;
         const tel = document.getElementById('c-telefono').value;
-        const p = { 
-            fecha: document.getElementById('c-fecha').value, 
-            hora_inicio: document.getElementById('c-hora').value, 
-            estado: document.getElementById('c-estado').value, 
-            notas: document.getElementById('c-notas').value 
-        };
-
+        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
         if(!nombre || !tel) return alert("NOMBRE Y TELÉFONO OBLIGATORIOS");
-
         try {
             let pacienteId;
-            // 1. Verificar/Crear Paciente
             const { data: pExistente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-            if(pExistente) {
-                pacienteId = pExistente.id;
-            } else {
-                const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single();
-                pacienteId = nuevoP.id;
-            }
-
-            // 2. Operación Cita
-            if (citaActual && citaActual.id) {
-                await supabase.from('Citas').update(p).eq('id', citaActual.id);
-            } else {
-                // Para citas nuevas, asignamos el primer servicio por default
+            if(pExistente) { pacienteId = pExistente.id; } 
+            else { const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single(); pacienteId = nuevoP.id; }
+            if (citaActual && citaActual.id) { await supabase.from('Citas').update(p).eq('id', citaActual.id); } 
+            else {
                 const { data: s } = await supabase.from('Servicios').select('id').limit(1).single();
-                await supabase.from('Citas').insert([{
-                    ...p,
-                    doctor_id: doctorActual,
-                    paciente_id: pacienteId,
-                    servicio_id: s.id,
-                    duracion_cita: 30
-                }]);
+                await supabase.from('Citas').insert([{ ...p, doctor_id: doctorActual, paciente_id: pacienteId, servicio_id: s.id, duracion_cita: 30 }]);
             }
-            calendar.refetchEvents(); 
-            cerrarModal();
+            calendar.refetchEvents(); cerrarModal();
         } catch (e) { alert("Error: " + e.message); }
     };
 
-    // ⚡ WHATSAPP INTELIGENTE: CAMBIA SEGÚN ESTADO Y NOTAS
     window.lanzarWhatsApp = () => {
         const tel = document.getElementById('c-telefono').value;
         const nombre = document.getElementById('c-paciente').value;
@@ -240,7 +212,6 @@
         const hora = document.getElementById('c-hora').value;
         const estado = document.getElementById('c-estado').value;
         const notas = (document.getElementById('c-notas').value || "").toLowerCase();
-        
         if(!tel) return alert("Sin número");
 
         let accion = (estado === 'confirmado') ? "confirmamos tu espacio" : "te recordamos tu cita";
@@ -248,19 +219,22 @@
         if(notas.includes("emb")) especial = " para tu control prenatal 🤰";
         else if(notas.includes("1ra vez")) especial = " de primera vez ✨";
 
-        const linkAgenda = `${window.location.origin}/agendar.html?docId=${doctorActual}`;
+        // ⚡ SOLUCIÓN 404: Link Relativo Inteligente
+        const urlBase = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
+        const linkAgenda = `${urlBase}agendar.html?docId=${doctorActual}`;
+
         const msg = encodeURIComponent(`Hola *${nombre}*, ${accion}${especial} el día *${fecha}* a las *${hora}* hrs. ✦\n\n¿Nos confirmas tu asistencia?\n\nSi necesitas reagendar, entra aquí: ${linkAgenda}`);
         window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
 
     window.copiarLinkAgenda = () => {
         if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO");
-        const link = `${window.location.origin}/agendar.html?docId=${doctorActual}`;
+        const urlBase = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
+        const link = `${urlBase}agendar.html?docId=${doctorActual}`;
         navigator.clipboard.writeText(link).then(() => alert("LINK COPIADO ✦"));
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
-    
     cargarDoctores();
 </script>
 </body>
