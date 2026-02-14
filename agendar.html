@@ -90,47 +90,82 @@
         } else { badge.style.display = 'none'; }
     });
 
-    async function actualizarRadar() {
-        const fechaInput = document.getElementById('fecha').value;
-        const selectServ = document.getElementById('servicio');
-        const radar = document.getElementById('radar-horas');
-        if (!fechaInput || !selectServ.value) return;
+async function actualizarRadar() {
+    const fechaInput = document.getElementById('fecha').value;
+    const selectServ = document.getElementById('servicio');
+    const radar = document.getElementById('radar-horas');
+    if (!fechaInput || !selectServ.value) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">ESCANEANDO RADAR...</p>';
-        
-        // ⚡ REPARACIÓN: Obtener citas ocupadas manualmente para asegurar que nadie agende encima
+    radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRONIZANDO RADAR...</p>';
+    
+    // 1. 📡 DETECTAR DÍA Y DOCTOR
+    const fechaObj = new Date(fechaInput + 'T00:00:00');
+    const diaSemana = fechaObj.getDay(); 
+    const servOpt = selectServ.selectedOptions[0];
+    const duracionMin = parseInt(servOpt.getAttribute('data-total')) || 30;
+
+    try {
+        // 2. 🔍 BUSCAR CONFIGURACIÓN DE HORARIO (ADAPTABILIDAD)
+        // Intentamos leer de una tabla de 'Horarios' (Ajuste el nombre si es diferente)
+        let { data: config } = await supabase
+            .from('Horarios_Doctor') 
+            .select('hora_apertura, hora_cierre')
+            .eq('doctor_id', docId)
+            .eq('dia_semana', diaSemana)
+            .single();
+
+        // 3. 🛡️ VALORES POR DEFECTO (Si no hay tabla de horarios aún)
+        let apertura = config?.hora_apertura || "09:00";
+        let cierre = config?.hora_cierre || (diaSemana === 6 ? "12:30" : "12:30"); // Sábados y entre semana igual por ahora
+
+        // 4. 🚫 BLOQUEO TOTAL DOMINGOS
+        if (diaSemana === 0) {
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ DOMINGO CERRADO</p>';
+            return;
+        }
+
+        // 5. 🛰️ ESCANEAR CITAS OCUPADAS EN TIEMPO REAL
         const { data: ocupadas } = await supabase.from('Citas')
-            .select('hora_inicio')
+            .select('hora_inicio, duracion_cita')
             .eq('doctor_id', docId)
             .eq('fecha', fechaInput)
             .not('estado', 'eq', 'cancelado');
 
-        const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
+        const horasBloqueadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-        // Generar horas base (Ej: 09:00 a 18:00)
-        const horasBase = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "16:00", "16:30", "17:00", "17:30"];
-        
+        // 6. 🧬 GENERADOR DINÁMICO DE SLOTS
         radar.innerHTML = '';
-        const diaSemana = new Date(fechaInput + 'T00:00:00').getDay();
+        let actual = new Date(`2026-01-01T${apertura}`);
+        let fin = new Date(`2026-01-01T${cierre}`);
 
-        horasBase.forEach(hora => {
-            // 🛡️ Filtro Sábado/Domingo o Bloqueos específicos
-            if (diaSemana === 0 || diaSemana === 6) return; // Cerrado fines de semana
-            if (horasOcupadas.includes(hora)) return; // ⚡ Si está ocupada, NO mostrar
+        while (actual < fin) {
+            const horaString = actual.toTimeString().slice(0,5);
+            
+            if (!horasBloqueadas.includes(horaString)) {
+                const pill = document.createElement('div');
+                pill.className = `time-pill`;
+                pill.innerText = horaString;
+                pill.onclick = () => {
+                    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                    pill.classList.add('selected');
+                    document.getElementById('hora_seleccionada').value = horaString + ":00";
+                };
+                radar.appendChild(pill);
+            }
+            
+            // Avanza según la duración del servicio (Groove adaptativo)
+            actual.setMinutes(actual.getMinutes() + 30); 
+        }
 
-            const pill = document.createElement('div');
-            pill.className = `time-pill`;
-            pill.innerText = hora;
-            pill.onclick = () => {
-                document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                pill.classList.add('selected');
-                document.getElementById('hora_seleccionada').value = hora + ":00";
-            };
-            radar.appendChild(pill);
-        });
+        if (radar.innerHTML === '') {
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
+        }
 
-        if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
+    } catch (err) {
+        console.error("Error en Radar:", err);
+        radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE CONEXIÓN</p>';
     }
+}
 
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
