@@ -23,6 +23,9 @@
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
+        /* Semáforo Visual de Pagos */
+        .event-pagado { border-left: 5px solid #22c55e !important; }
+        .event-deuda { border-left: 5px solid #ef4444 !important; }
     </style>
 </head>
 <body class="p-4 gap-4">
@@ -41,7 +44,7 @@
                 <input type="text" id="buscadorLocal" oninput="filtrarRadar()" placeholder="ESCANEANDO PACIENTE..." class="input-luxe text-center uppercase tracking-widest border-none bg-slate-100 focus:bg-white focus:ring-2 focus:ring-[#c5a059]">
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="irAAgendar()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition">✚ Agendar</button>
+                <button onclick="copiarLinkAgenda()" class="text-[9px] font-black uppercase px-4 py-2 bg-[#c5a059] text-white rounded-xl shadow-lg hover:scale-105 transition flex items-center gap-1">🔗 Copiar Link</button>
                 <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-[#0f172a] text-white rounded-xl shadow-xl hover:bg-[#c5a059] transition">☰</button>
             </div>
         </header>
@@ -63,12 +66,13 @@
             <p class="text-[8px] font-black text-slate-300 text-center uppercase mt-4">K.B TECH 2026</p>
         </div>
     </aside>
+
     <div id="modalCita" class="fixed inset-0 hidden modal-blur flex items-center justify-center z-[9999] p-4">
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl border border-[var(--luxe-gold)]">
-            <h2 class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
+            <h2 id="modal-titulo" class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-4">
-                <input id="c-paciente" class="input-luxe bg-slate-50 border-none" readonly>
-                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO">
+                <input id="c-paciente" class="input-luxe bg-slate-50" placeholder="NOMBRE DE PACIENTE">
+                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO (10 DÍGITOS)">
                 <div class="grid grid-cols-2 gap-2"><input type="date" id="c-fecha" class="input-luxe"><input type="time" id="c-hora" class="input-luxe"></div>
                 <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
                     <option value="pendiente">⏳ Pendiente</option>
@@ -77,39 +81,49 @@
                     <option value="completado">✦ Completado</option>
                     <option value="cancelado">🚫 Cancelar</option>
                 </select>
-                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2">📱 WhatsApp</button>
-                <textarea id="c-notas" class="input-luxe h-20" placeholder="NOTAS..."></textarea>
+                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-md">📱 Enviar Confirmación Inteligente</button>
+                <textarea id="c-notas" class="input-luxe h-20" placeholder="NOTAS (Ej: EMB, 1ra vez, Pendiente de pago)..."></textarea>
             </div>
             <div class="flex gap-2 mt-6">
-                <button onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px]">Actualizar</button>
+                <button id="btn-accion" onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px]">Actualizar</button>
                 <button onclick="cerrarModal()" class="px-6 py-3 text-[9px] font-black uppercase text-slate-400">Cerrar</button>
             </div>
         </div>
     </div>
+
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
     let calendar, citaActual = null, doctorActual = null, todasLasCitas = [];
+
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
+    
     window.filtrarRadar = () => {
         const query = document.getElementById('buscadorLocal').value.toUpperCase();
         const filtradas = todasLasCitas.filter(c => (c.Pacientes?.nombre || '').toUpperCase().includes(query));
         calendar.removeAllEvents();
         calendar.addEventSource(filtradas.map(c => procesarCitaParaCalendario(c)));
     };
+
     function procesarCitaParaCalendario(c) {
         const ESTADOS = { pendiente: '#f8fafc', confirmado: '#fff7ed', atendiendo: '#f0fdf4', completado: '#0f172a', cancelado: '#fef2f2' };
         const TXT = { pendiente: '#94a3b8', confirmado: '#c5a059', atendiendo: '#10b981', completado: '#c5a059', cancelado: '#ef4444' };
+        
+        // Semáforo Visual de Pago
+        const clasePago = c.pagado ? 'event-pagado' : 'event-deuda';
+        const iconoPago = c.pagado ? '✅' : '💰';
+
         return {
             id: c.id,
-            title: c.Pacientes?.nombre || 'PACIENTE',
+            title: `${iconoPago} ${c.Pacientes?.nombre || 'PACIENTE'}`,
             start: `${c.fecha}T${c.hora_inicio}`,
             backgroundColor: ESTADOS[c.estado] || '#f8fafc',
             textColor: TXT[c.estado] || '#1e293b',
-            classNames: [c.Pacientes?.primera_visita ? 'event-primera' : 'event-recurrente'],
+            classNames: [clasePago],
             extendedProps: c
         };
     }
+
     async function cargarCitas() {
         if (!doctorActual) return [];
         const { data, error } = await supabase.from('Citas').select('*, Pacientes(*)').eq('doctor_id', doctorActual);
@@ -117,6 +131,7 @@
         todasLasCitas = data || [];
         return todasLasCitas.map(c => procesarCitaParaCalendario(c));
     }
+
     async function verHistorial(pacienteId) {
         if(!pacienteId) return;
         const { data } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', pacienteId).order('fecha', { ascending: false }).limit(5);
@@ -125,54 +140,127 @@
         document.getElementById('paciente-info').classList.remove('hidden');
         if(!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
     }
+
     function initCalendar() {
         calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             locale: 'es',
             initialView: 'timeGridDay',
             allDaySlot: false,
+            slotMinTime: "08:00:00",
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay' },
             buttonText: { today: 'Hoy', year: 'Año', month: 'Mes', week: 'Semana', day: 'Día' },
             events: (info, success) => cargarCitas().then(success),
+            // ⚡ HABILITADO: AGENDAR CON UN CLIC
+            dateClick: (info) => {
+                citaActual = { id: null };
+                document.getElementById('modal-titulo').innerHTML = 'Agendar <span class="text-[#c5a059]">Nueva</span>';
+                document.getElementById('c-paciente').value = "";
+                document.getElementById('c-telefono').value = "";
+                document.getElementById('c-fecha').value = info.dateStr.split('T')[0];
+                document.getElementById('c-hora').value = info.dateStr.split('T')[1]?.slice(0,5) || "09:00";
+                document.getElementById('c-notas').value = "";
+                document.getElementById('btn-accion').innerText = "AGENDAR AHORA ✦";
+                document.getElementById('modalCita').classList.remove('hidden');
+            },
             eventClick: (info) => {
                 citaActual = info.event.extendedProps;
-                document.getElementById('c-paciente').value = info.event.title;
+                document.getElementById('modal-titulo').innerHTML = 'Gestión <span class="text-[#c5a059]">Cita</span>';
+                document.getElementById('c-paciente').value = citaActual.Pacientes?.nombre || '';
                 document.getElementById('c-telefono').value = citaActual.Pacientes?.telefono || '';
                 document.getElementById('c-fecha').value = citaActual.fecha;
                 document.getElementById('c-hora').value = citaActual.hora_inicio.slice(0,5);
                 document.getElementById('c-estado').value = citaActual.estado;
                 document.getElementById('c-notas').value = citaActual.notas || '';
+                document.getElementById('btn-accion').innerText = "ACTUALIZAR DATOS";
                 document.getElementById('modalCita').classList.remove('hidden');
                 verHistorial(citaActual.paciente_id);
             }
         });
         calendar.render();
     }
+
     async function cargarDoctores() {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { document.getElementById('doctorSelect').innerHTML = '<option value="">ERROR DE SESIÓN</option>'; return; }
+        if (!session) return;
         const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session.user.id);
         const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asig?.map(a => a.doctor_id) || []);
         const select = document.getElementById('doctorSelect');
         select.innerHTML = '<option value="">ELEGIR DOCTOR</option>' + (docs?.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('') || '');
         select.onchange = () => { doctorActual = select.value; if (!calendar) initCalendar(); else calendar.refetchEvents(); };
     }
+
+    // ⚡ FUNCIÓN MAESTRA: GUARDA O CREA SIN SALIR DE PANTALLA
     window.guardarCita = async () => {
-        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
-        await supabase.from('Citas').update(p).eq('id', citaActual.id);
-        calendar.refetchEvents(); cerrarModal();
+        const nombre = document.getElementById('c-paciente').value;
+        const tel = document.getElementById('c-telefono').value;
+        const p = { 
+            fecha: document.getElementById('c-fecha').value, 
+            hora_inicio: document.getElementById('c-hora').value, 
+            estado: document.getElementById('c-estado').value, 
+            notas: document.getElementById('c-notas').value 
+        };
+
+        if(!nombre || !tel) return alert("NOMBRE Y TELÉFONO OBLIGATORIOS");
+
+        try {
+            let pacienteId;
+            // 1. Verificar/Crear Paciente
+            const { data: pExistente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+            if(pExistente) {
+                pacienteId = pExistente.id;
+            } else {
+                const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single();
+                pacienteId = nuevoP.id;
+            }
+
+            // 2. Operación Cita
+            if (citaActual && citaActual.id) {
+                await supabase.from('Citas').update(p).eq('id', citaActual.id);
+            } else {
+                // Para citas nuevas, asignamos el primer servicio por default
+                const { data: s } = await supabase.from('Servicios').select('id').limit(1).single();
+                await supabase.from('Citas').insert([{
+                    ...p,
+                    doctor_id: doctorActual,
+                    paciente_id: pacienteId,
+                    servicio_id: s.id,
+                    duracion_cita: 30
+                }]);
+            }
+            calendar.refetchEvents(); 
+            cerrarModal();
+        } catch (e) { alert("Error: " + e.message); }
     };
+
+    // ⚡ WHATSAPP INTELIGENTE: CAMBIA SEGÚN ESTADO Y NOTAS
     window.lanzarWhatsApp = () => {
         const tel = document.getElementById('c-telefono').value;
         const nombre = document.getElementById('c-paciente').value;
         const fecha = document.getElementById('c-fecha').value;
         const hora = document.getElementById('c-hora').value;
+        const estado = document.getElementById('c-estado').value;
+        const notas = (document.getElementById('c-notas').value || "").toLowerCase();
+        
         if(!tel) return alert("Sin número");
-        const linkAgenda = window.location.origin + "/agendar.html?docId=" + doctorActual;
-        const msg = encodeURIComponent(`Hola *${nombre}*, te recordamos tu cita el día *${fecha}* a las *${hora}* hrs. ✦\n\nSi necesitas agendar otra fecha o ver disponibilidad, entra aquí: ${linkAgenda}`);
+
+        let accion = (estado === 'confirmado') ? "confirmamos tu espacio" : "te recordamos tu cita";
+        let especial = "";
+        if(notas.includes("emb")) especial = " para tu control prenatal 🤰";
+        else if(notas.includes("1ra vez")) especial = " de primera vez ✨";
+
+        const linkAgenda = `${window.location.origin}/agendar.html?docId=${doctorActual}`;
+        const msg = encodeURIComponent(`Hola *${nombre}*, ${accion}${especial} el día *${fecha}* a las *${hora}* hrs. ✦\n\n¿Nos confirmas tu asistencia?\n\nSi necesitas reagendar, entra aquí: ${linkAgenda}`);
         window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
+
+    window.copiarLinkAgenda = () => {
+        if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO");
+        const link = `${window.location.origin}/agendar.html?docId=${doctorActual}`;
+        navigator.clipboard.writeText(link).then(() => alert("LINK COPIADO ✦"));
+    };
+
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
-    window.irAAgendar = () => { if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO"); window.location.href = `agendar.html?docId=${doctorActual}`; };
+    
     cargarDoctores();
 </script>
 </body>
