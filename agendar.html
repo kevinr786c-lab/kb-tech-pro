@@ -67,7 +67,6 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     const urlParams = new URLSearchParams(window.location.search);
-    // 🔗 ID DRA. ALBA PATRICIA ROJAS FLORES
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
 
     document.getElementById('telefono').addEventListener('input', async (e) => {
@@ -99,32 +98,37 @@
 
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">ESCANEANDO RADAR...</p>';
         
-        const servOpt = selectServ.selectedOptions[0];
-        const duracionTotal = parseInt(servOpt.getAttribute('data-total')) || 30;
+        // ⚡ REPARACIÓN: Obtener citas ocupadas manualmente para asegurar que nadie agende encima
+        const { data: ocupadas } = await supabase.from('Citas')
+            .select('hora_inicio')
+            .eq('doctor_id', docId)
+            .eq('fecha', fechaInput)
+            .not('estado', 'eq', 'cancelado');
 
-        const { data: slots, error } = await supabase.rpc('obtener_horarios_disponibles', {
-            p_doctor: docId, p_fecha: fechaInput, p_duracion: duracionTotal
-        });
+        const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-        if (error) { radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR</p>'; return; }
-
+        // Generar horas base (Ej: 09:00 a 18:00)
+        const horasBase = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "16:00", "16:30", "17:00", "17:30"];
+        
         radar.innerHTML = '';
         const diaSemana = new Date(fechaInput + 'T00:00:00').getDay();
 
-        slots?.forEach(s => {
-            // 🛡️ FILTRO DE SEGURIDAD: Lunes a Viernes (1-5) bloqueo 12:30 PM
-            if (diaSemana >= 1 && diaSemana <= 5 && s.hora >= '12:30:00') return;
+        horasBase.forEach(hora => {
+            // 🛡️ Filtro Sábado/Domingo o Bloqueos específicos
+            if (diaSemana === 0 || diaSemana === 6) return; // Cerrado fines de semana
+            if (horasOcupadas.includes(hora)) return; // ⚡ Si está ocupada, NO mostrar
 
             const pill = document.createElement('div');
             pill.className = `time-pill`;
-            pill.innerText = s.hora.slice(0,5);
+            pill.innerText = hora;
             pill.onclick = () => {
                 document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
                 pill.classList.add('selected');
-                document.getElementById('hora_seleccionada').value = s.hora;
+                document.getElementById('hora_seleccionada').value = hora + ":00";
             };
             radar.appendChild(pill);
         });
+
         if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
     }
 
