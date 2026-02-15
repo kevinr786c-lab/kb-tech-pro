@@ -23,7 +23,6 @@
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
-        /* Semáforo Visual de Pagos */
         .event-pagado { border-left: 5px solid #22c55e !important; }
         .event-deuda { border-left: 5px solid #ef4444 !important; }
     </style>
@@ -61,13 +60,11 @@
             <p class="text-[8px] font-black text-slate-400 uppercase mb-2">Historial Reciente</p>
             <div id="historial-lista" class="space-y-2"></div>
         </div>
-
         <div id="stats-caja" class="mb-6" style="padding: 15px; background: rgba(197, 160, 89, 0.1); border-radius: 1.5rem; border: 1px dashed var(--luxe-gold);">
             <p style="color: var(--luxe-gold); font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0;">📊 Control Semanal</p>
             <h3 id="contador-semanal" style="color: var(--luxe-dark); font-size: 1.2rem; font-weight: 800; margin: 5px 0;">0 Citas</h3>
             <p style="color: #22c55e; font-size: 7px; font-weight: 800; text-transform: uppercase; margin: 0;">Inicia: Lun 16 Feb</p>
         </div>
-
         <div class="pt-4 border-t space-y-2">
             <button onclick="location.reload()" class="w-full text-left p-3 rounded-xl bg-slate-100 text-[10px] font-bold hover:bg-[#c5a059] transition">🔄 REFRESCAR</button>
             <p class="text-[8px] font-black text-slate-300 text-center uppercase mt-4">K.B TECH 2026</p>
@@ -78,8 +75,8 @@
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl border border-[var(--luxe-gold)]">
             <h2 id="modal-titulo" class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-4">
-                <input id="c-paciente" class="input-luxe bg-slate-50" placeholder="NOMBRE DE PACIENTE">
-                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO (10 DÍGITOS)">
+                <input id="c-paciente" class="input-luxe bg-slate-50 uppercase" placeholder="NOMBRE DE PACIENTE">
+                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO (10 DÍGITOS)" maxlength="10">
                 <div class="grid grid-cols-2 gap-2"><input type="date" id="c-fecha" class="input-luxe"><input type="time" id="c-hora" class="input-luxe"></div>
                 <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
                     <option value="pendiente">⏳ Pendiente</option>
@@ -88,8 +85,8 @@
                     <option value="completado">✦ Completado</option>
                     <option value="cancelado">🚫 Cancelar</option>
                 </select>
-                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-md">📱 Enviar Confirmación Inteligente</button>
-                <textarea id="c-notas" class="input-luxe h-20" placeholder="NOTAS (Ej: EMB, 1ra vez, Pendiente de pago)..."></textarea>
+                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-md hover:bg-emerald-600 transition">📱 Confirmar y Actualizar</button>
+                <textarea id="c-notas" class="input-luxe h-20 uppercase" placeholder="NOTAS (1RA VEZ, URG, PAGADO)..."></textarea>
             </div>
             <div class="flex gap-2 mt-6">
                 <button id="btn-accion" onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px]">Actualizar</button>
@@ -112,15 +109,23 @@
         calendar.addEventSource(filtradas.map(c => procesarCitaParaCalendario(c)));
     };
 
+    // MOTOR DE ICONOS UNIVERSAL MULTIPLATAFORMA
     function procesarCitaParaCalendario(c) {
         const ESTADOS = { pendiente: '#f8fafc', confirmado: '#fff7ed', atendiendo: '#f0fdf4', completado: '#0f172a', cancelado: '#fef2f2' };
         const TXT = { pendiente: '#94a3b8', confirmado: '#c5a059', atendiendo: '#10b981', completado: '#c5a059', cancelado: '#ef4444' };
-        const clasePago = c.pagado ? 'event-pagado' : 'event-deuda';
-        const iconoPago = c.pagado ? '✅' : '💰';
+        
+        let iconos = "";
+        const notas = (c.notas || "").toUpperCase();
+        if (notas.includes("1RA") || notas.includes("NUEVA")) iconos += "✨ ";
+        if (notas.includes("URG")) iconos += "🚨 ";
+        if (notas.includes("EMB")) iconos += "🤰 ";
+        
+        const iconoPago = (c.pagado || notas.includes("PAGADO")) ? '✅' : '💰';
+        const clasePago = (c.pagado || notas.includes("PAGADO")) ? 'event-pagado' : 'event-deuda';
 
         return {
             id: c.id,
-            title: `${iconoPago} ${c.Pacientes?.nombre || 'PACIENTE'}`,
+            title: `${iconos}${iconoPago} ${c.Pacientes?.nombre || 'PACIENTE'}`,
             start: `${c.fecha}T${c.hora_inicio}`,
             backgroundColor: ESTADOS[c.estado] || '#f8fafc',
             textColor: TXT[c.estado] || '#1e293b',
@@ -129,19 +134,11 @@
         };
     }
 
-    // FUNCIÓN DE INTELIGENCIA FINANCIERA (AGREGADA POR EL JEFE)
     async function actualizarContadorFinanciero() {
         if (!doctorActual) return;
-        const fechaInicioCobro = '2026-02-16'; // Lunes de inicio oficial
-        const { count, error } = await supabase
-            .from('Citas')
-            .select('*', { count: 'exact', head: true })
-            .eq('doctor_id', doctorActual)
-            .gte('fecha', fechaInicioCobro)
-            .not('estado', 'eq', 'cancelado');
-        if (!error) {
-            document.getElementById('contador-semanal').innerText = `${count} Citas`;
-        }
+        const fechaInicioCobro = '2026-02-16'; 
+        const { count, error } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('doctor_id', doctorActual).gte('fecha', fechaInicioCobro).not('estado', 'eq', 'cancelado');
+        if (!error) document.getElementById('contador-semanal').innerText = `${count} Citas`;
     }
 
     async function cargarCitas() {
@@ -149,7 +146,7 @@
         const { data, error } = await supabase.from('Citas').select('*, Pacientes(*)').eq('doctor_id', doctorActual);
         if (error) return [];
         todasLasCitas = data || [];
-        actualizarContadorFinanciero(); // Actualizamos contador cada vez que cargamos
+        actualizarContadorFinanciero();
         return todasLasCitas.map(c => procesarCitaParaCalendario(c));
     }
 
@@ -161,6 +158,18 @@
         document.getElementById('paciente-info').classList.remove('hidden');
         if(!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
     }
+
+    // BUSCADOR INTELIGENTE DE PACIENTES (Ahorra tiempo a Elena)
+    document.getElementById('c-telefono').addEventListener('input', async (e) => {
+        const tel = e.target.value;
+        if(tel.length === 10) {
+            const { data } = await supabase.from('Pacientes').select('nombre').eq('telefono', tel).maybeSingle();
+            if(data) {
+                document.getElementById('c-paciente').value = data.nombre;
+                document.getElementById('c-paciente').classList.add('bg-green-50');
+            }
+        }
+    });
 
     function initCalendar() {
         calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
@@ -174,8 +183,7 @@
             dateClick: (info) => {
                 citaActual = { id: null };
                 document.getElementById('modal-titulo').innerHTML = 'Agendar <span class="text-[#c5a059]">Nueva</span>';
-                document.getElementById('c-paciente').value = "";
-                document.getElementById('c-telefono').value = "";
+                document.getElementById('c-paciente').value = ""; document.getElementById('c-telefono').value = "";
                 document.getElementById('c-fecha').value = info.dateStr.split('T')[0];
                 document.getElementById('c-hora').value = info.dateStr.split('T')[1]?.slice(0,5) || "09:00";
                 document.getElementById('c-notas').value = "";
@@ -210,50 +218,51 @@
     }
 
     window.guardarCita = async () => {
-        const nombre = document.getElementById('c-paciente').value;
-        const tel = document.getElementById('c-telefono').value;
-        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
-        if(!nombre || !tel) return alert("NOMBRE Y TELÉFONO OBLIGATORIOS");
+        const nombre = document.getElementById('c-paciente').value.toUpperCase().trim();
+        const tel = document.getElementById('c-telefono').value.replace(/\D/g,'');
+        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value.toUpperCase() };
+        
+        if(!nombre || tel.length < 10) return alert("DATOS INVÁLIDOS: REVISE NOMBRE Y TELÉFONO");
+        
         try {
             let pacienteId;
-            const { data: pExistente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-            if(pExistente) { pacienteId = pExistente.id; } 
+            const { data: pExist { id } } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+            if(pExist) { pacienteId = pExist.id; } 
             else { const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single(); pacienteId = nuevoP.id; }
+            
             if (citaActual && citaActual.id) { await supabase.from('Citas').update(p).eq('id', citaActual.id); } 
             else {
-                const { data: s } = await supabase.from('Servicios').select('id').limit(1).single();
-                await supabase.from('Citas').insert([{ ...p, doctor_id: doctorActual, paciente_id: pacienteId, servicio_id: s.id, duracion_cita: 30 }]);
+                const { data: s } = await supabase.from('Servicios').select('id').eq('doctor_id', doctorActual).limit(1).maybeSingle();
+                const servId = s ? s.id : (await supabase.from('Servicios').select('id').limit(1).single()).data.id;
+                await supabase.from('Citas').insert([{ ...p, doctor_id: doctorActual, paciente_id: pacienteId, servicio_id: servId, duracion_cita: 30 }]);
             }
             calendar.refetchEvents(); cerrarModal();
-        } catch (e) { alert("Error: " + e.message); }
+        } catch (e) { console.error(e); }
     };
 
-    window.lanzarWhatsApp = () => {
-        const tel = document.getElementById('c-telefono').value;
-        const nombre = document.getElementById('c-paciente').value;
+    window.lanzarWhatsApp = async () => {
+        const tel = document.getElementById('c-telefono').value.replace(/\D/g,'');
+        const nombre = document.getElementById('c-paciente').value.toUpperCase();
         const fecha = document.getElementById('c-fecha').value;
         const hora = document.getElementById('c-hora').value;
-        const estado = document.getElementById('c-estado').value;
-        const notas = (document.getElementById('c-notas').value || "").toLowerCase();
-        if(!tel) return alert("Sin número");
+        const docName = document.getElementById('doctorSelect').options[document.getElementById('doctorSelect').selectedIndex].text;
+        
+        if(!tel) return alert("SIN TELÉFONO");
 
-        let accion = (estado === 'confirmado') ? "confirmamos tu espacio" : "te recordamos tu cita";
-        let especial = "";
-        if(notas.includes("emb")) especial = " para tu control prenatal 🤰";
-        else if(notas.includes("1ra vez")) especial = " de primera vez ✨";
-
-        const urlBase = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
-        const linkAgenda = `${urlBase}agendar.html?docId=${doctorActual}`;
-
-        const msg = encodeURIComponent(`Hola *${nombre}*, ${accion}${especial} el día *${fecha}* a las *${hora}* hrs. ✦\n\n¿Nos confirmas tu asistencia?\n\nSi necesitas reagendar, entra aquí: ${linkAgenda}`);
+        // MENSAJE UNIVERSAL NEUTRAL
+        const msg = encodeURIComponent(`Hola *${nombre}*, le saludamos de la clínica de la *${docName}*. ✦\n\nConfirmamos su espacio el día *${fecha}* a las *${hora}* hrs.\n\n¿Nos confirma su asistencia?`);
+        
+        // Auto-confirmar en base de datos para ahorrar tiempo
+        document.getElementById('c-estado').value = 'confirmado';
+        await guardarCita();
+        
         window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
 
     window.copiarLinkAgenda = () => {
-        if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO");
+        if (!doctorActual) return alert("ELIJA DOCTOR");
         const urlBase = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
-        const link = `${urlBase}agendar.html?docId=${doctorActual}`;
-        navigator.clipboard.writeText(link).then(() => alert("LINK COPIADO ✦"));
+        navigator.clipboard.writeText(`${urlBase}agendar.html?docId=${doctorActual}`).then(() => alert("LINK COPIADO ✦"));
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
