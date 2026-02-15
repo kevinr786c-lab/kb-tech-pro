@@ -157,7 +157,7 @@
         </form>
 
         <div id="error-msg" class="hidden mt-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-center">
-            <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest italic">⚠️ Acceso Denegado: Registro No Encontrado</p>
+            <p id="error-text" class="text-[9px] font-black text-rose-500 uppercase tracking-widest italic">⚠️ Acceso Denegado: Registro No Encontrado</p>
         </div>
         
         <footer class="mt-16 text-center">
@@ -178,17 +178,12 @@ let lastClickTime = 0;
 
 document.getElementById('secret-trigger').onclick = () => {
     const currentTime = new Date().getTime();
-    
-    if (currentTime - lastClickTime > 1000) {
-        starClicks = 0;
-    }
-    
+    if (currentTime - lastClickTime > 1000) starClicks = 0;
     starClicks++;
     lastClickTime = currentTime;
 
     if (starClicks === 3) {
         const masterPin = prompt("SISTEMA DE MANDO ✦ INGRESE CÓDIGO DE ACCESO:");
-        
         if (masterPin === "1437") {
             alert("ADN CONFIRMADO. BIENVENIDO COMANDANTE.");
             window.location.href = 'secreto.html';
@@ -201,16 +196,18 @@ document.getElementById('secret-trigger').onclick = () => {
 
 document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
-    const emailVal = document.getElementById('email').value.toLowerCase(); // Normalización preventiva
+    const emailVal = document.getElementById('email').value.trim(); // Trim para evitar espacios fantasma
     const passVal = document.getElementById('password').value;
     const btn = document.getElementById('btnLogin');
     const msg = document.getElementById('error-msg');
+    const errorText = document.getElementById('error-text');
 
     btn.innerText = "VERIFICANDO ADN...";
     btn.disabled = true;
     msg.classList.add('hidden');
 
     try {
+        // 1. AUTENTICACIÓN
         const { data, error } = await supabase.auth.signInWithPassword({
             email: emailVal,
             password: passVal
@@ -218,15 +215,23 @@ document.getElementById('loginForm').onsubmit = async (e) => {
 
         if (error) throw error;
 
+        // 2. BUSCAR PERFIL EN TABLA USUARIOS (Usando el correo si el ID falla)
         const { data: usuario, error: userError } = await supabase
             .from('Usuarios')
             .select('*')
-            .eq('id', data.user.id)
+            .eq('email', emailVal.toLowerCase()) // Buscamos por correo para ser infalibles
             .single();
 
-        if (userError || !usuario) throw new Error("Nodo no reconocido");
+        if (userError || !usuario) {
+            console.warn("Usuario no encontrado en tabla, intentando por ID...");
+            // Intento secundario por ID por si el correo no coincide exacto
+            const { data: retryUser } = await supabase.from('Usuarios').select('*').eq('id', data.user.id).single();
+            if(!retryUser) throw new Error("PERFIL NO REGISTRADO EN EL BÚNKER");
+            // Si el retry funciona, usamos ese
+            usuario = retryUser;
+        }
 
-        // Almacenar datos de sesión en el búnker local
+        // 3. ÉXITO - GUARDAR SESIÓN
         localStorage.setItem('user_id', data.user.id);
         localStorage.setItem('rol', usuario.rol);
         localStorage.setItem('nombre', usuario.nombre);
@@ -236,23 +241,20 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         btn.style.color = "white";
 
         setTimeout(() => {
-            // --- CORRECCIÓN DE RUTAS DE MANDO ---
             if (usuario.rol === 'doctor') {
-                // Redirección al búnker real (app.html) inyectando el ID
                 window.location.href = `app.html?id=${data.user.id}`;
             } else if (usuario.rol === 'asistente') {
                 window.location.href = 'asistente.html';
             } else {
-                alert("RANGO ADMINISTRATIVO NO CONFIGURADO");
-                btn.disabled = false;
-                btn.innerText = "REINTENTAR";
+                throw new Error("RANGO NO AUTORIZADO");
             }
-        }, 1000);
+        }, 800);
 
     } catch (err) {
         console.error("Falla de acceso:", err.message);
         btn.innerText = "REINTENTAR";
         btn.disabled = false;
+        errorText.innerText = "⚠️ " + err.message.toUpperCase();
         msg.classList.remove('hidden');
     }
 };
