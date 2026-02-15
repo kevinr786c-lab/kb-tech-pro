@@ -23,6 +23,7 @@
         .modal-blur { backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.4); }
         .kb-star { color: var(--luxe-gold); animation: star-glow 3s infinite ease-in-out; }
         @keyframes star-glow { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
+        /* Semáforo Visual de Pagos */
         .event-pagado { border-left: 5px solid #22c55e !important; }
         .event-deuda { border-left: 5px solid #ef4444 !important; }
     </style>
@@ -34,8 +35,8 @@
                 <div class="w-12 h-12 bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-xl"><span class="kb-star text-2xl">✦</span></div>
                 <div>
                     <h1 class="text-xl font-black italic uppercase tracking-tighter text-[#0f172a]">K.B <span class="text-[#c5a059]">SYSTEM</span></h1>
-                    <select id="doctorSelect" class="text-[10px] font-black uppercase text-[#c5a059] bg-transparent border-none p-0 outline-none cursor-pointer">
-                        <option value="8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985" selected>DRA. ALBA PATRICIA ROJAS FLORES</option>
+                    <select id="doctorSelect" class="text-[10px] font-black uppercase text-slate-400 bg-transparent border-none p-0 outline-none cursor-pointer hover:text-[#c5a059] transition">
+                        <option value="">ESCANEANDO DOCTORES...</option>
                     </select>
                 </div>
             </div>
@@ -60,11 +61,13 @@
             <p class="text-[8px] font-black text-slate-400 uppercase mb-2">Historial Reciente</p>
             <div id="historial-lista" class="space-y-2"></div>
         </div>
+
         <div id="stats-caja" class="mb-6" style="padding: 15px; background: rgba(197, 160, 89, 0.1); border-radius: 1.5rem; border: 1px dashed var(--luxe-gold);">
             <p style="color: var(--luxe-gold); font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0;">📊 Control Semanal</p>
             <h3 id="contador-semanal" style="color: var(--luxe-dark); font-size: 1.2rem; font-weight: 800; margin: 5px 0;">0 Citas</h3>
             <p style="color: #22c55e; font-size: 7px; font-weight: 800; text-transform: uppercase; margin: 0;">Inicia: Lun 16 Feb</p>
         </div>
+
         <div class="pt-4 border-t space-y-2">
             <button onclick="location.reload()" class="w-full text-left p-3 rounded-xl bg-slate-100 text-[10px] font-bold hover:bg-[#c5a059] transition">🔄 REFRESCAR</button>
             <p class="text-[8px] font-black text-slate-300 text-center uppercase mt-4">K.B TECH 2026</p>
@@ -75,8 +78,8 @@
         <div class="glass max-w-md w-full p-8 bg-white shadow-2xl border border-[var(--luxe-gold)]">
             <h2 id="modal-titulo" class="text-xl font-black uppercase italic text-[#0f172a] mb-6 border-b pb-2 text-center">Gestión <span class="text-[#c5a059]">Cita</span></h2>
             <div class="space-y-4">
-                <input id="c-paciente" class="input-luxe bg-slate-50 uppercase" placeholder="NOMBRE DE PACIENTE">
-                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO (10 DÍGITOS)" maxlength="10">
+                <input id="c-paciente" class="input-luxe bg-slate-50" placeholder="NOMBRE DE PACIENTE">
+                <input id="c-telefono" class="input-luxe" placeholder="TELÉFONO (10 DÍGITOS)">
                 <div class="grid grid-cols-2 gap-2"><input type="date" id="c-fecha" class="input-luxe"><input type="time" id="c-hora" class="input-luxe"></div>
                 <select id="c-estado" class="input-luxe font-bold uppercase text-[10px]">
                     <option value="pendiente">⏳ Pendiente</option>
@@ -85,8 +88,8 @@
                     <option value="completado">✦ Completado</option>
                     <option value="cancelado">🚫 Cancelar</option>
                 </select>
-                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-md hover:bg-emerald-600 transition">📱 Confirmar y Actualizar</button>
-                <textarea id="c-notas" class="input-luxe h-20 uppercase" placeholder="NOTAS (1RA VEZ, URG, PAGADO)..."></textarea>
+                <button onclick="lanzarWhatsApp()" class="w-full py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-md">📱 Enviar Confirmación Inteligente</button>
+                <textarea id="c-notas" class="input-luxe h-20" placeholder="NOTAS (Ej: EMB, 1ra vez, Pendiente de pago)..."></textarea>
             </div>
             <div class="flex gap-2 mt-6">
                 <button id="btn-accion" onclick="guardarCita()" class="flex-1 py-3 bg-[#0f172a] text-[#c5a059] rounded-xl font-black uppercase text-[9px]">Actualizar</button>
@@ -98,9 +101,7 @@
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
-    
-    // ASIGNACIÓN DIRECTA DE DOCTOR ACTUAL
-    let calendar, citaActual = null, doctorActual = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985', todasLasCitas = [];
+    let calendar, citaActual = null, doctorActual = null, todasLasCitas = [];
 
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
     
@@ -114,19 +115,12 @@
     function procesarCitaParaCalendario(c) {
         const ESTADOS = { pendiente: '#f8fafc', confirmado: '#fff7ed', atendiendo: '#f0fdf4', completado: '#0f172a', cancelado: '#fef2f2' };
         const TXT = { pendiente: '#94a3b8', confirmado: '#c5a059', atendiendo: '#10b981', completado: '#c5a059', cancelado: '#ef4444' };
-        
-        let iconos = "";
-        const notas = (c.notas || "").toUpperCase();
-        if (notas.includes("1RA") || notas.includes("NUEVA")) iconos += "✨ ";
-        if (notas.includes("URG")) iconos += "🚨 ";
-        if (notas.includes("EMB")) iconos += "🤰 ";
-        
-        const iconoPago = (notas.includes("PAGADO")) ? '✅' : '💰';
-        const clasePago = (notas.includes("PAGADO")) ? 'event-pagado' : 'event-deuda';
+        const clasePago = c.pagado ? 'event-pagado' : 'event-deuda';
+        const iconoPago = c.pagado ? '✅' : '💰';
 
         return {
             id: c.id,
-            title: `${iconos}${iconoPago} ${c.Pacientes?.nombre || 'PACIENTE'}`,
+            title: `${iconoPago} ${c.Pacientes?.nombre || 'PACIENTE'}`,
             start: `${c.fecha}T${c.hora_inicio}`,
             backgroundColor: ESTADOS[c.estado] || '#f8fafc',
             textColor: TXT[c.estado] || '#1e293b',
@@ -135,11 +129,19 @@
         };
     }
 
+    // FUNCIÓN DE INTELIGENCIA FINANCIERA (AGREGADA POR EL JEFE)
     async function actualizarContadorFinanciero() {
         if (!doctorActual) return;
-        const fechaInicioCobro = '2026-02-16'; 
-        const { count, error } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('doctor_id', doctorActual).gte('fecha', fechaInicioCobro).not('estado', 'eq', 'cancelado');
-        if (!error) document.getElementById('contador-semanal').innerText = `${count || 0} Citas`;
+        const fechaInicioCobro = '2026-02-16'; // Lunes de inicio oficial
+        const { count, error } = await supabase
+            .from('Citas')
+            .select('*', { count: 'exact', head: true })
+            .eq('doctor_id', doctorActual)
+            .gte('fecha', fechaInicioCobro)
+            .not('estado', 'eq', 'cancelado');
+        if (!error) {
+            document.getElementById('contador-semanal').innerText = `${count} Citas`;
+        }
     }
 
     async function cargarCitas() {
@@ -147,7 +149,7 @@
         const { data, error } = await supabase.from('Citas').select('*, Pacientes(*)').eq('doctor_id', doctorActual);
         if (error) return [];
         todasLasCitas = data || [];
-        actualizarContadorFinanciero();
+        actualizarContadorFinanciero(); // Actualizamos contador cada vez que cargamos
         return todasLasCitas.map(c => procesarCitaParaCalendario(c));
     }
 
@@ -155,17 +157,10 @@
         if(!pacienteId) return;
         const { data } = await supabase.from('Citas').select('fecha, estado').eq('paciente_id', pacienteId).order('fecha', { ascending: false }).limit(5);
         const lista = document.getElementById('historial-lista');
-        lista.innerHTML = (data || []).map(c => `<div class="p-2 bg-slate-50 rounded-lg border mb-2 text-[8px] font-black uppercase"><div class="flex justify-between"><span>${c.fecha}</span><span class="text-[#c5a059]">${c.estado}</span></div></div>`).join('');
+        lista.innerHTML = (data || []).map(c => `<div class="p-2 bg-slate-50 rounded-lg border mb-2"><div class="flex justify-between text-[8px] font-black"><span>${c.fecha}</span><span class="uppercase text-[#c5a059]">${c.estado}</span></div></div>`).join('');
         document.getElementById('paciente-info').classList.remove('hidden');
+        if(!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
     }
-
-    document.getElementById('c-telefono').addEventListener('input', async (e) => {
-        const tel = e.target.value;
-        if(tel.length === 10) {
-            const { data } = await supabase.from('Pacientes').select('nombre').eq('telefono', tel).maybeSingle();
-            if(data) document.getElementById('c-paciente').value = data.nombre;
-        }
-    });
 
     function initCalendar() {
         calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
@@ -173,12 +168,14 @@
             initialView: 'timeGridDay',
             allDaySlot: false,
             slotMinTime: "08:00:00",
-            headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+            headerToolbar: { left: 'prev,next today', center: 'title', right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay' },
+            buttonText: { today: 'Hoy', year: 'Año', month: 'Mes', week: 'Semana', day: 'Día' },
             events: (info, success) => cargarCitas().then(success),
             dateClick: (info) => {
                 citaActual = { id: null };
                 document.getElementById('modal-titulo').innerHTML = 'Agendar <span class="text-[#c5a059]">Nueva</span>';
-                document.getElementById('c-paciente').value = ""; document.getElementById('c-telefono').value = "";
+                document.getElementById('c-paciente').value = "";
+                document.getElementById('c-telefono').value = "";
                 document.getElementById('c-fecha').value = info.dateStr.split('T')[0];
                 document.getElementById('c-hora').value = info.dateStr.split('T')[1]?.slice(0,5) || "09:00";
                 document.getElementById('c-notas').value = "";
@@ -194,6 +191,7 @@
                 document.getElementById('c-hora').value = citaActual.hora_inicio.slice(0,5);
                 document.getElementById('c-estado').value = citaActual.estado;
                 document.getElementById('c-notas').value = citaActual.notas || '';
+                document.getElementById('btn-accion').innerText = "ACTUALIZAR DATOS";
                 document.getElementById('modalCita').classList.remove('hidden');
                 verHistorial(citaActual.paciente_id);
             }
@@ -202,53 +200,63 @@
     }
 
     async function cargarDoctores() {
-        // BYPASS: Conexión forzada a la Dra. Alba
-        if (!calendar) initCalendar();
-        else calendar.refetchEvents();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session.user.id);
+        const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asig?.map(a => a.doctor_id) || []);
+        const select = document.getElementById('doctorSelect');
+        select.innerHTML = '<option value="">ELEGIR DOCTOR</option>' + (docs?.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('') || '');
+        select.onchange = () => { doctorActual = select.value; if (!calendar) initCalendar(); else calendar.refetchEvents(); };
     }
 
     window.guardarCita = async () => {
-        const nombre = document.getElementById('c-paciente').value.toUpperCase().trim();
-        const tel = document.getElementById('c-telefono').value.replace(/\D/g,'');
-        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value.toUpperCase() };
-        
-        if(!nombre || tel.length < 10) return alert("REVISE NOMBRE Y TELÉFONO");
-        
+        const nombre = document.getElementById('c-paciente').value;
+        const tel = document.getElementById('c-telefono').value;
+        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
+        if(!nombre || !tel) return alert("NOMBRE Y TELÉFONO OBLIGATORIOS");
         try {
-            let pId;
-            const { data: pExist } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-            if(pExist) { pId = pExist.id; } 
-            else { 
-                const { data: nP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single(); 
-                pId = nP.id; 
-            }
-            
-            if (citaActual?.id) { 
-                await supabase.from('Citas').update(p).eq('id', citaActual.id); 
-            } else {
-                await supabase.from('Citas').insert([{ ...p, doctor_id: doctorActual, paciente_id: pId, servicio_id: '89fe8d0b-4a26-47b9-bb33-e3afa8344bee', duracion_cita: 30 }]);
+            let pacienteId;
+            const { data: pExistente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+            if(pExistente) { pacienteId = pExistente.id; } 
+            else { const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single(); pacienteId = nuevoP.id; }
+            if (citaActual && citaActual.id) { await supabase.from('Citas').update(p).eq('id', citaActual.id); } 
+            else {
+                const { data: s } = await supabase.from('Servicios').select('id').limit(1).single();
+                await supabase.from('Citas').insert([{ ...p, doctor_id: doctorActual, paciente_id: pacienteId, servicio_id: s.id, duracion_cita: 30 }]);
             }
             calendar.refetchEvents(); cerrarModal();
-        } catch (e) { console.error(e); }
+        } catch (e) { alert("Error: " + e.message); }
     };
 
-    window.lanzarWhatsApp = async () => {
-        const tel = document.getElementById('c-telefono').value.replace(/\D/g,'');
-        const nombre = document.getElementById('c-paciente').value.toUpperCase();
-        const msg = encodeURIComponent(`Hola *${nombre}*, le confirmamos su cita para el día *${document.getElementById('c-fecha').value}* a las *${document.getElementById('c-hora').value}* hrs. ✦`);
-        document.getElementById('c-estado').value = 'confirmado';
-        await guardarCita();
+    window.lanzarWhatsApp = () => {
+        const tel = document.getElementById('c-telefono').value;
+        const nombre = document.getElementById('c-paciente').value;
+        const fecha = document.getElementById('c-fecha').value;
+        const hora = document.getElementById('c-hora').value;
+        const estado = document.getElementById('c-estado').value;
+        const notas = (document.getElementById('c-notas').value || "").toLowerCase();
+        if(!tel) return alert("Sin número");
+
+        let accion = (estado === 'confirmado') ? "confirmamos tu espacio" : "te recordamos tu cita";
+        let especial = "";
+        if(notas.includes("emb")) especial = " para tu control prenatal 🤰";
+        else if(notas.includes("1ra vez")) especial = " de primera vez ✨";
+
+        const urlBase = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
+        const linkAgenda = `${urlBase}agendar.html?docId=${doctorActual}`;
+
+        const msg = encodeURIComponent(`Hola *${nombre}*, ${accion}${especial} el día *${fecha}* a las *${hora}* hrs. ✦\n\n¿Nos confirmas tu asistencia?\n\nSi necesitas reagendar, entra aquí: ${linkAgenda}`);
         window.open(`https://wa.me/52${tel}?text=${msg}`, '_blank');
     };
 
     window.copiarLinkAgenda = () => {
-        const url = `${window.location.origin}/agendar.html?docId=${doctorActual}`;
-        navigator.clipboard.writeText(url).then(() => alert("LINK COPIADO ✦"));
+        if (!doctorActual) return alert("ELIJA DOCTOR PRIMERO");
+        const urlBase = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
+        const link = `${urlBase}agendar.html?docId=${doctorActual}`;
+        navigator.clipboard.writeText(link).then(() => alert("LINK COPIADO ✦"));
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
-    
-    // ARRANQUE AUTOMÁTICO
     cargarDoctores();
 </script>
 </body>
