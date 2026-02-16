@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica de Colposcopía Tijuana | Liderazgo y Cuidado Integral</title>
+    <title>Clínica de Colposcopía Tijuana | Dra. Alba Patricia Rojas</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/smooth-scroll/16.1.3/smooth-scroll.polyfills.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
@@ -18,280 +17,148 @@
         body { font-family: 'Outfit', sans-serif; color: var(--dark-slate); scroll-behavior: smooth; overflow-x: hidden; }
         .serif { font-family: 'Playfair Display', serif; }
         
-        /* 🌸 EFECTO ZEN FLOWERS */
         #flower-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-        .flower { position: absolute; top: -10%; animation: fall linear infinite; opacity: 0.5; filter: blur(0.5px); }
+        .flower { position: absolute; top: -10%; animation: fall linear infinite; opacity: 0.5; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
-        /* HEADER GLASSMORPHISM */
-        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(155, 89, 182, 0.1); }
-
-        /* INTERACTIVIDAD: TRIAJE CARD */
-        .triaje-card { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
-        .triaje-card:hover { border-color: var(--lila-main); transform: translateY(-10px) scale(1.02); background: white; box-shadow: 0 30px 60px -12px rgba(155, 89, 182, 0.15); }
-
-        /* 💰 SECCIÓN DE PRECIOS */
-        .price-card { transition: 0.4s; border-left: 5px solid var(--lila-main); }
-        .price-card:hover { background: #fdfaff; transform: translateX(10px); }
-
-        /* BOTÓN WHATSAPP PULSANTE */
+        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(155, 89, 182, 0.1); }
+        .triaje-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(155, 89, 182, 0.1); }
         .wp-pulse { position: fixed; bottom: 30px; right: 30px; z-index: 100; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
-
-        .legal-link { font-size: 10px; font-weight: 700; color: #94a3b8; transition: 0.3s; }
-        .legal-link:hover { color: var(--lila-main); }
     </style>
 </head>
-<body class="bg-white text-left">
+<body class="bg-white">
 
     <div id="flower-container"></div>
 
-    <a href="https://wa.me/526640000000" class="wp-pulse bg-[#25d366] text-white p-5 rounded-full shadow-2xl flex items-center justify-center">
+    <a href="https://wa.me/526643700527" class="wp-pulse bg-[#25d366] text-white p-5 rounded-full shadow-2xl flex items-center justify-center">
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
-    <nav class="glass-header sticky top-0 z-50 px-6 md:px-20 py-5 flex justify-between items-center">
-        <div class="flex flex-col">
-            <h1 class="text-2xl font-black text-slate-800 tracking-tighter uppercase leading-none">Clínica de Colposcopía</h1>
-            <p class="text-[10px] tracking-[0.5em] text-purple-500 font-bold italic">TIJUANA • MÉXICO</p>
+    <nav class="glass-header sticky top-0 z-50 px-6 md:px-20 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <img src="logo_clinica.png" alt="Logo" class="h-12 w-auto">
+            <div class="flex flex-col">
+                <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase leading-none">Dra. Alba Rojas</h1>
+                <p class="text-[8px] tracking-[0.3em] text-purple-500 font-bold italic text-center">GINECOLOGÍA Y COLPOSCOPÍA</p>
+            </div>
         </div>
-        <div class="hidden lg:flex gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
+        <div class="hidden lg:flex gap-10 text-[10px] font-black uppercase tracking-widest text-slate-500">
             <a href="#inicio" class="hover:text-purple-600 transition">Inicio</a>
             <a href="#especialista" class="hover:text-purple-600 transition">Especialista</a>
-            <a href="#servicios" class="hover:text-purple-600 transition">Servicios</a>
-            <a href="#educacion" class="hover:text-purple-600 transition">Educación</a>
+            <a href="#consultorio" class="hover:text-purple-600 transition">Consultorio</a>
             <a href="#contacto" class="hover:text-purple-600 transition">Ubicación</a>
         </div>
-        <div class="flex items-center gap-4">
-            <a href="#agendar" class="bg-purple-600 text-white px-7 py-3 rounded-full text-[11px] font-black shadow-xl shadow-purple-200 hover:bg-purple-700 transition-all hover:scale-105">AGENDAR CITA</a>
-        </div>
+        <a href="https://wa.me/526643700527" class="bg-purple-600 text-white px-6 py-3 rounded-full text-[10px] font-black shadow-lg hover:bg-purple-700 transition">AGENDAR</a>
     </nav>
 
-    <section id="inicio" class="relative min-h-[90vh] flex items-center px-6 md:px-20 overflow-hidden bg-gradient-to-br from-white to-[#f9f7ff]">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
+    <section id="inicio" class="relative min-h-[85vh] flex items-center px-6 md:px-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
             <div data-aos="fade-right">
-                <div class="inline-block bg-purple-100 text-purple-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6">Excelencia Médica en Zona Río</div>
-                <h2 class="serif text-6xl md:text-8xl text-slate-900 leading-[0.95] mb-8">Cuidamos tu <br> <span class="italic text-purple-500 font-light">bienestar.</span></h2>
-                <p class="text-slate-500 text-lg md:text-xl max-w-lg mb-10 font-light leading-relaxed text-justify">Detección oportuna, tecnología diagnóstica de vanguardia y la calidez que tu salud merece en el corazón de Tijuana.</p>
-                <div class="flex flex-wrap gap-5">
-                    <a href="#agendar" class="bg-slate-900 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-purple-600 transition-all">Iniciar Consulta</a>
-                    <a href="#servicios" class="bg-white border border-slate-200 text-slate-700 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-50 transition-all">Explorar Servicios</a>
+                <div class="inline-block bg-purple-100 text-purple-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-6">Salud Femenina Especializada</div>
+                <h2 class="serif text-5xl md:text-7xl text-slate-900 leading-tight mb-8">Detección oportuna con <span class="italic text-purple-500 font-light underline">calidez humana.</span></h2>
+                <p class="text-slate-500 text-lg mb-10 font-light leading-relaxed">Expertos en colposcopía y ginecología integral en Zona Río, Tijuana.</p>
+                <div class="flex gap-4">
+                    <a href="https://wa.me/526643700527" class="bg-slate-900 text-white px-10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl">Agendar ahora</a>
                 </div>
             </div>
-            <div class="relative" data-aos="zoom-in" data-aos-delay="200">
-                <div class="w-full aspect-[4/5] bg-slate-200 rounded-[5rem] overflow-hidden border-[20px] border-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)]">
-                    <img src="FOTO_PRINCIPAL_DRA.jpg" class="w-full h-full object-cover" alt="Dra. Especialista">
-                </div>
-                <div class="absolute -bottom-10 -right-10 bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-50 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white">
-                        <i class="fas fa-award text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-xl font-black text-slate-800 tracking-tighter">Certificada</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Consejo Mexicano de Ginecología</p>
-                    </div>
+            <div class="relative" data-aos="zoom-in">
+                <div class="rounded-[4rem] overflow-hidden border-[15px] border-white shadow-2xl">
+                    <img src="foto_consultorio_1.jpg" class="w-full h-auto object-cover" alt="Consultorio">
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="servicios" class="py-32 px-6 bg-[#fbfaff]">
-        <div class="max-w-7xl mx-auto text-center mb-20" data-aos="fade-up">
-            <h3 class="serif text-4xl mb-4 uppercase italic font-bold">Inversión en tu Salud</h3>
-            <p class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.4em]">Transparencia Quirúrgica en cada proceso</p>
-        </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            <div class="price-card bg-white p-10 rounded-[3rem] shadow-sm" data-aos="fade-up" data-aos-delay="100">
-                <p class="text-[10px] font-black text-purple-500 uppercase mb-2 italic">Integral Primera Vez</p>
-                <h4 class="text-3xl font-black text-slate-900 mb-6">$1,500 <small class="text-xs font-bold">MXN</small></h4>
-                <ul class="text-[11px] text-slate-500 space-y-3 font-medium">
-                    <li><i class="fas fa-check text-purple-400 mr-2"></i>Consulta Médica</li>
-                    <li><i class="fas fa-check text-purple-400 mr-2"></i>Ultrasonido Pélvico/Vaginal</li>
-                    <li><i class="fas fa-check text-purple-400 mr-2"></i>Colposcopía</li>
-                    <li><i class="fas fa-check text-purple-400 mr-2"></i>Papanicolau</li>
-                </ul>
-            </div>
-            <div class="price-card bg-white p-10 rounded-[3rem] shadow-sm" data-aos="fade-up" data-aos-delay="200">
-                <p class="text-[10px] font-black text-purple-500 uppercase mb-2 italic">Seguimiento (Paquete)</p>
-                <h4 class="text-3xl font-black text-slate-900 mb-6">$1,300 <small class="text-xs font-bold">MXN</small></h4>
-                <p class="text-[11px] text-slate-500 leading-relaxed font-medium">Incluye paquete completo (USG, Colpo y Pap) para pacientes que ya iniciaron proceso.</p>
-            </div>
-            <div class="price-card bg-white p-10 rounded-[3rem] shadow-sm" data-aos="fade-up" data-aos-delay="300">
-                <p class="text-[10px] font-black text-purple-500 uppercase mb-2 italic">Diagnóstico Dirigido</p>
-                <h4 class="text-3xl font-black text-slate-900 mb-6">$1,000 <small class="text-xs font-bold">MXN</small></h4>
-                <p class="text-[11px] text-slate-500 leading-relaxed font-medium">Consulta Médica enfocada específicamente en estudio de Colposcopía.</p>
-            </div>
-            <div class="price-card bg-white p-10 rounded-[3rem] shadow-sm" data-aos="fade-up" data-aos-delay="400">
-                <p class="text-[10px] font-black text-purple-500 uppercase mb-2 italic">Consulta Básica</p>
-                <h4 class="text-3xl font-black text-slate-900 mb-6">$800 <small class="text-xs font-bold">MXN</small></h4>
-                <p class="text-[11px] text-slate-500 leading-relaxed font-medium">Valoración clínica ginecológica general (Sin estudios adicionales).</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-32 px-6 bg-white">
-        <div class="max-w-7xl mx-auto text-center mb-20" data-aos="fade-up">
-            <h3 class="serif text-4xl mb-4">¿Cómo podemos ayudarte hoy?</h3>
-            <p class="text-slate-400 text-sm uppercase font-bold tracking-[0.3em]">Selecciona tu necesidad para una atención personalizada</p>
-        </div>
-        <div class="grid md:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            <div class="triaje-card p-10 rounded-[3rem] bg-slate-50 text-center cursor-pointer" data-aos="fade-up" data-aos-delay="100">
-                <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center text-purple-500 shadow-sm mb-6"><i class="fas fa-search-plus text-xl"></i></div>
-                <h4 class="font-bold text-xs uppercase mb-2">Check-up Preventivo</h4>
-                <p class="text-[10px] text-slate-500">Mi revisión anual de rutina.</p>
-            </div>
-            <div class="triaje-card p-10 rounded-[3rem] bg-slate-50 text-center cursor-pointer" data-aos="fade-up" data-aos-delay="200">
-                <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center text-purple-500 shadow-sm mb-6"><i class="fas fa-microscope text-xl"></i></div>
-                <h4 class="font-bold text-xs uppercase mb-2">Colposcopía</h4>
-                <p class="text-[10px] text-slate-500">Tengo un resultado anormal.</p>
-            </div>
-            <div class="triaje-card p-10 rounded-[3rem] bg-slate-50 text-center cursor-pointer" data-aos="fade-up" data-aos-delay="300">
-                <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center text-purple-500 shadow-sm mb-6"><i class="fas fa-baby text-xl"></i></div>
-                <h4 class="font-bold text-xs uppercase mb-2">Control Prenatal</h4>
-                <p class="text-[10px] text-slate-500">Estoy esperando un bebé.</p>
-            </div>
-            <div class="triaje-card p-10 rounded-[3rem] bg-slate-50 text-center cursor-pointer" data-aos="fade-up" data-aos-delay="400">
-                <div class="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center text-purple-500 shadow-sm mb-6"><i class="fas fa-stethoscope text-xl"></i></div>
-                <h4 class="font-bold text-xs uppercase mb-2">Ginecología</h4>
-                <p class="text-[10px] text-slate-500">Tengo síntomas o dolor.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="especialista" class="py-32 px-6 bg-slate-900 text-white rounded-[5rem] mx-4">
+    <section id="especialista" class="py-24 px-6 bg-slate-900 text-white rounded-[5rem] mx-4">
         <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div data-aos="fade-right">
-                <h3 class="serif text-5xl mb-10">Formación y Compromiso <br><span class="text-purple-400 italic font-light">Médico Profesional.</span></h3>
-                <div class="space-y-8 text-sm">
-                    <div class="flex gap-6">
-                        <div class="w-10 h-10 border border-purple-500/50 rounded-full flex items-center justify-center text-purple-400">01</div>
-                        <div>
-                            <h5 class="font-bold uppercase tracking-widest text-xs mb-2">Educación Superior</h5>
-                            <p class="text-slate-400">Especialidad en Ginecología y Obstetricia con Mención Honorífica.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-6">
-                        <div class="w-10 h-10 border border-purple-500/50 rounded-full flex items-center justify-center text-purple-400">02</div>
-                        <div>
-                            <h5 class="font-bold uppercase tracking-widest text-xs mb-2">Certificaciones Oficiales</h5>
-                            <p class="text-slate-400">Cédula Profesional: 10452392 | Cédula Especialidad: 13076822</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-6">
-                        <div class="w-10 h-10 border border-purple-500/50 rounded-full flex items-center justify-center text-purple-400">03</div>
-                        <div>
-                            <h5 class="font-bold uppercase tracking-widest text-xs mb-2">Membresías Activas</h5>
-                            <p class="text-slate-400">Miembro del Colegio de Ginecólogos de Tijuana y la Federación Mexicana (FIGO).</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 gap-4" data-aos="fade-right">
+                <img src="certificacion_conacem.jpg" class="rounded-3xl shadow-xl hover:scale-105 transition" alt="Certificado CONACEM">
+                <img src="titulo_udg.jpg" class="rounded-3xl shadow-xl translate-y-8 hover:scale-105 transition" alt="Título UDG">
             </div>
-            <div class="grid grid-cols-2 gap-4" data-aos="fade-left">
-                <div class="bg-white/5 aspect-square rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center text-white">
-                    <i class="fas fa-user-md text-3xl text-purple-400 mb-4"></i>
-                    <p class="text-[10px] font-black uppercase tracking-widest italic">Dra. Alba Patricia Rojas</p>
-                </div>
-                <div class="bg-white/5 aspect-square rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center translate-y-8 text-white">
-                    <i class="fas fa-hospital text-3xl text-purple-400 mb-4"></i>
-                    <p class="text-[10px] font-black uppercase tracking-widest italic">Clínica de Colposcopía Tijuana</p>
+            <div data-aos="fade-left">
+                <h3 class="serif text-4xl mb-6">Dra. Alba Patricia Rojas Flores</h3>
+                <p class="text-purple-400 font-bold uppercase text-[10px] tracking-widest mb-8">Ginecología y Obstetricia | Especialista en Colposcopía</p>
+                <div class="space-y-6 text-sm text-slate-300">
+                    <p><i class="fas fa-graduation-cap text-purple-500 mr-3"></i>Especialista por la Universidad de Guadalajara.</p>
+                    <p><i class="fas fa-award text-purple-500 mr-3"></i>Certificada por el Consejo Mexicano de Ginecología y Obstetricia (Vigencia 2023-2028).</p>
+                    <p><i class="fas fa-id-card text-purple-500 mr-3"></i>Cédula Especialidad: 13076822</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="educacion" class="py-32 px-6">
-        <div class="max-w-4xl mx-auto">
+    <section id="consultorio" class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h3 class="serif text-4xl mb-4 text-slate-900 tracking-tighter">Educación para la Paciente</h3>
-                <p class="text-slate-500 text-[11px] font-bold uppercase tracking-[0.4em]">Lo que debes saber antes de tu revisión</p>
+                <h3 class="serif text-4xl mb-2 italic">Tecnología Diagnóstica</h3>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Equipamiento de Grado Quirúrgico</p>
             </div>
-            
-            <div class="space-y-4">
-                <details class="group bg-slate-50 rounded-3xl p-6 transition-all border border-transparent open:border-purple-200 open:bg-white">
-                    <summary class="flex justify-between items-center font-bold text-sm uppercase tracking-widest cursor-pointer list-none">
-                        ¿Qué es una colposcopía?
-                        <span class="text-purple-500 transition-transform group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
-                    </summary>
-                    <p class="text-sm text-slate-500 mt-6 leading-relaxed text-justify">Es un procedimiento ginecológico que permite observar de forma amplificada el cuello del útero, la vagina y la vulva para detectar lesiones o cambios celulares sospechosos que no se ven a simple vista.</p>
-                </details>
-
-                <details class="group bg-slate-50 rounded-3xl p-6 transition-all border border-transparent open:border-purple-200 open:bg-white">
-                    <summary class="flex justify-between items-center font-bold text-sm uppercase tracking-widest cursor-pointer list-none">
-                        Preparación previa (Protocolo de Misión)
-                        <span class="text-purple-500 transition-transform group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
-                    </summary>
-                    <ul class="text-sm text-slate-500 mt-6 space-y-3">
-                        <li><i class="fas fa-check text-purple-500 mr-2"></i> No tener relaciones sexuales 48h antes.</li>
-                        <li><i class="fas fa-check text-purple-500 mr-2"></i> No usar óvulos, cremas o duchas vaginales.</li>
-                        <li><i class="fas fa-check text-purple-500 mr-2"></i> No estar en tu periodo menstrual.</li>
-                    </ul>
-                </details>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="rounded-3xl overflow-hidden shadow-lg border border-slate-100" data-aos="fade-up">
+                    <img src="foto_equipo_ultrasonido.jpg" class="w-full h-64 object-cover" alt="Equipo Chison">
+                    <div class="p-6">
+                        <h4 class="font-bold text-xs uppercase mb-2">Ultrasonido de Alta Definición</h4>
+                        <p class="text-xs text-slate-500">Diagnóstico preciso en control prenatal y ginecología.</p>
+                    </div>
+                </div>
+                <div class="rounded-3xl overflow-hidden shadow-lg border border-slate-100" data-aos="fade-up" data-aos-delay="200">
+                    <img src="foto_consultorio_interior.jpg" class="w-full h-64 object-cover" alt="Interior Consultorio">
+                    <div class="p-6">
+                        <h4 class="font-bold text-xs uppercase mb-2">Espacio Clínico Seguro</h4>
+                        <p class="text-xs text-slate-500">Ambiente diseñado para tu comodidad y privacidad.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="contacto" class="py-32 px-6 bg-[#fbfaff]">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div data-aos="fade-right">
-                <h3 class="serif text-4xl mb-8">Nuestra Ubicación en Zona Río</h3>
-                <div class="space-y-10">
-                    <div class="flex gap-6 text-left">
-                        <i class="fas fa-map-marked-alt text-2xl text-purple-500"></i>
+    <section id="contacto" class="py-24 px-6 bg-slate-50">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12">
+            <div>
+                <h3 class="serif text-4xl mb-8">¿Cómo llegar?</h3>
+                <div class="space-y-8">
+                    <div class="flex gap-4">
+                        <i class="fas fa-map-marker-alt text-purple-500 text-xl"></i>
                         <div>
-                            <p class="font-bold uppercase text-[11px] tracking-widest text-slate-900 mb-1">Dirección Oficial</p>
-                            <p class="text-slate-500 text-sm italic">C. David Alfaro Siqueiros #2800, Int. L16. Plaza Siqueiros, Zona Río, Tijuana.</p>
+                            <p class="font-bold text-[11px] uppercase tracking-widest">Ubicación</p>
+                            <p class="text-sm text-slate-600">David Alfaro Siqueiros #2800, Int. L16, Plaza Siqueiros, Zona Río, Tijuana.</p>
                         </div>
                     </div>
-                    <div class="flex gap-6 text-left">
-                        <i class="fas fa-parking text-2xl text-purple-500"></i>
+                    <div class="flex gap-4">
+                        <i class="fas fa-info-circle text-purple-500 text-xl"></i>
                         <div>
-                            <p class="font-bold uppercase text-[11px] tracking-widest text-slate-900 mb-1">Logística de Estacionamiento</p>
-                            <p class="text-slate-500 text-sm">Estacionamiento subterráneo disponible al finalizar la plaza por la calle lateral German Gedovius.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-6 text-left">
-                        <i class="fas fa-elevator text-2xl text-purple-500"></i>
-                        <div>
-                            <p class="font-bold uppercase text-[11px] tracking-widest text-slate-900 mb-1 text-purple-600">Acceso a la Clínica</p>
-                            <p class="text-slate-500 text-sm font-bold italic">2do piso por elevador o 1er piso por escaleras.</p>
+                            <p class="font-bold text-[11px] uppercase tracking-widest">Acceso</p>
+                            <p class="text-sm text-slate-600 italic">2do piso por elevador / 1er piso por escaleras.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="h-[500px] bg-slate-200 rounded-[4rem] overflow-hidden shadow-2xl border-[12px] border-white" data-aos="fade-left">
-                <iframe src="http://googleusercontent.com/maps.google.com/3" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <div class="h-80 rounded-3xl overflow-hidden shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3364.205739055811!2d-117.0141689!3d32.5205556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80d94f4e4e768771%3A0x11a25595cd3b7d2b!2sDavid%20Alfaro%20Siqueiros%202800%2C%20Zona%20Urbana%20Rio%20Tijuana%2C%2022010%20Tijuana%2C%20B.C.!5e0!3m2!1ses-419!2smx!4v1700000000000!5m2!1ses-419!2smx" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
     </section>
 
-    <footer class="bg-white py-20 px-6 border-t border-slate-100">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-            <div class="flex flex-col items-center md:items-start">
-                <h4 class="text-xl font-black text-slate-800 uppercase leading-none">Clínica de Colposcopía</h4>
-                <p class="text-[9px] font-black text-purple-500 uppercase tracking-[0.5em] mt-2 italic">Desarrollado por K.B Tech Solution ✦</p>
-            </div>
-            <div class="flex flex-wrap justify-center gap-10">
-                <a href="#" class="legal-link uppercase tracking-widest">Aviso de Privacidad</a>
-                <a href="#" class="legal-link uppercase tracking-widest">Aviso Médico</a>
-            </div>
-        </div>
+    <footer class="bg-white py-12 text-center border-t border-slate-100">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Dra. Alba Patricia Rojas Flores © 2026 | Desarrollado por K.B Tech Solution ✦</p>
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({ duration: 1200, once: true });
+        AOS.init({ duration: 1000, once: true });
         function createFlower() {
             const container = document.getElementById('flower-container');
             const flower = document.createElement('div');
             flower.className = 'flower';
             flower.innerHTML = '🌸';
             flower.style.left = Math.random() * 100 + 'vw';
-            flower.style.animationDuration = Math.random() * 7 + 4 + 's';
-            flower.style.fontSize = Math.random() * 20 + 10 + 'px';
+            flower.style.animationDuration = Math.random() * 5 + 5 + 's';
+            flower.style.fontSize = Math.random() * 15 + 10 + 'px';
             container.appendChild(flower);
             setTimeout(() => flower.remove(), 10000);
         }
-        setInterval(createFlower, 500);
+        setInterval(createFlower, 600);
     </script>
 </body>
 </html>
