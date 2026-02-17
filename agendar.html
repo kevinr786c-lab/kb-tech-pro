@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
@@ -22,8 +21,8 @@
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">CONECTANDO AL BÚNKER...</h1>
-            <p id="doc-especialidad" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SISTEMA K.B TECH SOLUTIONS</p>
+            <h1 class="text-xl font-black italic uppercase tracking-tighter text-slate-900">DRA. ALBA ELENA</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">CLÍNICA DE COLPOSCOPIA | K.B TECH</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
@@ -32,15 +31,17 @@
             
             <div class="space-y-4">
                 <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
-                    <option value="" disabled selected>Cargando Inteligencia...</option>
+                    <option value="" disabled selected>CARGANDO SERVICIOS...</option>
                 </select>
-                <input type="date" id="fecha" class="input-elite">
+                <input type="date" id="fecha" class="input-elite" required>
             </div>
 
-            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2"></div>
+            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2">
+                <p class="col-span-3 text-center text-slate-400 text-[10px] uppercase font-bold italic">Seleccione una fecha</p>
+            </div>
 
             <input type="hidden" id="hora_seleccionada">
-            <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR ESPACIO ✦</button>
+            <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR CITA ✦</button>
         </form>
     </div>
 
@@ -48,111 +49,98 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
+    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; // ID Fijo de la Dra. Alba
+
+    // 🕒 HORARIOS MANUALE DE LA DRA ALBA (Según sus archivos SQL)
+    const horariosFijos = {
+        "1": [{ inicio: "09:00", fin: "12:30" }], // Lunes
+        "2": [{ inicio: "09:00", fin: "12:30" }], // Martes
+        "3": [{ inicio: "09:00", fin: "12:30" }], // Miércoles
+        "4": [{ inicio: "09:00", fin: "12:30" }], // Jueves
+        "5": [{ inicio: "09:00", fin: "12:30" }]  // Viernes
+    };
 
     async function actualizarRadar() {
-        const fechaInput = document.getElementById('fecha').value;
+        const fechaVal = document.getElementById('fecha').value;
         const radar = document.getElementById('radar-horas');
-        if (!fechaInput) return;
+        if (!fechaVal) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
+        // Obtener día de la semana (1-Lunes a 5-Viernes)
+        const dateParts = fechaVal.split('-');
+        const diaSemana = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]).getDay().toString();
+
+        const bloques = horariosFijos[diaSemana];
         
+        if (!bloques) {
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ CERRADO ESTE DÍA</p>';
+            return;
+        }
+
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO ESPACIOS...</p>';
+
         try {
-            // 1. Verificar Bloqueos de Vacaciones
-            const { data: bloqueo } = await supabase.from('Bloqueos_Horario').select('motivo').eq('doctor_id', docId).eq('fecha', fechaInput).maybeSingle();
-            if (bloqueo) {
-                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
-                return;
-            }
-
-            // 🎯 NORMALIZACIÓN DE DÍA
-            const partes = fechaInput.split('-');
-            const diaSemana = new Date(partes[0], partes[1] - 1, partes[2]).getDay().toString();
-
-            // 2. Traer TODOS los bloques de horario del día (Mañana y Tarde)
-            const { data: horarios } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId);
-            
-            // Filtro local multiformato
-            const bloquesActivos = horarios?.filter(h => 
-                h.dia_semana.toString() === diaSemana && 
-                (h.activo === true || h.activo === 'true')
-            ) || [];
-
-            if (bloquesActivos.length === 0) {
-                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ BÚNKER CERRADO (Día ${diaSemana})</p>`;
-                return;
-            }
-
-            // 3. Filtrar Citas Ocupadas
-            const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaInput).neq('estado', 'cancelado');
-            const ocupadasMap = ocupadas?.map(o => o.hora_inicio.substring(0,5)) || [];
+            // Consultar citas ya agendadas para esa fecha
+            const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado');
+            const ocupadasList = ocupadas?.map(o => o.hora_inicio.substring(0,5)) || [];
 
             radar.innerHTML = '';
-            
-            // 4. Generación de Slots por cada bloque
-            bloquesActivos.sort((a,b) => a.hora_inicio.localeCompare(b.hora_inicio)).forEach(bloque => {
-                let actual = new Date(`2026-01-01T${bloque.hora_inicio.substring(0,5)}`);
-                let limite = new Date(`2026-01-01T${bloque.hora_fin.substring(0,5)}`);
+            bloques.forEach(bloque => {
+                let actual = new Date(`2026-01-01T${bloque.inicio}`);
+                let fin = new Date(`2026-01-01T${bloque.fin}`);
                 
-                while (actual < limite) {
-                    const hString = actual.toTimeString().substring(0,5);
-                    if (!ocupadasMap.includes(hString)) {
+                while (actual < fin) {
+                    const hStr = actual.toTimeString().substring(0,5);
+                    if (!ocupadasList.includes(hStr)) {
                         const pill = document.createElement('div');
                         pill.className = 'time-pill';
-                        pill.innerText = hString;
+                        pill.innerText = hStr;
                         pill.onclick = () => {
                             document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
                             pill.classList.add('selected');
-                            document.getElementById('hora_seleccionada').value = hString + ":00";
+                            document.getElementById('hora_seleccionada').value = hStr + ":00";
                         };
                         radar.appendChild(pill);
                     }
                     actual.setMinutes(actual.getMinutes() + 30);
                 }
             });
-
-        } catch (e) { radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE SEÑAL</p>'; }
+        } catch (e) { radar.innerHTML = 'ERROR DE CARGA'; }
     }
 
     async function init() {
-        try {
-            const { data: u } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-            const { data: p } = await supabase.from('Perfiles_Medicos').select('especialidad').eq('usuario_id', docId).single();
-            if(u) document.getElementById('doc-name').innerText = `DR(A). ${u.nombre.toUpperCase()}`;
-            if(p) document.getElementById('doc-especialidad').innerText = p.especialidad.toUpperCase();
-
-            const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
-            const sel = document.getElementById('servicio');
-            sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
-            s?.forEach(item => {
-                sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
-            });
-        } catch (e) { console.error(e); }
+        // Cargar Servicios de la Dra. Alba
+        const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
+        const sel = document.getElementById('servicio');
+        sel.innerHTML = '<option value="" disabled selected>ELIJA EL SERVICIO</option>';
+        s?.forEach(item => {
+            sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
+        });
     }
 
     document.getElementById('fecha').onchange = actualizarRadar;
-    document.getElementById('servicio').onchange = actualizarRadar;
 
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('confirmar-btn');
         const h = document.getElementById('hora_seleccionada').value;
         if(!h) return alert("✦ SELECCIONE HORA");
 
-        btn.disabled = true; btn.innerText = "BLOQUEANDO COORDENADA...";
+        const btn = document.getElementById('confirmar-btn');
+        btn.disabled = true; btn.innerText = "BLOQUEANDO...";
+
         const s = document.getElementById('servicio').selectedOptions[0];
 
         try {
+            // Lógica de Paciente (verificar o crear)
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if(!pac) {
-                const { data: nP } = await supabase.from('Pacientes').insert({ 
+                const { data } = await supabase.from('Pacientes').insert({ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
                     telefono: document.getElementById('telefono').value 
                 }).select().single();
-                pac = nP;
+                pac = data;
             }
 
+            // Insertar Cita
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
                 fecha: document.getElementById('fecha').value, hora_inicio: h,
@@ -161,9 +149,9 @@
             });
 
             if(error) throw error;
-            alert("✅ OPERACIÓN EXITOSA: CITA AGENDADA");
+            alert("✅ CITA AGENDADA CON ÉXITO");
             location.reload();
-        } catch (err) { alert("⚠️ FALLO: " + err.message); btn.disabled = false; }
+        } catch (err) { alert("ERROR: " + err.message); btn.disabled = false; }
     };
 
     init();
