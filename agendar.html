@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
@@ -11,54 +12,37 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #f8fafc, #e2e8f0); color: var(--dark); }
         .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; }
         .input-elite { width: 100%; padding: 1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; }
-        .input-elite:focus { border-color: var(--main); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
         .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
-        .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
+        .time-pill.selected { background: var(--main) !important; color: white !important; transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
         .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
-        .badge-estatus { display: none; padding: 0.3rem 0.8rem; border-radius: 0.7rem; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.3s; }
-        .estatus-nuevo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-        .estatus-recurrente { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
-        .estatus-oro { background: #fefce8; color: #a16207; border: 1px solid #fef08a; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-md w-full glass p-8 shadow-2xl relative overflow-hidden">
+    <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
-            <button onclick="history.back()" class="absolute left-6 top-8 text-slate-300 hover:text-slate-900 transition text-sm">←</button>
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">ESCANEANDO BÚNKER...</h1>
-            <p id="doc-especialidad" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Inteligencia Médica</p>
+            <h1 class="text-xl font-black italic uppercase tracking-tighter text-slate-900">DRA. ALBA ELENA</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">CLÍNICA DE COLPOSCOPIA | K.B TECH</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
-            <div>
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Identificación (Teléfono)</p>
-                    <span id="badge-paciente" class="badge-estatus italic"></span>
-                </div>
-                <input type="tel" id="telefono" placeholder="10 DÍGITOS" class="input-elite" maxlength="10" required>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="email" id="email" placeholder="EMAIL" class="input-elite text-xs">
-                    <input type="date" id="fecha_nacimiento" class="input-elite text-xs">
-                </div>
-            </div>
-
+            <input type="tel" id="telefono" placeholder="WHATSAPP (10 DÍGITOS)" class="input-elite" maxlength="10" required>
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
+            
             <div class="space-y-4">
                 <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
-                    <option value="" disabled selected>Seleccione Servicio</option>
+                    <option value="" disabled selected>CARGANDO SERVICIOS...</option>
                 </select>
-                <input type="date" id="fecha" class="input-elite">
+                <input type="date" id="fecha" class="input-elite" required>
             </div>
 
-            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2"></div>
+            <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2">
+                <p class="col-span-3 text-center text-slate-400 text-[10px] uppercase font-bold italic">Seleccione una fecha</p>
+            </div>
 
             <input type="hidden" id="hora_seleccionada">
-            <button type="submit" id="confirmar-btn" class="btn-mision">Confirmar Reservación ✦</button>
+            <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR CITA ✦</button>
         </form>
     </div>
 
@@ -66,144 +50,119 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
+    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
 
-    document.getElementById('telefono').addEventListener('input', async (e) => {
-        const tel = e.target.value;
-        const badge = document.getElementById('badge-paciente');
-        if (tel.length === 10) {
-            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
-            if (pac) {
-                document.getElementById('nombre').value = pac.nombre;
-                document.getElementById('email').value = pac.email || '';
-                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
-                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id).eq('estado','completado');
-                badge.style.display = 'block';
-                badge.innerText = count >= 3 ? "✦ PACIENTE ORO" : "✓ RECURRENTE";
-                badge.className = "badge-estatus " + (count >= 3 ? "estatus-oro" : "estatus-recurrente") + " italic";
-            } else {
-                badge.style.display = 'block';
-                badge.innerText = "+ PACIENTE NUEVO";
-                badge.className = "badge-estatus estatus-nuevo italic";
-            }
-        } else { badge.style.display = 'none'; }
-    });
+    const horariosFijos = {
+        "1": [{ inicio: "09:00", fin: "12:30" }],
+        "2": [{ inicio: "09:00", fin: "12:30" }],
+        "3": [{ inicio: "09:00", fin: "12:30" }],
+        "4": [{ inicio: "09:00", fin: "12:30" }],
+        "5": [{ inicio: "09:00", fin: "12:30" }],
+        "6": [{ inicio: "09:00", fin: "14:30" }]
+    };
 
-async function actualizarRadar() {
-    const fechaInput = document.getElementById('fecha').value;
-    const selectServ = document.getElementById('servicio');
-    const radar = document.getElementById('radar-horas');
-    if (!fechaInput || !selectServ.value) return;
+    async function actualizarRadar() {
+        const fechaVal = document.getElementById('fecha').value;
+        const radar = document.getElementById('radar-horas');
+        if (!fechaVal) return;
 
-    radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
-    
-    try {
-        // 1. 📡 LEER HORARIO REAL DESDE SU TABLA "Horarios_Doctor"
-        const diaSemana = new Date(fechaInput + 'T00:00:00').getDay();
+        const partes = fechaVal.split('-');
+        const diaSemana = new Date(partes[0], partes[1] - 1, partes[2]).getDay().toString();
+        const bloques = horariosFijos[diaSemana];
         
-        const { data: config, error: errConf } = await supabase
-            .from('Horarios_Doctor') 
-            .select('hora_inicio, hora_fin')
-            .eq('doctor_id', docId)
-            .eq('dia_semana', diaSemana)
-            .eq('activo', 'true')
-            .maybeSingle();
-
-        // Si no hay horario para ese día (ej. Domingo), bloqueamos
-        if (!config) {
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ DÍA NO DISPONIBLE</p>';
+        if (!bloques) {
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ CERRADO ESTE DÍA</p>';
             return;
         }
 
-        // 2. 🛡️ OBTENER CITAS OCUPADAS
-        const { data: ocupadas } = await supabase.from('Citas')
-            .select('hora_inicio')
-            .eq('doctor_id', docId)
-            .eq('fecha', fechaInput)
-            .not('estado', 'eq', 'cancelado');
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO DISPONIBILIDAD...</p>';
 
-        const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
+        try {
+            // 📡 OBTENER CITAS OCUPADAS
+            const { data: ocupadas, error } = await supabase
+                .from('Citas')
+                .select('hora_inicio')
+                .eq('doctor_id', docId)
+                .eq('fecha', fechaVal)
+                .neq('estado', 'cancelado');
 
-        // 3. 🧬 GENERADOR DINÁMICO (Usa apertura y cierre de la tabla)
-        let actual = new Date(`2026-01-01T${config.hora_inicio}`);
-        let limite = new Date(`2026-01-01T${config.hora_fin}`);
-        
-        radar.innerHTML = '';
-        while (actual < limite) {
-            const horaString = actual.toTimeString().slice(0,5);
-            if (!horasOcupadas.includes(horaString)) {
-                const pill = document.createElement('div');
-                pill.className = `time-pill`;
-                pill.innerText = horaString;
-                pill.onclick = () => {
-                    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                    pill.classList.add('selected');
-                    document.getElementById('hora_seleccionada').value = horaString + ":00";
-                };
-                radar.appendChild(pill);
+            // 🎯 NORMALIZACIÓN CRÍTICA: Quitamos segundos para comparar (ej: 09:30:00 -> 09:30)
+            const ocupadasList = ocupadas?.map(o => o.hora_inicio.slice(0, 5)) || [];
+            console.log("Citas detectadas para el radar:", ocupadasList);
+
+            radar.innerHTML = '';
+            bloques.forEach(bloque => {
+                let actual = new Date(`2026-01-01T${bloque.inicio}`);
+                let fin = new Date(`2026-01-01T${bloque.fin}`);
+                
+                while (actual < fin) {
+                    const hStr = actual.toTimeString().substring(0, 5);
+                    
+                    // Solo mostramos la hora si NO está en la lista de ocupadas
+                    if (!ocupadasList.includes(hStr)) {
+                        const pill = document.createElement('div');
+                        pill.className = 'time-pill';
+                        pill.innerText = hStr;
+                        pill.onclick = () => {
+                            document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                            pill.classList.add('selected');
+                            document.getElementById('hora_seleccionada').value = hStr + ":00";
+                        };
+                        radar.appendChild(pill);
+                    }
+                    actual.setMinutes(actual.getMinutes() + 30);
+                }
+            });
+
+            if (radar.innerHTML === '') {
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase">⚠️ SIN HORAS DISPONIBLES</p>';
             }
-            actual.setMinutes(actual.getMinutes() + 30);
+
+        } catch (e) { 
+            console.error("Fallo de radar:", e);
+            radar.innerHTML = 'ERROR DE CONEXIÓN'; 
         }
-
-        if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
-
-    } catch (e) {
-        console.error(e);
-        radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE SEÑAL</p>';
     }
-}
-    document.getElementById('fecha').onchange = actualizarRadar;
-    document.getElementById('servicio').onchange = actualizarRadar;
 
     async function init() {
-        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-        if(doc) document.getElementById('doc-name').innerText = `DRA. ${doc.nombre.toUpperCase()}`;
-        document.getElementById('doc-especialidad').innerText = "CLÍNICA DE COLPOSCOPÍA";
-
-        const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
-        const select = document.getElementById('servicio');
-        servs?.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.setAttribute('data-total', s.duracion_min);
-            opt.setAttribute('data-monto', s.precio);
-            opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
-            select.appendChild(opt);
+        const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
+        const sel = document.getElementById('servicio');
+        sel.innerHTML = '<option value="" disabled selected>ELIJA EL SERVICIO</option>';
+        s?.forEach(item => {
+            sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
         });
     }
 
+    document.getElementById('fecha').onchange = actualizarRadar;
+
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
+        const h = document.getElementById('hora_seleccionada').value;
+        if(!h) return alert("✦ SELECCIONE HORA");
+
         const btn = document.getElementById('confirmar-btn');
-        const hora = document.getElementById('hora_seleccionada').value;
-        const selectServ = document.getElementById('servicio');
-        if(!hora) return alert("✦ ELIJA HORA EN EL RADAR");
-        
-        btn.disabled = true; btn.innerText = "REGISTRANDO...";
-        const servOpt = selectServ.selectedOptions[0];
+        btn.disabled = true; btn.innerText = "BLOQUEANDO...";
+        const s = document.getElementById('servicio').selectedOptions[0];
 
         try {
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
-            if (!pac) {
+            if(!pac) {
                 const { data } = await supabase.from('Pacientes').insert({ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
-                    telefono: document.getElementById('telefono').value, 
-                    email: document.getElementById('email').value,
-                    fecha_nacimiento: document.getElementById('fecha_nacimiento').value
+                    telefono: document.getElementById('telefono').value 
                 }).select().single();
                 pac = data;
             }
 
             const { error } = await supabase.from('Citas').insert({
-                doctor_id: docId, paciente_id: pac.id, servicio_id: servOpt.value,
-                fecha: document.getElementById('fecha').value, hora_inicio: hora,
-                duracion_cita: parseInt(servOpt.getAttribute('data-total')), monto: parseFloat(servOpt.getAttribute('data-monto')),
-                estado: 'pendiente'
+                doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
+                fecha: document.getElementById('fecha').value, hora_inicio: h,
+                duracion_cita: parseInt(s.getAttribute('data-min')),
+                monto: parseFloat(s.getAttribute('data-p')), estado: 'pendiente'
             });
 
-            if (error) throw error;
-            alert("✅ CITA REGISTRADA");
+            if(error) throw error;
+            alert("✅ CITA CONFIRMADA");
             location.reload();
         } catch (err) { alert("ERROR: " + err.message); btn.disabled = false; }
     };
