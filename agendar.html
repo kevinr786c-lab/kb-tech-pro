@@ -92,84 +92,86 @@
         } else { badge.style.display = 'none'; }
     });
 
-    // 🧬 ACTUALIZAR RADAR USANDO BÚSQUEDA POR ID DE DOCTOR
     async function actualizarRadar() {
-        const fechaInput = document.getElementById('fecha').value;
-        const selectServ = document.getElementById('servicio');
-        const radar = document.getElementById('radar-horas');
-        if (!fechaInput || !selectServ.value) return;
+    const fechaInput = document.getElementById('fecha').value;
+    const selectServ = document.getElementById('servicio');
+    const radar = document.getElementById('radar-horas');
+    if (!fechaInput || !selectServ.value) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
-        
-        try {
-            // 1. 🛡️ VERIFICAR BLOQUEOS (Prioridad Máxima)
-            const { data: bloqueo } = await supabase
-                .from('Bloqueos_Horario')
-                .select('motivo')
-                .eq('doctor_id', docId)
-                .eq('fecha', fechaInput)
-                .maybeSingle();
+    radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
+    
+    try {
+        // 1. 🛡️ ESCANEO DE BLOQUEOS (Prioridad Máxima)
+        const { data: bloqueo } = await supabase
+            .from('Bloqueos_Horario')
+            .select('motivo')
+            .eq('doctor_id', docId)
+            .eq('fecha', fechaInput)
+            .maybeSingle();
 
-            if (bloqueo) {
-                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
-                return;
-            }
-
-            // 2. 📅 CALCULAR DÍA (Ajustado con T12 para evitar desfases de zona horaria)
-            const dateObj = new Date(fechaInput + 'T12:00:00');
-            const diaSemanaActual = dateObj.getDay().toString(); // 0-6 en String
-
-            // 3. 📡 BUSCAR HORARIOS DEL DOCTOR
-            const { data: horariosDoc } = await supabase
-                .from('Horarios_Doctor') 
-                .select('dia_semana, hora_inicio, hora_fin')
-                .eq('doctor_id', docId)
-                .eq('activo', true);
-
-            // Filtrar el día correcto (Comparando como texto para coincidir con el SQL)
-            const config = horariosDoc?.find(h => h.dia_semana === diaSemanaActual);
-
-            if (!config) {
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL</p>';
-                return;
-            }
-
-            // 4. 🛡️ FILTRAR CITAS OCUPADAS
-            const { data: ocupadas } = await supabase.from('Citas')
-                .select('hora_inicio')
-                .eq('doctor_id', docId)
-                .eq('fecha', fechaInput)
-                .neq('estado', 'cancelado');
-
-            const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
-
-            // 5. 🧬 GENERAR SLOTS (Limpiando segundos del formato SQL '00:00:00')
-            let actual = new Date(`2026-01-01T${config.hora_inicio.slice(0,5)}`);
-            let limite = new Date(`2026-01-01T${config.hora_fin.slice(0,5)}`);
-            
-            radar.innerHTML = '';
-            while (actual < limite) {
-                const h = actual.toTimeString().slice(0,5);
-                if (!horasOcupadas.includes(h)) {
-                    const pill = document.createElement('div');
-                    pill.className = `time-pill`;
-                    pill.innerText = h;
-                    pill.onclick = () => {
-                        document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                        pill.classList.add('selected');
-                        document.getElementById('hora_seleccionada').value = h + ":00";
-                    };
-                    radar.appendChild(pill);
-                }
-                actual.setMinutes(actual.getMinutes() + 30);
-            }
-
-            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
-
-        } catch (e) {
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE ENLACE</p>';
+        if (bloqueo) {
+            radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
+            return;
         }
+
+        // 2. 📅 CALCULAR DÍA (Normalización Total)
+        // Usamos T12:00:00 para asegurar que el día no cambie por zona horaria
+        const dateObj = new Date(fechaInput + 'T12:00:00');
+        const diaSemana = dateObj.getDay(); 
+
+        // 3. 📡 CONSULTA FLEXIBLE AL BÚNKER
+        // Probamos enviando el día como Número y como Texto al mismo tiempo
+        const { data: config, error: errC } = await supabase
+            .from('Horarios_Doctor') 
+            .select('hora_inicio, hora_fin')
+            .eq('doctor_id', docId)
+            .in('dia_semana', [diaSemana, diaSemana.toString()]) 
+            .eq('activo', true)
+            .maybeSingle();
+
+        if (!config) {
+            console.error("Día buscado:", diaSemana);
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL (VERIFICAR CONFIG)</p>';
+            return;
+        }
+
+        // 4. 🛡️ FILTRAR CITAS OCUPADAS
+        const { data: ocupadas } = await supabase.from('Citas')
+            .select('hora_inicio')
+            .eq('doctor_id', docId)
+            .eq('fecha', fechaInput)
+            .neq('estado', 'cancelado');
+
+        const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
+
+        // 5. 🧬 GENERACIÓN DE SLOTS (Limpiando segundos: 09:00:00 -> 09:00)
+        let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
+        let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
+        
+        radar.innerHTML = '';
+        while (actual < limite) {
+            const h = actual.toTimeString().slice(0,5);
+            if (!horasOcupadas.includes(h)) {
+                const pill = document.createElement('div');
+                pill.className = `time-pill`;
+                pill.innerText = h;
+                pill.onclick = () => {
+                    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                    pill.classList.add('selected');
+                    document.getElementById('hora_seleccionada').value = h + ":00";
+                };
+                radar.appendChild(pill);
+            }
+            actual.setMinutes(actual.getMinutes() + 30);
+        }
+
+        if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ BÚNKER LLENO</p>';
+
+    } catch (e) {
+        console.error("Error táctico:", e);
+        radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE CONEXIÓN</p>';
     }
+}
 
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
