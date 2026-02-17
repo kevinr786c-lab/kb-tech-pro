@@ -68,6 +68,7 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
+    let orgId = null;
 
     // 📡 DETECTOR DE PACIENTES
     document.getElementById('telefono').addEventListener('input', async (e) => {
@@ -101,8 +102,23 @@
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
         try {
-            // 1. OBTENER DÍA (Ajuste UTC para evitar desfases)
-            const diaSemana = new Date(fechaInput + 'T00:00:00').getDay();
+            // 1. 🛡️ VERIFICAR BLOQUEOS (Vacaciones / Festivos)
+            const { data: bloqueo } = await supabase
+                .from('Bloqueos_Horario')
+                .select('*')
+                .eq('doctor_id', docId)
+                .eq('fecha', fechaInput)
+                .maybeSingle();
+
+            if (bloqueo) {
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase">⚠️ ${bloqueo.motivo || 'BÚNKER CERRADO'}</p>`;
+                return;
+            }
+
+            // 2. OBTENER DÍA (Normalizado Lunes=1... Domingo=7)
+            const dateObj = new Date(fechaInput + 'T00:00:00');
+            let diaSemana = dateObj.getDay(); 
+            if (diaSemana === 0) diaSemana = 7; 
             
             const { data: config } = await supabase
                 .from('Horarios_Doctor') 
@@ -117,7 +133,7 @@
                 return;
             }
 
-            // 2. FILTRAR CITAS OCUPADAS
+            // 3. FILTRAR CITAS OCUPADAS
             const { data: ocupadas } = await supabase.from('Citas')
                 .select('hora_inicio')
                 .eq('doctor_id', docId)
@@ -126,7 +142,7 @@
 
             const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-            // 3. GENERAR SLOTS DINÁMICOS
+            // 4. GENERAR SLOTS
             let actual = new Date(`2026-01-01T${config.hora_inicio}`);
             let limite = new Date(`2026-01-01T${config.hora_fin}`);
             
@@ -159,8 +175,11 @@
 
     // 🏛️ INICIALIZAR BÚNKER
     async function init() {
-        const { data: doc } = await supabase.from('Usuarios').select('nombre').eq('id', docId).single();
-        if(doc) document.getElementById('doc-name').innerText = `${doc.nombre.toUpperCase()}`;
+        const { data: doc } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
+        if(doc) {
+            document.getElementById('doc-name').innerText = `${doc.nombre.toUpperCase()}`;
+            orgId = doc.organizacion_id;
+        }
         
         const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
         const select = document.getElementById('servicio');
@@ -186,7 +205,7 @@
         const servOpt = selectServ.selectedOptions[0];
 
         try {
-            // 1. VALIDACIÓN/CREACIÓN DE PACIENTE
+            // 1. GESTIÓN DE PACIENTE
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if (!pac) {
                 const { data } = await supabase.from('Pacientes').insert({ 
@@ -198,11 +217,16 @@
                 pac = data;
             }
 
+            // 🛡️ BUSCAR CONSULTORIO DE LA CLÍNICA
+            const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).single();
+
             // 2. INSERCIÓN DE CITA
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, 
                 paciente_id: pac.id, 
                 servicio_id: servOpt.value,
+                organizacion_id: orgId, // 🏢 SELLO MULTI-TENANT
+                consultorio_id: cons?.id, // 🏥 ASIGNACIÓN FÍSICA
                 fecha: document.getElementById('fecha').value, 
                 hora_inicio: hora,
                 duracion_cita: parseInt(servOpt.getAttribute('data-total')), 
@@ -210,7 +234,11 @@
                 estado: 'pendiente'
             });
 
-            if (error) throw error;
+            if (error) {
+                if(error.message.includes('ERROR DE RADAR')) throw new Error("CONFLICTO DE RADAR: El consultorio ya está ocupado.");
+                throw error;
+            }
+            
             alert("✅ CITA REGISTRADA EN EL BÚNKER");
             location.reload();
         } catch (err) { 
