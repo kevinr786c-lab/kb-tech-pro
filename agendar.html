@@ -92,7 +92,7 @@
         } else { badge.style.display = 'none'; }
     });
 
-    // 🧬 ACTUALIZAR RADAR DE HORAS
+    // 🧬 ACTUALIZAR RADAR DE HORAS (VERSIÓN CALIBRADA)
     async function actualizarRadar() {
         const fechaInput = document.getElementById('fecha').value;
         const selectServ = document.getElementById('servicio');
@@ -115,25 +115,25 @@
                 return;
             }
 
-            // 2. OBTENER DÍA (Normalizado: Lunes=1 ... Domingo=7)
-            const dateObj = new Date(fechaInput + 'T00:00:00');
-            let diaSemana = dateObj.getDay(); 
-            if (diaSemana === 0) diaSemana = 7; 
-            
+            // 2. 📅 OBTENER DÍA (Calibrado con T12:00:00 para evitar desfases de zona horaria)
+            const dateObj = new Date(fechaInput + 'T12:00:00');
+            const diaSemana = dateObj.getDay(); // 0=Dom, 1=Lun, ..., 6=Sáb
+
+            // 3. 📡 CONSULTAR HORARIO (Buscando día como string para coincidir con el SQL cargado)
             const { data: config } = await supabase
                 .from('Horarios_Doctor') 
                 .select('hora_inicio, hora_fin')
                 .eq('doctor_id', docId)
-                .eq('dia_semana', diaSemana)
+                .eq('dia_semana', diaSemana.toString()) 
                 .eq('activo', true)
                 .maybeSingle();
 
             if (!config) {
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ DÍA NO DISPONIBLE</p>';
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ DÍA NO LABORAL</p>';
                 return;
             }
 
-            // 3. FILTRAR CITAS OCUPADAS
+            // 4. 🛡️ FILTRAR CITAS OCUPADAS
             const { data: ocupadas } = await supabase.from('Citas')
                 .select('hora_inicio')
                 .eq('doctor_id', docId)
@@ -142,21 +142,21 @@
 
             const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-            // 4. GENERAR SLOTS (Rangos dinámicos del búnker)
+            // 5. 🧬 GENERAR SLOTS (30 min)
             let actual = new Date(`2026-01-01T${config.hora_inicio}`);
             let limite = new Date(`2026-01-01T${config.hora_fin}`);
             
             radar.innerHTML = '';
             while (actual < limite) {
-                const horaString = actual.toTimeString().slice(0,5);
-                if (!horasOcupadas.includes(horaString)) {
+                const h = actual.toTimeString().slice(0,5);
+                if (!horasOcupadas.includes(h)) {
                     const pill = document.createElement('div');
                     pill.className = `time-pill`;
-                    pill.innerText = horaString;
+                    pill.innerText = h;
                     pill.onclick = () => {
                         document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
                         pill.classList.add('selected');
-                        document.getElementById('hora_seleccionada').value = horaString + ":00";
+                        document.getElementById('hora_seleccionada').value = h + ":00";
                     };
                     radar.appendChild(pill);
                 }
@@ -166,7 +166,7 @@
             if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ BÚNKER SIN ESPACIO</p>';
 
         } catch (e) {
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE SEÑAL</p>';
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE ENLACE</p>';
         }
     }
 
@@ -201,7 +201,7 @@
         const selectServ = document.getElementById('servicio');
         if(!hora) return alert("✦ ELIJA HORA EN EL RADAR");
         
-        btn.disabled = true; btn.innerText = "REGISTRANDO...";
+        btn.disabled = true; btn.innerText = "BLOQUEANDO COORDENADA...";
         const servOpt = selectServ.selectedOptions[0];
 
         try {
@@ -217,10 +217,10 @@
                 pac = data;
             }
 
-            // 🛡️ BUSCAR CONSULTORIO DISPONIBLE
+            // 🛡️ OBTENER CONSULTORIO DE LA ORGANIZACIÓN
             const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).single();
 
-            // 2. INSERCIÓN DE CITA
+            // 2. INSERCIÓN DE CITA CON SELLOS DE SEGURIDAD
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, 
                 paciente_id: pac.id, 
@@ -235,11 +235,11 @@
             });
 
             if (error) {
-                if(error.message.includes('CONFLICTO')) throw new Error("RADAR: El espacio se ocupó hace un instante.");
+                if(error.message.includes('CONFLICTO')) throw new Error("RADAR: El espacio se ocupó recientemente.");
                 throw error;
             }
             
-            alert("✅ CITA REGISTRADA");
+            alert("✅ CITA CONFIRMADA");
             location.reload();
         } catch (err) { 
             alert("⚠️ " + err.message); 
