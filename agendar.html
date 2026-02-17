@@ -67,14 +67,15 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     const urlParams = new URLSearchParams(window.location.search);
-    // ID de la Dra. Alba confirmado por sus archivos SQL
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
 
+    // 🧬 ACTUALIZAR RADAR DE DISPONIBILIDAD
     async function actualizarRadar() {
         const fechaInput = document.getElementById('fecha').value;
+        const selectServ = document.getElementById('servicio');
         const radar = document.getElementById('radar-horas');
-        if (!fechaInput) return;
+        if (!fechaInput || !selectServ.value) return;
 
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
@@ -92,22 +93,21 @@
                 return;
             }
 
-            // 2. 📅 CALCULAR DÍA (Ajuste T12 para evitar desfases de zona horaria)
+            // 2. 📅 CALCULAR DÍA (Ajuste T12 para evitar desfases)
             const dateObj = new Date(fechaInput + 'T12:00:00');
-            const diaSemana = dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
+            const diaSemana = dateObj.getDay().toString(); 
 
-            // 3. 📡 CONSULTA FLEXIBLE (Buscamos el día como número Y como texto)
-            const { data: config, error } = await supabase
+            // 3. 📡 CONSULTA DE HORARIO (Búsqueda Híbrida)
+            const { data: config } = await supabase
                 .from('Horarios_Doctor') 
                 .select('hora_inicio, hora_fin')
                 .eq('doctor_id', docId)
-                .in('dia_semana', [diaSemana, diaSemana.toString()]) // 🎯 Busca ambas versiones
+                .eq('dia_semana', diaSemana)
                 .eq('activo', true)
                 .maybeSingle();
 
             if (!config) {
-                console.log("Día buscado en radar:", diaSemana);
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL (REVISAR CONFIG)</p>';
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL</p>';
                 return;
             }
 
@@ -120,8 +120,7 @@
 
             const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-            // 5. 🧬 GENERAR SLOTS (Limpiando los segundos del formato SQL)
-            // Sus archivos muestran '09:00:00', tomamos solo '09:00'
+            // 5. 🧬 GENERAR SLOTS (30 min)
             let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
             let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
             
@@ -142,18 +141,36 @@
                 actual.setMinutes(actual.getMinutes() + 30);
             }
 
-            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ BÚNKER LLENO</p>';
+            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
 
         } catch (e) {
-            console.error("Error en radar:", e);
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE CONEXIÓN</p>';
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE SEÑAL</p>';
         }
     }
 
-    document.getElementById('fecha').onchange = actualizarRadar;
-    document.getElementById('servicio').onchange = actualizarRadar;
-    // ... resto del código (init, submit) se mantiene igual
-    init();
+    // 📡 DETECTOR DE PACIENTES
+    document.getElementById('telefono').addEventListener('input', async (e) => {
+        const tel = e.target.value;
+        const badge = document.getElementById('badge-paciente');
+        if (tel.length === 10) {
+            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
+            if (pac) {
+                document.getElementById('nombre').value = pac.nombre;
+                document.getElementById('email').value = pac.email || '';
+                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
+                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id).eq('estado','completado');
+                badge.style.display = 'block';
+                badge.innerText = count >= 3 ? "✦ PACIENTE ORO" : "✓ RECURRENTE";
+                badge.className = "badge-estatus " + (count >= 3 ? "estatus-oro" : "estatus-recurrente") + " italic";
+            } else {
+                badge.style.display = 'block';
+                badge.innerText = "+ PACIENTE NUEVO";
+                badge.className = "badge-estatus estatus-nuevo italic";
+            }
+        } else { badge.style.display = 'none'; }
+    });
+
+    // 🏛️ INICIALIZAR DATOS
     async function init() {
         const { data: doc } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
         if(doc) {
@@ -173,6 +190,11 @@
         });
     }
 
+    // ⚔️ EVENTOS DE ACTIVACIÓN
+    document.getElementById('fecha').onchange = actualizarRadar;
+    document.getElementById('servicio').onchange = actualizarRadar;
+
+    // 🏹 CONFIRMAR RESERVA
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
@@ -180,7 +202,7 @@
         const selectServ = document.getElementById('servicio');
         if(!hora) return alert("✦ ELIJA HORA EN EL RADAR");
         
-        btn.disabled = true; btn.innerText = "REGISTRANDO...";
+        btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
         const servOpt = selectServ.selectedOptions[0];
 
         try {
@@ -210,15 +232,12 @@
                 estado: 'pendiente'
             });
 
-            if (error) {
-                if(error.message.includes('CONFLICTO')) throw new Error("RADAR: El espacio se ocupó recientemente.");
-                throw error;
-            }
+            if (error) throw error;
             
-            alert("✅ CITA CONFIRMADA");
+            alert("✅ ESPACIO ASEGURADO EN EL BÚNKER");
             location.reload();
         } catch (err) { 
-            alert("⚠️ " + err.message); 
+            alert("⚠️ ERROR DE SISTEMA: " + err.message); 
             btn.disabled = false; 
             btn.innerText = "REINTENTAR";
         }
