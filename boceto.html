@@ -3,36 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dra. Alba Patricia Rojas | Clínica de Colposcopía Elite</title>
+    <title>Clínica de Colposcopía | Dra. Alba Patricia Rojas</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        @import url('https://i.ibb.co/hxJqg3Ph/Whats-App-Image-2026-02-16-at-9-17-01-AM-3.jpg');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
         
         :root { 
             --lila-main: #a78bfa; 
             --lila-dark: #8b5cf6; 
-            --lila-soft: #f5f3ff; 
             --dark-slate: #0f172a; 
         }
 
         body { font-family: 'Outfit', sans-serif; color: var(--dark-slate); scroll-behavior: smooth; overflow-x: hidden; background: #fff; }
         .serif { font-family: 'Playfair Display', serif; }
         
-        /* 🌸 ZEN FLOWERS OPTIMIZADO */
         #flower-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
         .flower { position: absolute; top: -10%; animation: fall linear infinite; opacity: 0.4; filter: blur(0.3px); }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
-        /* EFECTO CRISTAL SUPERIOR */
         .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(167, 139, 250, 0.15); }
 
-        /* TARJETAS DE PRECIOS MEJORADAS */
-        .price-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
-        .price-card:hover { transform: translateY(-12px); box-shadow: 0 40px 80px -15px rgba(139, 92, 246, 0.15); }
+        .price-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; border: 1px solid #f1f5f9; }
+        .price-card:hover { transform: translateY(-12px); box-shadow: 0 40px 80px -15px rgba(139, 92, 246, 0.15); border-color: var(--lila-main); }
         .price-card::after { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: var(--lila-main); }
 
         .btn-premium {
@@ -50,49 +46,32 @@
 
     <div id="flower-container"></div>
 
-    <a href="https://wa.me/526643700527" class="wp-pulse bg-[#25d366] text-white p-5 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110">
+    <a href="https://wa.me/526643700527" class="wp-pulse bg-[#25d366] text-white p-5 rounded-full shadow-2xl flex items-center justify-center">
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
     <nav class="glass-header sticky top-0 z-50 px-6 md:px-20 py-4 flex justify-between items-center">
         <div class="flex items-center gap-4">
-            <img src="https://i.ibb.co/VWX4ymdN/Captura-de-pantalla-2026-02-16-092003.png" alt="Logo K.B" class="h-14 w-auto drop-shadow-sm">
+            <img src="https://i.ibb.co/S77VRPgQ/Captura-de-pantalla-2026-02-16-092003.png" alt="Logo Clínica" class="h-14 w-auto drop-shadow-sm">
             <div class="flex flex-col border-l-2 border-violet-100 pl-4">
                 <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase leading-tight">Dra. Alba Patricia Rojas</h1>
-                <p class="text-[9px] tracking-[0.4em] text-violet-400 font-bold italic uppercase">Ginecología • Colposcopía</p>
+                <p class="text-[9px] tracking-[0.4em] text-violet-400 font-bold italic uppercase mt-1">Ginecología • Colposcopía</p>
             </div>
         </div>
-        <div class="hidden lg:flex gap-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-            <a href="#inicio" class="hover:text-violet-500 transition-colors">Inicio</a>
-            <a href="#especialista" class="hover:text-violet-500 transition-colors">Especialista</a>
-            <a href="#servicios" class="hover:text-violet-500 transition-colors">Inversión</a>
-            <a href="#contacto" class="hover:text-violet-500 transition-colors">Ubicación</a>
-        </div>
-        <a href="https://kevinr786c-lab.github.io/kb-tech-pro/agendar.html?docId=8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985" class="btn-premium text-white px-8 py-3.5 rounded-full text-[10px] font-black tracking-widest uppercase">Agendar Cita ✦</a>
+        <a href="https://kevinr786c-lab.github.io/kb-tech-pro/agendar.html?docId=8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985" class="btn-premium text-white px-8 py-3.5 rounded-full text-[10px] font-black tracking-widest uppercase">Agendar ✦</a>
     </nav>
 
     <section id="inicio" class="relative min-h-[90vh] flex items-center px-6 md:px-20 overflow-hidden bg-white">
         <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
             <div data-aos="fade-right">
-                <span class="inline-block bg-violet-100 text-violet-600 px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8">Zona Río • Tijuana</span>
-                <h2 class="serif text-6xl md:text-8xl text-slate-900 leading-none mb-10">Salud con <br> <span class="italic text-violet-400 font-light">sensibilidad.</span></h2>
-                <p class="text-slate-500 text-lg md:text-xl max-w-lg mb-12 font-light leading-relaxed">Detección oportuna y tecnología diagnóstica de vanguardia bajo el cuidado de una especialista certificada.</p>
-                <div class="flex flex-wrap gap-6">
-                    <a href="https://kevinr786c-lab.github.io/kb-tech-pro/agendar.html?docId=8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985" class="bg-slate-900 text-white px-12 py-5 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-violet-600 transition-all active:scale-95">Reservar Espacio</a>
-                </div>
+                <span class="inline-block bg-violet-100 text-violet-600 px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 italic">Excelencia Médica Tijuana</span>
+                <h2 class="serif text-6xl md:text-8xl text-slate-900 leading-none mb-10">Salud con <br> <span class="italic text-violet-400 font-light text-5xl md:text-7xl">sensibilidad.</span></h2>
+                <p class="text-slate-500 text-lg md:text-xl max-w-lg mb-12 font-light leading-relaxed">Tecnología diagnóstica de vanguardia y calidez humana en Zona Río.</p>
+                <a href="https://kevinr786c-lab.github.io/kb-tech-pro/agendar.html?docId=8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985" class="bg-slate-900 text-white px-12 py-5 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-violet-600 transition-all active:scale-95">Reservar Consulta</a>
             </div>
-            <div class="relative" data-aos="zoom-in" data-aos-delay="200">
+            <div class="relative" data-aos="zoom-in">
                 <div class="w-full aspect-[4/5] bg-slate-100 rounded-[5rem] overflow-hidden border-[15px] border-white shadow-2xl">
-                    <img src="https://i.ibb.co/k24GTx8n/Whats-App-Image-2026-02-16-at-9-17-01-AM-2.jpg" class="w-full h-full object-cover" alt="Dra. Alba Rojas">
-                </div>
-                <div class="absolute -bottom-6 -right-6 bg-white p-7 rounded-[2.5rem] shadow-2xl flex items-center gap-4 border border-violet-50">
-                    <div class="w-14 h-14 bg-violet-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                        <i class="fas fa-check-circle text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-lg font-black text-slate-800 leading-none">Certificada</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Vigencia 2023 - 2028</p>
-                    </div>
+                    <img src="https://i.ibb.co/Qjc3g7RF/Whats-App-Image-2026-02-16-at-9-17-01-AM-2.jpg" class="w-full h-full object-cover" alt="Dra. Alba Rojas">
                 </div>
             </div>
         </div>
@@ -101,37 +80,23 @@
     <section id="especialista" class="py-32 px-6 bg-slate-900 text-white rounded-[4rem] md:rounded-[6rem] mx-4 my-20">
         <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
             <div data-aos="fade-up">
-                <h3 class="serif text-5xl mb-12 leading-tight">Dra. Alba Patricia Rojas Flores <br><span class="text-violet-400 italic font-light text-3xl">Ginecología de Vanguardia.</span></h3>
+                <h3 class="serif text-5xl mb-12 leading-tight">Dra. Alba Patricia Rojas Flores <br><span class="text-violet-400 italic font-light text-3xl">Respaldo Profesional.</span></h3>
                 <div class="space-y-12">
                     <div class="flex gap-8">
                         <div class="w-14 h-14 shrink-0 border-2 border-violet-500/30 rounded-2xl flex items-center justify-center text-violet-400 font-black text-xl">01</div>
                         <div>
-                            <h5 class="font-bold uppercase tracking-widest text-xs mb-3 italic text-violet-300">Respaldo Académico</h5>
-                            <p class="text-slate-400 text-base leading-relaxed">Egresada de la **Universidad de Guadalajara (U. de G.)** con Mención Honorífica. Especialista en constante actualización diagnóstica.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-8">
-                        <div class="w-14 h-14 shrink-0 border-2 border-violet-500/30 rounded-2xl flex items-center justify-center text-violet-400 font-black text-xl">02</div>
-                        <div>
                             <h5 class="font-bold uppercase tracking-widest text-xs mb-3 italic text-violet-300">Certificación Oficial</h5>
-                            <p class="text-slate-400 text-base leading-relaxed">Certificada por el **Consejo Mexicano de Ginecología y Obstetricia**. <br>Cédula: 10452392 | Especialidad: 13076822.</p>
+                            <p class="text-slate-400 text-base">Vigencia 2023-2028 por el **Consejo Mexicano de Ginecología**. Cédula: 10452392.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            
             <div class="grid grid-cols-2 gap-6" data-aos="fade-left">
-                <div class="space-y-4">
-                    <div class="bg-white p-3 rounded-[2.5rem] shadow-2xl aspect-[3/4] border-4 border-violet-500/20 overflow-hidden">
-                        <img src="https://i.ibb.co/B2Wm5T1s/Captura-de-pantalla-2026-02-16-093118.png" class="w-full h-full object-contain">
-                    </div>
-                    <p class="text-[9px] text-center font-black uppercase text-violet-400 tracking-[0.3em]">Consejo Mexicano</p>
+                <div class="bg-white p-3 rounded-[2.5rem] shadow-2xl aspect-[3/4] border-4 border-violet-500/20 overflow-hidden">
+                    <img src="https://i.ibb.co/BXjvr3t/Captura-de-pantalla-2026-02-16-093118.png" class="w-full h-full object-contain">
                 </div>
-                <div class="space-y-4 translate-y-12">
-                    <div class="bg-white p-3 rounded-[2.5rem] shadow-2xl aspect-[3/4] border-4 border-violet-500/20 overflow-hidden">
-                        <img src="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" class="w-full h-full object-contain">
-                    </div>
-                    <p class="text-[9px] text-center font-black uppercase text-violet-400 tracking-[0.3em]">Título Profesional</p>
+                <div class="bg-white p-3 rounded-[2.5rem] shadow-2xl aspect-[3/4] border-4 border-violet-500/20 overflow-hidden translate-y-12">
+                    <img src="https://i.ibb.co/S77VRPgQ/Captura-de-pantalla-2026-02-16-092003.png" class="w-full h-full object-contain">
                 </div>
             </div>
         </div>
@@ -139,69 +104,26 @@
 
     <section id="servicios" class="py-32 px-6 bg-[#fdfbff]">
         <div class="max-w-7xl mx-auto text-center mb-20" data-aos="fade-up">
-            <h3 class="serif text-4xl mb-4 italic">Tarifas de Atención</h3>
-            <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.5em]">Excelencia y transparencia en cada proceso</p>
+            <h3 class="serif text-4xl mb-4 italic">Servicios y Costos</h3>
+            <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.5em]">Excelencia y transparencia en Zona Río</p>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            <div class="price-card bg-white p-10 rounded-[3rem] border border-slate-100">
-                <p class="text-[10px] font-black text-violet-400 uppercase mb-4 italic">Paquete Integral 1ra Vez</p>
+            <div class="price-card bg-white p-10 rounded-[3rem]">
+                <p class="text-[10px] font-black text-violet-400 uppercase mb-4 italic">Integral 1ra Vez</p>
                 <h4 class="text-4xl font-black text-slate-900 mb-8">$1,500 <span class="text-xs">MXN</span></h4>
                 <ul class="space-y-4 text-xs font-medium text-slate-500">
                     <li><i class="fas fa-check text-violet-400 mr-2"></i> Consulta Médica</li>
-                    <li><i class="fas fa-check text-violet-400 mr-2"></i> Ultrasonido Vaginal</li>
+                    <li><i class="fas fa-check text-violet-400 mr-2"></i> Ultrasonido</li>
                     <li><i class="fas fa-check text-violet-400 mr-2"></i> Colposcopía</li>
                     <li><i class="fas fa-check text-violet-400 mr-2"></i> Papanicolau</li>
                 </ul>
             </div>
-            <div class="price-card bg-white p-10 rounded-[3rem] border border-slate-100 flex flex-col justify-center">
-                <p class="text-[10px] font-black text-violet-400 uppercase mb-4 italic">Seguimiento</p>
-                <h4 class="text-4xl font-black text-slate-900 mb-6">$1,300</h4>
-                <p class="text-xs text-slate-400 leading-relaxed italic">Paquete preventivo anual completo para pacientes constantes.</p>
             </div>
-            <div class="price-card bg-white p-10 rounded-[3rem] border border-slate-100 flex flex-col justify-center">
-                <p class="text-[10px] font-black text-violet-400 uppercase mb-4 italic">Diagnóstico Especial</p>
-                <h4 class="text-4xl font-black text-slate-900 mb-6">$1,000</h4>
-                <p class="text-xs text-slate-400 leading-relaxed italic">Consulta especializada únicamente en Colposcopía.</p>
-            </div>
-            <div class="price-card bg-white p-10 rounded-[3rem] border border-slate-100 flex flex-col justify-center">
-                <p class="text-[10px] font-black text-violet-400 uppercase mb-4 italic">Valoración Ginecología</p>
-                <h4 class="text-4xl font-black text-slate-900 mb-6">$800</h4>
-                <p class="text-xs text-slate-400 leading-relaxed italic">Consulta clínica ginecológica general de rutina.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="contacto" class="py-32 px-6 bg-white">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div data-aos="fade-right">
-                <h3 class="serif text-4xl mb-12 italic">Tu cita en el corazón de Zona Río</h3>
-                <div class="space-y-10">
-                    <div class="flex gap-6">
-                        <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-violet-500">
-                            <i class="fas fa-location-dot text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="font-black text-xs uppercase tracking-widest text-slate-800 italic">Dirección</p>
-                            <p class="text-slate-500 mt-1">Plaza Siqueiros, C. David Alfaro Siqueiros #2800, Int. L16. Zona Río, Tijuana.</p>
-                        </div>
-                    </div>
-                    <div class="p-6 bg-violet-50 rounded-[2.5rem] border border-violet-100">
-                        <div class="flex gap-4">
-                            <i class="fas fa-elevator text-violet-500 mt-1"></i>
-                            <p class="text-sm text-violet-900 font-bold italic">Fácil acceso: 2do piso por elevador o 1er piso por escaleras (Plaza Siqueiros).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="h-[500px] bg-slate-100 rounded-[5rem] overflow-hidden shadow-2xl border-[15px] border-white" data-aos="zoom-in">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3364.577232386121!2d-117.0135!3d32.5181!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzLCuDMxJzA1LjEiTiAxMTfCsDAwJzQ4LjYiVw!5e0!3m2!1ses!2smx!4v1708000000000!5m2!1ses!2smx" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
-        </div>
     </section>
 
     <footer class="bg-white py-16 px-6 border-t border-slate-50">
         <div class="max-w-7xl mx-auto text-center">
-            <img src="https://i.ibb.co/hxJqg3Ph/Whats-App-Image-2026-02-16-at-9-17-01-AM-3.jpg" class="h-10 mx-auto mb-8 opacity-40 grayscale">
+            <img src="https://i.ibb.co/S77VRPgQ/Captura-de-pantalla-2026-02-16-092003.png" class="h-10 mx-auto mb-8 opacity-40 grayscale">
             <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em] italic">Desarrollado por K.B Tech Solutions ✦ 2026</p>
         </div>
     </footer>
@@ -209,12 +131,10 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({ duration: 1000, once: true });
-        
         function createFlower() {
             const container = document.getElementById('flower-container');
             const flower = document.createElement('div');
-            flower.className = 'flower';
-            flower.innerHTML = '🌸';
+            flower.className = 'flower'; flower.innerHTML = '🌸';
             flower.style.left = Math.random() * 100 + 'vw';
             flower.style.animationDuration = Math.random() * 6 + 4 + 's';
             flower.style.fontSize = Math.random() * 18 + 10 + 'px';
