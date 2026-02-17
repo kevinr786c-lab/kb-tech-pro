@@ -10,20 +10,18 @@
         :root { --main: #c5a059; --dark: #0f172a; --glow: rgba(197, 160, 89, 0.2); }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
         
-        /* 💎 ESTILO K.B TECH SOLUTION (GOLD & DARK) */
         .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(25px); border: 1px solid rgba(197, 160, 89, 0.1); border-radius: 2.5rem; }
         .card-cita { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2.2rem; border: 1px solid rgba(197, 160, 89, 0.05); }
         .card-cita:hover { transform: scale(1.01) translateY(-5px); box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.1); }
 
         /* 🚥 TRIAGE DE RANGO (ADN K.B) */
-        .r-nuevo { border-left: 10px solid #6366f1 !important; } /* Azul: Sangre nueva */
-        .r-recurrente { border-left: 10px solid #10b981 !important; } /* Verde: Fiel */
-        .r-oro { border-left: 10px solid var(--main) !important; box-shadow: 0 0 20px var(--glow); } /* Dorado: VIP */
+        .r-nuevo { border-left: 10px solid #6366f1 !important; }
+        .r-recurrente { border-left: 10px solid #10b981 !important; }
+        .r-oro { border-left: 10px solid var(--main) !important; box-shadow: 0 0 20px var(--glow); }
 
         .btn-action { padding: 1.25rem; background: var(--dark); color: white; border-radius: 1.5rem; font-weight: 800; transition: 0.3s; }
         .btn-action:hover { background: var(--main); color: white; transform: translateY(-2px); }
         
-        /* ✨ ESTRELLA DE MANDO */
         .kb-star { color: var(--main); text-shadow: 0 0 10px var(--glow); animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
@@ -55,8 +53,8 @@
         <div class="lg:col-span-4 space-y-6">
             <div class="glass-panel p-8 shadow-xl border border-white">
                 <div class="text-center mb-8">
-                    <div class="w-24 h-24 bg-slate-50 rounded-full mx-auto mb-4 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
-                        <span class="text-4xl">🩺</span>
+                    <div class="w-24 h-24 bg-slate-50 rounded-full mx-auto mb-4 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden text-4xl">
+                        🩺
                     </div>
                     <h3 class="text-2xl font-black uppercase italic tracking-tighter" id="display-nombre-doc">...</h3>
                     <p class="text-[10px] font-bold text-[#c5a059] uppercase tracking-widest mt-1" id="display-especialidad">Sincronizando ADN...</p>
@@ -65,6 +63,10 @@
                 <hr class="my-6 border-slate-100">
                 
                 <div class="space-y-3">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 mb-4">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Clínica Asignada</p>
+                        <p id="display-organizacion" class="text-[10px] font-bold text-center text-[#0f172a] uppercase mt-1">CARGANDO...</p>
+                    </div>
                     <button onclick="window.location.href='asistente.html'" class="w-full py-5 bg-[#0f172a] text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:bg-[#c5a059] transition shadow-lg">
                         Radar Recepción 👩‍💼
                     </button>
@@ -76,8 +78,7 @@
         </div>
 
         <div class="lg:col-span-8">
-            <div id="contenedor-citas" class="space-y-4">
-                </div>
+            <div id="contenedor-citas" class="space-y-4"></div>
         </div>
     </main>
 
@@ -89,21 +90,24 @@
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
 const supabase = createClient("https://ctvqjnckxmqeejbfwmkj.supabase.co", "sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w");
 
 const maestroUI = {
     user: null,
+    orgId: null,
 
     async init() {
         const { data } = await supabase.auth.getSession();
         if (!data.session) { window.location.href = 'index.html'; return; }
         this.user = data.session.user;
 
-        const { data: p } = await supabase.from('Usuarios').select('*').eq('id', this.user.id).single();
+        // 📡 Sincronizar Perfil y Organización
+        const { data: p } = await supabase.from('Usuarios').select('*, Organizaciones(nombre)').eq('id', this.user.id).single();
         if(p) {
-            document.getElementById('display-nombre-doc').innerText = `DR. ${p.nombre.toUpperCase()}`;
+            document.getElementById('display-nombre-doc').innerText = `${p.nombre.toUpperCase()}`;
             document.getElementById('display-especialidad').innerText = p.especialidad || 'ESPECIALISTA ELITE';
+            document.getElementById('display-organizacion').innerText = p.Organizaciones?.nombre || 'BÚNKER INDEPENDIENTE';
+            this.orgId = p.organizacion_id;
         }
 
         this.configurarCalendario();
@@ -122,11 +126,13 @@ const maestroUI = {
         contenedor.innerHTML = `<div class="p-20 text-center animate-pulse italic text-slate-300 uppercase text-[9px] tracking-[0.4em]">Escaneando actividad en el radar...</div>`;
 
         try {
+            // 🛡️ Filtro Multi-tenant: Solo citas de MI organización
             const { data: citas, error } = await supabase
                 .from('Citas')
-                .select('*, Pacientes!fk_citas_pacientes_maestra(*), Servicios(nombre)')
+                .select('*, Pacientes(*), Servicios(nombre)')
                 .eq('doctor_id', this.user.id)
                 .eq('fecha', fecha)
+                .eq('organizacion_id', this.orgId)
                 .neq('estado', 'cancelado')
                 .order('hora_inicio', { ascending: true });
 
@@ -137,14 +143,12 @@ const maestroUI = {
                 return;
             }
 
-            // Procesar citas con rango de paciente
             const htmlCitas = await Promise.all(citas.map(async (c) => {
                 const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', c.paciente_id).eq('estado', 'completado');
                 let rango = 'r-nuevo';
                 let tag = 'Paciente Nuevo';
                 if(count >= 3) { rango = 'r-oro'; tag = 'Paciente ORO ✦'; }
                 else if(count >= 1) { rango = 'r-recurrente'; tag = 'Recurrente'; }
-                
                 return this.renderCita(c, rango, tag);
             }));
             
@@ -157,7 +161,7 @@ const maestroUI = {
     renderCita(cita, rangoClase, tag) {
         const hora = cita.hora_inicio.slice(0, 5);
         return `
-            <div class="card-cita ${rangoClase} glass-panel p-6 px-8 flex justify-between items-center shadow-sm bg-white border-none">
+            <div class="card-cita ${rangoClase} glass-panel p-6 px-8 flex justify-between items-center shadow-sm bg-white border-none mb-4">
                 <div class="flex items-center gap-10">
                     <span class="text-4xl font-black italic text-[#0f172a] tracking-tighter">${hora}</span>
                     <div>
