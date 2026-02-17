@@ -13,7 +13,7 @@
         .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; }
         .input-elite { width: 100%; padding: 1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; }
         .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
-        .time-pill.selected { background: var(--main) !important; color: white !important; transform: scale(1.05); }
+        .time-pill.selected { background: var(--main) !important; color: white !important; transform: scale(1.05); border-color: var(--main); }
         .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
         .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
     </style>
@@ -22,17 +22,17 @@
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">ESCANEANDO BÚNKER...</h1>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">SINCRONIZANDO...</h1>
             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SISTEMA K.B TECH SOLUTIONS</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
-            <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-elite" maxlength="10" required>
-            <input type="text" id="nombre" placeholder="NOMBRE DEL PACIENTE" class="input-elite uppercase" required>
+            <input type="tel" id="telefono" placeholder="WHATSAPP (10 DÍGITOS)" class="input-elite" maxlength="10" required>
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
             
             <div class="space-y-4">
                 <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
-                    <option value="" disabled selected>CARGANDO SERVICIOS...</option>
+                    <option value="" disabled selected>Cargando Inteligencia...</option>
                 </select>
                 <input type="date" id="fecha" class="input-elite">
             </div>
@@ -40,7 +40,7 @@
             <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2"></div>
 
             <input type="hidden" id="hora_seleccionada">
-            <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR CITA ✦</button>
+            <button type="submit" id="confirmar-btn" class="btn-mision">Asegurar Cita ✦</button>
         </form>
     </div>
 
@@ -52,7 +52,7 @@
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
 
-    // 🧬 ACTUALIZAR RADAR (Protocolo de Búsqueda de Fuerza Bruta)
+    // 🧬 ACTUALIZAR RADAR (Protocolo de Rescate Final)
     async function actualizarRadar() {
         const fechaInput = document.getElementById('fecha').value;
         const radar = document.getElementById('radar-horas');
@@ -61,75 +61,79 @@
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
         try {
-            // 1. Verificar Bloqueos (Vacaciones de su SQL)
+            // 1. Verificar Bloqueos de Vacaciones (SQL)
             const { data: bloqueo } = await supabase.from('Bloqueos_Horario').select('motivo').eq('doctor_id', docId).eq('fecha', fechaInput).maybeSingle();
             if (bloqueo) {
                 radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
                 return;
             }
 
-            // 2. Calcular Día (Forzamos T12 para evitar desfases)
-            const dateObj = new Date(fechaInput + 'T12:00:00');
-            const diaSemana = dateObj.getDay(); 
+            // 🎯 CALIBRACIÓN DE DÍA (Evitamos el error del Date nativo)
+            const partes = fechaInput.split('-');
+            const diaSemana = new Date(partes[0], partes[1] - 1, partes[2]).getDay().toString();
 
-            // 3. 📡 CONSULTA DE ALTA DISPONIBILIDAD (Sin filtros restrictivos)
+            // 2. Consulta de Horarios Activos
             const { data: horariosDoc } = await supabase.from('Horarios_Doctor')
                 .select('*')
                 .eq('doctor_id', docId);
 
-            // Buscamos el horario ignorando si el activo es booleano o string
+            // Filtro de Fuerza Bruta para coincidencia de día
             const config = horariosDoc?.find(h => 
-                (h.dia_semana == diaSemana || h.dia_semana == diaSemana.toString()) && 
-                (h.activo == true || h.activo == 'true')
+                h.dia_semana.toString() === diaSemana && 
+                (h.activo === true || h.activo === 'true')
             );
 
             if (!config) {
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL</p>';
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ BÚNKER CERRADO (Día: ${diaSemana})</p>`;
                 return;
             }
 
-            // 4. Filtrar ocupadas
+            // 3. Filtrar Citas ya agendadas
             const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaInput).neq('estado', 'cancelado');
             const ocupadasMap = ocupadas?.map(o => o.hora_inicio.substring(0,5)) || [];
 
-            // 5. Generar Slots (Limpiando segundos: 09:00:00 -> 09:00)
+            // 4. Generación de Slots (Limpieza de Segundos SQL)
             let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
             let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
             
             radar.innerHTML = '';
             while (actual < limite) {
-                const h = actual.toTimeString().substring(0,5);
-                if (!ocupadasMap.includes(h)) {
+                const hString = actual.toTimeString().substring(0,5);
+                if (!ocupadasMap.includes(hString)) {
                     const pill = document.createElement('div');
                     pill.className = 'time-pill';
-                    pill.innerText = h;
+                    pill.innerText = hString;
                     pill.onclick = () => {
                         document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
                         pill.classList.add('selected');
-                        document.getElementById('hora_seleccionada').value = h + ":00";
+                        document.getElementById('hora_seleccionada').value = hString + ":00";
                     };
                     radar.appendChild(pill);
                 }
                 actual.setMinutes(actual.getMinutes() + 30);
             }
-        } catch (e) { radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE RADAR</p>'; }
+        } catch (e) {
+            console.error(e);
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE RADAR</p>';
+        }
     }
 
+    // 🏛️ INICIALIZAR TERMINAL
     async function init() {
         try {
             const { data: u } = await supabase.from('Usuarios').select('*').eq('id', docId).single();
             if(u) {
-                document.getElementById('doc-name').innerText = `DRA. ${u.nombre.toUpperCase()}`;
+                document.getElementById('doc-name').innerText = `DR(A). ${u.nombre.toUpperCase()}`;
                 orgId = u.organizacion_id || null;
             }
 
-            const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId);
+            const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
             const sel = document.getElementById('servicio');
             sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
-            s?.filter(item => item.activo == true || item.activo == 'true').forEach(item => {
+            s?.forEach(item => {
                 sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
             });
-        } catch (e) { console.error("Error init:", e); }
+        } catch (e) { console.error("Fallo de inicio:", e); }
     }
 
     document.getElementById('fecha').onchange = actualizarRadar;
@@ -147,22 +151,22 @@
         try {
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if(!pac) {
-                const { data } = await supabase.from('Pacientes').insert({ 
+                const { data: nP } = await supabase.from('Pacientes').insert({ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
                     telefono: document.getElementById('telefono').value 
                 }).select().single();
-                pac = data;
+                pac = nP;
             }
 
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
                 fecha: document.getElementById('fecha').value, hora_inicio: h,
-                duracion_cita: parseInt(s.getAttribute('data-min')) || 30,
-                monto: parseFloat(s.getAttribute('data-p')) || 0, estado: 'pendiente'
+                duracion_cita: parseInt(s.getAttribute('data-min')),
+                monto: parseFloat(s.getAttribute('data-p')), estado: 'pendiente'
             });
 
             if(error) throw error;
-            alert("✅ CITA CONFIRMADA");
+            alert("✅ CITA CONFIRMADA EN BÚNKER");
             location.reload();
         } catch (err) { alert("⚠️ FALLO: " + err.message); btn.disabled = false; }
     };
