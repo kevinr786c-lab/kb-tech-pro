@@ -22,13 +22,13 @@
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">SINCRONIZANDO BÚNKER...</h1>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">IDENTIFICANDO BÚNKER...</h1>
             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SISTEMA K.B TECH SOLUTIONS</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
-            <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-elite" maxlength="10" required>
-            <input type="text" id="nombre" placeholder="NOMBRE DEL PACIENTE" class="input-elite uppercase" required>
+            <input type="tel" id="telefono" placeholder="WHATSAPP (10 DÍGITOS)" class="input-elite" maxlength="10" required>
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
             
             <div class="space-y-4">
                 <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
@@ -52,45 +52,47 @@
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
 
-    // 🧬 ACTUALIZAR RADAR (Protocolo de Triple Escaneo)
+    // 🧬 ACTUALIZAR RADAR (Protocolo de Búsqueda de Fuerza Bruta)
     async function actualizarRadar() {
         const fechaInput = document.getElementById('fecha').value;
         const radar = document.getElementById('radar-horas');
         if (!fechaInput) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">RUMBO DE COLISIÓN...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
         try {
-            // 1. 🛡️ VERIFICAR BLOQUEOS (Prioridad de Vacaciones)
+            // 1. Verificar Bloqueos (Vacaciones de su SQL)
             const { data: bloqueo } = await supabase.from('Bloqueos_Horario').select('motivo').eq('doctor_id', docId).eq('fecha', fechaInput).maybeSingle();
             if (bloqueo) {
                 radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
                 return;
             }
 
-            // 2. 📅 CALCULAR DÍA (Ajuste T12 para evitar desfases de zona horaria)
+            // 2. Calcular Día (Forzamos T12 para evitar desfases de zona horaria)
             const dateObj = new Date(fechaInput + 'T12:00:00');
-            const diaSemana = dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
+            const diaSemana = dateObj.getDay(); 
 
-            // 3. 📡 CONSULTA FLEXIBLE (Buscamos día como texto o número)
-            const { data: config } = await supabase.from('Horarios_Doctor')
-                .select('hora_inicio, hora_fin')
+            // 3. 📡 CONSULTA DE ALTA DISPONIBILIDAD
+            // Traemos todos los horarios del doctor y filtramos en el cliente para evitar errores de tipo
+            const { data: horariosDoc } = await supabase.from('Horarios_Doctor')
+                .select('*')
                 .eq('doctor_id', docId)
-                .in('dia_semana', [diaSemana, diaSemana.toString()]) // 🎯 BUSCA AMBAS VERSIONES
-                .eq('activo', 'true')
-                .maybeSingle();
+                .eq('activo', 'true');
+
+            // Buscamos el horario que coincida con el día (como número o como texto)
+            const config = horariosDoc?.find(h => h.dia_semana == diaSemana || h.dia_semana == diaSemana.toString());
 
             if (!config) {
-                console.log("Día buscado en radar:", diaSemana);
+                console.log("Día buscado:", diaSemana, "Horarios disponibles:", horariosDoc);
                 radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL</p>';
                 return;
             }
 
-            // 4. 🛡️ FILTRAR CITAS OCUPADAS
+            // 4. Filtrar ocupadas
             const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaInput).neq('estado', 'cancelado');
             const ocupadasMap = ocupadas?.map(o => o.hora_inicio.substring(0,5)) || [];
 
-            // 5. 🧬 GENERAR SLOTS (Limpiando segundos del formato SQL)
+            // 5. Generar Slots (Limpiando segundos del formato SQL '00:00:00')
             let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
             let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
             
@@ -114,20 +116,20 @@
     }
 
     async function init() {
-        // Cargar Doctor
-        const { data: u } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
-        if(u) {
-            document.getElementById('doc-name').innerText = `DR(A). ${u.nombre.toUpperCase()}`;
-            orgId = u.organizacion_id;
-        }
+        try {
+            const { data: u } = await supabase.from('Usuarios').select('*').eq('id', docId).single();
+            if(u) {
+                document.getElementById('doc-name').innerText = `DRA. ${u.nombre.toUpperCase()}`;
+                orgId = u.organizacion_id || null;
+            }
 
-        // Cargar Servicios
-        const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
-        const sel = document.getElementById('servicio');
-        sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
-        s?.forEach(item => {
-            sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
-        });
+            const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
+            const sel = document.getElementById('servicio');
+            sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
+            s?.forEach(item => {
+                sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
+            });
+        } catch (e) { console.error("Error init:", e); }
     }
 
     document.getElementById('fecha').onchange = actualizarRadar;
@@ -152,13 +154,11 @@
                 pac = data;
             }
 
-            const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).maybeSingle();
-
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
                 fecha: document.getElementById('fecha').value, hora_inicio: h,
-                duracion_cita: parseInt(s.getAttribute('data-min')),
-                monto: parseFloat(s.getAttribute('data-p')), estado: 'pendiente'
+                duracion_cita: parseInt(s.getAttribute('data-min')) || 30,
+                monto: parseFloat(s.getAttribute('data-p')) || 0, estado: 'pendiente'
             });
 
             if(error) throw error;
