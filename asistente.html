@@ -63,7 +63,7 @@
         <div id="stats-caja" class="mb-6" style="padding: 15px; background: rgba(197, 160, 89, 0.1); border-radius: 1.5rem; border: 1px dashed var(--luxe-gold);">
             <p style="color: var(--luxe-gold); font-size: 8px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0;">📊 Control Semanal</p>
             <h3 id="contador-semanal" style="color: var(--luxe-dark); font-size: 1.2rem; font-weight: 800; margin: 5px 0;">0 Citas</h3>
-            <p id="label-inicio" style="color: #22c55e; font-size: 7px; font-weight: 800; text-transform: uppercase; margin: 0;">Inicia: Lun 16 Feb</p>
+            <p id="label-inicio" style="color: #22c55e; font-size: 7px; font-weight: 800; text-transform: uppercase; margin: 0;">Sincronizando...</p>
         </div>
         <div class="pt-4 border-t space-y-2">
             <button onclick="location.reload()" class="w-full text-left p-3 rounded-xl bg-slate-100 text-[10px] font-bold hover:bg-[#c5a059] transition">🔄 REFRESCAR</button>
@@ -127,11 +127,10 @@
 
     async function actualizarContadorFinanciero() {
         if (!doctorActual) return;
-        // Lógica dinámica del Jefe: Detectamos el lunes de esta semana
         const hoy = new Date();
         const diaSemana = hoy.getDay();
         const diferencia = diaSemana === 0 ? -6 : 1 - diaSemana;
-        const lunes = new Date(hoy.setDate(hoy.getDate() + diferencia));
+        const lunes = new Date(new Date().setDate(new Date().getDate() + diferencia));
         const lunesISO = lunes.toISOString().split('T')[0];
 
         const { count, error } = await supabase
@@ -139,7 +138,7 @@
             .select('*', { count: 'exact', head: true })
             .eq('doctor_id', doctorActual)
             .gte('fecha', lunesISO)
-            .not('estado', 'eq', 'cancelado');
+            .neq('estado', 'cancelado');
             
         if (!error) {
             document.getElementById('contador-semanal').innerText = `${count} Citas`;
@@ -171,6 +170,7 @@
             initialView: 'timeGridDay',
             allDaySlot: false,
             slotMinTime: "08:00:00",
+            slotMaxTime: "21:00:00",
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay' },
             buttonText: { today: 'Hoy', year: 'Año', month: 'Mes', week: 'Semana', day: 'Día' },
             events: (info, success) => cargarCitas().then(success),
@@ -203,32 +203,66 @@
     }
 
     async function cargarDoctores() {
+        // Obtenemos los doctores según la tabla Asistentes_Doctor para este usuario logueado
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
         const { data: asig } = await supabase.from('Asistentes_Doctor').select('doctor_id').eq('asistente_id', session.user.id);
         const { data: docs } = await supabase.from('Usuarios').select('id, nombre').in('id', asig?.map(a => a.doctor_id) || []);
         const select = document.getElementById('doctorSelect');
         select.innerHTML = '<option value="">ELEGIR DOCTOR</option>' + (docs?.map(d => `<option value="${d.id}">DR. ${d.nombre.toUpperCase()}</option>`).join('') || '');
-        select.onchange = () => { doctorActual = select.value; if (!calendar) initCalendar(); else calendar.refetchEvents(); };
+        select.onchange = () => { 
+            doctorActual = select.value; 
+            if (!calendar) initCalendar(); 
+            else calendar.refetchEvents(); 
+        };
     }
 
     window.guardarCita = async () => {
         const nombre = document.getElementById('c-paciente').value;
-        const tel = document.getElementById('c-telefono').value.replace(/\D/g, ''); // Blindaje de seguridad
-        const p = { fecha: document.getElementById('c-fecha').value, hora_inicio: document.getElementById('c-hora').value, estado: document.getElementById('c-estado').value, notas: document.getElementById('c-notas').value };
-        if(!nombre || !tel) return alert("NOMBRE Y TELÉFONO OBLIGATORIOS");
+        const tel = document.getElementById('c-telefono').value.replace(/\D/g, ''); 
+        const fecha = document.getElementById('c-fecha').value;
+        const hora = document.getElementById('c-hora').value;
+        const p = { 
+            fecha: fecha, 
+            hora_inicio: hora.length === 5 ? `${hora}:00` : hora, 
+            estado: document.getElementById('c-estado').value, 
+            notas: document.getElementById('c-notas').value 
+        };
+
+        if(!nombre || !tel) return alert("✦ ERROR: NOMBRE Y TELÉFONO REQUERIDOS");
+        
         try {
             let pacienteId;
             const { data: pExistente } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
-            if(pExistente) { pacienteId = pExistente.id; } 
-            else { const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre, telefono: tel }]).select().single(); pacienteId = nuevoP.id; }
-            if (citaActual && citaActual.id) { await supabase.from('Citas').update(p).eq('id', citaActual.id); } 
-            else {
-                const { data: s } = await supabase.from('Servicios').select('id').limit(1).single();
-                await supabase.from('Citas').insert([{ ...p, doctor_id: doctorActual, paciente_id: pacienteId, servicio_id: s.id, duracion_cita: 30 }]);
+            if(pExistente) { 
+                pacienteId = pExistente.id; 
+            } else { 
+                const { data: nuevoP } = await supabase.from('Pacientes').insert([{ nombre: nombre.toUpperCase(), telefono: tel }]).select().single(); 
+                pacienteId = nuevoP.id; 
             }
-            calendar.refetchEvents(); cerrarModal();
-        } catch (e) { alert("Error: " + e.message); }
+
+            if (citaActual && citaActual.id) { 
+                await supabase.from('Citas').update(p).eq('id', citaActual.id); 
+            } else {
+                // Sincronización con Servicios y Organización
+                const { data: docInfo } = await supabase.from('Usuarios').select('organizacion_id').eq('id', doctorActual).single();
+                const { data: s } = await supabase.from('Servicios').select('id, duracion_min').eq('doctor_id', doctorActual).limit(1).single();
+                
+                await supabase.from('Citas').insert([{ 
+                    ...p, 
+                    doctor_id: doctorActual, 
+                    paciente_id: pacienteId, 
+                    servicio_id: s?.id, 
+                    duracion_cita: s?.duracion_min || 30,
+                    organizacion_id: docInfo?.organizacion_id
+                }]);
+            }
+            calendar.refetchEvents(); 
+            cerrarModal();
+            alert("✅ OPERACIÓN EXITOSA");
+        } catch (e) { 
+            alert("⚠️ FALLO: " + e.message); 
+        }
     };
 
     window.lanzarWhatsApp = () => {
@@ -260,6 +294,7 @@
     };
 
     window.cerrarModal = () => document.getElementById('modalCita').classList.add('hidden');
+    
     cargarDoctores();
 </script>
 </body>
