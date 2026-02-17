@@ -67,115 +67,93 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     const urlParams = new URLSearchParams(window.location.search);
+    // ID de la Dra. Alba confirmado por sus archivos SQL
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
 
-    // 📡 DETECTOR DE PACIENTES
-    document.getElementById('telefono').addEventListener('input', async (e) => {
-        const tel = e.target.value;
-        const badge = document.getElementById('badge-paciente');
-        if (tel.length === 10) {
-            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
-            if (pac) {
-                document.getElementById('nombre').value = pac.nombre;
-                document.getElementById('email').value = pac.email || '';
-                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
-                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id).eq('estado','completado');
-                badge.style.display = 'block';
-                badge.innerText = count >= 3 ? "✦ PACIENTE ORO" : "✓ RECURRENTE";
-                badge.className = "badge-estatus " + (count >= 3 ? "estatus-oro" : "estatus-recurrente") + " italic";
-            } else {
-                badge.style.display = 'block';
-                badge.innerText = "+ PACIENTE NUEVO";
-                badge.className = "badge-estatus estatus-nuevo italic";
-            }
-        } else { badge.style.display = 'none'; }
-    });
-
     async function actualizarRadar() {
-    const fechaInput = document.getElementById('fecha').value;
-    const selectServ = document.getElementById('servicio');
-    const radar = document.getElementById('radar-horas');
-    if (!fechaInput || !selectServ.value) return;
+        const fechaInput = document.getElementById('fecha').value;
+        const radar = document.getElementById('radar-horas');
+        if (!fechaInput) return;
 
-    radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
-    
-    try {
-        // 1. 🛡️ ESCANEO DE BLOQUEOS (Prioridad Máxima)
-        const { data: bloqueo } = await supabase
-            .from('Bloqueos_Horario')
-            .select('motivo')
-            .eq('doctor_id', docId)
-            .eq('fecha', fechaInput)
-            .maybeSingle();
-
-        if (bloqueo) {
-            radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
-            return;
-        }
-
-        // 2. 📅 CALCULAR DÍA (Normalización Total)
-        // Usamos T12:00:00 para asegurar que el día no cambie por zona horaria
-        const dateObj = new Date(fechaInput + 'T12:00:00');
-        const diaSemana = dateObj.getDay(); 
-
-        // 3. 📡 CONSULTA FLEXIBLE AL BÚNKER
-        // Probamos enviando el día como Número y como Texto al mismo tiempo
-        const { data: config, error: errC } = await supabase
-            .from('Horarios_Doctor') 
-            .select('hora_inicio, hora_fin')
-            .eq('doctor_id', docId)
-            .in('dia_semana', [diaSemana, diaSemana.toString()]) 
-            .eq('activo', true)
-            .maybeSingle();
-
-        if (!config) {
-            console.error("Día buscado:", diaSemana);
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL (VERIFICAR CONFIG)</p>';
-            return;
-        }
-
-        // 4. 🛡️ FILTRAR CITAS OCUPADAS
-        const { data: ocupadas } = await supabase.from('Citas')
-            .select('hora_inicio')
-            .eq('doctor_id', docId)
-            .eq('fecha', fechaInput)
-            .neq('estado', 'cancelado');
-
-        const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
-
-        // 5. 🧬 GENERACIÓN DE SLOTS (Limpiando segundos: 09:00:00 -> 09:00)
-        let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
-        let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
-        radar.innerHTML = '';
-        while (actual < limite) {
-            const h = actual.toTimeString().slice(0,5);
-            if (!horasOcupadas.includes(h)) {
-                const pill = document.createElement('div');
-                pill.className = `time-pill`;
-                pill.innerText = h;
-                pill.onclick = () => {
-                    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
-                    pill.classList.add('selected');
-                    document.getElementById('hora_seleccionada').value = h + ":00";
-                };
-                radar.appendChild(pill);
+        try {
+            // 1. 🛡️ VERIFICAR BLOQUEOS (Vacaciones/Festivos)
+            const { data: bloqueo } = await supabase
+                .from('Bloqueos_Horario')
+                .select('motivo')
+                .eq('doctor_id', docId)
+                .eq('fecha', fechaInput)
+                .maybeSingle();
+
+            if (bloqueo) {
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
+                return;
             }
-            actual.setMinutes(actual.getMinutes() + 30);
+
+            // 2. 📅 CALCULAR DÍA (Ajuste T12 para evitar desfases de zona horaria)
+            const dateObj = new Date(fechaInput + 'T12:00:00');
+            const diaSemana = dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
+
+            // 3. 📡 CONSULTA FLEXIBLE (Buscamos el día como número Y como texto)
+            const { data: config, error } = await supabase
+                .from('Horarios_Doctor') 
+                .select('hora_inicio, hora_fin')
+                .eq('doctor_id', docId)
+                .in('dia_semana', [diaSemana, diaSemana.toString()]) // 🎯 Busca ambas versiones
+                .eq('activo', true)
+                .maybeSingle();
+
+            if (!config) {
+                console.log("Día buscado en radar:", diaSemana);
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL (REVISAR CONFIG)</p>';
+                return;
+            }
+
+            // 4. 🛡️ FILTRAR CITAS OCUPADAS
+            const { data: ocupadas } = await supabase.from('Citas')
+                .select('hora_inicio')
+                .eq('doctor_id', docId)
+                .eq('fecha', fechaInput)
+                .neq('estado', 'cancelado');
+
+            const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
+
+            // 5. 🧬 GENERAR SLOTS (Limpiando los segundos del formato SQL)
+            // Sus archivos muestran '09:00:00', tomamos solo '09:00'
+            let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
+            let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
+            
+            radar.innerHTML = '';
+            while (actual < limite) {
+                const h = actual.toTimeString().slice(0,5);
+                if (!horasOcupadas.includes(h)) {
+                    const pill = document.createElement('div');
+                    pill.className = `time-pill`;
+                    pill.innerText = h;
+                    pill.onclick = () => {
+                        document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+                        pill.classList.add('selected');
+                        document.getElementById('hora_seleccionada').value = h + ":00";
+                    };
+                    radar.appendChild(pill);
+                }
+                actual.setMinutes(actual.getMinutes() + 30);
+            }
+
+            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ BÚNKER LLENO</p>';
+
+        } catch (e) {
+            console.error("Error en radar:", e);
+            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE CONEXIÓN</p>';
         }
-
-        if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ BÚNKER LLENO</p>';
-
-    } catch (e) {
-        console.error("Error táctico:", e);
-        radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE CONEXIÓN</p>';
     }
-}
 
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
-
+    // ... resto del código (init, submit) se mantiene igual
+    init();
     async function init() {
         const { data: doc } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
         if(doc) {
