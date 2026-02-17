@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
@@ -23,7 +22,7 @@
     <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
             <h1 class="text-xl font-black italic uppercase tracking-tighter text-slate-900">DRA. ALBA ELENA</h1>
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">CLÍNICA DE COLPOSCOPIA | K.B TECH</p>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SISTEMA K.B TECH SOLUTIONS</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
@@ -51,6 +50,7 @@
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
     const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
+    let orgId = null;
 
     const horariosFijos = {
         "1": [{ inicio: "09:00", fin: "12:30" }],
@@ -75,30 +75,18 @@
             return;
         }
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO DISPONIBILIDAD...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO RADAR...</p>';
 
         try {
-            // 📡 OBTENER CITAS OCUPADAS
-            const { data: ocupadas, error } = await supabase
-                .from('Citas')
-                .select('hora_inicio')
-                .eq('doctor_id', docId)
-                .eq('fecha', fechaVal)
-                .neq('estado', 'cancelado');
-
-            // 🎯 NORMALIZACIÓN CRÍTICA: Quitamos segundos para comparar (ej: 09:30:00 -> 09:30)
+            const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado');
             const ocupadasList = ocupadas?.map(o => o.hora_inicio.slice(0, 5)) || [];
-            console.log("Citas detectadas para el radar:", ocupadasList);
 
             radar.innerHTML = '';
             bloques.forEach(bloque => {
                 let actual = new Date(`2026-01-01T${bloque.inicio}`);
                 let fin = new Date(`2026-01-01T${bloque.fin}`);
-                
                 while (actual < fin) {
                     const hStr = actual.toTimeString().substring(0, 5);
-                    
-                    // Solo mostramos la hora si NO está en la lista de ocupadas
                     if (!ocupadasList.includes(hStr)) {
                         const pill = document.createElement('div');
                         pill.className = 'time-pill';
@@ -113,21 +101,17 @@
                     actual.setMinutes(actual.getMinutes() + 30);
                 }
             });
-
-            if (radar.innerHTML === '') {
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase">⚠️ SIN HORAS DISPONIBLES</p>';
-            }
-
-        } catch (e) { 
-            console.error("Fallo de radar:", e);
-            radar.innerHTML = 'ERROR DE CONEXIÓN'; 
-        }
+        } catch (e) { radar.innerHTML = 'ERROR DE RADAR'; }
     }
 
     async function init() {
+        // Obtenemos la ORG_ID real del doctor directamente
+        const { data: u } = await supabase.from('Usuarios').select('organizacion_id').eq('id', docId).single();
+        if(u) orgId = u.organizacion_id;
+
         const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
         const sel = document.getElementById('servicio');
-        sel.innerHTML = '<option value="" disabled selected>ELIJA EL SERVICIO</option>';
+        sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
         s?.forEach(item => {
             sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
         });
@@ -141,30 +125,43 @@
         if(!h) return alert("✦ SELECCIONE HORA");
 
         const btn = document.getElementById('confirmar-btn');
-        btn.disabled = true; btn.innerText = "BLOQUEANDO...";
+        btn.disabled = true; btn.innerText = "BLOQUEANDO CITA...";
+
         const s = document.getElementById('servicio').selectedOptions[0];
+        const tel = document.getElementById('telefono').value.replace(/\D/g, '');
 
         try {
-            let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
+            let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
             if(!pac) {
-                const { data } = await supabase.from('Pacientes').insert({ 
+                const { data: nP } = await supabase.from('Pacientes').insert([{ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
-                    telefono: document.getElementById('telefono').value 
-                }).select().single();
-                pac = data;
+                    telefono: tel 
+                }]).select().single();
+                pac = nP;
             }
 
-            const { error } = await supabase.from('Citas').insert({
-                doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
-                fecha: document.getElementById('fecha').value, hora_inicio: h,
-                duracion_cita: parseInt(s.getAttribute('data-min')),
-                monto: parseFloat(s.getAttribute('data-p')), estado: 'pendiente'
-            });
+            // Inserción con IDs reales detectados por el sistema
+            const { error } = await supabase.from('Citas').insert([{
+                doctor_id: docId,
+                paciente_id: pac.id,
+                servicio_id: s.value,
+                fecha: document.getElementById('fecha').value,
+                hora_inicio: h,
+                duracion_cita: parseInt(s.getAttribute('data-min')) || 30,
+                monto: parseFloat(s.getAttribute('data-p')) || 0,
+                estado: 'pendiente',
+                organizacion_id: orgId,
+                consultorio_id: '73834112-39a7-4b33-9e09-b0d29d7918a0' // Consultorio Alfa Ginecología
+            }]);
 
             if(error) throw error;
-            alert("✅ CITA CONFIRMADA");
+            alert("✅ CITA CONFIRMADA CON ÉXITO");
             location.reload();
-        } catch (err) { alert("ERROR: " + err.message); btn.disabled = false; }
+        } catch (err) { 
+            alert("⚠️ FALLO: " + err.message); 
+            btn.disabled = false; 
+            btn.innerText = "ASEGURAR CITA ✦";
+        }
     };
 
     init();
