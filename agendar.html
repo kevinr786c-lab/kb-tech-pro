@@ -115,18 +115,18 @@
                 return;
             }
 
-            // 2. 📅 CALCULAR DÍA DE LA SEMANA
+            // 2. 📅 CALCULAR DÍA (Ajustado con T12 para evitar desfases de zona horaria)
             const dateObj = new Date(fechaInput + 'T12:00:00');
             const diaSemanaActual = dateObj.getDay().toString(); // 0-6 en String
 
-            // 3. 📡 BUSCAR TODOS LOS HORARIOS DEL ID DOCTOR
+            // 3. 📡 BUSCAR HORARIOS DEL DOCTOR
             const { data: horariosDoc } = await supabase
                 .from('Horarios_Doctor') 
                 .select('dia_semana, hora_inicio, hora_fin')
                 .eq('doctor_id', docId)
                 .eq('activo', true);
 
-            // Filtrar en el cliente el horario que corresponde al día seleccionado
+            // Filtrar el día correcto (Comparando como texto para coincidir con el SQL)
             const config = horariosDoc?.find(h => h.dia_semana === diaSemanaActual);
 
             if (!config) {
@@ -143,9 +143,9 @@
 
             const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-            // 5. 🧬 GENERAR SLOTS (Frecuencia 30 min)
-            let actual = new Date(`2026-01-01T${config.hora_inicio}`);
-            let limite = new Date(`2026-01-01T${config.hora_fin}`);
+            // 5. 🧬 GENERAR SLOTS (Limpiando segundos del formato SQL '00:00:00')
+            let actual = new Date(`2026-01-01T${config.hora_inicio.slice(0,5)}`);
+            let limite = new Date(`2026-01-01T${config.hora_fin.slice(0,5)}`);
             
             radar.innerHTML = '';
             while (actual < limite) {
@@ -174,7 +174,6 @@
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
-    // 🏛️ INICIALIZAR BÚNKER
     async function init() {
         const { data: doc } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
         if(doc) {
@@ -194,7 +193,6 @@
         });
     }
 
-    // ⚔️ EJECUTAR REGISTRO
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
@@ -206,7 +204,6 @@
         const servOpt = selectServ.selectedOptions[0];
 
         try {
-            // 1. GESTIÓN DE PACIENTE
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if (!pac) {
                 const { data } = await supabase.from('Pacientes').insert({ 
@@ -218,10 +215,8 @@
                 pac = data;
             }
 
-            // 🛡️ BUSCAR CONSULTORIO DISPONIBLE
             const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).single();
 
-            // 2. INSERCIÓN DE CITA
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, 
                 paciente_id: pac.id, 
