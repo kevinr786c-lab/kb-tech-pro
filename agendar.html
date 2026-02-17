@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
+    <title>K.B SYSTEM | AGENDADOR INTELIGENTE ✦</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
@@ -21,8 +21,8 @@
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
-            <h1 class="text-xl font-black italic uppercase tracking-tighter text-slate-900">DRA. ALBA ELENA</h1>
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SISTEMA K.B TECH SOLUTIONS</p>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">ESCANEANDO DISPONIBILIDAD...</h1>
+            <p id="doc-especialidad" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">K.B TECH SOLUTIONS</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
@@ -37,11 +37,11 @@
             </div>
 
             <div id="radar-horas" class="grid grid-cols-3 gap-2 py-2">
-                <p class="col-span-3 text-center text-slate-400 text-[10px] uppercase font-bold italic">Seleccione una fecha</p>
+                <p class="col-span-3 text-center text-slate-400 text-[10px] uppercase font-bold italic text-amber-500">Seleccione una fecha para el radar</p>
             </div>
 
             <input type="hidden" id="hora_seleccionada">
-            <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR CITA ✦</button>
+            <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR ESPACIO ✦</button>
         </form>
     </div>
 
@@ -49,44 +49,47 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
 
-    const horariosFijos = {
-        "1": [{ inicio: "09:00", fin: "12:30" }],
-        "2": [{ inicio: "09:00", fin: "12:30" }],
-        "3": [{ inicio: "09:00", fin: "12:30" }],
-        "4": [{ inicio: "09:00", fin: "12:30" }],
-        "5": [{ inicio: "09:00", fin: "12:30" }],
-        "6": [{ inicio: "09:00", fin: "14:30" }]
-    };
-
+    // 🧬 FUNCIÓN DE RADAR INTELIGENTE
     async function actualizarRadar() {
         const fechaVal = document.getElementById('fecha').value;
         const radar = document.getElementById('radar-horas');
         if (!fechaVal) return;
 
-        const partes = fechaVal.split('-');
-        const diaSemana = new Date(partes[0], partes[1] - 1, partes[2]).getDay().toString();
-        const bloques = horariosFijos[diaSemana];
-        
-        if (!bloques) {
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ CERRADO ESTE DÍA</p>';
-            return;
-        }
-
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO RADAR...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold uppercase">Sincronizando disponibilidad...</p>';
 
         try {
-            const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado');
-            const ocupadasList = ocupadas?.map(o => o.hora_inicio.slice(0, 5)) || [];
+            // 1. Detectar día de la semana (Tijuana Fix)
+            const partes = fechaVal.split('-');
+            const diaSemana = new Date(partes[0], partes[1] - 1, partes[2]).getDay();
+
+            // 2. Traer horarios del doctor y citas ocupadas al mismo tiempo
+            const [resHorarios, resCitas] = await Promise.all([
+                supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).eq('dia_semana', diaSemana.toString()).eq('activo', 'true'),
+                supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado')
+            ]);
+
+            const ocupadasList = resCitas.data?.map(o => o.hora_inicio.slice(0, 5)) || [];
+            
+            if (!resHorarios.data || resHorarios.data.length === 0) {
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ CERRADO ESTE DÍA</p>';
+                return;
+            }
 
             radar.innerHTML = '';
-            bloques.forEach(bloque => {
-                let actual = new Date(`2026-01-01T${bloque.inicio}`);
-                let fin = new Date(`2026-01-01T${bloque.fin}`);
+            
+            // 3. Generar horas solo si NO están ocupadas
+            resHorarios.data.forEach(bloque => {
+                let actual = new Date(`2026-01-01T${bloque.hora_inicio.substring(0, 5)}`);
+                let fin = new Date(`2026-01-01T${bloque.hora_fin.substring(0, 5)}`);
+                
                 while (actual < fin) {
                     const hStr = actual.toTimeString().substring(0, 5);
+                    
+                    // 🎯 AQUÍ OCURRE LA MAGIA: Si la hora está en la lista de ocupadas, NO se muestra
                     if (!ocupadasList.includes(hStr)) {
                         const pill = document.createElement('div');
                         pill.className = 'time-pill';
@@ -101,13 +104,21 @@
                     actual.setMinutes(actual.getMinutes() + 30);
                 }
             });
+
+            if (radar.innerHTML === '') {
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase">⚠️ NO HAY HORAS LIBRES</p>';
+            }
+
         } catch (e) { radar.innerHTML = 'ERROR DE RADAR'; }
     }
 
     async function init() {
-        // Obtenemos la ORG_ID real del doctor directamente
-        const { data: u } = await supabase.from('Usuarios').select('organizacion_id').eq('id', docId).single();
-        if(u) orgId = u.organizacion_id;
+        // Cargar datos básicos
+        const { data: u } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
+        if(u) {
+            document.getElementById('doc-name').innerText = `DRA. ${u.nombre.toUpperCase()}`;
+            orgId = u.organizacion_id;
+        }
 
         const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
         const sel = document.getElementById('servicio');
@@ -125,43 +136,31 @@
         if(!h) return alert("✦ SELECCIONE HORA");
 
         const btn = document.getElementById('confirmar-btn');
-        btn.disabled = true; btn.innerText = "BLOQUEANDO CITA...";
-
+        btn.disabled = true; btn.innerText = "REGISTRANDO...";
         const s = document.getElementById('servicio').selectedOptions[0];
-        const tel = document.getElementById('telefono').value.replace(/\D/g, '');
 
         try {
-            let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle();
+            let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if(!pac) {
                 const { data: nP } = await supabase.from('Pacientes').insert([{ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
-                    telefono: tel 
+                    telefono: document.getElementById('telefono').value 
                 }]).select().single();
                 pac = nP;
             }
 
-            // Inserción con IDs reales detectados por el sistema
             const { error } = await supabase.from('Citas').insert([{
-                doctor_id: docId,
-                paciente_id: pac.id,
-                servicio_id: s.value,
-                fecha: document.getElementById('fecha').value,
-                hora_inicio: h,
-                duracion_cita: parseInt(s.getAttribute('data-min')) || 30,
-                monto: parseFloat(s.getAttribute('data-p')) || 0,
-                estado: 'pendiente',
-                organizacion_id: orgId,
-                consultorio_id: '73834112-39a7-4b33-9e09-b0d29d7918a0' // Consultorio Alfa Ginecología
+                doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
+                fecha: document.getElementById('fecha').value, hora_inicio: h,
+                duracion_cita: parseInt(s.getAttribute('data-min')),
+                monto: parseFloat(s.getAttribute('data-p')), estado: 'pendiente',
+                organizacion_id: orgId
             }]);
 
             if(error) throw error;
-            alert("✅ CITA CONFIRMADA CON ÉXITO");
+            alert("✅ CITA CONFIRMADA");
             location.reload();
-        } catch (err) { 
-            alert("⚠️ FALLO: " + err.message); 
-            btn.disabled = false; 
-            btn.innerText = "ASEGURAR CITA ✦";
-        }
+        } catch (err) { alert("ERROR: " + err.message); btn.disabled = false; }
     };
 
     init();
