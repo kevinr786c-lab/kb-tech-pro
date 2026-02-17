@@ -102,20 +102,20 @@
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
         try {
-            // 1. 🛡️ VERIFICAR BLOQUEOS (Vacaciones / Festivos)
+            // 1. 🛡️ VERIFICAR BLOQUEOS (VACACIONES/FESTIVOS)
             const { data: bloqueo } = await supabase
                 .from('Bloqueos_Horario')
-                .select('*')
+                .select('motivo')
                 .eq('doctor_id', docId)
                 .eq('fecha', fechaInput)
                 .maybeSingle();
 
             if (bloqueo) {
-                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase">⚠️ ${bloqueo.motivo || 'BÚNKER CERRADO'}</p>`;
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
                 return;
             }
 
-            // 2. OBTENER DÍA (Normalizado Lunes=1... Domingo=7)
+            // 2. OBTENER DÍA (Normalizado: Lunes=1 ... Domingo=7)
             const dateObj = new Date(fechaInput + 'T00:00:00');
             let diaSemana = dateObj.getDay(); 
             if (diaSemana === 0) diaSemana = 7; 
@@ -142,7 +142,7 @@
 
             const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-            // 4. GENERAR SLOTS
+            // 4. GENERAR SLOTS (Rangos dinámicos del búnker)
             let actual = new Date(`2026-01-01T${config.hora_inicio}`);
             let limite = new Date(`2026-01-01T${config.hora_fin}`);
             
@@ -163,7 +163,7 @@
                 actual.setMinutes(actual.getMinutes() + 30);
             }
 
-            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
+            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ BÚNKER SIN ESPACIO</p>';
 
         } catch (e) {
             radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE SEÑAL</p>';
@@ -217,7 +217,7 @@
                 pac = data;
             }
 
-            // 🛡️ BUSCAR CONSULTORIO DE LA CLÍNICA
+            // 🛡️ BUSCAR CONSULTORIO DISPONIBLE
             const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).single();
 
             // 2. INSERCIÓN DE CITA
@@ -225,8 +225,8 @@
                 doctor_id: docId, 
                 paciente_id: pac.id, 
                 servicio_id: servOpt.value,
-                organizacion_id: orgId, // 🏢 SELLO MULTI-TENANT
-                consultorio_id: cons?.id, // 🏥 ASIGNACIÓN FÍSICA
+                organizacion_id: orgId,
+                consultorio_id: cons?.id,
                 fecha: document.getElementById('fecha').value, 
                 hora_inicio: hora,
                 duracion_cita: parseInt(servOpt.getAttribute('data-total')), 
@@ -235,11 +235,11 @@
             });
 
             if (error) {
-                if(error.message.includes('ERROR DE RADAR')) throw new Error("CONFLICTO DE RADAR: El consultorio ya está ocupado.");
+                if(error.message.includes('CONFLICTO')) throw new Error("RADAR: El espacio se ocupó hace un instante.");
                 throw error;
             }
             
-            alert("✅ CITA REGISTRADA EN EL BÚNKER");
+            alert("✅ CITA REGISTRADA");
             location.reload();
         } catch (err) { 
             alert("⚠️ " + err.message); 
