@@ -49,15 +49,16 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w');
 
-    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; // ID Fijo de la Dra. Alba
+    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
 
-    // 🕒 HORARIOS MANUALE DE LA DRA ALBA (Según sus archivos SQL)
+    // 🕒 HORARIOS MANUALES ACTUALIZADOS
     const horariosFijos = {
         "1": [{ inicio: "09:00", fin: "12:30" }], // Lunes
         "2": [{ inicio: "09:00", fin: "12:30" }], // Martes
         "3": [{ inicio: "09:00", fin: "12:30" }], // Miércoles
         "4": [{ inicio: "09:00", fin: "12:30" }], // Jueves
-        "5": [{ inicio: "09:00", fin: "12:30" }]  // Viernes
+        "5": [{ inicio: "09:00", fin: "12:30" }], // Viernes
+        "6": [{ inicio: "09:00", fin: "14:30" }]  // Sábado (9 a 2:30)
     };
 
     async function actualizarRadar() {
@@ -65,7 +66,6 @@
         const radar = document.getElementById('radar-horas');
         if (!fechaVal) return;
 
-        // Obtener día de la semana (1-Lunes a 5-Viernes)
         const dateParts = fechaVal.split('-');
         const diaSemana = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]).getDay().toString();
 
@@ -79,7 +79,6 @@
         radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO ESPACIOS...</p>';
 
         try {
-            // Consultar citas ya agendadas para esa fecha
             const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado');
             const ocupadasList = ocupadas?.map(o => o.hora_inicio.substring(0,5)) || [];
 
@@ -108,7 +107,6 @@
     }
 
     async function init() {
-        // Cargar Servicios de la Dra. Alba
         const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', 'true');
         const sel = document.getElementById('servicio');
         sel.innerHTML = '<option value="" disabled selected>ELIJA EL SERVICIO</option>';
@@ -126,11 +124,9 @@
 
         const btn = document.getElementById('confirmar-btn');
         btn.disabled = true; btn.innerText = "BLOQUEANDO...";
-
         const s = document.getElementById('servicio').selectedOptions[0];
 
         try {
-            // Lógica de Paciente (verificar o crear)
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if(!pac) {
                 const { data } = await supabase.from('Pacientes').insert({ 
@@ -140,7 +136,6 @@
                 pac = data;
             }
 
-            // Insertar Cita
             const { error } = await supabase.from('Citas').insert({
                 doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
                 fecha: document.getElementById('fecha').value, hora_inicio: h,
@@ -149,7 +144,7 @@
             });
 
             if(error) throw error;
-            alert("✅ CITA AGENDADA CON ÉXITO");
+            alert("✅ CITA CONFIRMADA CON ÉXITO");
             location.reload();
         } catch (err) { alert("ERROR: " + err.message); btn.disabled = false; }
     };
