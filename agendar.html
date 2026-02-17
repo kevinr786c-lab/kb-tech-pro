@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>K.B SYSTEM | AGENDADOR ELITE ✦</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
@@ -11,43 +12,24 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #f8fafc, #e2e8f0); color: var(--dark); }
         .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.2); border-radius: 2.5rem; }
         .input-elite { width: 100%; padding: 1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; }
-        .input-elite:focus { border-color: var(--main); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
         .time-pill { padding: 0.8rem; border-radius: 1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: 0.3s; background: white; }
         .time-pill.selected { background: var(--main); color: white; border-color: var(--main); transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.2rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
         .btn-mision:hover { background: var(--main); transform: translateY(-3px); }
-        .badge-estatus { display: none; padding: 0.3rem 0.8rem; border-radius: 0.7rem; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.3s; }
-        .estatus-nuevo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-        .estatus-recurrente { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
-        .estatus-oro { background: #fefce8; color: #a16207; border: 1px solid #fef08a; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative overflow-hidden">
         <header class="text-center mb-8">
-            <button onclick="history.back()" class="absolute left-6 top-8 text-slate-300 hover:text-slate-900 transition text-sm">←</button>
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">ESCANEANDO BÚNKER...</h1>
-            <p id="doc-especialidad" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal de Inteligencia Médica</p>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">SINCRONIZANDO...</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Terminal K.B Tech Solution</p>
         </header>
 
         <form id="agendador-form" class="space-y-5">
-            <div>
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <p class="text-[10px] font-black uppercase text-slate-400 italic">Identificación (Teléfono)</p>
-                    <span id="badge-paciente" class="badge-estatus italic"></span>
-                </div>
-                <input type="tel" id="telefono" placeholder="10 DÍGITOS" class="input-elite" maxlength="10" required>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-                <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="email" id="email" placeholder="EMAIL" class="input-elite text-xs">
-                    <input type="date" id="fecha_nacimiento" class="input-elite text-xs">
-                </div>
-            </div>
-
+            <input type="tel" id="telefono" placeholder="WHATSAPP (10 DÍGITOS)" class="input-elite" maxlength="10" required>
+            <input type="text" id="nombre" placeholder="NOMBRE COMPLETO" class="input-elite uppercase" required>
+            
             <div class="space-y-4">
                 <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
                     <option value="" disabled selected>Seleccione Servicio</option>
@@ -69,58 +51,40 @@
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
+    let horariosCargados = [];
 
-    // 🧬 ACTUALIZAR RADAR DE DISPONIBILIDAD
+    // 🧬 ACTUALIZAR RADAR (Lógica de memoria local para evitar errores de BD)
     async function actualizarRadar() {
         const fechaInput = document.getElementById('fecha').value;
-        const selectServ = document.getElementById('servicio');
         const radar = document.getElementById('radar-horas');
-        if (!fechaInput || !selectServ.value) return;
+        if (!fechaInput) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold">ESCANEANDO DISPONIBILIDAD...</p>';
         
         try {
-            // 1. 🛡️ VERIFICAR BLOQUEOS (Vacaciones/Festivos)
-            const { data: bloqueo } = await supabase
-                .from('Bloqueos_Horario')
-                .select('motivo')
-                .eq('doctor_id', docId)
-                .eq('fecha', fechaInput)
-                .maybeSingle();
-
+            // 1. Revisa Bloqueos
+            const { data: bloqueo } = await supabase.from('Bloqueos_Horario').select('motivo').eq('doctor_id', docId).eq('fecha', fechaInput).maybeSingle();
             if (bloqueo) {
                 radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
                 return;
             }
 
-            // 2. 📅 CALCULAR DÍA (Ajuste T12 para evitar desfases)
-            const dateObj = new Date(fechaInput + 'T12:00:00');
-            const diaSemana = dateObj.getDay().toString(); 
-
-            // 3. 📡 CONSULTA DE HORARIO (Búsqueda Híbrida)
-            const { data: config } = await supabase
-                .from('Horarios_Doctor') 
-                .select('hora_inicio, hora_fin')
-                .eq('doctor_id', docId)
-                .eq('dia_semana', diaSemana)
-                .eq('activo', true)
-                .maybeSingle();
+            // 2. Calcula día de la semana (0=Dom, 1=Lun...)
+            const diaSemana = new Date(fechaInput + 'T12:00:00').getDay();
+            
+            // 3. Busca en los horarios que ya descargamos en init()
+            const config = horariosCargados.find(h => h.dia_semana == diaSemana.toString() || h.dia_semana == diaSemana);
 
             if (!config) {
                 radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL</p>';
                 return;
             }
 
-            // 4. 🛡️ FILTRAR CITAS OCUPADAS
-            const { data: ocupadas } = await supabase.from('Citas')
-                .select('hora_inicio')
-                .eq('doctor_id', docId)
-                .eq('fecha', fechaInput)
-                .neq('estado', 'cancelado');
-
+            // 4. Busca citas ocupadas
+            const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaInput).neq('estado', 'cancelado');
             const horasOcupadas = ocupadas?.map(o => o.hora_inicio.slice(0,5)) || [];
 
-            // 5. 🧬 GENERAR SLOTS (30 min)
+            // 5. Genera slots
             let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
             let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
             
@@ -140,79 +104,56 @@
                 }
                 actual.setMinutes(actual.getMinutes() + 30);
             }
-
-            if (radar.innerHTML === '') radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold">⚠️ SIN ESPACIO</p>';
-
         } catch (e) {
             radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE SEÑAL</p>';
         }
     }
 
-    // 📡 DETECTOR DE PACIENTES
-    document.getElementById('telefono').addEventListener('input', async (e) => {
-        const tel = e.target.value;
-        const badge = document.getElementById('badge-paciente');
-        if (tel.length === 10) {
-            const { data: pac } = await supabase.from('Pacientes').select('*').eq('telefono', tel).maybeSingle();
-            if (pac) {
-                document.getElementById('nombre').value = pac.nombre;
-                document.getElementById('email').value = pac.email || '';
-                document.getElementById('fecha_nacimiento').value = pac.fecha_nacimiento || '';
-                const { count } = await supabase.from('Citas').select('*', { count: 'exact', head: true }).eq('paciente_id', pac.id).eq('estado','completado');
-                badge.style.display = 'block';
-                badge.innerText = count >= 3 ? "✦ PACIENTE ORO" : "✓ RECURRENTE";
-                badge.className = "badge-estatus " + (count >= 3 ? "estatus-oro" : "estatus-recurrente") + " italic";
-            } else {
-                badge.style.display = 'block';
-                badge.innerText = "+ PACIENTE NUEVO";
-                badge.className = "badge-estatus estatus-nuevo italic";
-            }
-        } else { badge.style.display = 'none'; }
-    });
-
-    // 🏛️ INICIALIZAR DATOS
+    // 🏛️ INICIALIZAR BÚNKER (Carga todo de una vez)
     async function init() {
+        // Datos del Doctor y Organización
         const { data: doc } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
         if(doc) {
             document.getElementById('doc-name').innerText = `${doc.nombre.toUpperCase()}`;
             orgId = doc.organizacion_id;
         }
         
+        // Carga Horarios en memoria para que el radar no falle
+        const { data: hor } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).eq('activo', true);
+        horariosCargados = hor || [];
+
+        // Carga Servicios
         const { data: servs } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
         const select = document.getElementById('servicio');
         servs?.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.setAttribute('data-total', s.duracion_min);
-            opt.setAttribute('data-monto', s.precio);
+            opt.setAttribute('data-total', s.duracion_min || 30);
+            opt.setAttribute('data-monto', s.precio || 0);
             opt.innerText = `${s.nombre.toUpperCase()} — $${s.precio}`;
             select.appendChild(opt);
         });
     }
 
-    // ⚔️ EVENTOS DE ACTIVACIÓN
     document.getElementById('fecha').onchange = actualizarRadar;
     document.getElementById('servicio').onchange = actualizarRadar;
 
-    // 🏹 CONFIRMAR RESERVA
     document.getElementById('agendador-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('confirmar-btn');
         const hora = document.getElementById('hora_seleccionada').value;
-        const selectServ = document.getElementById('servicio');
         if(!hora) return alert("✦ ELIJA HORA EN EL RADAR");
         
-        btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
-        const servOpt = selectServ.selectedOptions[0];
+        btn.disabled = true; btn.innerText = "BLOQUEANDO ESPACIO...";
+        const servOpt = document.getElementById('servicio').selectedOptions[0];
 
         try {
+            // Manejo de Paciente
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if (!pac) {
                 const { data } = await supabase.from('Pacientes').insert({ 
                     nombre: document.getElementById('nombre').value.toUpperCase(), 
-                    telefono: document.getElementById('telefono').value, 
-                    email: document.getElementById('email').value,
-                    fecha_nacimiento: document.getElementById('fecha_nacimiento').value
+                    telefono: document.getElementById('telefono').value 
                 }).select().single();
                 pac = data;
             }
@@ -220,26 +161,19 @@
             const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).single();
 
             const { error } = await supabase.from('Citas').insert({
-                doctor_id: docId, 
-                paciente_id: pac.id, 
-                servicio_id: servOpt.value,
-                organizacion_id: orgId,
-                consultorio_id: cons?.id,
-                fecha: document.getElementById('fecha').value, 
-                hora_inicio: hora,
+                doctor_id: docId, paciente_id: pac.id, servicio_id: servOpt.value,
+                organizacion_id: orgId, consultorio_id: cons?.id,
+                fecha: document.getElementById('fecha').value, hora_inicio: hora,
                 duracion_cita: parseInt(servOpt.getAttribute('data-total')), 
-                monto: parseFloat(servOpt.getAttribute('data-monto')),
-                estado: 'pendiente'
+                monto: parseFloat(servOpt.getAttribute('data-monto')), estado: 'pendiente'
             });
 
             if (error) throw error;
-            
-            alert("✅ ESPACIO ASEGURADO EN EL BÚNKER");
+            alert("✅ CITA CONFIRMADA");
             location.reload();
         } catch (err) { 
-            alert("⚠️ ERROR DE SISTEMA: " + err.message); 
+            alert("⚠️ " + err.message); 
             btn.disabled = false; 
-            btn.innerText = "REINTENTAR";
         }
     };
 
