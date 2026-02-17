@@ -22,7 +22,7 @@
 
     <div class="max-w-md w-full glass p-8 shadow-2xl relative">
         <header class="text-center mb-8">
-            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">IDENTIFICANDO DOCTOR...</h1>
+            <h1 id="doc-name" class="text-xl font-black italic uppercase tracking-tighter text-slate-900">ESCANEANDO BÚNKER...</h1>
             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SISTEMA K.B TECH SOLUTIONS</p>
         </header>
 
@@ -52,83 +52,84 @@
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null;
 
-    // 🧬 ESCANEO DE RADAR (Protocolo de Triple Verificación)
+    // 🧬 ACTUALIZAR RADAR (Protocolo de Búsqueda de Fuerza Bruta)
     async function actualizarRadar() {
         const fechaInput = document.getElementById('fecha').value;
         const radar = document.getElementById('radar-horas');
         if (!fechaInput) return;
 
-        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">RUMBO DE COLISIÓN...</p>';
+        radar.innerHTML = '<p class="col-span-3 text-center text-[10px] animate-pulse text-amber-500 font-bold italic">SINCRO DE RADAR...</p>';
         
         try {
-            // 1. Verificar Bloqueos de la imagen SQL
+            // 1. Verificar Bloqueos (Vacaciones de su SQL)
             const { data: bloqueo } = await supabase.from('Bloqueos_Horario').select('motivo').eq('doctor_id', docId).eq('fecha', fechaInput).maybeSingle();
             if (bloqueo) {
                 radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ ${bloqueo.motivo}</p>`;
                 return;
             }
 
-            // 2. Cálculo de día forzando mediodía (Evita desfases de fecha)
+            // 2. Calcular Día (Forzamos T12 para evitar desfases)
             const dateObj = new Date(fechaInput + 'T12:00:00');
-            const diaSemana = dateObj.getDay().toString(); // '1' = Lunes...
+            const diaSemana = dateObj.getDay(); 
 
-            // 3. Consulta de horario (Buscando coincidencia de texto como en tu SQL)
-            const { data: config } = await supabase.from('Horarios_Doctor')
+            // 3. 📡 CONSULTA DE ALTA DISPONIBILIDAD (Sin filtros restrictivos)
+            const { data: horariosDoc } = await supabase.from('Horarios_Doctor')
                 .select('*')
-                .eq('doctor_id', docId)
-                .eq('dia_semana', diaSemana)
-                .eq('activo', 'true')
-                .maybeSingle();
+                .eq('doctor_id', docId);
+
+            // Buscamos el horario ignorando si el activo es booleano o string
+            const config = horariosDoc?.find(h => 
+                (h.dia_semana == diaSemana || h.dia_semana == diaSemana.toString()) && 
+                (h.activo == true || h.activo == 'true')
+            );
 
             if (!config) {
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ BÚNKER CERRADO ESTE DÍA</p>';
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold uppercase py-4">⚠️ DÍA NO LABORAL</p>';
                 return;
             }
 
-            // 4. Citas ocupadas
+            // 4. Filtrar ocupadas
             const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio').eq('doctor_id', docId).eq('fecha', fechaInput).neq('estado', 'cancelado');
             const ocupadasMap = ocupadas?.map(o => o.hora_inicio.substring(0,5)) || [];
 
-            // 5. Generar Slots (Ignorando segundos del SQL)
+            // 5. Generar Slots (Limpiando segundos: 09:00:00 -> 09:00)
             let actual = new Date(`2026-01-01T${config.hora_inicio.substring(0,5)}`);
             let limite = new Date(`2026-01-01T${config.hora_fin.substring(0,5)}`);
             
             radar.innerHTML = '';
             while (actual < limite) {
-                const horaH = actual.toTimeString().substring(0,5);
-                if (!ocupadasMap.includes(horaH)) {
+                const h = actual.toTimeString().substring(0,5);
+                if (!ocupadasMap.includes(h)) {
                     const pill = document.createElement('div');
                     pill.className = 'time-pill';
-                    pill.innerText = horaH;
+                    pill.innerText = h;
                     pill.onclick = () => {
                         document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
                         pill.classList.add('selected');
-                        document.getElementById('hora_seleccionada').value = horaH + ":00";
+                        document.getElementById('hora_seleccionada').value = h + ":00";
                     };
                     radar.appendChild(pill);
                 }
                 actual.setMinutes(actual.getMinutes() + 30);
             }
-        } catch (e) {
-            radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE RADAR</p>';
-        }
+        } catch (e) { radar.innerHTML = '<p class="col-span-3 text-center text-rose-500">ERROR DE RADAR</p>'; }
     }
 
     async function init() {
-        // Cargar Doctor e ID de Organización
-        const { data: u } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single();
-        if(u) {
-            document.getElementById('doc-name').innerText = `DR(A). ${u.nombre.toUpperCase()}`;
-            orgId = u.organizacion_id;
-        }
+        try {
+            const { data: u } = await supabase.from('Usuarios').select('*').eq('id', docId).single();
+            if(u) {
+                document.getElementById('doc-name').innerText = `DRA. ${u.nombre.toUpperCase()}`;
+                orgId = u.organizacion_id || null;
+            }
 
-        // Cargar Servicios
-        const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true);
-        const sel = document.getElementById('servicio');
-        sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
-        s?.forEach(item => {
-            sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
-        });
+            const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId);
+            const sel = document.getElementById('servicio');
+            sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>';
+            s?.filter(item => item.activo == true || item.activo == 'true').forEach(item => {
+                sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`;
+            });
+        } catch (e) { console.error("Error init:", e); }
     }
 
     document.getElementById('fecha').onchange = actualizarRadar;
@@ -140,11 +141,10 @@
         const h = document.getElementById('hora_seleccionada').value;
         if(!h) return alert("✦ SELECCIONE HORA");
 
-        btn.disabled = true; btn.innerText = "ASEGURANDO ESPACIO...";
+        btn.disabled = true; btn.innerText = "BLOQUEANDO COORDENADA...";
         const s = document.getElementById('servicio').selectedOptions[0];
 
         try {
-            // Gestión de Paciente
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', document.getElementById('telefono').value).maybeSingle();
             if(!pac) {
                 const { data } = await supabase.from('Pacientes').insert({ 
@@ -154,20 +154,15 @@
                 pac = data;
             }
 
-            // Consultorio de la clínica
-            const { data: cons } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).single();
-
-            // Insertar Cita
             const { error } = await supabase.from('Citas').insert({
-                doctor_id: docId, paciente_id: pac.id, organizacion_id: orgId,
-                consultorio_id: cons?.id, servicio_id: s.value,
+                doctor_id: docId, paciente_id: pac.id, servicio_id: s.value,
                 fecha: document.getElementById('fecha').value, hora_inicio: h,
-                duracion_cita: parseInt(s.getAttribute('data-min')),
-                monto: parseFloat(s.getAttribute('data-p')), estado: 'pendiente'
+                duracion_cita: parseInt(s.getAttribute('data-min')) || 30,
+                monto: parseFloat(s.getAttribute('data-p')) || 0, estado: 'pendiente'
             });
 
             if(error) throw error;
-            alert("✅ OPERACIÓN EXITOSA: CITA AGENDADA");
+            alert("✅ CITA CONFIRMADA");
             location.reload();
         } catch (err) { alert("⚠️ FALLO: " + err.message); btn.disabled = false; }
     };
