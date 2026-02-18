@@ -8,51 +8,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --lila-bajo: #fdfaff; --lila-acento: #d8b4fe; --dark: #0f172a; }
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top, #fdfaff, #f3e8ff); 
-            color: var(--dark); 
-            min-height: 100vh;
-        }
-
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(25px); 
-            border: 1px solid rgba(216, 180, 254, 0.4); 
-            border-radius: 2.5rem; 
-            box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25);
-        }
-
-        .input-elite { 
-            width: 100%; padding: 1.1rem; border-radius: 1.2rem; 
-            border: 1px solid #e2e8f0; outline: none; transition: 0.3s; 
-            font-weight: 600; background: white; 
-        }
-        .input-elite:focus { 
-            border-color: var(--lila-acento); 
-            box-shadow: 0 0 0 4px rgba(216, 180, 254, 0.1); 
-        }
-
-        .time-pill { 
-            padding: 0.9rem; border-radius: 1.1rem; border: 1px solid #e2e8f0; 
-            text-align: center; cursor: pointer; font-weight: 800; 
-            font-size: 0.85rem; transition: 0.3s; background: white; 
-        }
-        .time-pill.selected { 
-            background: var(--dark) !important; color: white !important; 
-            transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); 
-        }
-
-        .btn-mision { 
-            width: 100%; padding: 1.3rem; border-radius: 1.5rem; 
-            background: var(--dark); color: white; font-weight: 800; 
-            text-transform: uppercase; letter-spacing: 0.15em; transition: 0.4s; 
-        }
-        .btn-mision:hover:not(:disabled) { 
-            background: var(--lila-acento); color: var(--dark); 
-            transform: translateY(-3px); 
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #fdfaff, #f3e8ff); color: var(--dark); min-height: 100vh; }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); border: 1px solid rgba(216, 180, 254, 0.4); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25); }
+        .input-elite { width: 100%; padding: 1.1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; background: white; }
+        .input-elite:focus { border-color: var(--lila-acento); box-shadow: 0 0 0 4px rgba(216, 180, 254, 0.1); }
+        .time-pill { padding: 0.9rem; border-radius: 1.1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.85rem; transition: 0.3s; background: white; }
+        .time-pill.selected { background: var(--dark) !important; color: white !important; transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); }
+        .btn-mision { width: 100%; padding: 1.3rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; transition: 0.4s; }
+        .btn-mision:hover:not(:disabled) { background: var(--lila-acento); color: var(--dark); transform: translateY(-3px); }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
@@ -88,13 +51,18 @@
     const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
     let orgId = null, consultorioId = null, horariosDoctor = [];
 
+    // --- SISTEMA DE TIEMPO (TIJUANA PRECISION) ---
     const getTjISO = () => new Intl.DateTimeFormat('fr-CA', { timeZone: 'America/Tijuana', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
     const getTjMinutes = () => {
         const tjStr = new Date().toLocaleTimeString('en-US', { timeZone: 'America/Tijuana', hour12: false });
         const [h, m] = tjStr.split(':').map(Number);
         return (h * 60) + m;
     };
-    const toMin = (t) => { const [h, m] = t.split(':').map(Number); return (h * 60) + m; };
+    const toMin = (t) => { 
+        if(!t) return 0;
+        const [h, m] = t.split(':').map(Number); 
+        return (h * 60) + m; 
+    };
 
     async function actualizarRadar() { 
         const fechaVal = document.getElementById('fecha').value; 
@@ -109,18 +77,20 @@
 
         try { 
             const { data: b } = await supabase.from('Bloqueos_Horario').select('*').eq('doctor_id', docId).eq('fecha', fechaVal);
-            if (b?.some(x => x.todo_el_dia)) {
-                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">⚠️ CERRADO: ${b.find(x => x.todo_el_dia).motivo || 'BLOQUEADO'}</p>`;
-                return;
-            }
-
             const { data: citas } = await supabase.from('Citas').select('hora_inicio, duracion_cita').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado'); 
+            
+            // CORRECCIÓN DE DÍA: Forzar lectura local de fecha
             const [y, m, d] = fechaVal.split('-').map(Number);
             const diaSemana = new Date(y, m - 1, d).getDay().toString();
-            const bloques = horariosDoctor.filter(h => h.dia_semana === diaSemana);
+            
+            // FILTRO DE BLOQUES: Comparar siempre como string
+            const bloques = horariosDoctor.filter(h => h.dia_semana.toString() === diaSemana);
             
             radar.innerHTML = ''; 
-            if (bloques.length === 0) { radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO ESTE DÍA</p>'; return; } 
+            if (bloques.length === 0) { 
+                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO ESTE DÍA</p>'; 
+                return; 
+            } 
 
             const ocupados = [
                 ...(citas?.map(c => ({ ini: toMin(c.hora_inicio), fin: toMin(c.hora_inicio) + c.duracion_cita })) || []),
@@ -136,7 +106,9 @@
                 while (actual + duracion <= limite) { 
                     const slotFin = actual + duracion;
                     const choca = ocupados.some(o => (actual >= o.ini && actual < o.fin) || (slotFin > o.ini && slotFin <= o.fin) || (actual <= o.ini && slotFin >= o.fin)); 
-                    if (!choca && !(fechaVal === hoyISO && actual <= ahoraMins)) { 
+                    const esPasada = (fechaVal === hoyISO && actual <= ahoraMins);
+
+                    if (!choca && !esPasada) { 
                         const hStr = `${Math.floor(actual/60).toString().padStart(2,'0')}:${(actual%60).toString().padStart(2,'0')}`;
                         const pill = document.createElement('div'); 
                         pill.className = 'time-pill'; pill.innerText = hStr; 
@@ -150,7 +122,7 @@
                     actual += 30; 
                 } 
             }); 
-            if (!radar.innerHTML) radar.innerHTML = '<p class="col-span-3 text-center text-rose-400 text-[10px] font-bold py-4 italic uppercase">SIN CUPOS</p>'; 
+            if (!radar.innerHTML) radar.innerHTML = '<p class="col-span-3 text-center text-rose-400 text-[10px] font-bold py-4 italic uppercase">SIN CUPOS DISPONIBLES</p>'; 
         } catch (e) { radar.innerHTML = 'ERROR DE RADAR'; } 
     } 
 
