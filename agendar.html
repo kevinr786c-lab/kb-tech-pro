@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA DE KB | AGENDADOR ELITE ✦</title>
+    <title>K.B TECH | SISTEMA ELITE v8.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --lila-bajo: #fdfaff; --lila-acento: #d8b4fe; --dark: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #fdfaff, #f3e8ff); color: var(--dark); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); border: 1px solid rgba(216, 180, 254, 0.4); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25); width: 100%; max-width: 28rem; }
-        .input-elite { width: 100%; padding: 1.1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; background: white; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #fdfaff, #f3e8ff); color: var(--dark); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); border: 1px solid rgba(216, 180, 254, 0.4); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25); width: 100%; max-width: 28rem; padding: 2rem; }
+        .input-elite { width: 100%; padding: 1.1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; background: white; margin-bottom: 1rem; }
         .time-pill { padding: 0.9rem; border-radius: 1.1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.85rem; transition: 0.3s; background: white; }
         .time-pill.selected { background: var(--dark) !important; color: white !important; transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.3rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; transition: 0.4s; }
     </style>
 </head>
-<body class="p-4">
+<body>
 
-<div class="glass-card p-8 border-2 border-white relative overflow-hidden">
+<div class="glass-card">
     <header class="text-center mb-8">
         <h1 id="doc-name" class="text-2xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">SINCRONIZANDO...</h1>
-        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">K.B TECH SOLUTIONS ✦ v7.0</p>
+        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">K.B TECH SOLUTIONS ✦ v8.5</p>
     </header>
     
-    <form id="agendador-form" class="space-y-5">
-        <input type="tel" id="telefono" placeholder="TELÉFONO" class="input-elite" maxlength="10" required>
+    <form id="agendador-form" class="space-y-4">
+        <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-elite" maxlength="10" required>
         <input type="text" id="nombre" placeholder="NOMBRE DEL PACIENTE" class="input-elite uppercase" required>
         <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
-            <option value="" disabled selected>CARGANDO ADN...</option>
+            <option value="" disabled selected>CARGANDO SERVICIOS...</option>
         </select>
         <input type="date" id="fecha" class="input-elite" required>
         <div id="radar-horas" class="grid grid-cols-3 gap-3 py-4"></div>
@@ -60,21 +60,22 @@
         if (!fechaVal || !servicioSel?.value) return; 
 
         const duracion = parseInt(servicioSel.getAttribute('data-min')) || 30;
-        radar.innerHTML = '<div class="col-span-3 text-center py-4 animate-pulse text-violet-400 font-bold text-[10px]">RADAR: ESCANEANDO...</div>'; 
+        radar.innerHTML = '<p class="col-span-3 text-center py-4 text-violet-400 font-bold text-[10px] animate-pulse">ESCANEANDO RADAR...</p>'; 
 
         try { 
             const { data: b } = await supabase.from('Bloqueos_Horario').select('*').eq('doctor_id', docId).eq('fecha', fechaVal);
             const { data: citas } = await supabase.from('Citas').select('hora_inicio, duracion_cita').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado'); 
             
-            // --- PARCHE DE CONVERSIÓN 1-7 (ELIMINA EL "CERRADO" POR ERROR) ---
-            let diaSemanaJS = new Date(fechaVal + "T00:00:00").getDay(); 
-            let diaParaDB = diaSemanaJS === 0 ? 7 : diaSemanaJS; // 0 (Dom) -> 7, 1 (Lun) -> 1, etc.
+            // --- LÓGICA DE TIEMPO BLINDADA ---
+            const diaSemanaJS = new Date(fechaVal + "T00:00:00").getDay(); 
+            const diaParaDB = diaSemanaJS === 0 ? 7 : diaSemanaJS; // Ajuste para su DB 1-7
 
+            // Filtro con conversión forzada a número
             const bloques = horariosDoctor.filter(h => Number(h.dia_semana) === diaParaDB);
             
             radar.innerHTML = ''; 
             if (bloques.length === 0) { 
-                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO (Día ${diaParaDB})</p>`; 
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">CERRADO (Día ${diaParaDB})</p>`; 
                 return; 
             } 
 
@@ -114,6 +115,7 @@
 
     async function init() { 
         document.getElementById('fecha').min = getTjISO(); 
+        // Carga de Usuario
         const { data: u } = await supabase.from('Usuarios').select('nombre, rol, organizacion_id').eq('id', docId).single(); 
         if(u) { 
             document.getElementById('doc-name').innerText = `${u.rol === 'doctor' ? 'DRA.' : 'ESPECIALISTA'} ${u.nombre.toUpperCase()}`; 
@@ -121,11 +123,17 @@
             const { data: c } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).maybeSingle();
             consultorioId = c?.id;
         } 
-        const { data: hor } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).eq('activo', true);
+        
+        // Carga de Horarios (Diagnóstico en consola)
+        const { data: hor, error: errH } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).eq('activo', true);
+        if (errH) console.error("ERROR DB HORARIOS:", errH.message);
         horariosDoctor = hor || [];
+        console.log("DATOS HORARIOS RECIBIDOS:", horariosDoctor);
+
+        // Carga de Servicios
         const { data: srv } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true); 
         const sel = document.getElementById('servicio'); 
-        sel.innerHTML = '<option value="" disabled selected>ELIJA UN SERVICIO</option>'; 
+        sel.innerHTML = '<option value="" disabled selected>ELIJA SERVICIO</option>'; 
         srv?.forEach(i => sel.innerHTML += `<option value="${i.id}" data-min="${i.duracion_min}" data-p="${i.precio}">${i.nombre.toUpperCase()}</option>`); 
     } 
 
@@ -134,7 +142,7 @@
     document.getElementById('agendador-form').onsubmit = async (e) => { 
         e.preventDefault(); 
         const hora = document.getElementById('hora_seleccionada').value; 
-        if (!hora) return alert("✦ SELECCIONE UNA HORA"); 
+        if (!hora) return alert("✦ SELECCIONE HORA"); 
         const btn = document.getElementById('confirmar-btn');
         btn.disabled = true; btn.innerText = "PROCESANDO...";
         try {
