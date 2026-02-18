@@ -8,29 +8,29 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --lila-bajo: #fdfaff; --lila-acento: #d8b4fe; --dark: #0f172a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #fdfaff, #f3e8ff); color: var(--dark); min-height: 100vh; }
-        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); border: 1px solid rgba(216, 180, 254, 0.4); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #fdfaff, #f3e8ff); color: var(--dark); }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(216, 180, 254, 0.3); border-radius: 2.5rem; }
         .input-elite { width: 100%; padding: 1.1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; background: white; }
-        .input-elite:focus { border-color: var(--lila-acento); box-shadow: 0 0 0 4px rgba(216, 180, 254, 0.1); }
         .time-pill { padding: 0.9rem; border-radius: 1.1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.85rem; transition: 0.3s; background: white; }
-        .time-pill.selected { background: var(--dark) !important; color: white !important; transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); }
+        .time-pill.selected { background: var(--dark) !important; color: white !important; transform: scale(1.05); }
         .btn-mision { width: 100%; padding: 1.3rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; transition: 0.4s; }
         .btn-mision:hover:not(:disabled) { background: var(--lila-acento); color: var(--dark); transform: translateY(-3px); }
+        .btn-mision:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-<div class="max-w-md w-full glass-card p-8 border-2 border-white relative overflow-hidden">
+<div class="max-w-md w-full glass-card p-8 shadow-2xl border-2 border-white">
     <header class="text-center mb-8">
-        <h1 id="doc-name" class="text-2xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">SINCRONIZANDO...</h1>
+        <h1 id="doc-name" class="text-2xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">CONECTANDO...</h1>
         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">K.B TECH SOLUTIONS ✦ AGENDADOR ELITE</p>
     </header>
     
     <form id="agendador-form" class="space-y-5">
         <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-elite" maxlength="10" required>
-        <input type="text" id="nombre" placeholder="NOMBRE DEL PACIENTE" class="input-elite uppercase" required>
+        <input type="text" id="nombre" placeholder="NOMBRE DE LA PACIENTE" class="input-elite uppercase" required>
         <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
-            <option value="" disabled selected>CARGANDO ADN...</option>
+            <option value="" disabled selected>CARGANDO SERVICIOS...</option>
         </select>
         <input type="date" id="fecha" class="input-elite" required>
         
@@ -47,71 +47,90 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'; 
     const supabase = createClient('https://ctvqjnckxmqeejbfwmkj.supabase.co', 'sb_publishable__JScNe1oUvVbV4Vww69CLg_6EasQg3w'); 
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('docId') || '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
-    let orgId = null, consultorioId = null, horariosDoctor = [];
+    const docId = '8a4cf0e6-ddf8-4a95-9bba-4d4d094ad985'; 
+    let orgId = null; let consultorioId = null; 
+    const horariosFijos = { 
+        "1": [{ inicio: "09:00", fin: "12:30" }], 
+        "2": [{ inicio: "09:00", fin: "12:30" }], 
+        "3": [{ inicio: "09:00", fin: "12:30" }], 
+        "4": [{ inicio: "09:00", fin: "12:30" }], 
+        "5": [{ inicio: "09:00", fin: "12:30" }], 
+        "6": [{ inicio: "09:00", fin: "14:30" }] 
+    }; 
 
-    // --- SISTEMA DE TIEMPO (TIJUANA PRECISION) ---
-    const getTjISO = () => new Intl.DateTimeFormat('fr-CA', { timeZone: 'America/Tijuana', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-    const getTjMinutes = () => {
-        const tjStr = new Date().toLocaleTimeString('en-US', { timeZone: 'America/Tijuana', hour12: false });
-        const [h, m] = tjStr.split(':').map(Number);
-        return (h * 60) + m;
-    };
-    const toMin = (t) => { 
-        if(!t) return 0;
-        const [h, m] = t.split(':').map(Number); 
-        return (h * 60) + m; 
-    };
+    function getTijuanaDate() { return new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Tijuana' }); } 
 
     async function actualizarRadar() { 
         const fechaVal = document.getElementById('fecha').value; 
         const radar = document.getElementById('radar-horas'); 
         const servicioSel = document.getElementById('servicio').selectedOptions[0];
+        
         document.getElementById('hora_seleccionada').value = "";
         
-        if (!fechaVal || !servicioSel?.value) return; 
+        if (!fechaVal || !servicioSel.value) return; 
 
-        const duracion = parseInt(servicioSel.getAttribute('data-min')) || 30;
+        const duracionServicio = parseInt(servicioSel.getAttribute('data-min')) || 30;
         radar.innerHTML = '<div class="col-span-3 text-center py-4 animate-pulse text-violet-400 font-bold text-[10px]">RADAR: ESCANEANDO DISPONIBILIDAD...</div>'; 
 
         try { 
-            const { data: b } = await supabase.from('Bloqueos_Horario').select('*').eq('doctor_id', docId).eq('fecha', fechaVal);
-            const { data: citas } = await supabase.from('Citas').select('hora_inicio, duracion_cita').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado'); 
+            // 1. OBTENER BLOQUEOS (Parciales y Totales)
+            const { data: bloqueos } = await supabase.from('Bloqueos_Horario').select('*').eq('doctor_id', docId).eq('fecha', fechaVal);
             
-            // CORRECCIÓN DE DÍA: Forzar lectura local de fecha
-            const [y, m, d] = fechaVal.split('-').map(Number);
-            const diaSemana = new Date(y, m - 1, d).getDay().toString();
-            
-            // FILTRO DE BLOQUES: Comparar siempre como string
-            const bloques = horariosDoctor.filter(h => h.dia_semana.toString() === diaSemana);
-            
-            radar.innerHTML = ''; 
-            if (bloques.length === 0) { 
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO ESTE DÍA</p>'; 
-                return; 
-            } 
+            if (bloqueos?.some(b => b.todo_el_dia)) {
+                const b = bloqueos.find(b => b.todo_el_dia);
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">⚠️ CERRADO: ${b.motivo || 'DIA BLOQUEADO'}</p>`;
+                return;
+            }
 
-            const ocupados = [
-                ...(citas?.map(c => ({ ini: toMin(c.hora_inicio), fin: toMin(c.hora_inicio) + c.duracion_cita })) || []),
-                ...(b?.filter(x => !x.todo_el_dia).map(x => ({ ini: toMin(x.hora_inicio), fin: toMin(x.hora_fin) })) || [])
+            // 2. OBTENER CITAS OCUPADAS
+            const { data: ocupadas } = await supabase.from('Citas').select('hora_inicio, duracion_cita').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado'); 
+            
+            // 3. MAPEO UNIFICADO DE OCUPACIÓN (Citas + Bloqueos Parciales)
+            // Usamos formato ISO 2026-01-01T para máxima compatibilidad
+            const baseDate = "2026-01-01T";
+            const rangosOcupados = [
+                ...(ocupadas?.map(c => ({
+                    inicio: new Date(`${baseDate}${c.hora_inicio}`),
+                    fin: new Date(new Date(`${baseDate}${c.hora_inicio}`).getTime() + c.duracion_cita * 60000)
+                })) || []),
+                ...(bloqueos?.filter(b => !b.todo_el_dia).map(b => ({
+                    inicio: new Date(`${baseDate}${b.hora_inicio || '00:00'}`),
+                    fin: new Date(`${baseDate}${b.hora_fin || '23:59'}`)
+                })) || [])
             ];
 
-            const hoyISO = getTjISO();
-            const ahoraMins = getTjMinutes();
+            const hoyTj = getTijuanaDate(); 
+            const esHoy = fechaVal === hoyTj; 
+            const ahoraTj = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Tijuana"})); 
+            const diaSemana = new Date(fechaVal.split('-').join('/')).getDay().toString(); 
+            const bloquesConsultorio = horariosFijos[diaSemana]; 
 
-            bloques.forEach(blq => { 
-                let actual = toMin(blq.hora_inicio);
-                const limite = toMin(blq.hora_fin);
-                while (actual + duracion <= limite) { 
-                    const slotFin = actual + duracion;
-                    const choca = ocupados.some(o => (actual >= o.ini && actual < o.fin) || (slotFin > o.ini && slotFin <= o.fin) || (actual <= o.ini && slotFin >= o.fin)); 
-                    const esPasada = (fechaVal === hoyISO && actual <= ahoraMins);
+            radar.innerHTML = ''; 
+            if (!bloquesConsultorio) { radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO</p>'; return; } 
 
-                    if (!choca && !esPasada) { 
-                        const hStr = `${Math.floor(actual/60).toString().padStart(2,'0')}:${(actual%60).toString().padStart(2,'0')}`;
+            bloquesConsultorio.forEach(bloque => { 
+                let actual = new Date(`${baseDate}${bloque.inicio}`); 
+                let limite = new Date(`${baseDate}${bloque.fin}`); 
+                
+                while (actual < limite) { 
+                    const hStr = actual.toTimeString().substring(0, 5); 
+                    const tInicio = new Date(actual);
+                    const tFin = new Date(tInicio.getTime() + duracionServicio * 60000);
+
+                    const cabeEnBloque = tFin <= limite;
+                    const chocaConAlgo = rangosOcupados.some(r => 
+                        (tInicio >= r.inicio && tInicio < r.fin) || 
+                        (tFin > r.inicio && tFin <= r.fin) ||
+                        (tInicio <= r.inicio && tFin >= r.fin)
+                    ); 
+                    
+                    const [ranuraH, ranuraM] = hStr.split(':'); 
+                    const horaEsPasada = esHoy && (parseInt(ranuraH) < ahoraTj.getHours() || (parseInt(ranuraH) === ahoraTj.getHours() && parseInt(ranuraM) <= ahoraTj.getMinutes())); 
+
+                    if (!chocaConAlgo && !horaEsPasada && cabeEnBloque) { 
                         const pill = document.createElement('div'); 
-                        pill.className = 'time-pill'; pill.innerText = hStr; 
+                        pill.className = 'time-pill'; 
+                        pill.innerText = hStr; 
                         pill.onclick = () => { 
                             document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected')); 
                             pill.classList.add('selected'); 
@@ -119,54 +138,85 @@
                         }; 
                         radar.appendChild(pill); 
                     } 
-                    actual += 30; 
+                    actual.setMinutes(actual.getMinutes() + 30); 
                 } 
             }); 
             if (!radar.innerHTML) radar.innerHTML = '<p class="col-span-3 text-center text-rose-400 text-[10px] font-bold py-4 italic uppercase">SIN CUPOS DISPONIBLES</p>'; 
-        } catch (e) { radar.innerHTML = 'ERROR DE RADAR'; } 
+        } catch (e) { radar.innerHTML = 'ERROR DE CONEXIÓN'; } 
     } 
 
     async function init() { 
-        document.getElementById('fecha').min = getTjISO(); 
-        const { data: u } = await supabase.from('Usuarios').select('nombre, rol, organizacion_id').eq('id', docId).single(); 
+        document.getElementById('fecha').min = getTijuanaDate(); 
+        const { data: u } = await supabase.from('Usuarios').select('nombre, organizacion_id').eq('id', docId).single(); 
         if(u) { 
-            document.getElementById('doc-name').innerText = `${u.rol === 'doctor' ? 'DRA.' : 'ESPECIALISTA'} ${u.nombre.toUpperCase()}`; 
+            document.getElementById('doc-name').innerText = `DRA. ${u.nombre.toUpperCase()}`; 
             orgId = u.organizacion_id; 
-            const { data: c } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).maybeSingle();
-            consultorioId = c?.id;
+            if(orgId) { 
+                const { data: c } = await supabase.from('consultorios').select('id').eq('organizacion_id', orgId).limit(1).maybeSingle(); 
+                if(c) consultorioId = c.id; 
+            } 
         } 
-        const { data: hor } = await supabase.from('Horarios_Doctor').select('*').eq('doctor_id', docId).eq('activo', true);
-        horariosDoctor = hor || [];
-        const { data: srv } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true); 
+        const { data: s } = await supabase.from('Servicios').select('*').eq('doctor_id', docId).eq('activo', true); 
         const sel = document.getElementById('servicio'); 
         sel.innerHTML = '<option value="" disabled selected>ELIJA UN SERVICIO</option>'; 
-        srv?.forEach(i => sel.innerHTML += `<option value="${i.id}" data-min="${i.duracion_min}" data-p="${i.precio}">${i.nombre.toUpperCase()}</option>`); 
+        s?.forEach(item => { 
+            sel.innerHTML += `<option value="${item.id}" data-min="${item.duracion_min}" data-p="${item.precio}">${item.nombre.toUpperCase()}</option>`; 
+        }); 
     } 
+
+    window.onfocus = () => { 
+        document.getElementById('fecha').min = getTijuanaDate();
+        actualizarRadar(); 
+    };
 
     document.getElementById('fecha').onchange = actualizarRadar; 
     document.getElementById('servicio').onchange = actualizarRadar;
+
     document.getElementById('agendador-form').onsubmit = async (e) => { 
         e.preventDefault(); 
+        const rawNombre = document.getElementById('nombre').value;
+        const tel = document.getElementById('telefono').value.replace(/\D/g, ''); 
+        const fecha = document.getElementById('fecha').value;
         const hora = document.getElementById('hora_seleccionada').value; 
-        if (!hora) return alert("✦ SELECCIONE UNA HORA"); 
-        const btn = document.getElementById('confirmar-btn');
-        btn.disabled = true; btn.innerText = "PROCESANDO...";
-        try {
-            const tel = document.getElementById('telefono').value.replace(/\D/g, '');
+
+        const nombreLimpio = rawNombre.replace(/[<>]/g, "").trim().toUpperCase();
+        if (nombreLimpio.length < 3) return alert("✦ INGRESE UN NOMBRE VÁLIDO");
+        if (tel.length !== 10) return alert("✦ EL TELÉFONO DEBE TENER 10 DÍGITOS"); 
+        if (!hora) return alert("✦ SELECCIONE UNA HORA EN EL RADAR"); 
+        if (fecha < getTijuanaDate()) return alert("✦ NO SE PUEDE AGENDAR EN DÍAS PASADOS"); 
+
+        const btn = document.getElementById('confirmar-btn'); 
+        btn.disabled = true; 
+        btn.innerText = "BLOQUEANDO TURNO..."; 
+
+        try { 
             let { data: pac } = await supabase.from('Pacientes').select('id').eq('telefono', tel).maybeSingle(); 
             if(!pac) { 
-                const { data: nP } = await supabase.from('Pacientes').insert([{ nombre: document.getElementById('nombre').value.toUpperCase(), telefono: tel }]).select().single(); 
+                const { data: nP, error: ePac } = await supabase.from('Pacientes').insert([{ nombre: nombreLimpio, telefono: tel }]).select().single(); 
+                if(ePac || !nP) throw new Error("Fallo al registrar paciente"); 
                 pac = nP; 
             } 
+
             const s = document.getElementById('servicio').selectedOptions[0]; 
-            const { error } = await supabase.from('Citas').insert([{ 
-                doctor_id: docId, paciente_id: pac.id, servicio_id: s.value, fecha: document.getElementById('fecha').value, hora_inicio: hora, 
-                duracion_cita: parseInt(s.getAttribute('data-min')), monto: parseFloat(s.getAttribute('data-p')), 
+            const { error: eCita } = await supabase.from('Citas').insert([{ 
+                doctor_id: docId, paciente_id: pac.id, servicio_id: s.value, fecha: fecha, hora_inicio: hora, 
+                duracion_cita: parseInt(s.getAttribute('data-min')) || 30, monto: parseFloat(s.getAttribute('data-p')) || 0, 
                 estado: 'pendiente', organizacion_id: orgId, consultorio_id: consultorioId 
             }]); 
-            if(error) throw error;
-            alert("✅ CITA CONFIRMADA"); location.reload(); 
-        } catch (err) { alert("⚠️ " + err.message); btn.disabled = false; btn.innerText = "ASEGURAR CITA ✦"; }
+            
+            if(eCita) {
+                if(eCita.code === '23505') throw new Error("¡LO SENTIMOS! Este turno acaba de ser reservado por alguien más.");
+                throw eCita;
+            }
+
+            alert("✅ CITA CONFIRMADA EXITOSAMENTE"); 
+            location.reload(); 
+        } catch (err) { 
+            alert("⚠️ " + err.message); 
+            btn.disabled = false; 
+            btn.innerText = "ASEGURAR CITA ✦"; 
+            actualizarRadar();
+        } 
     }; 
     init(); 
 </script>
