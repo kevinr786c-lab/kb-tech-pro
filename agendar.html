@@ -8,56 +8,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap');
         :root { --lila-bajo: #fdfaff; --lila-acento: #d8b4fe; --dark: #0f172a; }
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top, #fdfaff, #f3e8ff); 
-            color: var(--dark); 
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(25px); 
-            border: 1px solid rgba(216, 180, 254, 0.4); 
-            border-radius: 2.5rem; 
-            box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25);
-            width: 100%;
-            max-width: 28rem;
-        }
-
-        .input-elite { 
-            width: 100%; padding: 1.1rem; border-radius: 1.2rem; 
-            border: 1px solid #e2e8f0; outline: none; transition: 0.3s; 
-            font-weight: 600; background: white; 
-        }
-        .input-elite:focus { 
-            border-color: var(--lila-acento); 
-            box-shadow: 0 0 0 4px rgba(216, 180, 254, 0.1); 
-        }
-
-        .time-pill { 
-            padding: 0.9rem; border-radius: 1.1rem; border: 1px solid #e2e8f0; 
-            text-align: center; cursor: pointer; font-weight: 800; 
-            font-size: 0.85rem; transition: 0.3s; background: white; 
-        }
-        .time-pill.selected { 
-            background: var(--dark) !important; color: white !important; 
-            transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); 
-        }
-
-        .btn-mision { 
-            width: 100%; padding: 1.3rem; border-radius: 1.5rem; 
-            background: var(--dark); color: white; font-weight: 800; 
-            text-transform: uppercase; letter-spacing: 0.15em; transition: 0.4s; 
-        }
-        .btn-mision:hover:not(:disabled) { 
-            background: var(--lila-acento); color: var(--dark); 
-            transform: translateY(-3px); 
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, #fdfaff, #f3e8ff); color: var(--dark); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); border: 1px solid rgba(216, 180, 254, 0.4); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(216, 180, 254, 0.25); width: 100%; max-width: 28rem; }
+        .input-elite { width: 100%; padding: 1.1rem; border-radius: 1.2rem; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-weight: 600; background: white; }
+        .time-pill { padding: 0.9rem; border-radius: 1.1rem; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; font-weight: 800; font-size: 0.85rem; transition: 0.3s; background: white; }
+        .time-pill.selected { background: var(--dark) !important; color: white !important; transform: scale(1.05); }
+        .btn-mision { width: 100%; padding: 1.3rem; border-radius: 1.5rem; background: var(--dark); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; transition: 0.4s; }
     </style>
 </head>
 <body class="p-4">
@@ -65,23 +21,17 @@
 <div class="glass-card p-8 border-2 border-white relative overflow-hidden">
     <header class="text-center mb-8">
         <h1 id="doc-name" class="text-2xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">SINCRONIZANDO...</h1>
-        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">K.B TECH SOLUTIONS ✦ AGENDADOR ELITE</p>
+        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 italic">K.B TECH SOLUTIONS ✦ v7.0</p>
     </header>
     
     <form id="agendador-form" class="space-y-5">
-        <input type="tel" id="telefono" placeholder="TELÉFONO (10 DÍGITOS)" class="input-elite" maxlength="10" required>
+        <input type="tel" id="telefono" placeholder="TELÉFONO" class="input-elite" maxlength="10" required>
         <input type="text" id="nombre" placeholder="NOMBRE DEL PACIENTE" class="input-elite uppercase" required>
-        
         <select id="servicio" class="input-elite text-xs uppercase font-bold" required>
             <option value="" disabled selected>CARGANDO ADN...</option>
         </select>
-        
         <input type="date" id="fecha" class="input-elite" required>
-        
-        <div id="radar-horas" class="grid grid-cols-3 gap-3 py-4">
-            <p class="col-span-3 text-center text-slate-400 text-[10px] uppercase font-bold italic">Seleccione fecha y servicio</p>
-        </div>
-        
+        <div id="radar-horas" class="grid grid-cols-3 gap-3 py-4"></div>
         <input type="hidden" id="hora_seleccionada">
         <button type="submit" id="confirmar-btn" class="btn-mision">ASEGURAR CITA ✦</button>
     </form>
@@ -107,8 +57,6 @@
         const fechaVal = document.getElementById('fecha').value; 
         const radar = document.getElementById('radar-horas'); 
         const servicioSel = document.getElementById('servicio').selectedOptions[0];
-        document.getElementById('hora_seleccionada').value = "";
-        
         if (!fechaVal || !servicioSel?.value) return; 
 
         const duracion = parseInt(servicioSel.getAttribute('data-min')) || 30;
@@ -118,13 +66,15 @@
             const { data: b } = await supabase.from('Bloqueos_Horario').select('*').eq('doctor_id', docId).eq('fecha', fechaVal);
             const { data: citas } = await supabase.from('Citas').select('hora_inicio, duracion_cita').eq('doctor_id', docId).eq('fecha', fechaVal).neq('estado', 'cancelado'); 
             
-            // --- FIX DE DÍA Y TIPO ---
-            const diaSemanaNum = new Date(fechaVal + "T00:00:00").getDay();
-            const bloques = horariosDoctor.filter(h => Number(h.dia_semana) === diaSemanaNum);
+            // --- PARCHE DE CONVERSIÓN 1-7 (ELIMINA EL "CERRADO" POR ERROR) ---
+            let diaSemanaJS = new Date(fechaVal + "T00:00:00").getDay(); 
+            let diaParaDB = diaSemanaJS === 0 ? 7 : diaSemanaJS; // 0 (Dom) -> 7, 1 (Lun) -> 1, etc.
+
+            const bloques = horariosDoctor.filter(h => Number(h.dia_semana) === diaParaDB);
             
             radar.innerHTML = ''; 
             if (bloques.length === 0) { 
-                radar.innerHTML = '<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO ESTE DÍA</p>'; 
+                radar.innerHTML = `<p class="col-span-3 text-center text-rose-500 text-[10px] font-bold py-4 italic uppercase">SISTEMA: CERRADO (Día ${diaParaDB})</p>`; 
                 return; 
             } 
 
@@ -158,7 +108,7 @@
                     actual += 30; 
                 } 
             }); 
-            if (!radar.innerHTML) radar.innerHTML = '<p class="col-span-3 text-center text-rose-400 text-[10px] font-bold py-4 italic uppercase">SIN CUPOS</p>'; 
+            if (!radar.innerHTML) radar.innerHTML = '<p class="col-span-3 text-center text-rose-400 text-[10px] font-bold py-4">SIN CUPOS</p>'; 
         } catch (e) { radar.innerHTML = 'ERROR DE RADAR'; } 
     } 
 
