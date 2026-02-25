@@ -216,7 +216,7 @@ document.getElementById('loginForm').onsubmit = async (e) => {
         if (error) throw error;
 
         // 2. BUSCAR PERFIL EN TABLA USUARIOS (Usando el correo si el ID falla)
-        const { data: usuario, error: userError } = await supabase
+        let { data: usuario, error: userError } = await supabase
             .from('Usuarios')
             .select('*')
             .eq('email', emailVal.toLowerCase()) // Buscamos por correo para ser infalibles
